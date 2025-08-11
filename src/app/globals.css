@@ -1,0 +1,39 @@
+
+/**
+ * @file globals.css
+ * @description Estilos globales. Importa las variables de tema generadas
+ *              automáticamente y establece las capas base de Tailwind CSS.
+ * @author Metashark (Refactorizado por L.I.A Legacy)
+ * @version 9.0.0 (Programmatic Theme)
+ */
+@import "./theme-variables.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+}
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Conexão do Sistema de Design**: ((Implementada)) Este aparato importa `theme-variables.css`, completando a conexão entre a SSoT em `styles/theme.ts` e a aplicação global de estilos.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Estilos de Tipografia Base**: ((Vigente)) Considerar adicionar estilos base para elementos tipográficos (h1, h2, p, a) dentro do `@layer base` para uma consistência tipográfica ainda maior, se não for gerenciado por um plugin.
+ *
+ * =====================================================================
+ */

@@ -1,0 +1,8 @@
+onlyBuiltDependencies:
+  - '@sentry/cli'
+  - '@tailwindcss/oxide'
+  - esbuild
+  - msw
+  - sharp
+  - supabase
+  - unrs-resolver
