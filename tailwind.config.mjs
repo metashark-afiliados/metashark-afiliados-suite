@@ -2,7 +2,7 @@
 /**
  * @file tailwind.config.mjs
  * @description Configuración canónica y de élite de Tailwind CSS. Ha sido
- *              nivelada para consumir la Única Fuente de Verdad desde
+ *              nivelado para consumir la Única Fuente de Verdad desde
  *              `src/app/globals.css`, alineándose con la arquitectura de
  *              Tailwind CSS v4.1 y garantizando una consistencia de diseño
  *              absoluta.
@@ -69,43 +69,6 @@ const config = {
       fontFamily: {
         sans: ["var(--font-geist-sans)", ...defaultTheme.fontFamily.sans],
       },
-      typography: (theme) => ({
-        DEFAULT: {
-          css: {
-            "--tw-prose-body": "hsl(var(--color-foreground) / 0.8)",
-            "--tw-prose-headings": "hsl(var(--color-foreground))",
-            "--tw-prose-lead": "hsl(var(--color-muted-foreground))",
-            "--tw-prose-links": "hsl(var(--color-primary))",
-            "--tw-prose-bold": "hsl(var(--color-foreground))",
-            "--tw-prose-counters": "hsl(var(--color-muted-foreground))",
-            "--tw-prose-bullets": "hsl(var(--color-border))",
-            "--tw-prose-hr": "hsl(var(--color-border))",
-            "--tw-prose-quotes": "hsl(var(--color-foreground))",
-            "--tw-prose-quote-borders": "hsl(var(--color-border))",
-            "--tw-prose-captions": "hsl(var(--color-muted-foreground))",
-            "--tw-prose-code": "hsl(var(--color-foreground))",
-            "--tw-prose-pre-code": "hsl(var(--color-foreground))",
-            "--tw-prose-pre-bg": "hsl(var(--color-muted))",
-            "--tw-prose-invert-body": "hsl(var(--color-foreground) / 0.7)",
-            "--tw-prose-invert-headings": "hsl(var(--color-foreground))",
-            "--tw-prose-invert-links": "hsl(var(--color-primary))",
-            "--tw-prose-invert-bold": "hsl(var(--color-foreground))",
-            "--tw-prose-invert-quotes": "hsl(var(--color-foreground))",
-            "--tw-prose-invert-pre-bg": "hsl(var(--color-card))",
-            p: { marginTop: "1.25em", marginBottom: "1.25em" },
-            h2: {
-              marginTop: "2em",
-              marginBottom: "1em",
-              fontWeight: "700",
-            },
-            h3: {
-              marginTop: "1.6em",
-              marginBottom: "0.6em",
-              fontWeight: "600",
-            },
-          },
-        },
-      }),
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -142,11 +105,11 @@ export default config;
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica Definitiva**: ((Implementada)) Se ha refactorizado la sección `theme.extend.colors` para que consuma las variables CSS definidas en `globals.css`. Esta es la corrección final que resuelve el blocker de compilación.
- * 2. **Cero Regresiones de Plugins**: ((Implementada)) Se ha preservado intacta toda la configuración de `plugins` y la personalización de `typography` del archivo original, garantizando que no se pierda ninguna funcionalidad.
+ * 1. **Alineación Arquitectónica Definitiva**: ((Implementada)) Se ha refactorizado la sección `theme.extend.colors` para que consuma las variables CSS definidas en `globals.css`. Esta es la corrección fundamental que resuelve el blocker de compilación.
+ * 2. **Cero Regresiones de Plugins**: ((Implementada)) Se ha preservado intacta toda la configuración de `plugins` del archivo original.
  *
  * @subsection Melhorias Futuras
- * 1. **Plugin de Tema Programático**: ((Vigente)) Para una solución aún más DRY, la lógica de `generateTailwindColors` del snapshot primitivo podría adaptarse para crear un plugin de Tailwind que genere esta sección `colors` automáticamente a partir de un objeto de configuración.
+ * 1. **Plugin de Tema Programático**: ((Vigente)) La lógica para generar esta sección `colors` podría ser abstraída a un plugin local de Tailwind para un enfoque aún más DRY.
  *
  * =====================================================================
  */

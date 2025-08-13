@@ -1,0 +1,32 @@
+{
+  "en-US": {
+    "email_label": "Email Address",
+    "password_label": "Password",
+    "forgotten_password": {
+      "link_text": "Forgot your password?"
+    },
+    "common": {
+      "loading_button_label": "Loading..."
+    }
+  },
+  "es-ES": {
+    "email_label": "Dirección de correo electrónico",
+    "password_label": "Contraseña",
+    "forgotten_password": {
+      "link_text": "¿Olvidaste tu contraseña?"
+    },
+    "common": {
+      "loading_button_label": "Cargando..."
+    }
+  },
+  "pt-BR": {
+    "email_label": "Endereço de e-mail",
+    "password_label": "Senha",
+    "forgotten_password": {
+      "link_text": "Esqueceu sua senha?"
+    },
+    "common": {
+      "loading_button_label": "Carregando..."
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "en-US": {
+    "selectLanguage_sr": "Select language",
+    "language_en_US": "English",
+    "flag_en_US": "🇺🇸",
+    "language_es_ES": "Spanish",
+    "flag_es_ES": "🇪🇸",
+    "language_pt_BR": "Portuguese",
+    "flag_pt_BR": "🇧🇷"
+  },
+  "es-ES": {
+    "selectLanguage_sr": "Seleccionar idioma",
+    "language_en_US": "Inglés",
+    "flag_en_US": "🇺🇸",
+    "language_es_ES": "Español",
+    "flag_es_ES": "🇪🇸",
+    "language_pt_BR": "Portugués",
+    "flag_pt_BR": "🇧🇷"
+  },
+  "pt-BR": {
+    "selectLanguage_sr": "Selecionar idioma",
+    "language_en_US": "Inglês",
+    "flag_en_US": "🇺🇸",
+    "language_es_ES": "Espanhol",
+    "flag_es_ES": "🇪🇸",
+    "language_pt_BR": "Português",
+    "flag_pt_BR": "🇧🇷"
+  }
+}

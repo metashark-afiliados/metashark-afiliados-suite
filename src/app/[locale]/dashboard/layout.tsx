@@ -1,10 +1,12 @@
+// src/app/[locale]/dashboard/layout.tsx
 /**
  * @file src/app/[locale]/dashboard/layout.tsx
  * @description Layout principal del dashboard. Nivelado a un estándar de élite,
- *              ahora envuelve el contenido de la página en un Error Boundary para
- *              una máxima resiliencia de la UI.
+ *              se ha eliminado la modificación ilegal de cookies para cumplir con
+ *              las reglas de Next.js. Ahora actúa como un lector puro del estado
+ *              de la sesión para proveer el contexto a los componentes cliente.
  * @author Raz Podestá
- * @version 3.1.0
+ * @version 3.2.0
  */
 import React from "react";
 import { unstable_cache as cache } from "next/cache";
@@ -16,7 +18,7 @@ import { CommandPalette } from "@/components/feedback/CommandPalette";
 import { LiaChatWidget } from "@/components/feedback/LiaChatWidget";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-import { ErrorBoundary } from "@/components/shared/ErrorBoundary"; // <-- MEJORA
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { DashboardProvider } from "@/lib/context/DashboardContext";
 import { modules as modulesData, notifications, workspaces } from "@/lib/data";
 import { logger } from "@/lib/logging";
@@ -26,7 +28,6 @@ import { type Tables } from "@/lib/types/database";
 type Workspace = Tables<"workspaces">;
 
 async function getLayoutData() {
-  // ... (lógica de getLayoutData sin cambios)
   const cookieStore = cookies();
   const supabase = createClient();
   const {
@@ -75,14 +76,11 @@ async function getLayoutData() {
   ) {
     activeWorkspace = userWorkspaces.find((ws) => ws.id === activeWorkspaceId)!;
   } else if (userWorkspaces.length > 0) {
+    // Si no hay cookie, se selecciona el primero como activo para ESTE RENDER,
+    // pero ya NO se escribe la cookie aquí.
     activeWorkspace = userWorkspaces[0];
-    cookies().set("active_workspace_id", activeWorkspace.id, {
-      path: "/",
-      httpOnly: true,
-      sameSite: "lax",
-    });
     logger.info(
-      `[DashboardLayout] No hay workspace activo. Estableciendo por defecto: ${activeWorkspace.id}`
+      `[DashboardLayout] No hay cookie de workspace activo. Usando por defecto para render: ${activeWorkspace.id}`
     );
   }
 
@@ -90,6 +88,7 @@ async function getLayoutData() {
     logger.warn(
       `[DashboardLayout] No se pudo determinar el workspace activo para ${user.id}. Redirigiendo.`
     );
+    // Este caso puede ocurrir si un usuario tiene invitaciones pero no workspaces.
     return redirect("/welcome");
   }
 
@@ -108,6 +107,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const layoutData = await getLayoutData();
+  // El redirect() dentro de getLayoutData maneja los casos nulos.
   if (!layoutData) return null;
 
   return (
@@ -133,10 +133,12 @@ export default async function DashboardLayout({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resiliencia de UI (Error Boundary)**: ((Implementada)) El contenido de la página (`children`) ahora está envuelto en un `ErrorBoundary`. Si una página anidada (ej. `/dashboard/sites`) falla durante el renderizado en el cliente, el layout principal no se romperá. En su lugar, se mostrará una UI de fallback con la opción de recargar, mejorando drásticamente la robustez de la aplicación.
+ * 1. **Resolución de Error de Runtime Crítico**: ((Implementada)) Se ha eliminado la llamada ilegal a `cookies().set()`, resolviendo el `Unhandled Runtime Error` que impedía el acceso al dashboard.
+ * 2. **Cumplimiento de Arquitectura Next.js**: ((Implementada)) El componente ahora es una función de renderizado pura, cumpliendo con las reglas de los Server Components y eliminando efectos secundarios impredecibles.
  *
  * @subsection Melhorias Futuras
- * 1. **Fallbacks de Error Contextuales**: ((Vigente)) El `ErrorBoundary` podría aceptar una prop `fallback` para permitir que diferentes secciones de la aplicación muestren mensajes de error más específicos y contextuales.
+ * 1. **Abstracción de Lógica de Datos**: ((Vigente)) La función `getLayoutData` podría ser movida a su propio módulo en `lib/data` para una mayor atomicidad y reutilización si otros layouts la necesitaran.
  *
  * =====================================================================
  */
+// src/app/[locale]/dashboard/layout.tsx

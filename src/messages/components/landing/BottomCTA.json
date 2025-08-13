@@ -1,0 +1,50 @@
+{
+  "en-US": {
+    "title": "Ready to Skyrocket Your Conversions?",
+    "subtitle": "Join thousands of elite affiliates who are building faster, converting higher, and scaling their business with ConvertiKit.",
+    "featuresTitle": "Get started with everything you need:",
+    "features": [
+      "AI-Powered Landing Page Builder",
+      "High-Performance Hosting Included",
+      "Advanced Analytics & Tracking",
+      "Unlimited Campaigns"
+    ],
+    "ctaPrimaryText": "Get Started for Free",
+    "ctaPlaceholderText": "Enter your email",
+    "pricingNote": "Free Forever. No credit card required.",
+    "guaranteeNote": "100% Satisfaction Guarantee.",
+    "creditCardNote": "No credit card required."
+  },
+  "es-ES": {
+    "title": "¿Listo para Disparar tus Conversiones?",
+    "subtitle": "Únete a miles de afiliados de élite que construyen más rápido, convierten más y escalan su negocio con ConvertiKit.",
+    "featuresTitle": "Empieza con todo lo que necesitas:",
+    "features": [
+      "Constructor de Landing Pages con IA",
+      "Hosting de Alto Rendimiento Incluido",
+      "Analíticas y Seguimiento Avanzados",
+      "Campañas Ilimitadas"
+    ],
+    "ctaPrimaryText": "Empezar Gratis",
+    "ctaPlaceholderText": "Introduce tu correo electrónico",
+    "pricingNote": "Gratis para Siempre. No se requiere tarjeta de crédito.",
+    "guaranteeNote": "Garantía de Satisfacción del 100%.",
+    "creditCardNote": "No se requiere tarjeta."
+  },
+  "pt-BR": {
+    "title": "Pronto para Disparar suas Conversões?",
+    "subtitle": "Junte-se a milhares de afiliados de elite que constroem mais rápido, convertem mais e escalam seus negócios com o ConvertiKit.",
+    "featuresTitle": "Comece com tudo que você precisa:",
+    "features": [
+      "Construtor de Landing Pages com IA",
+      "Hospedagem de Alta Performance Inclusa",
+      "Análises e Rastreamento Avançados",
+      "Campanhas Ilimitadas"
+    ],
+    "ctaPrimaryText": "Comece de Graça",
+    "ctaPlaceholderText": "Digite seu e-mail",
+    "pricingNote": "Grátis para Sempre. Não é necessário cartão de crédito.",
+    "guaranteeNote": "Garantia de Satisfação de 100%.",
+    "creditCardNote": "Sem cartão de crédito."
+  }
+}

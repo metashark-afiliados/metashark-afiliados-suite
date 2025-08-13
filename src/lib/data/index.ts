@@ -1,3 +1,4 @@
+// src/lib/data/index.ts
 /**
  * @file src/lib/data/index.ts
  * @description Manifiesto de la Capa de Datos (Barrel File). Ha sido sincronizado
@@ -7,12 +8,8 @@
  * @author Raz Podestá
  * @version 2.0.0
  */
-
 export * as admin from "./admin";
-// --- CORRECCIÓN ARQUITECTÓNICA ---
-// Ahora apunta al nuevo manifiesto del módulo de campañas.
 export * as campaignsData from "./campaigns";
-// --- FIN DE CORRECCIÓN ---
 export * as invitations from "./invitations";
 export * as modules from "./modules";
 export * as notifications from "./notifications";
@@ -30,3 +27,4 @@ export * as workspaces from "./workspaces";
  *
  * =====================================================================
  */
+// src/lib/data/index.ts

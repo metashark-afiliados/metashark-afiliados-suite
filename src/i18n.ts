@@ -1,49 +1,70 @@
 // src/i18n.ts
 /**
  * @file src/i18n.ts
- * @description Orquestador de configuración para `next-intl`. Carga dinámicamente
- *              el archivo de mensajes consolidado para el locale de la petición actual.
- *              Esta es la SSoT para la obtención de mensajes en el servidor. Ha sido
- *              actualizado para establecer 'es-ES' como el idioma por defecto.
- * @author L.I.A. Legacy
- * @version 3.1.0
+ * @description Orquestador de Internacionalización de Élite (Arquitectura IMAS Híbrida).
+ *              Ha sido nivelado a un estándar de élite con tipado explícito,
+ *              eliminando todos los `any` implícitos y resolviendo los errores
+ *              de compilación.
+ * @author Raz Podestá
+ * @version 5.1.0
  */
 import { getRequestConfig } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { logger } from "@/lib/logging";
 import { type AppLocale, locales } from "@/lib/navigation";
+import { messagesManifest } from "@/messages/manifest";
+import { type MessageModule } from "@/messages/types";
 
-// Define un locale por defecto explícito y canónico para toda la aplicación.
 export const defaultLocale: AppLocale = "es-ES";
 
 export default getRequestConfig(async ({ locale }) => {
   const typedLocale = locale as AppLocale;
 
   if (!locales.includes(typedLocale)) {
-    logger.warn(
-      `[I18N Orquestador] Intento de acceso con un locale inválido: "${locale}".`
-    );
     notFound();
   }
 
-  return {
-    messages: (await import(`./messages/${locale}.json`)).default,
-  };
-});
+  const namespaces = Object.keys(
+    messagesManifest
+  ) as (keyof typeof messagesManifest)[];
 
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Manejo de Fallback de Mensajes**: ((Vigente)) Investigar la configuración de `next-intl` para implementar un sistema de fallback. Si una clave no se encuentra en `es-ES.json`, podría intentar buscarla en `en-US.json` antes de lanzar un error, haciendo la UI más resiliente a traducciones incompletas.
- *
- * @subsection Melhorias Adicionadas
- * 1. **Definición de `defaultLocale` SSoT**: ((Implementada)) Se ha exportado `defaultLocale` para que pueda ser consumido por el middleware, creando una única fuente de verdad para el idioma por defecto.
- * 2. **Alineación con Requisitos de Negocio**: ((Implementada)) Se ha actualizado el `defaultLocale` a 'es-ES', cumpliendo con la nueva directiva y corrigiendo el comportamiento de redirección del middleware.
- *
- * =====================================================================
- */
+  try {
+    const modulePromises = namespaces.map((ns) => messagesManifest[ns]());
+    const modules = await Promise.all(modulePromises);
+
+    const messages = modules.reduce(
+      (
+        acc: Record<string, any>,
+        module: { default: MessageModule },
+        index: number
+      ) => {
+        const namespace = namespaces[index];
+        const defaultExport = module.default;
+
+        if (defaultExport && defaultExport[typedLocale]) {
+          acc[namespace] = defaultExport[typedLocale];
+        } else {
+          const fallbackLocale = Object.keys(defaultExport)[0] as AppLocale;
+          if (fallbackLocale) {
+            acc[namespace] = defaultExport[fallbackLocale];
+            logger.warn(
+              `[I18N Assembler] Locale '${typedLocale}' no encontrado para '${namespace}'. Usando fallback a '${fallbackLocale}'.`
+            );
+          }
+        }
+        return acc;
+      },
+      {}
+    );
+
+    return { messages };
+  } catch (error) {
+    logger.error("[I18N Orquestador] Fallo crítico al ensamblar mensajes", {
+      locale: typedLocale,
+      error,
+    });
+    return { messages: {} };
+  }
+});
 // src/i18n.ts

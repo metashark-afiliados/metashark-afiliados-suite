@@ -1,0 +1,23 @@
+{
+  "en-US": {
+    "success_duplicate": "You are already subscribed! Thanks for your interest.",
+    "success_new": "Thanks for subscribing! Stay tuned for updates.",
+    "error_server": "Could not process subscription. Please try again.",
+    "error_invalid_email": "Please provide a valid email address.",
+    "error_unexpected": "An unexpected error occurred."
+  },
+  "es-ES": {
+    "success_duplicate": "¡Ya estás suscrito! Gracias por tu interés.",
+    "success_new": "¡Gracias por suscribirte! Mantente atento a las novedades.",
+    "error_server": "No se pudo procesar la suscripción. Por favor, inténtalo de nuevo.",
+    "error_invalid_email": "Por favor, introduce un correo electrónico válido.",
+    "error_unexpected": "Ocurrió un error inesperado."
+  },
+  "pt-BR": {
+    "success_duplicate": "Você já está inscrito! Obrigado pelo seu interesse.",
+    "success_new": "Obrigado por se inscrever! Fique atento às novidades.",
+    "error_server": "Não foi possível processar a inscrição. Por favor, tente novamente.",
+    "error_invalid_email": "Por favor, forneça um endereço de e-mail válido.",
+    "error_unexpected": "Ocorreu um erro inesperado."
+  }
+}
