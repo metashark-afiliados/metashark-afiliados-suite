@@ -1,0 +1,20 @@
+{
+  "en-US": {
+    "title": "Still Have Questions?",
+    "description": "Our dedicated support team is here to help you succeed. Whether you're a beginner or an expert, we've got your back.",
+    "contactButtonText": "Contact Support",
+    "docsButtonText": "Read Docs"
+  },
+  "es-ES": {
+    "title": "¿Aún Tienes Preguntas?",
+    "description": "Nuestro equipo de soporte dedicado está aquí para ayudarte a tener éxito. Ya seas un principiante o un experto, te cubrimos las espaldas.",
+    "contactButtonText": "Contactar Soporte",
+    "docsButtonText": "Leer Documentación"
+  },
+  "pt-BR": {
+    "title": "Ainda tem Dúvidas?",
+    "description": "Nossa equipe de suporte dedicada está aqui para ajudá-lo a ter sucesso. Seja você um iniciante ou um especialista, nós te damos cobertura.",
+    "contactButtonText": "Contatar Suporte",
+    "docsButtonText": "Ler Documentação"
+  }
+}

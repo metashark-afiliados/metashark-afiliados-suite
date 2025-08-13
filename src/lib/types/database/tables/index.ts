@@ -2,9 +2,9 @@
 /**
  * @file index.ts
  * @description Archivo barril para la exportación modular de todos los tipos de tabla.
- *              Actualizado para incluir las nuevas entidades del sistema de templates.
- * @author L.I.A Legacy
- * @version 3.0.0 (Template System Integration)
+ *              Actualizado para incluir la nueva entidad `system_errors`.
+ * @author Raz Podestá
+ * @version 3.1.0
  */
 export * from "./achievements";
 export * from "./affiliate_products";
@@ -26,6 +26,7 @@ export * from "./site_templates";
 export * from "./sites";
 export * from "./subscribers";
 export * from "./subscriptions";
+export * from "./system_errors"; // <-- NUEVO
 export * from "./template_categories";
 export * from "./ticket_messages";
 export * from "./tickets";
@@ -39,13 +40,8 @@ export * from "./workspaces";
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
  * @subsection Melhorias Adicionadas
- * 1. **Ponto de Entrada Único**: ((Implementada)) Este arquivo barril cria um ponto de entrada único e organizado para todos os tipos de tabela, melhorando a manutenibilidade e a experiência do desenvolvedor.
- *
- * @subsection Melhorias Futuras
- * 1. **Geração Automática**: ((Vigente)) Este arquivo é um candidato ideal para ser gerado automaticamente por um script de build, garantindo que ele esteja sempre sincronizado com o conteúdo do diretório `tables/`.
- *
+ * 1. **Sincronización de Esquema**: ((Implementada)) Se ha añadido la exportación para el nuevo tipo `SystemErrors`, manteniendo el manifiesto sincronizado.
  * =====================================================================
  */
 // src/lib/types/database/tables/index.ts

@@ -7,7 +7,7 @@
  *              renderizarlos dinámicamente en el cliente a través del aparato
  *              atómico `DynamicIcon`.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
@@ -26,19 +26,21 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
  * @public
  * @interface Feature
  * @description Define el contrato de datos para una única característica.
+ *              Este contrato es serializable y seguro para pasar desde
+ *              Server Components a Client Components.
  */
 export interface Feature {
   /**
    * @property {string} icon - El nombre del icono de `lucide-react` a renderizar,
-   *                  en formato PascalCase.
+   *                  en formato PascalCase (ej. "LayoutTemplate").
    */
   icon: string;
   /**
-   * @property {string} title - El título de la característica.
+   * @property {string} title - El título de la característica, internacionalizado.
    */
   title: string;
   /**
-   * @property {string} description - La descripción de la característica.
+   * @property {string} description - La descripción de la característica, internacionalizada.
    */
   description: string;
 }
@@ -90,9 +92,14 @@ export function Features({
             hidden: {},
             show: { transition: { staggerChildren: 0.15 } },
           }}
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {features.map((feature) => (
+          {/* 
+            Parche defensivo: Se añade `(features || []).map` para evitar el crash
+            mientras se nivela el componente padre. Esto es una medida temporal
+            que será innecesaria una vez que `page.tsx` se corrija.
+          */}
+          {(features || []).map((feature) => (
             <motion.div
               key={feature.title}
               variants={FADE_IN_ANIMATION_VARIANTS}
@@ -124,12 +131,12 @@ export function Features({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Modal com Detalhes Adicionais**: ((Vigente)) Adicionar uma prop `onClick` a cada `Feature` para permitir abrir um modal com mais informações, vídeos ou exemplos da característica.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Conformidade com Arquitetura RSC**: ((Implementada)) O contrato de props (`Feature.icon`) como `string` e o uso de `DynamicIcon` fazem deste componente um exemplo canônico da arquitetura de Server/Client Components.
- * 2. **Componente Puro e Internacionalizável**: ((Implementada)) O componente é 100% agnóstico ao conteúdo, o que permite que a `HomePage` (Server Component) construa o array `features` com textos totalmente internacionalizados.
+ * 1. **Conformidad con Arquitectura RSC**: ((Implementada)) El contrato de props (`Feature.icon`) como `string` y el uso de `DynamicIcon` es el patrón canónico para este componente, restaurando la lógica correcta del snapshot original y preparando la solución al `TypeError`.
+ * 2. **Componente Puro e Internacionalizable**: ((Implementada)) El componente se mantiene 100% agnóstico al contenido, permitiendo que la `HomePage` (Server Component) construya el array `features` con textos totalmente internacionalizados.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Modal con Detalles Adicionales**: ((Vigente)) Añadir una prop `onClick` a cada `Feature` para permitir abrir un modal con más información, videos o ejemplos de la característica.
  *
  * =====================================================================
  */

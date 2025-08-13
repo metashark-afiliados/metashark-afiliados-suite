@@ -1,0 +1,32 @@
+{
+  "en-US": {
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "legalNotice": "By creating an account, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>.",
+    "acceptTermsLabel": "I accept the terms and conditions",
+    "subscribeToNewsletterLabel": "I want to receive news and tips",
+    "error_password_too_short": "Password must be at least 8 characters long.",
+    "error_passwords_do_not_match": "Passwords do not match.",
+    "error_accept_terms_required": "You must accept the terms and conditions to proceed."
+  },
+  "es-ES": {
+    "passwordLabel": "Contraseña",
+    "confirmPasswordLabel": "Confirmar Contraseña",
+    "legalNotice": "Al crear una cuenta, aceptas nuestros <terms>Términos de Servicio</terms> y <privacy>Política de Privacidad</privacy>.",
+    "acceptTermsLabel": "Acepto los términos y condiciones",
+    "subscribeToNewsletterLabel": "Quiero recibir noticias y consejos",
+    "error_password_too_short": "La contraseña debe tener al menos 8 caracteres.",
+    "error_passwords_do_not_match": "Las contraseñas no coinciden.",
+    "error_accept_terms_required": "Debes aceptar los términos y condiciones para continuar."
+  },
+  "pt-BR": {
+    "passwordLabel": "Senha",
+    "confirmPasswordLabel": "Confirmar Senha",
+    "legalNotice": "Ao criar uma conta, você concorda com nossos <terms>Termos de Serviço</terms> e <privacy>Política de Privacidade</privacy>.",
+    "acceptTermsLabel": "Aceito os termos e condições",
+    "subscribeToNewsletterLabel": "Quero receber notícias e dicas",
+    "error_password_too_short": "A senha deve ter pelo menos 8 caracteres.",
+    "error_passwords_do_not_match": "As senhas não coincidem.",
+    "error_accept_terms_required": "Você deve aceitar os termos e condições para prosseguir."
+  }
+}

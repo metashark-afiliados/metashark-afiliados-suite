@@ -1,24 +1,20 @@
 // src/lib/supabase/auth-theme.ts
 /**
  * @file src/lib/supabase/auth-theme.ts
- * @description Manifiesto de Estilo Declarativo. Esta es la Única Fuente de Verdad (SSoT)
- *              para la apariencia del componente de UI de autenticación de Supabase
- *              (`@supabase/auth-ui-react`). Este aparato garantiza que el formulario
- *              de login/signup se alinee perfectamente con la identidad visual de la
- *              marca, consumiendo las variables CSS canónicas del sistema de diseño.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Manifiesto de Estilo para la UI de Supabase. Ha sido revertido a
+ *              su estado canónico y simple. Su única responsabilidad es exportar
+ *              un objeto estático `brandTheme` que define la apariencia visual,
+ *              sin incluir lógica de localización.
+ * @author Raz Podestá
+ * @version 3.1.0
  */
 import { type Theme } from "@supabase/auth-ui-shared";
 
 /**
  * @public
  * @constant brandTheme
- * @description Un objeto de tema compatible con `@supabase/auth-ui-react` que mapea
- *              los elementos de la UI del formulario a las variables CSS del sistema
- *              de diseño (`--primary`, `--foreground`, etc.). Esto desacopla el estilo
- *              del componente de la implementación, adhiriéndose al principio de
- *              "Configuración sobre Código".
+ * @description El objeto de tema estático para la UI de Supabase. Se inyecta en la
+ *              prop `appearance` del componente `<Auth>`.
  */
 export const brandTheme: Theme = {
   default: {
@@ -79,13 +75,8 @@ export const brandTheme: Theme = {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Tema Claro Dinâmico**: ((Vigente)) Desenvolver uma lógica que detecte o tema ativo da aplicação (usando `next-themes`) e passe uma versão do `brandTheme` adaptada para o tema claro, fazendo com que o formulário do Supabase mude de aparência junto com o restante da aplicação.
- * 2. **Variantes de Tema**: ((Vigente)) O arquivo poderia ser expandido para exportar múltiplos temas (ex: `minimalTheme`, `corporateTheme`) que poderiam ser aplicados dinamicamente ao componente de autenticação dependendo do contexto.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Coesão da Identidade Visual**: ((Implementada)) A transcrição deste aparato garante que a experiência de autenticação do usuário seja visualmente coesa com o resto da plataforma, um detalhe crucial para a confiança e o profissionalismo da marca.
- * 2. **Manutenibilidade do Estilo**: ((Implementada)) Centralizar a configuração de estilo do formulário de autenticação neste manifesto declarativo torna futuras modificações na marca mais fáceis e menos propensas a erros.
+ * 1. **Simplificación Arquitectónica**: ((Implementada)) Al eliminar la factoría, este aparato vuelve a ser un manifiesto de configuración puro, más simple y mantenible.
  *
  * =====================================================================
  */

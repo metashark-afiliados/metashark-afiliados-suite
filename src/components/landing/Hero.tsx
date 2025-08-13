@@ -2,12 +2,11 @@
 /**
  * @file src/components/landing/Hero.tsx
  * @description Componente de presentación puro para la sección "Hero" de la landing page.
- *              Es 100% agnóstico al contenido, recibiendo todos sus textos y datos de
- *              llamada a la acción (CTA) a través de su contrato de props. Esto garantiza
- *              una completa internacionalización y reutilización. Utiliza `framer-motion`
- *              para animaciones de entrada sutiles y de alto rendimiento.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ *              Ha sido nivelado para incluir observabilidad en las interacciones
+ *              de los botones de llamada a la acción (CTA) y alineado con la
+ *              directiva de rebranding de "ConvertiKit".
+ * @author Raz Podestá
+ * @version 2.0.0
  */
 "use client";
 
@@ -15,40 +14,29 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { clientLogger } from "@/lib/logging";
 import { Link } from "@/lib/navigation";
 
-/**
- * @public
- * @interface HeroProps
- * @description Define el contrato de props para el componente Hero.
- */
 export interface HeroProps {
-  /** El titular principal que se mostrará en la sección. */
   title: string;
-  /** El texto secundario o eslogan debajo del titular. */
   subtitle: string;
-  /** El texto para el botón de llamada a la acción principal (ej. "Empezar Ahora"). */
   ctaPrimaryText: string;
-  /** El texto para el botón de llamada a la acción secundario (ej. "Ver Características"). */
   ctaSecondaryText: string;
 }
 
-/**
- * @public
- * @component Hero
- * @description Renderiza la sección principal de bienvenida de la landing page.
- * @param {HeroProps} props - Propiedades para configurar la sección Hero.
- * @returns {React.ReactElement}
- */
 export function Hero({
   title,
   subtitle,
   ctaPrimaryText,
   ctaSecondaryText,
-}: HeroProps) {
+}: HeroProps): React.ReactElement {
   const FADE_IN_ANIMATION_VARIANTS = {
     hidden: { opacity: 0, y: 10 },
     show: { opacity: 1, y: 0, transition: { type: "spring" } },
+  };
+
+  const handleCTAClick = (ctaName: string) => {
+    clientLogger.info(`[Hero] CTA Clicked: ${ctaName}`);
   };
 
   return (
@@ -79,12 +67,17 @@ export function Hero({
           variants={FADE_IN_ANIMATION_VARIANTS}
           className="mt-8 flex flex-col justify-center gap-4 sm:flex-row"
         >
-          <Button size="lg" asChild>
+          <Button asChild size="lg" onClick={() => handleCTAClick("Primary")}>
             <Link href="/auth/login">
               {ctaPrimaryText} <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-          <Button size="lg" variant="outline" asChild>
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            onClick={() => handleCTAClick("Secondary")}
+          >
             <a href="#features">{ctaSecondaryText}</a>
           </Button>
         </motion.div>
@@ -98,13 +91,12 @@ export function Hero({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Botões de CTA Dinâmicos**: ((Vigente)) Adicionar uma prop opcional `ctaButtons` (um array de objetos com `text`, `href` e `variant`) para permitir a total customização dos botões de Call to Action a partir do componente pai (`HomePage`).
- * 2. **Vídeo de Fundo**: ((Vigente)) Adicionar suporte para uma prop `backgroundVideoUrl` que renderizaria um vídeo em loop como fundo da seção Hero, com sobreposição para garantir a legibilidade do texto.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Puro e Internacionalizável**: ((Implementada)) O componente é 100% agnóstico ao conteúdo, recebendo todos os seus textos via props, o que o torna totalmente traduzível e reutilizável. É uma dependência chave para a `HomePage`.
- * 2. **Animações de Alto Desempenho**: ((Implementada)) A utilização de `framer-motion` para animações de entrada garante uma experiência de usuário fluida e moderna sem comprometer o desempenho.
+ * 1. **Full Observabilidad**: ((Implementada)) Se ha añadido un `onClick` handler a los botones CTA que invoca a `clientLogger.info`. Esto proporciona visibilidad sobre la interacción más importante de la landing page.
+ * 2. **Rebranding**: ((Implementada)) La autoría y los comentarios han sido actualizados a "Raz Podestá" y "ConvertiKit".
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Botones de CTA Dinámicos**: ((Vigente)) La prop `ctaButtons` (un array de objetos) sigue siendo la mejora de élite para una máxima flexibilidad.
  *
  * =====================================================================
  */

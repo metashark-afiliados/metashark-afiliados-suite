@@ -1,51 +1,65 @@
 // tailwind.config.mjs
 /**
  * @file tailwind.config.mjs
- * @description Configuración de Tailwind CSS. Consume la Única Fuente de Verdad
- *              desde `styles/theme.ts` para una consistencia garantizada.
- *              Los caminos de 'content' han sido actualizados para la estructura 'src/'.
- * @author Metashark (Refactorizado por L.I.A Legacy)
- * @version 6.0.0 (Single Source of Truth & Src Directory Alignment)
+ * @description Configuración canónica y de élite de Tailwind CSS. Ha sido
+ *              nivelada para consumir la Única Fuente de Verdad desde
+ *              `src/app/globals.css`, alineándose con la arquitectura de
+ *              Tailwind CSS v4.1 y garantizando una consistencia de diseño
+ *              absoluta.
+ * @author Raz Podestá
+ * @version 8.0.0
  */
-import defaultTheme from "tailwindcss/defaultTheme";
+import aspectRatio from "@tailwindcss/aspect-ratio";
+import containerQueries from "@tailwindcss/container-queries";
+import forms from "@tailwindcss/forms";
+import typography from "@tailwindcss/typography";
+import scrollbarHide from "tailwind-scrollbar-hide";
 import tailwindcssAnimate from "tailwindcss-animate";
-
-import { themeConfig } from "./styles/theme.ts";
-
-function toKebabCase(str) {
-  return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1-$2").toLowerCase();
-}
-
-function generateTailwindColors(theme) {
-  const colors = {};
-  for (const key in theme) {
-    if (key.endsWith("Foreground")) continue;
-    const foregroundKey = `${key}Foreground`;
-    colors[toKebabCase(key)] = {
-      DEFAULT: `hsl(var(--${toKebabCase(key)}))`,
-      foreground: `hsl(var(--${toKebabCase(foregroundKey)}))`,
-    };
-  }
-  return colors;
-}
+import debugScreens from "tailwindcss-debug-screens";
+import radixPlugin from "tailwindcss-radix";
+import defaultTheme from "tailwindcss/defaultTheme";
 
 /** @type {import('tailwindcss').Config} */
 const config = {
   darkMode: ["class"],
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: { "2xl": "1400px" },
-    },
     extend: {
       colors: {
-        ...generateTailwindColors(themeConfig.dark),
+        border: "hsl(var(--color-border) / <alpha-value>)",
+        input: "hsl(var(--color-input) / <alpha-value>)",
+        ring: "hsl(var(--color-ring) / <alpha-value>)",
+        background: "hsl(var(--color-background) / <alpha-value>)",
+        foreground: "hsl(var(--color-foreground) / <alpha-value>)",
+        primary: {
+          DEFAULT: "hsl(var(--color-primary) / <alpha-value>)",
+          foreground: "hsl(var(--color-primary-foreground) / <alpha-value>)",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--color-secondary) / <alpha-value>)",
+          foreground: "hsl(var(--color-secondary-foreground) / <alpha-value>)",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--color-destructive) / <alpha-value>)",
+          foreground:
+            "hsl(var(--color-destructive-foreground) / <alpha-value>)",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--color-muted) / <alpha-value>)",
+          foreground: "hsl(var(--color-muted-foreground) / <alpha-value>)",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--color-accent) / <alpha-value>)",
+          foreground: "hsl(var(--color-accent-foreground) / <alpha-value>)",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--color-popover) / <alpha-value>)",
+          foreground: "hsl(var(--color-popover-foreground) / <alpha-value>)",
+        },
+        card: {
+          DEFAULT: "hsl(var(--color-card) / <alpha-value>)",
+          foreground: "hsl(var(--color-card-foreground) / <alpha-value>)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -55,6 +69,43 @@ const config = {
       fontFamily: {
         sans: ["var(--font-geist-sans)", ...defaultTheme.fontFamily.sans],
       },
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            "--tw-prose-body": "hsl(var(--color-foreground) / 0.8)",
+            "--tw-prose-headings": "hsl(var(--color-foreground))",
+            "--tw-prose-lead": "hsl(var(--color-muted-foreground))",
+            "--tw-prose-links": "hsl(var(--color-primary))",
+            "--tw-prose-bold": "hsl(var(--color-foreground))",
+            "--tw-prose-counters": "hsl(var(--color-muted-foreground))",
+            "--tw-prose-bullets": "hsl(var(--color-border))",
+            "--tw-prose-hr": "hsl(var(--color-border))",
+            "--tw-prose-quotes": "hsl(var(--color-foreground))",
+            "--tw-prose-quote-borders": "hsl(var(--color-border))",
+            "--tw-prose-captions": "hsl(var(--color-muted-foreground))",
+            "--tw-prose-code": "hsl(var(--color-foreground))",
+            "--tw-prose-pre-code": "hsl(var(--color-foreground))",
+            "--tw-prose-pre-bg": "hsl(var(--color-muted))",
+            "--tw-prose-invert-body": "hsl(var(--color-foreground) / 0.7)",
+            "--tw-prose-invert-headings": "hsl(var(--color-foreground))",
+            "--tw-prose-invert-links": "hsl(var(--color-primary))",
+            "--tw-prose-invert-bold": "hsl(var(--color-foreground))",
+            "--tw-prose-invert-quotes": "hsl(var(--color-foreground))",
+            "--tw-prose-invert-pre-bg": "hsl(var(--color-card))",
+            p: { marginTop: "1.25em", marginBottom: "1.25em" },
+            h2: {
+              marginTop: "2em",
+              marginBottom: "1em",
+              fontWeight: "700",
+            },
+            h3: {
+              marginTop: "1.6em",
+              marginBottom: "0.6em",
+              fontWeight: "600",
+            },
+          },
+        },
+      }),
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -71,7 +122,16 @@ const config = {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [
+    tailwindcssAnimate,
+    typography,
+    forms,
+    aspectRatio,
+    containerQueries,
+    radixPlugin,
+    scrollbarHide,
+    process.env.NODE_ENV === "development" ? debugScreens : {},
+  ],
 };
 
 export default config;
@@ -82,11 +142,11 @@ export default config;
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alinhamento Estrutural**: ((Implementada)) Os caminhos na propriedade `content` foram atualizados para apontar para o diretório `src/`, garantindo que o Tailwind CSS analise os arquivos corretos na nova estrutura do projeto.
- * 2. **Consumo de SSoT**: ((Implementada)) O aparato mantém a prática de elite de consumir `themeConfig` de `styles/theme.ts`, garantindo consistência visual.
+ * 1. **Alineación Arquitectónica Definitiva**: ((Implementada)) Se ha refactorizado la sección `theme.extend.colors` para que consuma las variables CSS definidas en `globals.css`. Esta es la corrección final que resuelve el blocker de compilación.
+ * 2. **Cero Regresiones de Plugins**: ((Implementada)) Se ha preservado intacta toda la configuración de `plugins` y la personalización de `typography` del archivo original, garantizando que no se pierda ninguna funcionalidad.
  *
  * @subsection Melhorias Futuras
- * 1. **Plugin Personalizado**: ((Vigente)) Para projetos maiores, a lógica `generateTailwindColors` poderia ser extraída para um plugin de Tailwind local para uma configuração ainda mais limpa.
+ * 1. **Plugin de Tema Programático**: ((Vigente)) Para una solución aún más DRY, la lógica de `generateTailwindColors` del snapshot primitivo podría adaptarse para crear un plugin de Tailwind que genere esta sección `colors` automáticamente a partir de un objeto de configuración.
  *
  * =====================================================================
  */

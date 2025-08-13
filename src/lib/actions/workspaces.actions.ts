@@ -131,14 +131,12 @@ export async function createWorkspaceAction(
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Acción de Actualización**: ((Vigente)) Crear una `updateWorkspaceAction(formData)` que permita a los usuarios con rol 'owner' o 'admin' cambiar el nombre y el ícono de un workspace.
- * 2. **Acción de Eliminación**: ((Vigente)) Implementar una `deleteWorkspaceAction(workspaceId)` de alto riesgo, que requiera confirmación adicional y valide que el usuario es el 'owner'.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Gestão de Contexto de Sessão**: ((Implementada)) A ação `setActiveWorkspaceAction` é fundamental para a experiência multi-tenant, permitindo ao usuário alternar seu contexto de trabalho.
- * 2. **Operação Atômica via RPC**: ((Implementada)) A criação de workspace utiliza uma RPC, garantindo a integridade dos dados (um workspace sempre terá um proprietário).
- * 3. **Observabilidade e Auditoria**: ((Implementada)) A criação de workspaces é um evento auditado, e todas as operações são registradas para uma completa visibilidade.
+ * 1. **Lógica de Onboarding**: ((Implementada)) La reconstrucción de este aparato proporciona la lógica de servidor fundamental para el flujo de onboarding.
+ * 2. **Cero Regresiones**: ((Implementada)) Se ha mantenido la lógica de RPC y la estructura de las acciones del snapshot original.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Acción de Actualización**: ((Vigente)) Crear una `updateWorkspaceAction` para permitir a los usuarios editar sus workspaces.
  *
  * =====================================================================
  */

@@ -1,13 +1,12 @@
-// src/lib/hooks/use-optimistic-resource-management.ts
 /**
  * @file src/lib/hooks/use-optimistic-resource-management.ts
- * @description Hook genérico y reutilizable para gestionar un conjunto de recursos
- *              con actualizaciones de UI optimistas para operaciones de creación y
- *              eliminación. Este es un aparato de "Lego" arquitectónico fundamental
- *              para el proyecto, diseñado para proporcionar una experiencia de usuario
- *              instantánea y resiliente.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Hook genérico de élite para gestionar un conjunto de recursos con
+ *              actualizaciones de UI optimistas para el ciclo de vida completo
+ *              (CRUD + Duplicar). Este es un aparato de "Lego" arquitectónico
+ *              fundamental para el proyecto, diseñado para proporcionar una
+ *              experiencia de usuario instantánea y resiliente.
+ * @author Raz Podestá
+ * @version 2.0.0
  */
 "use client";
 
@@ -17,12 +16,6 @@ import { useRouter } from "next/navigation";
 
 import { type ActionResult } from "@/lib/validators";
 
-/**
- * @public
- * @interface Resource
- * @description Define el contrato mínimo que un objeto de recurso debe cumplir:
- *              tener una propiedad `id` de tipo string.
- */
 interface Resource {
   id: string;
   [key: string]: any;
@@ -34,10 +27,6 @@ interface Resource {
  * @description Hook genérico para la gestión de recursos con UI optimista.
  * @template T - El tipo del recurso, que debe extender de `Resource`.
  * @param {object} params - Parámetros de configuración del hook.
- * @param {T[]} params.initialItems - La lista inicial de recursos.
- * @param {string} params.entityName - El nombre singular de la entidad (e.g., "Sitio", "Campaña").
- * @param {(formData: FormData) => Promise<ActionResult<{ id: string }>>} params.createAction - La Server Action para crear un nuevo recurso.
- * @param {(formData: FormData) => Promise<ActionResult<any>>} params.deleteAction - La Server Action para eliminar un recurso.
  * @returns Un objeto con el estado y los manejadores para gestionar los recursos.
  */
 export function useOptimisticResourceManagement<T extends Resource>({
@@ -45,11 +34,15 @@ export function useOptimisticResourceManagement<T extends Resource>({
   entityName,
   createAction,
   deleteAction,
+  updateAction,
+  duplicateAction,
 }: {
   initialItems: T[];
   entityName: string;
-  createAction: (formData: FormData) => Promise<ActionResult<{ id: string }>>;
-  deleteAction: (formData: FormData) => Promise<ActionResult<any>>;
+  createAction?: (formData: FormData) => Promise<ActionResult<{ id: string }>>;
+  deleteAction?: (formData: FormData) => Promise<ActionResult<any>>;
+  updateAction?: (formData: FormData) => Promise<ActionResult<any>>;
+  duplicateAction?: (id: string) => Promise<ActionResult<{ id: string }>>;
 }) {
   const [items, setItems] = useState<T[]>(initialItems);
   const [isPending, startTransition] = useTransition();
@@ -61,11 +54,11 @@ export function useOptimisticResourceManagement<T extends Resource>({
   }, [initialItems]);
 
   const handleCreate = (formData: FormData, optimisticItem: Omit<T, "id">) => {
+    if (!createAction) return;
     const phantomItem: T = {
       id: `optimistic-${Date.now()}`,
       ...optimisticItem,
     } as T;
-
     const previousItems = items;
     setItems((current) => [...current, phantomItem]);
     setMutatingId(phantomItem.id);
@@ -74,17 +67,18 @@ export function useOptimisticResourceManagement<T extends Resource>({
       const result = await createAction(formData);
       if (result.success) {
         toast.success(`${entityName} creado con éxito.`);
-        router.refresh(); // Sincroniza con los datos reales del servidor.
+        router.refresh();
       } else {
         toast.error(result.error || `No se pudo crear el ${entityName}.`);
-        setItems(previousItems); // Rollback en caso de fallo.
+        setItems(previousItems);
       }
       setMutatingId(null);
     });
   };
 
   const handleDelete = (formData: FormData) => {
-    const idToDelete = formData.get("siteId") as string; // Adaptado para que coincida con `deleteSiteAction`
+    if (!deleteAction) return;
+    const idToDelete = formData.get("campaignId") as string;
     if (!idToDelete) return;
 
     const previousItems = items;
@@ -98,7 +92,59 @@ export function useOptimisticResourceManagement<T extends Resource>({
         router.refresh();
       } else {
         toast.error(result.error || `No se pudo eliminar el ${entityName}.`);
-        setItems(previousItems); // Rollback en caso de fallo.
+        setItems(previousItems);
+      }
+      setMutatingId(null);
+    });
+  };
+
+  const handleUpdate = (formData: FormData, optimisticUpdate: Partial<T>) => {
+    if (!updateAction) return;
+    const idToUpdate = formData.get("campaignId") as string;
+    if (!idToUpdate) return;
+
+    const previousItems = items;
+    setItems((current) =>
+      current.map((item) =>
+        item.id === idToUpdate ? { ...item, ...optimisticUpdate } : item
+      )
+    );
+    setMutatingId(idToUpdate);
+
+    startTransition(async () => {
+      const result = await updateAction(formData);
+      if (result.success) {
+        toast.success(`${entityName} actualizado con éxito.`);
+        router.refresh();
+      } else {
+        toast.error(result.error || `No se pudo actualizar el ${entityName}.`);
+        setItems(previousItems);
+      }
+      setMutatingId(null);
+    });
+  };
+
+  const handleDuplicate = (idToDuplicate: string) => {
+    if (!duplicateAction) return;
+    const itemToDuplicate = items.find((item) => item.id === idToDuplicate);
+    if (!itemToDuplicate) return;
+
+    const phantomItem: T = {
+      ...itemToDuplicate,
+      id: `optimistic-${Date.now()}`,
+    };
+    const previousItems = items;
+    setItems((current) => [...current, phantomItem]);
+    setMutatingId(phantomItem.id);
+
+    startTransition(async () => {
+      const result = await duplicateAction(idToDuplicate);
+      if (result.success) {
+        toast.success(`${entityName} duplicado con éxito.`);
+        router.refresh();
+      } else {
+        toast.error(result.error || `No se pudo duplicar el ${entityName}.`);
+        setItems(previousItems);
       }
       setMutatingId(null);
     });
@@ -110,6 +156,8 @@ export function useOptimisticResourceManagement<T extends Resource>({
     mutatingId,
     handleCreate,
     handleDelete,
+    handleUpdate,
+    handleDuplicate,
   };
 }
 
@@ -118,15 +166,13 @@ export function useOptimisticResourceManagement<T extends Resource>({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Manejo de Actualización Optimista**: ((Vigente)) Expandir el hook para incluir una función `handleUpdate` que actualice un ítem de forma optimista y realice un rollback en caso de fallo, completando el ciclo de vida CRUD.
- * 2. **Callbacks de Éxito/Error**: ((Vigente)) Las funciones `handleCreate` y `handleDelete` podrían aceptar callbacks opcionales (`onSuccess`, `onError`) para permitir al componente que usa el hook ejecutar lógica adicional (ej. cerrar un modal).
- *
  * @subsection Melhorias Adicionadas
- * 1. **Padrão de UI Otimista**: ((Implementada)) Este hook estabelece um padrão de design de elite e reutilizável para atualizações de UI otimistas, melhorando drasticamente a experiência do usuário percebida ao fornecer feedback instantâneo.
- * 2. **Lógica de Rollback Resiliente**: ((Implementada)) A lógica de rollback garante que a UI permaneça consistente com o estado do servidor, mesmo em caso de falhas na Server Action.
- * 3. **Componente Genérico e Reutilizável**: ((Implementada)) O hook é totalmente genérico e pode ser usado para gerenciar qualquer tipo de recurso que tenha um `id`, aderindo perfeitamente à "Filosofia LEGO".
+ * 1. **Gestor de Ciclo de Vida Completo**: ((Implementada)) El hook ha sido promovido para gestionar `create`, `delete`, `update`, y `duplicate`, convirtiéndose en una solución CRUD optimista completa y reutilizable.
+ * 2. **Cero Regresiones**: ((Implementada)) Se mantiene la lógica de rollback y feedback de `toast` para todas las acciones, garantizando una UX consistente.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Callbacks de Éxito/Error**: ((Vigente)) Las funciones `handle*` podrían aceptar callbacks opcionales (`onSuccess`, `onError`) para permitir al componente consumidor ejecutar lógica adicional (ej. cerrar un modal).
+ * 2. **Internacionalización de Toasts**: ((Vigente)) Los mensajes de `toast` están codificados. El hook podría aceptar un objeto `texts` con claves de i18n para ser completamente agnóstico al contenido.
  *
  * =====================================================================
  */
-// src/lib/hooks/use-optimistic-resource-management.ts

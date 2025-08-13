@@ -1,0 +1,68 @@
+{
+  "en-US": {
+    "tag": "Testimonials",
+    "title": "What Our Users Say",
+    "subtitle": "Real results from real marketers who have supercharged their business with ConvertiKit.",
+    "testimonials": [
+      {
+        "quote": "ConvertiKit has been a game-changer for our agency. We've cut our campaign launch time by 90% and seen a significant uplift in conversions across the board. The AI copywriter alone is worth the price.",
+        "authorName": "Sarah J.",
+        "authorTitle": "Founder, Digital Growth Agency"
+      },
+      {
+        "quote": "As a solo affiliate marketer, I don't have time for complex tools. ConvertiKit is incredibly intuitive and the predictive analytics help me make smarter decisions. My profits have doubled since I started using it.",
+        "authorName": "Mike R.",
+        "authorTitle": "Super Affiliate, Health & Wellness Niche"
+      },
+      {
+        "quote": "The ability to manage multiple client projects in separate workspaces is a lifesaver. It keeps everything organized and secure. Our team is more efficient, and our clients are happier.",
+        "authorName": "Elena V.",
+        "authorTitle": "Lead Strategist, Performance Marketing Co."
+      }
+    ]
+  },
+  "es-ES": {
+    "tag": "Testimonios",
+    "title": "Lo que Dicen Nuestros Usuarios",
+    "subtitle": "Resultados reales de marketers reales que han potenciado su negocio con ConvertiKit.",
+    "testimonials": [
+      {
+        "quote": "ConvertiKit ha cambiado las reglas del juego para nuestra agencia. Hemos reducido el tiempo de lanzamiento de campañas en un 90% y hemos visto un aumento significativo en las conversiones en general. Solo el redactor de IA vale el precio.",
+        "authorName": "Sara J.",
+        "authorTitle": "Fundadora, Agencia de Crecimiento Digital"
+      },
+      {
+        "quote": "Como marketer de afiliados en solitario, no tengo tiempo para herramientas complejas. ConvertiKit es increíblemente intuitivo y los análisis predictivos me ayudan a tomar decisiones más inteligentes. Mis ganancias se han duplicado desde que empecé a usarlo.",
+        "authorName": "Miguel R.",
+        "authorTitle": "Súper Afiliado, Nicho de Salud y Bienestar"
+      },
+      {
+        "quote": "La capacidad de gestionar múltiples proyectos de clientes en workspaces separados es un salvavidas. Mantiene todo organizado y seguro. Nuestro equipo es más eficiente y nuestros clientes están más contentos.",
+        "authorName": "Elena V.",
+        "authorTitle": "Estratega Principal, Performance Marketing Co."
+      }
+    ]
+  },
+  "pt-BR": {
+    "tag": "Depoimentos",
+    "title": "O que Nossos Usuários Dizem",
+    "subtitle": "Resultados reais de profissionais de marketing reais que potencializaram seus negócios com o ConvertiKit.",
+    "testimonials": [
+      {
+        "quote": "O ConvertiKit mudou o jogo para nossa agência. Reduzimos nosso tempo de lançamento de campanhas em 90% e vimos um aumento significativo nas conversões em geral. Só o redator de IA já vale o preço.",
+        "authorName": "Sara J.",
+        "authorTitle": "Fundadora, Agência de Crescimento Digital"
+      },
+      {
+        "quote": "Como profissional de marketing de afiliados solo, não tenho tempo para ferramentas complexas. O ConvertiKit é incrivelmente intuitivo e as análises preditivas me ajudam a tomar decisões mais inteligentes. Meus lucros dobraram desde que comecei a usá-lo.",
+        "authorName": "Miguel R.",
+        "authorTitle": "Super Afiliado, Nicho de Saúde e Bem-Estar"
+      },
+      {
+        "quote": "A capacidade de gerenciar múltiplos projetos de clientes em workspaces separados é um salva-vidas. Mantém tudo organizado e seguro. Nossa equipe está mais eficiente e nossos clientes estão mais felizes.",
+        "authorName": "Elena V.",
+        "authorTitle": "Estrategista Principal, Performance Marketing Co."
+      }
+    ]
+  }
+}

@@ -1,12 +1,11 @@
-// src/lib/data/campaigns.ts
 /**
  * @file src/lib/data/campaigns.ts
  * @description Aparato de datos para la entidad 'campaigns'. Esta es la Única Fuente de
- *              Verdad para interactuar con la tabla `campaigns`. Implementa cacheo
- *              de alto rendimiento y lógica de autorización para garantizar la seguridad
- *              y la velocidad de las consultas.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ *              Verdad para interactuar con la tabla `campaigns`. Ha sido nivelado a un
+ *              estándar de élite para soportar filtros y ordenamiento avanzados,
+ *              implementando cacheo de alto rendimiento y lógica de autorización.
+ * @author Raz Podestá
+ * @version 2.0.0
  */
 "use server";
 
@@ -25,6 +24,7 @@ export type CampaignMetadata = Pick<
   | "site_id"
   | "name"
   | "slug"
+  | "status"
   | "created_at"
   | "updated_at"
   | "affiliate_url"
@@ -41,15 +41,29 @@ export type CampaignWithContent = Tables<"campaigns"> & {
  * @description Obtiene una lista paginada y filtrada de metadatos de campañas para un sitio específico.
  *              Los resultados se cachean para mejorar el rendimiento en la navegación.
  * @param {string} siteId - El ID del sitio para el que se obtendrán las campañas.
- * @param {object} options - Opciones de paginación y búsqueda.
+ * @param {object} options - Opciones de paginación, búsqueda, filtro y ordenamiento.
  * @returns {Promise<{ campaigns: CampaignMetadata[]; totalCount: number }>} Los metadatos de las campañas y el conteo total.
  */
 export async function getCampaignsMetadataBySiteId(
   siteId: string,
-  { page, limit, query }: { page: number; limit: number; query?: string }
+  {
+    page,
+    limit,
+    query,
+    status,
+    sortBy,
+  }: {
+    page: number;
+    limit: number;
+    query?: string;
+    status?: "draft" | "published" | "archived";
+    sortBy?: "updated_at_desc" | "name_asc";
+  }
 ): Promise<{ campaigns: CampaignMetadata[]; totalCount: number }> {
-  const cacheKey = `campaigns-meta-${siteId}-p${page}-q${query || ""}`;
-  const cacheTags = [`campaigns:${siteId}`, `campaigns:${siteId}:p${page}`];
+  const cacheKey = `campaigns-meta-${siteId}-p${page}-q${
+    query || ""
+  }-s${status || ""}-o${sortBy || ""}`;
+  const cacheTags = [`campaigns:${siteId}`];
 
   return cache(
     async () => {
@@ -63,7 +77,7 @@ export async function getCampaignsMetadataBySiteId(
       let queryBuilder = supabase
         .from("campaigns")
         .select(
-          "id, site_id, name, slug, created_at, updated_at, affiliate_url",
+          "id, site_id, name, slug, status, created_at, updated_at, affiliate_url",
           { count: "exact" }
         )
         .eq("site_id", siteId);
@@ -74,13 +88,25 @@ export async function getCampaignsMetadataBySiteId(
         );
       }
 
-      const { data, error, count } = await queryBuilder
-        .order("updated_at", { ascending: false, nullsFirst: false })
-        .range(from, to);
+      if (status) {
+        queryBuilder = queryBuilder.eq("status", status);
+      }
+
+      const sortMap = {
+        updated_at_desc: { column: "updated_at", ascending: false },
+        name_asc: { column: "name", ascending: true },
+      };
+      const sort = sortMap[sortBy || "updated_at_desc"];
+      queryBuilder = queryBuilder.order(sort.column, {
+        ascending: sort.ascending,
+        nullsFirst: false,
+      });
+
+      const { data, error, count } = await queryBuilder.range(from, to);
 
       if (error) {
         logger.error(
-          `[DataLayer:Campaigns] Error al obtener campañas para el sitio ${siteId}:`,
+          `Error al obtener campañas para el sitio ${siteId}:`,
           error
         );
         return { campaigns: [], totalCount: 0 };
@@ -97,7 +123,6 @@ export async function getCampaignsMetadataBySiteId(
  * @async
  * @function getRecentCampaignsByWorkspaceId
  * @description Obtiene las campañas modificadas más recientemente dentro de un workspace.
- *              Crucial para la sección "Continuar trabajando en..." del dashboard.
  * @param {string} workspaceId - El ID del workspace.
  * @param {number} [limit=4] - El número máximo de campañas a devolver.
  * @returns {Promise<Tables<"campaigns">[]>} Un array de las campañas recientes.
@@ -121,7 +146,7 @@ export async function getRecentCampaignsByWorkspaceId(
       if (sitesError || !sites || sites.length === 0) {
         if (sitesError)
           logger.error(
-            `[DataLayer:Campaigns] Error al obtener sitios para el workspace ${workspaceId}:`,
+            `Error al obtener sitios para el workspace ${workspaceId}:`,
             sitesError
           );
         return [];
@@ -138,7 +163,7 @@ export async function getRecentCampaignsByWorkspaceId(
 
       if (campaignsError) {
         logger.error(
-          `[DataLayer:Campaigns] Error al obtener campañas recientes para el workspace ${workspaceId}:`,
+          `Error al obtener campañas recientes para el workspace ${workspaceId}:`,
           campaignsError
         );
         return [];
@@ -159,7 +184,7 @@ export async function getRecentCampaignsByWorkspaceId(
  *              tiene permiso para acceder a ella.
  * @param {string} campaignId - El ID de la campaña a obtener.
  * @param {string} userId - El ID del usuario que solicita el acceso.
- * @returns {Promise<CampaignWithContent | null>} El objeto de la campaña o null si no se encuentra o el acceso es denegado.
+ * @returns {Promise<CampaignWithContent | null>} El objeto de la campaña o null.
  */
 export async function getCampaignContentById(
   campaignId: string,
@@ -174,10 +199,7 @@ export async function getCampaignContentById(
 
   if (error || !campaign) {
     if (error && error.code !== "PGRST116") {
-      logger.error(
-        `[DataLayer:Campaigns] Error al obtener la campaña ${campaignId}:`,
-        error
-      );
+      logger.error(`Error al obtener la campaña ${campaignId}:`, error);
     }
     return null;
   }
@@ -185,7 +207,7 @@ export async function getCampaignContentById(
   const workspaceId = campaign.sites?.workspace_id;
   if (!workspaceId) {
     logger.error(
-      `[DataLayer:Campaigns] INCONSISTENCIA DE DATOS: Campaña ${campaignId} sin workspace asociado.`
+      `INCONSISTENCIA: Campaña ${campaignId} sin workspace asociado.`
     );
     return null;
   }
@@ -198,7 +220,7 @@ export async function getCampaignContentById(
 
   if (!isAuthorized) {
     logger.warn(
-      `[DataLayer:Campaigns] VIOLACIÓN DE ACCESO: Usuario ${userId} intentó acceder a la campaña ${campaignId} sin permisos.`
+      `SEGURIDAD: Usuario ${userId} intentó acceder a la campaña ${campaignId} sin permisos.`
     );
     return null;
   }
@@ -210,7 +232,7 @@ export async function getCampaignContentById(
  * @public
  * @async
  * @function getPublishedCampaignByHostAndSlug
- * @description Obtiene una campaña publicada para renderizado público, basándose en el host y el slug.
+ * @description Obtiene una campaña publicada para renderizado público.
  * @param {string} host - El host (subdominio o dominio personalizado).
  * @param {string} slug - El slug de la campaña.
  * @returns {Promise<Tables<"campaigns"> | null>} La campaña publicada o null.
@@ -225,34 +247,24 @@ export async function getPublishedCampaignByHostAndSlug(
   return cache(
     async () => {
       logger.info(`[Cache MISS] Buscando campaña pública para: ${cacheKey}`);
-
       const site = await getSiteDataByHost(host);
-
       if (!site) {
-        logger.trace(
-          `[DataLayer:Campaigns] Sitio no encontrado por host: ${host}`
-        );
         return null;
       }
-
       const supabase = createClient();
-      const { data: campaign, error: campaignError } = await supabase
+      const { data: campaign, error } = await supabase
         .from("campaigns")
         .select("*")
         .eq("site_id", site.id)
         .eq("slug", slug)
         .single();
-
-      if (campaignError) {
-        if (campaignError.code !== "PGRST116") {
-          logger.error(
-            `[DataLayer:Campaigns] Error buscando campaña ${slug} en sitio ${site.id}`,
-            campaignError
-          );
-        }
+      if (error && error.code !== "PGRST116") {
+        logger.error(
+          `Error buscando campaña ${slug} en sitio ${site.id}`,
+          error
+        );
         return null;
       }
-
       return campaign;
     },
     [cacheKey],
@@ -265,14 +277,12 @@ export async function getPublishedCampaignByHostAndSlug(
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Função RPC `get_published_campaign`**: ((Vigente)) La mejora de rendimiento de élite para `getPublishedCampaignByHostAndSlug` sigue siendo consolidar la lógica en una única función de base de datos para eliminar la latencia de red entre las dos consultas (sitio y luego campaña).
- *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato de Tipo Explícito**: ((Implementada)) Se ha definido y exportado el tipo explícito `CampaignMetadata`, mejorando la seguridad de tipos y la claridad del contrato de la función `getCampaignsMetadataBySiteId`.
- * 2. **Lógica de Segurança Integrada**: ((Implementada)) A função `getCampaignContentById` integra a verificação de permissões, garantindo que os dados sensíveis do conteúdo da campanha só sejam acessíveis por usuários autorizados.
- * 3. **Estratégia de Cacheo de Elite**: ((Implementada)) Todas as funções de leitura pública (`getPublishedCampaignByHostAndSlug`) e de dados frequentemente acessados (`getRecentCampaignsByWorkspaceId`) utilizam `unstable_cache` com chaves e tags bem definidas para um desempenho máximo.
+ * 1. **Gestión de Datos Avanzada**: ((Implementada)) La función `getCampaignsMetadataBySiteId` ha sido nivelada para aceptar parámetros de `status` y `sortBy`, proveyendo a la UI de capacidades de filtrado y ordenamiento de élite.
+ * 2. **Sincronización de Tipos**: ((Implementada)) El tipo `CampaignMetadata` ha sido actualizado para incluir el campo `status`, manteniendo la consistencia con el esquema de la base de datos.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Índices Compuestos**: ((Vigente)) Para optimizar las nuevas consultas de filtrado y ordenamiento, se debería considerar añadir un índice compuesto en la base de datos en las columnas `(site_id, status, updated_at)` y `(site_id, status, name)`.
  *
  * =====================================================================
  */
-// src/lib/data/campaigns.ts

@@ -1,13 +1,12 @@
 // src/components/ui/SmartLink.tsx
 /**
  * @file src/components/ui/SmartLink.tsx
- * @description Componente de enlace inteligente y atómico. Renderiza un componente
- *              `<Link>` de `next-intl` para rutas internas o una etiqueta `<a>`
- *              estándar para enlaces externos (`http`, `https`, `mailto`, `tel`) y de
- *              anclaje (`#`). Su prop `href` es agnóstica para máxima flexibilidad y para
- *              evitar conflictos con la inferencia de tipos de `next-intl`.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Componente de enlace inteligente y atómico. Ha sido nivelado
+ *              a un estándar de élite para aceptar `React.ReactNode` en su prop
+ *              `label`, permitiendo la composición de enlaces con contenido
+ *              enriquecido (ej. iconos, texto formateado).
+ * @author Raz Podestá
+ * @version 2.1.0
  */
 "use client";
 
@@ -15,38 +14,12 @@ import React from "react";
 
 import { Link } from "@/lib/navigation";
 
-/**
- * @public
- * @interface NavLinkItem
- * @description Define el contrato de props para un item de navegación.
- */
 export interface NavLinkItem {
-  /**
-   * @property {any} href - La destinación del enlace. Puede ser un string para
-   *              rutas estáticas, anclajes y URLs externas, o un objeto para rutas
-   *              dinámicas de `next-intl`. Se utiliza `any` de forma deliberada para
-   *              ser compatible con el tipo complejo y genérico inferido por el
-   *              componente `Link` de `next-intl`.
-   */
-  href: any;
-  /**
-   * @property {string} label - El texto visible del enlace.
-   */
-  label: string;
-  /**
-   * @property {string} [className] - Clases CSS opcionales para aplicar al enlace.
-   */
+  href: any; // Se mantiene 'any' por compatibilidad con next-intl
+  label: React.ReactNode; // <-- MEJORA DE TIPO
   className?: string;
 }
 
-/**
- * @public
- * @component SmartLink
- * @description Renderiza el tipo de enlace correcto (`<a>` o `next-intl <Link>`)
- *              basándose en el formato del `href` proporcionado.
- * @param {NavLinkItem} props - Las propiedades del enlace.
- * @returns {React.ReactElement} El componente de enlace renderizado.
- */
 export const SmartLink: React.FC<NavLinkItem> = ({
   href,
   label,
@@ -78,7 +51,6 @@ export const SmartLink: React.FC<NavLinkItem> = ({
     );
   }
 
-  // Para todas las demás rutas, se asume que son internas y se utiliza el Link de next-intl.
   return (
     <Link href={href} className={finalClassName} {...props}>
       {label}
@@ -91,13 +63,11 @@ export const SmartLink: React.FC<NavLinkItem> = ({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Ícones Automáticos**: ((Vigente)) O componente poderia ser aprimorado para renderizar automaticamente um ícone de "link externo" (ex: `<ExternalLink />` de `lucide-react`) ao lado do `label` se `isExternal` for verdadeiro, melhorando a UX.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Navegação Universal**: ((Implementada)) Este aparato fornece uma solução robusta e centralizada para a renderização de todos os tipos de links, uma dependência crítica para os componentes `LandingHeader` e `LandingFooter`.
- * 2. **Lógica de Roteamento Inteligente**: ((Implementada)) A lógica condicional que diferencia entre links internos e externos/de âncora é crucial para que a navegação internacionalizada de `next-intl` coexista com links padrão.
- * 3. **Contrato de Tipo Flexível e Documentado**: ((Implementada)) O uso deliberado de `any` para a prop `href` é documentado para explicar a necessidade de compatibilidade com os tipos complexos de `next-intl`.
+ * 1. **Contrato de Tipo Flexible**: ((Implementada)) La prop `label` ahora es de tipo `React.ReactNode`, lo que permite al `SmartLink` renderizar no solo texto, sino también componentes de React. Esto resuelve el error `TS2322` y lo convierte en un componente de UI más versátil.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Íconos Automáticos**: ((Vigente)) El componente podría renderizar automáticamente un icono de "enlace externo" si detecta un `href` externo.
  *
  * =====================================================================
  */

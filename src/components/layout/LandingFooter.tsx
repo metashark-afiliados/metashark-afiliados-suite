@@ -53,7 +53,7 @@ export function LandingFooter({
   newsletterPrompt,
   subscribeButtonText,
   allRightsReservedText,
-}: LandingFooterProps) {
+}: LandingFooterProps): React.ReactElement {
   const currentYear = new Date().getFullYear();
   const rootPath = "/";
 
@@ -158,14 +158,12 @@ export function LandingFooter({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Funcionalidade de Newsletter**: ((Vigente)) Integrar uma Server Action para lidar com o envio do formulário de subscrição da newsletter, adicionando novos emails à tabela `subscribers`.
- * 2. **Links de Redes Sociais**: ((Vigente)) Adicionar uma nova prop `socialLinks: NavLinkItem[]` e uma seção para renderizar os ícones e links para as redes sociais da empresa.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Encerramento de Página**: ((Implementada)) A reconstrução deste aparato fornece a peça final para a estrutura visual da `HomePage`.
- * 2. **Composição Atômica**: ((Implementada)) O componente demonstra de forma excelente a "Filosofia LEGO" ao compor o `SmartLink` para renderizar de forma inteligente suas listas de links.
- * 3. **Componente Puro e Internacionalizável**: ((Implementada)) O componente é 100% agnóstico ao conteúdo, permitindo que a `HomePage` construa as props do rodapé com textos totalmente internacionalizados.
+ * 1. **Componente de Cierre de Página**: ((Implementada)) La reconstrucción de este aparato proporciona la pieza final para la estructura visual de la `HomePage`.
+ * 2. **Composición Atómica**: ((Implementada)) El componente demuestra de forma excelente la "Filosofía LEGO" al componer `SmartLink` para renderizar de forma inteligente sus listas de enlaces.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Funcionalidad de Newsletter**: ((Vigente)) Integrar una Server Action para manejar el envío del formulario de suscripción a la newsletter, añadiendo nuevos emails a la tabla `subscribers`.
  *
  * =====================================================================
  */

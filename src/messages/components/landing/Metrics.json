@@ -1,0 +1,71 @@
+{
+  "en-US": {
+    "metrics": [
+      {
+        "iconName": "Zap",
+        "value": 98,
+        "suffix": "%",
+        "label": "Faster Campaign Launches"
+      },
+      {
+        "iconName": "TrendingUp",
+        "prefix": "+",
+        "value": 35,
+        "suffix": "%",
+        "label": "Average Conversion Uplift"
+      },
+      {
+        "iconName": "Users",
+        "value": 10000,
+        "suffix": "+",
+        "label": "Happy Marketers"
+      }
+    ]
+  },
+  "es-ES": {
+    "metrics": [
+      {
+        "iconName": "Zap",
+        "value": 98,
+        "suffix": "%",
+        "label": "Lanzamientos de Campaña Más Rápidos"
+      },
+      {
+        "iconName": "TrendingUp",
+        "prefix": "+",
+        "value": 35,
+        "suffix": "%",
+        "label": "Aumento Promedio de Conversión"
+      },
+      {
+        "iconName": "Users",
+        "value": 10000,
+        "suffix": "+",
+        "label": "Marketers Satisfechos"
+      }
+    ]
+  },
+  "pt-BR": {
+    "metrics": [
+      {
+        "iconName": "Zap",
+        "value": 98,
+        "suffix": "%",
+        "label": "Lançamentos de Campanha Mais Rápidos"
+      },
+      {
+        "iconName": "TrendingUp",
+        "prefix": "+",
+        "value": 35,
+        "suffix": "%",
+        "label": "Aumento Médio de Conversão"
+      },
+      {
+        "iconName": "Users",
+        "value": 10000,
+        "suffix": "+",
+        "label": "Marketers Satisfeitos"
+      }
+    ]
+  }
+}

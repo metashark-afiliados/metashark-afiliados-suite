@@ -1,0 +1,24 @@
+{
+  "en-US": {
+    "features": "Features",
+    "pricing": "Pricing",
+    "signIn": "Sign In",
+    "signUp": "Sign Up Free",
+    "openMenu": "Open menu"
+  },
+  "es-ES": {
+    "features": "Características",
+    "pricing": "Precios",
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse Gratis",
+    "openMenu": "Abrir menú"
+  },
+  "pt-BR": {
+    "features": "Recursos",
+    "pricing": "Preços",
+    "signIn": "Entrar",
+    "signUp": "Cadastre-se Grátis",
+    "openMenu": "Abrir menu"
+  }
+}
+

@@ -1,18 +1,18 @@
-// src/lib/data/index.ts
 /**
  * @file src/lib/data/index.ts
- * @description Manifiesto de la Capa de Datos (Barrel File). Esta es la Única Fuente
- *              de Verdad para acceder a los diferentes módulos de la capa de datos.
- *              Exporta cada módulo de datos (`sites`, `workspaces`, etc.) como un
- *              namespace, adhiriéndose al principio de "Configuración sobre Código"
- *              y proporcionando una API de consumo limpia y organizada para las
- *              Server Actions y los Server Components.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Manifiesto de la Capa de Datos (Barrel File). Ha sido sincronizado
+ *              con la nueva arquitectura de datos atómica para la entidad 'campaigns',
+ *              resolviendo una desincronización crítica que causaba fallos de
+ *              compilación en cascada.
+ * @author Raz Podestá
+ * @version 2.0.0
  */
 
 export * as admin from "./admin";
-export * as campaigns from "./campaigns";
+// --- CORRECCIÓN ARQUITECTÓNICA ---
+// Ahora apunta al nuevo manifiesto del módulo de campañas.
+export * as campaignsData from "./campaigns";
+// --- FIN DE CORRECCIÓN ---
 export * as invitations from "./invitations";
 export * as modules from "./modules";
 export * as notifications from "./notifications";
@@ -25,13 +25,8 @@ export * as workspaces from "./workspaces";
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Geração Automática**: ((Vigente)) Este arquivo barril é um candidato ideal para ser gerado e mantido por um script de build (`generate-data-barrel.mjs`). Isso garantiria que ele esteja sempre sincronizado com o conteúdo do diretório `src/lib/data/`, prevenindo erros de importação por omissão manual.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Ponto de Entrada Único (Single Entry Point)**: ((Implementada)) A transcrição deste aparato estabelece um ponto de entrada único e coeso para toda a camada de dados, simplificando as importações em toda a aplicação e melhorando a organização do código.
- * 2. **API de Namespaces**: ((Implementada)) O uso de `export * as ...` cria uma API de consumo clara e baseada em namespaces (ex: `data.sites.getSiteById(...)`), o que melhora a legibilidade e evita colisões de nomes.
+ * 1. **Sincronización Arquitectónica**: ((Implementada)) Se ha corregido la exportación de `campaigns` para que apunte al nuevo manifiesto `src/lib/data/campaigns/index.ts`, restaurando la integridad del grafo de dependencias de la capa de datos.
  *
  * =====================================================================
  */
-// src/lib/data/index.ts

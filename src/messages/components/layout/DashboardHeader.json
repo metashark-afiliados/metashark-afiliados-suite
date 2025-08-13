@@ -1,0 +1,17 @@
+{
+  "en-US": {
+    "mobile_openMenu_sr": "Open navigation menu",
+    "search_placeholder": "Search...",
+    "search_command": "⌘K"
+  },
+  "es-ES": {
+    "mobile_openMenu_sr": "Abrir menú de navegación",
+    "search_placeholder": "Buscar...",
+    "search_command": "⌘K"
+  },
+  "pt-BR": {
+    "mobile_openMenu_sr": "Abrir menu de navegação",
+    "search_placeholder": "Buscar...",
+    "search_command": "⌘K"
+  }
+}

@@ -5,7 +5,7 @@
  *              las páginas públicas (no autenticadas). Es completamente agnóstico
  *              al contenido, recibiendo todos sus textos y datos de enlace a través
  *              de su contrato de props. Compone otros aparatos atómicos como `SmartLink`
- *              y `LanguageSwitcher`.
+ *              y `ThemeSwitcher`.
  * @author L.I.A. Legacy
  * @version 1.0.0
  */
@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { type NavLinkItem, SmartLink } from "@/components/ui/SmartLink";
+import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +48,7 @@ export function LandingHeader({
   signInText,
   signUpText,
   openMenuText,
-}: LandingHeaderProps) {
+}: LandingHeaderProps): React.ReactElement {
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
   const rootPath = "/";
@@ -84,6 +85,7 @@ export function LandingHeader({
 
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-2">
+            <ThemeSwitcher />
             <LanguageSwitcher />
             <Button variant="ghost" asChild>
               <Link href={loginPath}>{signInText}</Link>
@@ -95,12 +97,7 @@ export function LandingHeader({
 
           <div className="md:hidden">
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-              <SheetTrigger
-                asChild
-                className={cn(
-                  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10"
-                )}
-              >
+              <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">{openMenuText}</span>
@@ -131,6 +128,7 @@ export function LandingHeader({
                   ))}
                 </nav>
                 <div className="mt-8 pt-8 border-t border-border/40 flex flex-col gap-4">
+                  <ThemeSwitcher />
                   <LanguageSwitcher />
                   <Button variant="ghost" asChild>
                     <Link href={loginPath}>{signInText}</Link>
@@ -153,14 +151,12 @@ export function LandingHeader({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Componente de Menu Móvel Atômico**: ((Vigente)) A lógica e o JSX para o menu móvel (`<Sheet>`) poderiam ser extraídos para seu próprio componente (`MobileMenu.tsx`) para uma maior atomicidade e simplificação do `LandingHeader`.
- * 2. **Ocultar no Scroll**: ((Vigente)) Implementar lógica para que o cabeçalho se oculte sutilmente quando o usuário rola para baixo e reapareça ao rolar para cima, maximizando o espaço de visualização.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Puro e Internacionalizável**: ((Implementada)) Este aparato é um componente de apresentação 100% puro, recebendo todo o seu conteúdo textual através de props, o que o torna totalmente traduzível.
- * 2. **Composição Atômica**: ((Implementada)) O componente compõe outros aparatos atômicos (`SmartLink`, `LanguageSwitcher`, `Sheet`), demonstrando a "Filosofia LEGO".
- * 3. **Acessibilidade (a11y)**: ((Implementada)) Inclui `aria-label` para a navegação e um `sr-only` para o botão do menu móvel, além de interações de teclado para fechar o menu.
+ * 1. **Composición Atómica**: ((Implementada)) El componente demuestra excelentemente la "Filosofía LEGO", ensamblando `SmartLink`, `LanguageSwitcher`, y el nuevo `ThemeSwitcher`.
+ * 2. **Componente Puro e Internacionalizable**: ((Implementada)) El componente es 100% agnóstico al contenido, permitiendo que la `HomePage` construya sus props con textos internacionalizados.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Menú Móvil Atómico**: ((Vigente)) La lógica y el JSX para el menú móvil (`<Sheet>`) podrían ser extraídos a su propio componente (`MobileMenu.tsx`) para una mayor atomicidad y simplificación del `LandingHeader`.
  *
  * =====================================================================
  */

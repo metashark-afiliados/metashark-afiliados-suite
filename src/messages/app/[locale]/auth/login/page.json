@@ -1,0 +1,23 @@
+{
+  "en-US": {
+    "metadataTitle": "Sign In | ConvertiKit",
+    "title": "Welcome back to ConvertiKit",
+    "subtitle": "Enter your credentials to access your dashboard.",
+    "signInButton": "Sign In",
+    "signInButton_pending": "Signing In..."
+  },
+  "es-ES": {
+    "metadataTitle": "Iniciar Sesión | ConvertiKit",
+    "title": "Bienvenido de nuevo a ConvertiKit",
+    "subtitle": "Introduce tus credenciales para acceder a tu panel.",
+    "signInButton": "Iniciar Sesión",
+    "signInButton_pending": "Iniciando Sesión..."
+  },
+  "pt-BR": {
+    "metadataTitle": "Entrar | ConvertiKit",
+    "title": "Bem-vindo(a) de volta à ConvertiKit",
+    "subtitle": "Insira suas credenciais para acessar seu painel.",
+    "signInButton": "Entrar",
+    "signInButton_pending": "Entrando..."
+  }
+}

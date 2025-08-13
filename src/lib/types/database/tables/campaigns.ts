@@ -1,15 +1,12 @@
-// src/lib/types/database/tables/campaigns.ts
 /**
  * @file campaigns.ts
  * @description Define el contrato de datos atómico para la tabla `campaigns`.
- *              Esta tabla es el núcleo de las operaciones de marketing, almacenando
- *              el contenido JSON que define la estructura de una landing page.
- *              Ha sido refactorizado para incluir el campo `affiliate_url`,
- *              resolviendo una inconsistencia de tipos en toda la aplicación.
- * @author L.I.A Legacy
- * @version 1.1.0 (Schema Alignment)
+ *              Nivelado a un estándar de élite para incluir la columna `status`.
+ * @author Raz Podestá
+ * @version 2.0.0
  */
 import { type Json } from "../_shared";
+import { type Enums } from "../enums";
 
 export type Campaigns = {
   Row: {
@@ -21,6 +18,7 @@ export type Campaigns = {
     slug: string | null;
     updated_at: string | null;
     affiliate_url: string | null;
+    status: Enums["campaign_status"];
   };
   Insert: {
     content?: Json | null;
@@ -31,6 +29,7 @@ export type Campaigns = {
     slug?: string | null;
     updated_at?: string | null;
     affiliate_url?: string | null;
+    status?: Enums["campaign_status"];
   };
   Update: {
     content?: Json | null;
@@ -41,6 +40,7 @@ export type Campaigns = {
     slug?: string | null;
     updated_at?: string | null;
     affiliate_url?: string | null;
+    status?: Enums["campaign_status"];
   };
   Relationships: [
     {
@@ -59,12 +59,10 @@ export type Campaigns = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato de Entidade Central**: ((Implementada)) Este tipo de dados define a estrutura da entidade mais crítica da aplicação.
+ * 1. **Gestión de Estado**: ((Implementada)) El contrato de datos ahora incluye el campo `status`, sincronizándolo con el esquema de la base de datos. Con la corrección en `enums.ts`, este tipo es ahora válido.
  *
  * @subsection Melhorias Futuras
- * 1. **Tipado Fuerte para `content`**: ((Vigente)) Reemplazar el tipo genérico `Json` con un tipo inferido de un esquema de Zod (`z.infer<typeof CampaignConfigSchema>`).
- * 2. **Campo de Estado (`status`)**: ((Vigente)) Añadir un campo `status` de tipo ENUM (ej: 'draft', 'published', 'archived') para permitir un flujo de trabajo de publicación más robusto.
+ * 1. **Tipado Fuerte para `content`**: ((Vigente)) Reemplazar el tipo `Json` con un tipo inferido de un `CampaignConfigSchema` de Zod.
  *
  * =====================================================================
  */
-// src/lib/types/database/tables/campaigns.ts

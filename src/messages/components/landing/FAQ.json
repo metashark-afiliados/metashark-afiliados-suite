@@ -1,0 +1,80 @@
+{
+  "en-US": {
+    "tag": "FAQs",
+    "title": "Frequently Asked Questions",
+    "subtitle": "Have questions? We have answers. If you can't find what you're looking for, feel free to contact our support team.",
+    "items": [
+      {
+        "question": "Is there a free trial available?",
+        "answer": "Yes, we offer a free plan that includes all the basic features to get you started. No credit card is required to sign up."
+      },
+      {
+        "question": "Can I use my own domain?",
+        "answer": "Absolutely. While we provide a free subdomain for every site, our Pro plan allows you to connect your own custom domain for a fully branded experience."
+      },
+      {
+        "question": "What kind of support do you offer?",
+        "answer": "We offer email support for all plans, and priority chat support for Pro and Enterprise customers. Our comprehensive documentation is also available 24/7."
+      },
+      {
+        "question": "Can I export my landing pages?",
+        "answer": "Yes, the ability to export your pages as static HTML is a feature of our Pro plan, giving you complete control to host your campaigns anywhere you wish."
+      }
+    ],
+    "searchPlaceholder": "Search questions...",
+    "noResultsText": "No matching questions found.",
+    "clearSearchAriaLabel": "Clear search"
+  },
+  "es-ES": {
+    "tag": "FAQs",
+    "title": "Preguntas Frecuentes",
+    "subtitle": "¿Tienes preguntas? Tenemos respuestas. Si no encuentras lo que buscas, no dudes en contactar a nuestro equipo de soporte.",
+    "items": [
+      {
+        "question": "¿Hay una prueba gratuita disponible?",
+        "answer": "Sí, ofrecemos un plan gratuito que incluye todas las funciones básicas para que puedas empezar. No se requiere tarjeta de crédito para registrarse."
+      },
+      {
+        "question": "¿Puedo usar mi propio dominio?",
+        "answer": "Absolutamente. Aunque proporcionamos un subdominio gratuito para cada sitio, nuestro plan Pro te permite conectar tu propio dominio personalizado para una experiencia de marca completa."
+      },
+      {
+        "question": "¿Qué tipo de soporte ofrecen?",
+        "answer": "Ofrecemos soporte por correo electrónico para todos los planes, y soporte prioritario por chat para clientes Pro y Enterprise. Nuestra completa documentación también está disponible 24/7."
+      },
+      {
+        "question": "¿Puedo exportar mis landing pages?",
+        "answer": "Sí, la capacidad de exportar tus páginas como HTML estático es una característica de nuestro plan Pro, dándote control total para alojar tus campañas donde desees."
+      }
+    ],
+    "searchPlaceholder": "Buscar preguntas...",
+    "noResultsText": "No se encontraron preguntas coincidentes.",
+    "clearSearchAriaLabel": "Limpiar búsqueda"
+  },
+  "pt-BR": {
+    "tag": "FAQs",
+    "title": "Perguntas Frequentes",
+    "subtitle": "Tem perguntas? Nós temos respostas. Se não encontrar o que procura, sinta-se à vontade para contatar nossa equipe de suporte.",
+    "items": [
+      {
+        "question": "Existe um período de teste gratuito?",
+        "answer": "Sim, oferecemos um plano gratuito que inclui todos os recursos básicos para você começar. Não é necessário cartão de crédito para se inscrever."
+      },
+      {
+        "question": "Posso usar meu próprio domínio?",
+        "answer": "Com certeza. Embora forneçamos um subdomínio gratuito para cada site, nosso plano Pro permite que você conecte seu próprio domínio personalizado para uma experiência de marca completa."
+      },
+      {
+        "question": "Que tipo de suporte vocês oferecem?",
+        "answer": "Oferecemos suporte por e-mail para todos os planos e suporte prioritário por chat para clientes Pro e Enterprise. Nossa documentação abrangente também está disponível 24/7."
+      },
+      {
+        "question": "Posso exportar minhas landing pages?",
+        "answer": "Sim, a capacidade de exportar suas páginas como HTML estático é um recurso do nosso plano Pro, dando a você controle total para hospedar suas campanhas onde desejar."
+      }
+    ],
+    "searchPlaceholder": "Buscar perguntas...",
+    "noResultsText": "Nenhuma pergunta correspondente encontrada.",
+    "clearSearchAriaLabel": "Limpar busca"
+  }
+}

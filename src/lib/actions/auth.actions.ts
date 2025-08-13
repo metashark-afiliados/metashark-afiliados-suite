@@ -1,165 +1,82 @@
 // src/lib/actions/auth.actions.ts
 /**
  * @file src/lib/actions/auth.actions.ts
- * @description Contiene las Server Actions para el flujo de autenticación soberano.
- *              Este aparato nos da control total sobre la lógica de registro e inicio
- *              de sesión, permitiendo la integración de validación robusta con Zod,
- *              limitación de tasa (rate limiting) y una observabilidad completa a través
- *              de logs de auditoría.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Contiene las Server Actions para el flujo de autenticación.
+ *              Ha sido nivelado para la arquitectura de UI delegada a Supabase.
+ *              Su única responsabilidad es manejar flujos que requieren una
+ *              intervención del servidor, como el inicio de sesión con OAuth.
+ * @author Raz Podestá
+ * @version 3.0.0
  */
 "use server";
 import "server-only";
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ZodError } from "zod";
+import { type Provider } from "@supabase/supabase-js";
 
+import { createPersistentErrorLog } from "@/lib/actions/_helpers";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
-import {
-  type ActionResult,
-  SignInSchema,
-  SignUpSchema,
-} from "@/lib/validators";
-
-import { createAuditLog, rateLimiter } from "./_helpers";
+import { type ActionResult } from "@/lib/validators";
 
 /**
  * @public
  * @async
- * @function signUpAction
- * @description Maneja el registro de un nuevo usuario. Valida los datos de entrada,
- *              llama a la función `signUp` de Supabase y redirige al usuario a una
- *              página de aviso para que confirme su correo electrónico.
- * @param {unknown} prevState - Estado anterior, requerido por `useFormState`.
- * @param {FormData} formData - Los datos del formulario de registro.
- * @returns {Promise<ActionResult<null>>} El resultado de la operación, conteniendo
- *          un error si la validación o el registro fallan.
+ * @function signInWithOAuthAction
+ * @description Inicia el flujo de inicio de sesión con un proveedor OAuth.
+ *              Esta acción es invocada por la UI de Supabase cuando el usuario
+ *              hace clic en un botón de proveedor (ej. Google, Apple).
+ * @param {FormData} formData - Datos del formulario que deben contener la clave 'provider'.
+ * @returns {Promise<ActionResult<never> | void>} Redirige al usuario a la página de
+ *          consentimiento del proveedor OAuth o devuelve un objeto de error
+ *          con una clave de internacionalización.
  */
-export async function signUpAction(
-  prevState: unknown,
+export async function signInWithOAuthAction(
   formData: FormData
-): Promise<ActionResult<null>> {
+): Promise<ActionResult<never> | void> {
+  const provider = formData.get("provider") as Provider | null;
+  if (!provider) {
+    return { success: false, error: "error_oauth_provider_missing" };
+  }
+
   const supabase = createClient();
-  const rawData = Object.fromEntries(formData);
-  try {
-    const { email, password } = SignUpSchema.parse(rawData);
-    const origin = headers().get("origin");
-    const emailRedirectTo = `${origin}/api/auth/callback`;
+  const origin = headers().get("origin");
 
-    logger.trace(`[AuthActions] Iniciando registro para ${email}`);
+  logger.trace(
+    `[AuthActions] Iniciando flujo OAuth para el proveedor: ${provider}`
+  );
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo },
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${origin}/api/auth/callback`,
+    },
+  });
+
+  if (error) {
+    logger.error(`[AuthActions] Error al iniciar OAuth con ${provider}`, error);
+    await createPersistentErrorLog("signInWithOAuthAction", error, {
+      provider,
     });
-
-    if (error) {
-      logger.warn(`[AuthActions] Fallo en el registro para ${email}`, {
-        message: error.message,
-      });
-      return {
-        success: false,
-        error:
-          "No se pudo completar el registro. El correo electrónico ya podría estar en uso.",
-      };
-    }
-
-    await createAuditLog("user_signup_initiated", {
-      metadata: { email },
-    });
-    logger.info(
-      `[AuthActions] Registro exitoso para ${email}. Esperando confirmación.`
-    );
-    redirect("/auth-notice?message=check-email-for-confirmation");
-  } catch (error) {
-    if (error instanceof ZodError) {
-      logger.warn("[AuthActions] Datos de registro inválidos.", {
-        errors: error.flatten(),
-      });
-      return { success: false, error: "Datos de registro inválidos." };
-    }
-    logger.error("[AuthActions] Error inesperado en signUpAction", { error });
-    return { success: false, error: "Un error inesperado ocurrió." };
+    return { success: false, error: "error_oauth_failed" };
   }
+
+  return redirect(data.url);
 }
-
-/**
- * @public
- * @async
- * @function signInWithPasswordAction
- * @description Maneja el inicio de sesión de un usuario con correo y contraseña.
- *              Aplica limitación de tasa, valida las credenciales y, en caso de éxito,
- *              redirige al dashboard. Registra los intentos de inicio de sesión fallidos.
- * @param {unknown} prevState - Estado anterior, requerido por `useFormState`.
- * @param {FormData} formData - Los datos del formulario de inicio de sesión.
- * @returns {Promise<ActionResult<null>>} El resultado de la operación.
- */
-export async function signInWithPasswordAction(
-  prevState: unknown,
-  formData: FormData
-): Promise<ActionResult<null>> {
-  const ip = headers().get("x-forwarded-for");
-  const limit = await rateLimiter.check(ip, "login");
-  if (!limit.success) {
-    return { success: false, error: limit.error! };
-  }
-
-  const rawData = Object.fromEntries(formData);
-  try {
-    const { email, password } = SignInSchema.parse(rawData);
-    const supabase = createClient();
-
-    logger.trace(
-      `[AuthActions] Iniciando intento de inicio de sesión para ${email}`
-    );
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      await createAuditLog("user_login_failed", {
-        metadata: { email, reason: error.message },
-      });
-      logger.warn(`[AuthActions] Intento de login fallido para ${email}`, {
-        message: error.message,
-      });
-      return { success: false, error: "Credenciales inválidas." };
-    }
-  } catch (error) {
-    if (error instanceof ZodError) {
-      logger.warn("[AuthActions] Datos de inicio de sesión inválidos.", {
-        errors: error.flatten(),
-      });
-      return { success: false, error: "Datos de inicio de sesión inválidos." };
-    }
-    logger.error("[AuthActions] Error inesperado en signInAction", { error });
-    return { success: false, error: "Un error inesperado ocurrió." };
-  }
-
-  // El `onAuthStateChange` de Supabase se encargará de crear el log de auditoría
-  // para el inicio de sesión exitoso.
-  redirect("/dashboard");
-}
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Manejo de Errores I18n**: ((Vigente)) Devolver claves de internacionalización (ej. "error_user_already_exists") en lugar de strings codificados para que la UI muestre mensajes traducidos.
- * 2. **Soporte para OAuth**: ((Vigente)) Crear una nueva Server Action `signInWithOAuth(provider)` que inicie el flujo de autenticación de terceros con Supabase.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Fluxo de Autenticação Soberano**: ((Implementada)) Este aparato nos dá controle total sobre a lógica de registro e login, desacoplando-nos da UI de autenticação padrão do Supabase.
- * 2. **Segurança Reforçada**: ((Implementada)) A ação `signInWithPasswordAction` integra o helper de `rateLimiter`, uma camada de segurança essencial contra ataques de força bruta.
- * 3. **Observabilidade Completa**: ((Implementada)) Todas as ações são instrumentadas com logs de `trace`, `info`, `warn` e `error`, e registram eventos de auditoria cruciais para a segurança.
+ * 1. **Alineación Arquitectónica**: ((Implementada)) El aparato ha sido refactorizado para eliminar la lógica de autenticación por contraseña, ahora obsoleta, y enfocarse únicamente en el flujo OAuth requerido por la nueva UI de Supabase. Esto resuelve los errores de compilación `TS2305`.
+ * 2. **Full Internacionalización**: ((Implementada)) Los mensajes de error ahora son claves de i18n, cumpliendo con el protocolo de élite.
+ * 3. **Full Observabilidad**: ((Implementada)) Se ha mantenido y verificado el logging de errores para una visibilidad total de los fallos en el flujo OAuth, y se ha integrado el registro de errores persistente en la base de datos.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Manejo de `redirect_to` Dinámico**: ((Vigente)) La acción podría aceptar un parámetro opcional `redirectTo` en el `FormData` para redirigir al usuario a una página específica después del callback de OAuth, similar a la lógica del parámetro `next`.
+ * 2. **Alcances (Scopes) de OAuth Configurables**: ((Vigente)) La acción podría aceptar una prop `scopes` para solicitar permisos adicionales al proveedor OAuth, útil para futuras integraciones.
  *
  * =====================================================================
  */

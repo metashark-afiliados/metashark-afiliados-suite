@@ -1,0 +1,101 @@
+{
+  "en-US": {
+    "UserManagementTable": {
+      "table_header": {
+        "email": "Email / User ID",
+        "full_name": "Full Name",
+        "role": "Role",
+        "actions": "Actions"
+      },
+      "search_placeholder": "Search by email or name...",
+      "clear_search_aria": "Clear search",
+      "table_empty_state": "No users found.",
+      "pagination": {
+        "previousPageLabel": "Previous page",
+        "nextPageLabel": "Next page",
+        "pageLabelTemplate": "Go to page {pageNumber}"
+      },
+      "role_update_success_toast": "User role updated successfully.",
+      "role_update_error_toast": "Failed to update user role."
+    },
+    "CampaignsTable": {
+      "title": "Campaign Viewer",
+      "description": "Monitor all campaigns created on the platform.",
+      "error_title": "Error Loading Campaigns",
+      "error_description": "Could not fetch data from the data layer."
+    },
+    "TelemetryTable": {
+      "title": "Visitor Telemetry Viewer",
+      "description": "Monitor visitor activity on the platform.",
+      "error_title": "Error Loading Logs",
+      "error_description": "Could not fetch telemetry information. Please try reloading the page.",
+      "empty_state": "No visits have been recorded yet."
+    }
+  },
+  "es-ES": {
+    "UserManagementTable": {
+      "table_header": {
+        "email": "Email / ID de Usuario",
+        "full_name": "Nombre Completo",
+        "role": "Rol",
+        "actions": "Acciones"
+      },
+      "search_placeholder": "Buscar por email o nombre...",
+      "clear_search_aria": "Limpiar búsqueda",
+      "table_empty_state": "No se encontraron usuarios.",
+      "pagination": {
+        "previousPageLabel": "Página anterior",
+        "nextPageLabel": "Página siguiente",
+        "pageLabelTemplate": "Ir a la página {pageNumber}"
+      },
+      "role_update_success_toast": "Rol de usuario actualizado con éxito.",
+      "role_update_error_toast": "No se pudo actualizar el rol del usuario."
+    },
+    "CampaignsTable": {
+      "title": "Visor de Campañas",
+      "description": "Supervisa todas las campañas creadas en la plataforma.",
+      "error_title": "Error al Cargar Campañas",
+      "error_description": "No se pudo obtener la información desde la capa de datos."
+    },
+    "TelemetryTable": {
+      "title": "Visor de Telemetría de Visitantes",
+      "description": "Supervisa la actividad de los visitantes en la plataforma.",
+      "error_title": "Error al Cargar los Logs",
+      "error_description": "No pudimos obtener la información de telemetría. Por favor, intenta recargar la página.",
+      "empty_state": "No se han registrado visitas todavía."
+    }
+  },
+  "pt-BR": {
+    "UserManagementTable": {
+      "table_header": {
+        "email": "E-mail / ID do Usuário",
+        "full_name": "Nome Completo",
+        "role": "Função",
+        "actions": "Ações"
+      },
+      "search_placeholder": "Buscar por e-mail ou nome...",
+      "clear_search_aria": "Limpar busca",
+      "table_empty_state": "Nenhum usuário encontrado.",
+      "pagination": {
+        "previousPageLabel": "Página anterior",
+        "nextPageLabel": "Próxima página",
+        "pageLabelTemplate": "Ir para a página {pageNumber}"
+      },
+      "role_update_success_toast": "Função do usuário atualizada com sucesso.",
+      "role_update_error_toast": "Falha ao atualizar a função do usuário."
+    },
+    "CampaignsTable": {
+      "title": "Visualizador de Campanhas",
+      "description": "Monitore todas as campanhas criadas na plataforma.",
+      "error_title": "Erro ao Carregar Campanhas",
+      "error_description": "Não foi possível obter os dados da camada de dados."
+    },
+    "TelemetryTable": {
+      "title": "Visualizador de Telemetria de Visitantes",
+      "description": "Monitore a atividade dos visitantes na plataforma.",
+      "error_title": "Erro ao Carregar os Logs",
+      "error_description": "Não foi possível obter as informações de telemetria. Por favor, tente recarregar a página.",
+      "empty_state": "Nenhuma visita foi registrada ainda."
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "en-US": {
+    "view_invitations_sr": "View invitations",
+    "pending_invitations_label": "Pending Invitations",
+    "invitation_text": "You have been invited to join <strong>{workspaceName}</strong>",
+    "no_pending_invitations": "You have no pending invitations.",
+    "accept_invitation_success": "You have joined the workspace!",
+    "accept_invitation_error": "Could not accept the invitation. Please try again."
+  },
+  "es-ES": {
+    "view_invitations_sr": "Ver invitaciones",
+    "pending_invitations_label": "Invitaciones Pendientes",
+    "invitation_text": "Te invitaron a unirte a <strong>{workspaceName}</strong>",
+    "no_pending_invitations": "No tienes invitaciones pendientes.",
+    "accept_invitation_success": "¡Te has unido al workspace!",
+    "accept_invitation_error": "No se pudo aceptar la invitación. Inténtalo de nuevo."
+  },
+  "pt-BR": {
+    "view_invitations_sr": "Ver convites",
+    "pending_invitations_label": "Convites Pendentes",
+    "invitation_text": "Você foi convidado(a) para se juntar a <strong>{workspaceName}</strong>",
+    "no_pending_invitations": "Você não tem convites pendentes.",
+    "accept_invitation_success": "Você se juntou ao workspace!",
+    "accept_invitation_error": "Não foi possível aceitar o convite. Tente novamente."
+  }
+}

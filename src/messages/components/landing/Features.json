@@ -1,0 +1,65 @@
+{
+  "en-US": {
+    "title": "A Suite of Tools, Unlimited Potential",
+    "subtitle": "Everything you need to scale your affiliate operations, powered by the most advanced technology.",
+    "features": [
+      {
+        "icon": "LayoutTemplate",
+        "title": "AI Landing Builder",
+        "description": "Create high-converting sales and capture pages in minutes with our AI-guided builder."
+      },
+      {
+        "icon": "FilePenSquare",
+        "title": "AI Copywriter Pro",
+        "description": "Generate persuasive copy for your ads, emails, and landing pages that connects with your audience and sells."
+      },
+      {
+        "icon": "ChartPie",
+        "title": "Predictive Analysis",
+        "description": "Our AI analyzes your metrics and gives you clear insights to optimize your campaigns and maximize your ROI."
+      }
+    ]
+  },
+  "es-ES": {
+    "title": "Una Suite de Herramientas, Potencial Ilimitado",
+    "subtitle": "Todo lo que necesitas para escalar tus operaciones de afiliado, impulsado por la tecnología más avanzada.",
+    "features": [
+      {
+        "icon": "LayoutTemplate",
+        "title": "Constructor de Landings IA",
+        "description": "Crea páginas de venta y captura de alta conversión en minutos con nuestro constructor guiado por IA."
+      },
+      {
+        "icon": "FilePenSquare",
+        "title": "AI Copywriter Pro",
+        "description": "Genera textos persuasivos para tus anuncios, emails y landings que conectan con tu audiencia y venden."
+      },
+      {
+        "icon": "ChartPie",
+        "title": "Análisis Predictivo",
+        "description": "Nuestra IA analiza tus métricas y te da insights claros para optimizar tus campañas y maximizar tu ROI."
+      }
+    ]
+  },
+  "pt-BR": {
+    "title": "Uma Suíte de Ferramentas, Potencial Ilimitado",
+    "subtitle": "Tudo o que você precisa para escalar suas operações de afiliado, impulsionado pela tecnologia mais avançada.",
+    "features": [
+      {
+        "icon": "LayoutTemplate",
+        "title": "Construtor de Landings IA",
+        "description": "Crie páginas de venda e captura de alta conversão em minutos com nosso construtor guiado por IA."
+      },
+      {
+        "icon": "FilePenSquare",
+        "title": "AI Copywriter Pro",
+        "description": "Gere textos persuasivos para seus anúncios, e-mails e landing pages que conectam com sua audiência e vendem."
+      },
+      {
+        "icon": "ChartPie",
+        "title": "Análise Preditiva",
+        "description": "Nossa IA analisa suas métricas e te dá insights claros para otimizar suas campanhas e maximizar seu ROI."
+      }
+    ]
+  }
+}

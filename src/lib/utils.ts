@@ -8,7 +8,6 @@
  * @author L.I.A. Legacy
  * @version 1.0.0
  */
-
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -34,7 +33,7 @@ export const rootDomain =
  * @function cn
  * @description Combina clases de Tailwind CSS de forma inteligente. Permite la
  *              aplicación condicional de clases y resuelve automáticamente
- *              conflictos de clases de Tailwind (ej. `p-2` y `p-4` se resuelve a `p-4`).
+ *              conflictos (ej. `p-2` y `p-4` se resuelve a `p-4`).
  * @param {...ClassValue[]} inputs - Una secuencia de clases a combinar.
  * @returns {string} La cadena de clases finales, optimizada y sin conflictos.
  */
@@ -88,13 +87,12 @@ export function isPrivateIpAddress(ip: string): boolean {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Validação de URL Canônica**: ((Vigente)) Adicionar uma função para validar e limpar URLs, garantindo que sejam sempre canônicas e seguras (ex: removendo parâmetros de rastreamento).
- * 2. **Formatação Localizada**: ((Vigente)) Implementar helpers para formatar números, moedas ou datas de forma localizada, utilizando a API `Intl`.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Fundação de Utilitários**: ((Implementada)) A transcrição deste arquivo fornece a função `cn`, uma dependência crítica para todos os componentes de UI, e `debounce`, essencial para hooks de validação em tempo real.
- * 2. **Helper de Segurança de Rede**: ((Implementada)) A função `isPrivateIpAddress` é uma peça importante para a otimização e segurança do serviço de GeoIP no middleware.
+ * 1. **Fundación de Utilidades**: ((Implementada)) La reconstrucción de este archivo proporciona utilidades críticas (`cn`, `debounce`, `rootDomain`) que son dependencias para la gran mayoría de los aparatos de UI y hooks del proyecto, desbloqueando su reconstrucción.
+ * 2. **Cero Regresiones**: ((Implementada)) La lógica es una transcripción de alta fidelidad del snapshot original.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Validación de URL Canónica**: ((Vigente)) Añadir una función `canonicalizeUrl(url)` para validar y limpiar URLs, asegurando que siempre sean canónicas y seguras (ej. eliminando parámetros de seguimiento innecesarios).
  *
  * =====================================================================
  */

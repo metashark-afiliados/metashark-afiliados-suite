@@ -1,0 +1,41 @@
+{
+  "en-US": {
+    "brand_name": "ConvertiKit",
+    "logo_alt_text": "ConvertiKit Logo",
+    "logo_aria_label": "Go to dashboard homepage",
+    "dashboard": "Dashboard",
+    "mySites": "My Sites",
+    "liaChat": "L.I.A. Chat",
+    "settings": "Settings",
+    "devConsole": "Dev Console",
+    "userMenu_accountSettings": "Account Settings",
+    "userMenu_support": "Support",
+    "userMenu_signOut": "Sign Out"
+  },
+  "es-ES": {
+    "brand_name": "ConvertiKit",
+    "logo_alt_text": "Logo de ConvertiKit",
+    "logo_aria_label": "Ir a la página principal del dashboard",
+    "dashboard": "Dashboard",
+    "mySites": "Mis Sitios",
+    "liaChat": "Chat L.I.A.",
+    "settings": "Ajustes",
+    "devConsole": "Dev Console",
+    "userMenu_accountSettings": "Ajustes de Cuenta",
+    "userMenu_support": "Soporte",
+    "userMenu_signOut": "Cerrar Sesión"
+  },
+  "pt-BR": {
+    "brand_name": "ConvertiKit",
+    "logo_alt_text": "Logo da ConvertiKit",
+    "logo_aria_label": "Ir para a página principal do painel",
+    "dashboard": "Painel",
+    "mySites": "Meus Sites",
+    "liaChat": "Chat L.I.A.",
+    "settings": "Configurações",
+    "devConsole": "Console Dev",
+    "userMenu_accountSettings": "Configurações da Conta",
+    "userMenu_support": "Suporte",
+    "userMenu_signOut": "Sair"
+  }
+}

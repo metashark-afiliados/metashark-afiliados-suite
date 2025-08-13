@@ -24,12 +24,13 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Fornecimento de Tema Corretivo**: ((Implementada)) O componente foi corrigido para usar a rota de importação de tipo correta da biblioteca `next-themes`, resolvendo o erro de compilação.
- *
  * @subsection Melhorias Futuras
- * 1. **Hook de Tema Personalizado (`useBrandTheme`)**: ((Vigente)) Abstrair o uso do hook `useTheme` em um hook personalizado (`useBrandTheme`) para centralizar a lógica de negócio futura (ex: analytics em mudança de tema) sem refatorar componentes consumidores.
- * 2. **Persistência na Base de Dados**: ((Vigente)) Para usuários autenticados, a preferência de tema poderia ser guardada na tabela `profiles` de Supabase. O `ThemeProvider` poderia ler esta preferência ao carregar a sessão, sincronizando a experiência através de diferentes dispositivos.
+ * 1. **Hook de Tema Personalizado (`useBrandTheme`)**: ((Vigente)) Abstraer el uso del hook `useTheme` en un hook personalizado (`useBrandTheme`) para centralizar la lógica de negocio futura (ej. analíticas en cambio de tema) sin refactorizar componentes consumidores.
+ * 2. **Persistencia en Base de Datos**: ((Vigente)) Para usuarios autenticados, la preferencia de tema podría guardarse en la tabla `profiles` de Supabase. El `ThemeProvider` podría leer esta preferencia al cargar la sesión, sincronizando la experiencia a través de diferentes dispositivos.
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Corrección de Contrato de Tipos**: ((Implementada)) Se ha corregido la ruta de importación de `ThemeProviderProps` para que apunte al módulo raíz de `next-themes`. Esto resuelve el error de compilación `TS2305` y alinea el aparato con las prácticas actuales de la librería.
+ * 2. **Restauración de Funcionalidad de Tema**: ((Implementada)) La reconstrucción de este componente es el último paso necesario para que el `LocaleLayout` sea completamente funcional, restaurando la capacidad de cambiar entre temas claro y oscuro.
  *
  * =====================================================================
  */

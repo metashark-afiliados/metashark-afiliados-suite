@@ -1,0 +1,20 @@
+{
+  "en-US": {
+    "title": "Build High-Performance Affiliate Campaigns with AI",
+    "subtitle": "Go from idea to published landing page in minutes. No code, just results.",
+    "ctaPrimary": "Start Now",
+    "ctaSecondary": "How it Works"
+  },
+  "es-ES": {
+    "title": "Crea Campañas de Afiliados de Alto Rendimiento con IA",
+    "subtitle": "Pasa de la idea a la landing page publicada en minutos. Sin código, solo resultados.",
+    "ctaPrimary": "Empezar Ahora",
+    "ctaSecondary": "Cómo Funciona"
+  },
+  "pt-BR": {
+    "title": "Crie Campanhas de Afiliados de Alta Performance com IA",
+    "subtitle": "Vá da ideia à landing page publicada em minutos. Sem código, apenas resultados.",
+    "ctaPrimary": "Comece Agora",
+    "ctaSecondary": "Como Funciona"
+  }
+}

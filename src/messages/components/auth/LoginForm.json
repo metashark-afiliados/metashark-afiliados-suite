@@ -1,0 +1,17 @@
+{
+  "en-US": {
+    "signInWith": "Or continue with",
+    "error_invalid_email": "Please enter a valid email address.",
+    "error_password_required": "Password is required."
+  },
+  "es-ES": {
+    "signInWith": "O continuar con",
+    "error_invalid_email": "Por favor, introduce un correo electrónico válido.",
+    "error_password_required": "La contraseña es requerida."
+  },
+  "pt-BR": {
+    "signInWith": "Ou continue com",
+    "error_invalid_email": "Por favor, insira um e-mail válido.",
+    "error_password_required": "A senha é obrigatória."
+  }
+}

@@ -1,16 +1,16 @@
 // src/lib/types/database/_supabase.generated.ts
 /**
- * @file _supabase.generated.ts
- * @description Snapshot de tipos de base de datos generado estáticamente.
- *              ESTE ARCHIVO ES UN FALLBACK. La práctica de élite es regenerarlo
- *              con `pnpm gen:types` después de cualquier cambio en el esquema de la BD.
- * @author L.I.A. Legacy (Snapshot Estático)
- * @version 2025-08-10T00:00:00.000Z
- */
+@file _supabase.generated.ts
+@description Manifiesto de tipos de base de datos canónico y ensamblado.
+code
+Code
+Actualizado para incluir la nueva tabla `system_errors`.
+@author Raz Podestá
+@version 2025-08-13T02:00:00.000Z
+*/
 import { type Enums } from "./enums";
 import { type Functions } from "./functions";
 import * as Tables from "./tables";
-
 export type Database = {
   public: {
     Tables: {
@@ -34,6 +34,7 @@ export type Database = {
       sites: Tables.Sites;
       subscribers: Tables.Subscribers;
       subscriptions: Tables.Subscriptions;
+      system_errors: Tables.SystemErrors; // <-- NUEVO
       template_categories: Tables.TemplateCategories;
       ticket_messages: Tables.TicketMessages;
       tickets: Tables.Tickets;
@@ -53,18 +54,4 @@ export type Database = {
     };
   };
 };
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Estrutura de Banco de Dados Base**: ((Implementada)) Este arquivo cria a estrutura `Database` fundamental que será consumida e aumentada por outros módulos de tipo.
- *
- * @subsection Melhorias Futuras
- * 1. **Geração Automática**: ((Vigente)) O script `pnpm gen:types` deve ser reativado e executado para garantir que este arquivo seja um reflexo fiel e atualizado do esquema do banco de dados remoto.
- *
- * =====================================================================
- */
 // src/lib/types/database/_supabase.generated.ts

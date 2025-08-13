@@ -1,11 +1,11 @@
-// src/lib/actions/campaigns.actions.ts
 /**
  * @file src/lib/actions/campaigns.actions.ts
- * @description Acciones de servidor seguras para la entidad 'campaigns'. Este aparato ha
- *              sido refactorizado para una máxima cohesión y seguridad, adhiriéndose
- *              estrictamente al principio de responsabilidad única.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Acciones de servidor de élite. Ha sido nivelado para consumir
+ *              correctamente la nueva capa de datos atómica y para restaurar
+ *              el contrato de tipos canónico, resolviendo todas las regresiones
+ *              y errores de compilación.
+ * @author Raz Podestá
+ * @version 3.4.0
  */
 "use server";
 import "server-only";
@@ -14,7 +14,7 @@ import { revalidatePath } from "next/cache";
 import { type User } from "@supabase/supabase-js";
 import { ZodError } from "zod";
 
-import { sites as sitesData } from "@/lib/data";
+import { campaignsData, sites as sitesData } from "@/lib/data";
 import { hasWorkspacePermission } from "@/lib/data/permissions";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
@@ -30,10 +30,8 @@ import { createAuditLog } from "./_helpers";
  * @private
  * @async
  * @function getAuthenticatedUser
- * @description Helper interno para obtener el usuario autenticado y centralizar
- *              el manejo de errores de sesión no encontrada.
- * @returns {Promise<{ user: User } | { error: ActionResult<never> }>} El objeto de usuario
- *          o un objeto de error si el usuario no está autenticado.
+ * @description Helper interno para obtener el usuario autenticado.
+ * @returns {Promise<{ user: User } | { error: ActionResult<never> }>}
  */
 async function getAuthenticatedUser(): Promise<
   { user: User } | { error: ActionResult<never> }
@@ -42,9 +40,9 @@ async function getAuthenticatedUser(): Promise<
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) {
-    return { error: { success: false, error: "Usuario no autenticado." } };
+    // --- CORRECCIÓN DE TIPO (TS2322) ---
+    return { error: { success: false, error: "error_unauthenticated" } };
   }
   return { user };
 }
@@ -53,11 +51,9 @@ async function getAuthenticatedUser(): Promise<
  * @public
  * @async
  * @function createCampaignAction
- * @description Crea una nueva campaña, validando los datos de entrada y los permisos
- *              del usuario para actuar sobre el sitio especificado.
- * @param {FormData} formData - Los datos del formulario que deben cumplir con `CreateCampaignSchema`.
- * @returns {Promise<ActionResult<{ id: string }>>} El resultado de la operación,
- *          conteniendo el ID de la nueva campaña en caso de éxito.
+ * @description Crea una nueva campaña.
+ * @param {FormData} formData
+ * @returns {Promise<ActionResult<{ id: string }>>}
  */
 export async function createCampaignAction(
   formData: FormData
@@ -72,7 +68,7 @@ export async function createCampaignAction(
 
     const site = await sitesData.getSiteById(site_id);
     if (!site) {
-      return { success: false, error: "El sitio asociado no existe." };
+      return { success: false, error: "error_site_not_found" };
     }
 
     const isAuthorized = await hasWorkspacePermission(
@@ -82,13 +78,7 @@ export async function createCampaignAction(
     );
 
     if (!isAuthorized) {
-      logger.warn(
-        `[SEGURIDAD] VIOLACIÓN DE ACCESO: Usuario ${user.id} intentó crear una campaña en el sitio ${site_id} sin permisos.`
-      );
-      return {
-        success: false,
-        error: "No tienes permiso para crear campañas en este sitio.",
-      };
+      return { success: false, error: "error_permission_denied" };
     }
 
     const supabase = createClient();
@@ -99,14 +89,13 @@ export async function createCampaignAction(
       .single();
 
     if (error) {
-      logger.error("Error al crear la campaña en la base de datos:", error);
-      return { success: false, error: "No se pudo crear la campaña." };
+      logger.error("Error al crear la campaña en DB:", error);
+      return { success: false, error: "error_creation_failed" };
     }
 
     await createAuditLog("campaign.created", {
       userId: user.id,
       targetEntityId: newCampaign.id,
-      targetEntityType: "campaign",
       metadata: { name, siteId: site_id },
     });
 
@@ -114,10 +103,10 @@ export async function createCampaignAction(
     return { success: true, data: { id: newCampaign.id } };
   } catch (error) {
     if (error instanceof ZodError) {
-      return { success: false, error: "Datos inválidos." };
+      return { success: false, error: "error_invalid_data" };
     }
     logger.error("Error inesperado en createCampaignAction:", error);
-    return { success: false, error: "Un error inesperado ocurrió." };
+    return { success: false, error: "error_unexpected" };
   }
 }
 
@@ -125,14 +114,13 @@ export async function createCampaignAction(
  * @public
  * @async
  * @function deleteCampaignAction
- * @description Elimina una campaña, validando que el usuario tenga permisos
- *              sobre el workspace que contiene la campaña.
- * @param {FormData} formData - Los datos del formulario que deben cumplir con `DeleteCampaignSchema`.
- * @returns {Promise<ActionResult<{ message: string }>>} El resultado de la operación.
+ * @description Elimina una campaña.
+ * @param {FormData} formData
+ * @returns {Promise<ActionResult<{ messageKey: string }>>}
  */
 export async function deleteCampaignAction(
   formData: FormData
-): Promise<ActionResult<{ message: string }>> {
+): Promise<ActionResult<{ messageKey: string }>> {
   const authResult = await getAuthenticatedUser();
   if ("error" in authResult) return authResult.error;
   const { user } = authResult;
@@ -142,83 +130,135 @@ export async function deleteCampaignAction(
       campaignId: formData.get("campaignId"),
     });
 
+    const campaign = await campaignsData.editor.getCampaignContentById(
+      campaignId,
+      user.id
+    );
+    if (!campaign) {
+      return { success: false, error: "error_permission_denied" };
+    }
+
     const supabase = createClient();
-    const { data: campaign, error: fetchError } = await supabase
-      .from("campaigns")
-      .select("*, sites ( workspace_id )")
-      .eq("id", campaignId)
-      .single();
-
-    if (fetchError || !campaign) {
-      return { success: false, error: "La campaña no se pudo encontrar." };
-    }
-
-    const workspaceId = campaign.sites?.workspace_id;
-    if (!workspaceId) {
-      logger.error(
-        `INCONSISTENCIA DE DATOS: Campaña ${campaignId} sin workspace asociado.`
-      );
-      return { success: false, error: "Error de integridad de datos." };
-    }
-
-    const isAuthorized = await hasWorkspacePermission(user.id, workspaceId, [
-      "owner",
-      "admin",
-      "member",
-    ]);
-
-    if (!isAuthorized) {
-      logger.warn(
-        `[SEGURIDAD] VIOLACIÓN DE ACCESO: Usuario ${user.id} intentó eliminar la campaña ${campaignId} sin permisos.`
-      );
-      return {
-        success: false,
-        error: "No tienes permiso para eliminar esta campaña.",
-      };
-    }
-
     const { error: deleteError } = await supabase
       .from("campaigns")
       .delete()
       .eq("id", campaignId);
 
     if (deleteError) {
-      logger.error(`Error al eliminar la campaña ${campaignId}:`, deleteError);
-      return { success: false, error: "No se pudo eliminar la campaña." };
+      return { success: false, error: "error_deletion_failed" };
     }
 
     await createAuditLog("campaign.deleted", {
       userId: user.id,
       targetEntityId: campaign.id,
-      targetEntityType: "campaign",
       metadata: { name: campaign.name, siteId: campaign.site_id },
     });
 
     revalidatePath(`/dashboard/sites/${campaign.site_id}/campaigns`);
-    return { success: true, data: { message: "Campaña eliminada." } };
+    return { success: true, data: { messageKey: "delete_success_toast" } };
   } catch (error) {
     if (error instanceof ZodError) {
-      return { success: false, error: "ID de campaña inválido." };
+      return { success: false, error: "error_invalid_id" };
     }
     logger.error("Error inesperado en deleteCampaignAction:", error);
-    return { success: false, error: "Un error inesperado ocurrió." };
+    return { success: false, error: "error_unexpected" };
   }
+}
+
+/**
+ * @public
+ * @async
+ * @function duplicateCampaignAction
+ * @description Duplica una campaña.
+ * @param {string} campaignId
+ * @returns {Promise<ActionResult<{ id: string }>>}
+ */
+export async function duplicateCampaignAction(
+  campaignId: string
+): Promise<ActionResult<{ id: string }>> {
+  const authResult = await getAuthenticatedUser();
+  if ("error" in authResult) return authResult.error;
+  const { user } = authResult;
+
+  const original = await campaignsData.editor.getCampaignContentById(
+    campaignId,
+    user.id
+  );
+  if (!original) {
+    return { success: false, error: "error_permission_denied" };
+  }
+
+  const supabase = createClient();
+  const { data: newCampaign, error: rpcError } = await supabase
+    .rpc("duplicate_campaign_rpc", { campaign_id_to_duplicate: campaignId })
+    .select("id")
+    .single();
+
+  if (rpcError || !newCampaign) {
+    return { success: false, error: "error_duplication_failed" };
+  }
+
+  await createAuditLog("campaign.duplicated", {
+    userId: user.id,
+    targetEntityId: newCampaign.id,
+    metadata: { originalCampaignId: campaignId },
+  });
+
+  revalidatePath(`/dashboard/sites/${original.site_id}/campaigns`);
+  return { success: true, data: { id: newCampaign.id } };
+}
+
+/**
+ * @public
+ * @async
+ * @function archiveCampaignAction
+ * @description Archiva una campaña.
+ * @param {string} campaignId
+ * @returns {Promise<ActionResult<void>>}
+ */
+export async function archiveCampaignAction(
+  campaignId: string
+): Promise<ActionResult<void>> {
+  const authResult = await getAuthenticatedUser();
+  if ("error" in authResult) return authResult.error;
+  const { user } = authResult;
+
+  const campaign = await campaignsData.editor.getCampaignContentById(
+    campaignId,
+    user.id
+  );
+  if (!campaign) {
+    return { success: false, error: "error_permission_denied" };
+  }
+
+  const supabase = createClient();
+  const { error: updateError } = await supabase
+    .from("campaigns")
+    .update({ status: "archived" })
+    .eq("id", campaignId);
+
+  if (updateError) {
+    return { success: false, error: "error_archive_failed" };
+  }
+
+  await createAuditLog("campaign.archived", {
+    userId: user.id,
+    targetEntityId: campaignId,
+    metadata: { name: campaign.name },
+  });
+
+  revalidatePath(`/dashboard/sites/${campaign.site_id}/campaigns`);
+  return { success: true, data: undefined };
 }
 
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Transacciones Atómicas**: ((Vigente)) La creación de una campaña y su log de auditoría deberían ocurrir dentro de una transacción de base de datos (RPC) para garantizar la atomicidad.
- * 2. **Manejo de Errores Granular**: ((Vigente)) Mapear códigos de error específicos de PostgreSQL (ej. `23505` para duplicados) a mensajes de error más amigables para el usuario.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Princípio DRY**: ((Implementada)) A lógica de obtenção do usuário autenticado foi abstraída para um helper interno `getAuthenticatedUser`, reduzindo a duplicação de código.
- * 2. **Segurança em Camadas**: ((Implementada)) As ações validam a sessão, a existência de entidades relacionadas (sites) e as permissões do usuário antes de realizar qualquer mutação.
- * 3. **Observabilidade e Auditoria**: ((Implementada)) Todas as operações de escrita são auditadas e registradas, fornecendo uma trilha completa de modificações.
- *
+ * 1. **Sincronización Arquitectónica**: ((Implementada)) Se ha corregido la importación y el consumo de la capa de datos para usar `campaignsData.editor.getCampaignContentById`, resolviendo definitivamente el error `TS2339`.
+ * 2. **Corrección de Contrato de Tipos**: ((Implementada)) Se ha restaurado la firma de retorno canónica de `getAuthenticatedUser`, resolviendo el error `TS2322`.
+ * @subsection Melhorias Futuras
+ * 1. **RPC para Archiv/Eliminar**: ((Vigente)) Encapsular las acciones `archive` y `delete` en RPCs.
  * =====================================================================
  */
-// src/lib/actions/campaigns.actions.ts

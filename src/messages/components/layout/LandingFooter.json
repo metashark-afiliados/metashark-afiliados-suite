@@ -1,0 +1,31 @@
+
+{
+  "en-US": {
+    "slogan": "Your strategic co-pilot for affiliate marketing.",
+    "product": "Product",
+    "company": "Company",
+    "stayUpdated": "Stay Updated",
+    "newsletterPrompt": "Join our newsletter for the latest news and tips.",
+    "subscribe": "Subscribe",
+    "allRightsReserved": "© {year} ConvertiKit. All rights reserved."
+  },
+  "es-ES": {
+    "slogan": "Tu copiloto estratégico para el marketing de afiliados.",
+    "product": "Producto",
+    "company": "Compañía",
+    "stayUpdated": "Mantente Actualizado",
+    "newsletterPrompt": "Únete a nuestro boletín para recibir las últimas noticias y consejos.",
+    "subscribe": "Suscribirse",
+    "allRightsReserved": "© {year} ConvertiKit. Todos los derechos reservados."
+  },
+  "pt-BR": {
+    "slogan": "Seu copiloto estratégico para marketing de afiliados.",
+    "product": "Produto",
+    "company": "Empresa",
+    "stayUpdated": "Mantenha-se Atualizado",
+    "newsletterPrompt": "Junte-se à nossa newsletter para receber as últimas notícias e dicas.",
+    "subscribe": "Inscrever-se",
+    "allRightsReserved": "© {year} ConvertiKit. Todos os direitos reservados."
+  }
+}
+

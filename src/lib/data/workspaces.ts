@@ -1,13 +1,12 @@
-// src/lib/data/workspaces.ts
 /**
  * @file src/lib/data/workspaces.ts
  * @description Aparato de datos para la entidad 'workspaces'. Esta es la Única Fuente
- *              de Verdad para interactuar con la tabla `workspaces` y sus entidades
- *              relacionadas. Ha sido refactorizado para una gestión de errores resiliente,
- *              manejo de inconsistencias de datos y soporte para inyección de dependencias
- *              en el entorno de pruebas.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ *              de Verdad para interactuar con la tabla `workspaces`. Ha sido
+ *              nivelado a un estándar de élite para incluir la obtención de datos
+ *              por ID, una gestión de errores resiliente y soporte para
+ *              inyección de dependencias.
+ * @author Raz Podestá
+ * @version 2.0.0
  */
 "use server";
 
@@ -24,10 +23,10 @@ type Supabase = SupabaseClient<any, "public", any>;
  * @public
  * @async
  * @function getWorkspacesByUserId
- * @description Obtiene todos los workspaces a los que un usuario pertenece a través de la tabla de unión `workspace_members`.
+ * @description Obtiene todos los workspaces a los que un usuario pertenece.
  * @param {string} userId - El ID del usuario.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
- * @returns {Promise<Workspace[]>} Una promesa que resuelve a un array de workspaces. Devuelve un array vacío en caso de error para máxima resiliencia.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
+ * @returns {Promise<Workspace[]>} Una promesa que resuelve a un array de workspaces.
  */
 export async function getWorkspacesByUserId(
   userId: string,
@@ -43,17 +42,10 @@ export async function getWorkspacesByUserId(
     if (error) {
       throw new Error("No se pudieron cargar los datos de los workspaces.");
     }
-
-    // Filtra cualquier resultado nulo que pueda provenir de inconsistencias de datos.
-    const workspaces: Workspace[] =
-      data?.flatMap((item) => item.workspaces || []) || [];
-    return workspaces;
+    return data?.flatMap((item) => item.workspaces || []) || [];
   } catch (error) {
-    logger.error(
-      `Error al obtener workspaces para el usuario ${userId}:`,
-      error
-    );
-    return []; // Retorna un array vacío para que la UI no falle.
+    logger.error(`Error al obtener workspaces para ${userId}:`, error);
+    return [];
   }
 }
 
@@ -61,12 +53,10 @@ export async function getWorkspacesByUserId(
  * @public
  * @async
  * @function getFirstWorkspaceForUser
- * @description Obtiene el primer workspace de un usuario. Es una función crítica para el
- *              flujo de onboarding, para determinar si un nuevo usuario ya ha creado
- *              o ha sido invitado a su primer workspace.
+ * @description Obtiene el primer workspace de un usuario, útil para el flujo de onboarding.
  * @param {string} userId - El ID del usuario.
  * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
- * @returns {Promise<Workspace | null>} El primer workspace encontrado o `null` si no existe o en caso de error.
+ * @returns {Promise<Workspace | null>} El primer workspace o null.
  */
 export async function getFirstWorkspaceForUser(
   userId: string,
@@ -82,26 +72,71 @@ export async function getFirstWorkspaceForUser(
       .single();
 
     if (error) {
-      // No registrar como error si simplemente no se encuentra (comportamiento esperado).
       if (error.code !== "PGRST116") {
         throw new Error("No se pudo cargar el workspace inicial del usuario.");
       }
       return null;
     }
 
-    // Lógica de resiliencia: maneja el caso en que `data` exista pero `data.workspaces` sea nulo.
     if (!data?.workspaces) {
       return null;
     }
-
     const workspaceData = data.workspaces;
     return Array.isArray(workspaceData) ? null : workspaceData;
   } catch (error) {
     logger.error(`Error al obtener el primer workspace para ${userId}:`, error);
-    return null; // Retorna null para que el flujo de onboarding pueda manejarlo.
+    return null;
   }
 }
 
+/**
+ * @public
+ * @async
+ * @function getWorkspaceById
+ * @description Obtiene la información básica de un workspace por su ID.
+ * @param {string} workspaceId - El ID del workspace.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
+ * @returns {Promise<Pick<Workspace, "id" | "name"> | null>} Información del workspace o null.
+ */
+export async function getWorkspaceById(
+  workspaceId: string,
+  supabaseClient?: Supabase
+): Promise<Pick<Workspace, "id" | "name"> | null> {
+  const supabase = supabaseClient || createServerClient();
+  try {
+    const { data, error } = await supabase
+      .from("workspaces")
+      .select("id, name")
+      .eq("id", workspaceId)
+      .single();
+
+    if (error) {
+      if (error.code !== "PGRST116") {
+        throw new Error(`Error al obtener el workspace ${workspaceId}.`);
+      }
+      return null;
+    }
+    return data;
+  } catch (error) {
+    logger.error(`Error en getWorkspaceById para ${workspaceId}:`, error);
+    return null;
+  }
+}
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Enriquecimiento de Contexto**: ((Implementada)) Se ha añadido la función `getWorkspaceById`, que es un prerrequisito para implementar la mejora de "Contexto de Breadcrumbs Enriquecido" en el `CampaignsPageLoader`.
+ * 2. **Cero Regresiones**: ((Implementada)) Se ha preservado la funcionalidad original de `getWorkspacesByUserId` y `getFirstWorkspaceForUser`.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Cacheo con `React.cache`**: ((Vigente)) Todas las funciones de lectura en este archivo son candidatas ideales para ser envueltas en `React.cache` para optimizar el rendimiento en Server Components.
+ *
+ * =====================================================================
+ */
 /**
  * =====================================================================
  *                           MEJORA CONTINUA

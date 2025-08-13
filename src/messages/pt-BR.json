@@ -1,7 +1,210 @@
+
 {
-  "HeroSection": {
-    "title": "Crie Campanhas de Afiliados de Alta Performance com IA",
-    "subtitle": "Vá da ideia à landing page publicada em minutos. Sem código, apenas resultados."
+  "LoginPage": {
+    "metadataTitle": "Entrar | ConvertiKit",
+    "title": "Bem-vindo(a) de volta",
+    "subtitle": "Insira suas credenciais para acessar seu painel.",
+    "signInButton": "Entrar",
+    "dontHaveAccount": "Não tem uma conta? Cadastre-se"
+  },
+  "SignUpPage": {
+    "metadataTitle": "Cadastre-se | ConvertiKit",
+    "title": "Crie sua Conta",
+    "subtitle": "Junte-se para começar a construir suas campanhas.",
+    "signUpButton": "Criar Conta",
+    "alreadyHaveAccount": "Já tem uma conta? Entrar",
+    "legalNotice": "Ao criar uma conta, você concorda com nossos <terms>Termos de Serviço</terms> e <privacy>Política de Privacidade</privacy>."
+  },
+  "AuthFooter": {
+    "dontHaveAccount": "Não tem uma conta? Cadastre-se",
+    "alreadyHaveAccount": "Já tem uma conta? Entrar"
+  },
+  "SupabaseAuthUI": {
+    "email_label": "Endereço de e-mail",
+    "password_label": "Senha",
+    "forgotten_password": {
+      "link_text": "Esqueceu sua senha?"
+    },
+    "common": {
+      "loading_button_label": "Carregando..."
+    }
+  },
+  "SocialProof": {
+    "title": "Com a confiança dos melhores profissionais de marketing de afiliados do mundo"
+  },
+  "FeaturesSection": {
+    "title": "Uma Suíte de Ferramentas, Potencial Ilimitado",
+    "subtitle": "Tudo o que você precisa para escalar suas operações de afiliado, impulsionado pela tecnologia mais avançada.",
+    "features": [
+      {
+        "icon": "LayoutTemplate",
+        "title": "Construtor de Landings IA",
+        "description": "Crie páginas de venda e captura de alta conversão em minutos com nosso construtor guiado por IA."
+      },
+      {
+        "icon": "FilePen",
+        "title": "AI Copywriter Pro",
+        "description": "Gere textos persuasivos para seus anúncios, e-mails e landing pages que conectam com sua audiência e vendem."
+      },
+      {
+        "icon": "ChartPie",
+        "title": "Análise Preditiva",
+        "description": "Nossa IA analisa suas métricas e te dá insights claros para otimizar suas campanhas e maximizar seu ROI."
+      }
+    ]
+  },
+  "ProcessSteps": {
+    "navLink": "Como Funciona",
+    "tag": "O Processo",
+    "title": "Da Ideia ao Lucro em 3 Passos Simples",
+    "description": "Otimizamos todo o fluxo de trabalho, para que você possa se concentrar na estratégia, não nos detalhes técnicos.",
+    "steps": [
+      {
+        "stepNumber": "01",
+        "iconName": "MousePointerClick",
+        "title": "Construa e Personalize",
+        "description": "Selecione um modelo de alta conversão e personalize-o em minutos com nosso editor intuitivo de arrastar e soltar, impulsionado por IA. Não é necessário codificar.",
+        "checklist": [
+          "Escolha de uma biblioteca de modelos comprovados",
+          "Geração de copy assistida por IA",
+          "Integre sua identidade de marca"
+        ]
+      },
+      {
+        "stepNumber": "02",
+        "iconName": "Rocket",
+        "title": "Lance e Distribua",
+        "description": "Publique sua campanha em uma rede global e rápida (edge network) com um único clique. Use nosso subdomínio gratuito ou conecte o seu próprio.",
+        "checklist": [
+          "Publicação com um único clique",
+          "CDN global para velocidade máxima",
+          "Suporte a domínios personalizados"
+        ]
+      },
+      {
+        "stepNumber": "03",
+        "iconName": "BarChartBig",
+        "title": "Analise e Otimize",
+        "description": "Nosso painel de análise preditiva oferece insights claros e acionáveis. Entenda seu tráfego e otimize para o máximo ROI.",
+        "checklist": [
+          "Acompanhamento de desempenho em tempo real",
+          "Sugestões de testes A/B",
+          "Recomendações estratégicas da L.I.A."
+        ]
+      }
+    ]
+  },
+  "Testimonials": {
+    "tag": "Depoimentos",
+    "title": "O que Nossos Usuários Dizem",
+    "subtitle": "Resultados reais de profissionais de marketing reais que potencializaram seus negócios com o ConvertiKit.",
+    "testimonials": [
+      {
+        "quote": "O ConvertiKit mudou o jogo para nossa agência. Reduzimos nosso tempo de lançamento de campanhas em 90% e vimos um aumento significativo nas conversões em geral. Só o redator de IA já vale o preço.",
+        "authorName": "Sara J.",
+        "authorTitle": "Fundadora, Agência de Crescimento Digital",
+        "authorImage": ""
+      },
+      {
+        "quote": "Como profissional de marketing de afiliados solo, não tenho tempo para ferramentas complexas. O ConvertiKit é incrivelmente intuitivo e as análises preditivas me ajudam a tomar decisões mais inteligentes. Meus lucros dobraram desde que comecei a usá-lo.",
+        "authorName": "Miguel R.",
+        "authorTitle": "Super Afiliado, Nicho de Saúde e Bem-Estar",
+        "authorImage": ""
+      }
+    ]
+  },
+  "Metrics": {
+    "metrics": [
+      {
+        "iconName": "Zap",
+        "value": 98,
+        "suffix": "%",
+        "label": "Lançamentos de Campanha Mais Rápidos"
+      },
+      {
+        "iconName": "TrendingUp",
+        "prefix": "+",
+        "value": 35,
+        "suffix": "%",
+        "label": "Aumento Médio de Conversão"
+      },
+      {
+        "iconName": "Users",
+        "value": 10000,
+        "suffix": "+",
+        "label": "Marketers Satisfeitos"
+      }
+    ]
+  },
+  "FAQ": {
+    "tag": "FAQs",
+    "title": "Perguntas Frequentes",
+    "subtitle": "Tem perguntas? Nós temos respostas. Se não encontrar o que procura, sinta-se à vontade para contatar nossa equipe de suporte.",
+    "items": [
+      {
+        "question": "Existe um período de teste gratuito?",
+        "answer": "Sim, oferecemos um plano gratuito que inclui todos os recursos básicos para você começar. Não é necessário cartão de crédito para se inscrever."
+      }
+    ],
+    "searchPlaceholder": "Buscar perguntas...",
+    "noResultsText": "Nenhuma pergunta correspondente encontrada.",
+    "clearSearchAriaLabel": "Limpar busca"
+  },
+  "SupportCTA": {
+    "title": "Ainda tem Dúvidas?",
+    "description": "Nossa equipe de suporte dedicada está aqui para ajudá-lo a ter sucesso. Seja você um iniciante ou um especialista, nós te damos cobertura.",
+    "contactButtonText": "Contatar Suporte",
+    "docsButtonText": "Ler Documentação"
+  },
+  "BottomCTA": {
+    "title": "Pronto para Disparar suas Conversões?",
+    "subtitle": "Junte-se a milhares de afiliados de elite que constroem mais rápido, convertem mais e escalam seus negócios com o ConvertiKit.",
+    "featuresTitle": "Comece com tudo que você precisa:",
+    "features": [
+      "Construtor de Landing Pages com IA",
+      "Hospedagem de Alta Performance Inclusa",
+      "Análises e Rastreamento Avançados",
+      "Campanhas Ilimitadas"
+    ],
+    "ctaPrimaryText": "Comece de Graça",
+    "ctaPlaceholderText": "Digite seu e-mail",
+    "pricingNote": "Grátis para Sempre. Não é necessário cartão de crédito.",
+    "guaranteeNote": "Garantia de Satisfação de 100%.",
+    "creditCardNote": "Sem cartão de crédito."
+  },
+  "LandingHeader": {
+    "features": "Recursos",
+    "pricing": "Preços",
+    "signIn": "Entrar",
+    "signUp": "Cadastre-se Grátis",
+    "openMenu": "Abrir menu"
+  },
+  "LandingFooter": {
+    "slogan": "Seu copiloto estratégico para marketing de afiliados.",
+    "product": "Produto",
+    "company": "Empresa",
+    "stayUpdated": "Mantenha-se Atualizado",
+    "newsletterPrompt": "Junte-se à nossa newsletter para receber as últimas notícias e dicas.",
+    "subscribe": "Inscrever-se",
+    "allRightsReserved": "© {year} ConvertiKit. Todos os direitos reservados."
+  },
+  "AboutPage": {
+    "title": "Sobre Nós"
+  },
+  "BlogPage": {
+    "title": "Blog"
+  },
+  "PrivacyPolicyPage": {
+    "title": "Política de Privacidade"
+  },
+  "TermsOfServicePage": {
+    "title": "Termos de Serviço"
+  },
+  "ThemeSwitcher": {
+    "toggleTheme": "Alternar tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
   },
   "LanguageSwitcher": {
     "selectLanguage_sr": "Selecionar idioma",
@@ -11,5 +214,19 @@
     "flag_es_ES": "🇪🇸",
     "language_pt_BR": "Português",
     "flag_pt_BR": "🇧🇷"
+  },
+  "HeroSection": {
+    "title": "Crie Campanhas de Afiliados de Alta Performance com IA",
+    "subtitle": "Vá da ideia à landing page publicada em minutos. Sem código, apenas resultados.",
+    "ctaPrimary": "Comece Agora",
+    "ctaSecondary": "Como Funciona"
+  },
+  "Newsletter": {
+    "success_duplicate": "Você já está inscrito! Obrigado pelo seu interesse.",
+    "success_new": "Obrigado por se inscrever! Fique atento às novidades.",
+    "error_server": "Não foi possível processar a inscrição. Por favor, tente novamente.",
+    "error_invalid_email": "Por favor, forneça um endereço de e-mail válido.",
+    "error_unexpected": "Ocorreu um erro inesperado."
   }
 }
+

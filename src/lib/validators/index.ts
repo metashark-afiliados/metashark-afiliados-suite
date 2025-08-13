@@ -1,43 +1,46 @@
 // src/lib/validators/index.ts
 /**
  * @file validators/index.ts
- * @description Manifiesto de Validadores. Ha sido refactorizado para separar los
- *              esquemas de cliente y servidor, resolviendo un conflicto de tipos
- *              entre `react-hook-form` y las transformaciones de Zod.
- * @author Metashark (Refactorizado por L.I.A Legacy)
- * @version 15.0.0 (Client/Server Schema Separation)
+ * @description Manifiesto de Validadores de Élite. Este aparato es la Única
+ *              Fuente de Verdad (SSoT) para todos los contratos de datos y
+ *              reglas de validación en la aplicación. Implementa un patrón
+ *              de separación Cliente/Servidor para transformaciones de datos
+ *              y utiliza claves de i18n para los mensajes de error, cumpliendo
+ *              con los más altos estándares de arquitectura.
+ * @author Raz Podestá
+ * @version 19.0.0
  */
 import { z } from "zod";
 
 import { keysToSnakeCase } from "@/lib/helpers/object-case-converter";
 
+// --- RE-EXPORTACIÓN DE CONTRATOS COMPARTIDOS ---
 export * from "./i18n.schema";
 
 export type ActionResult<T = unknown> =
   | { success: true; data: T }
   | { success: false; error: string };
 
-const UuidSchema = z.string().uuid("ID inválido.");
+// --- ESQUEMAS BASE ATÓMICOS (INTERNACIONALIZADOS) ---
+
+const UuidSchema = z.string().uuid({ message: "error_invalid_id" });
 const NameSchema = z
-  .string({ required_error: "El nombre es requerido." })
+  .string({ required_error: "error_name_required" })
   .trim()
-  .min(3, "El nombre debe tener al menos 3 caracteres.");
+  .min(3, { message: "error_name_too_short" });
 const SubdomainSchema = z
   .string()
   .trim()
-  .min(3, "El subdominio debe tener al menos 3 caracteres.")
-  .regex(
-    /^[a-z0-9-]+$/,
-    "Solo se permiten letras minúsculas, números y guiones."
-  )
+  .min(3, { message: "error_subdomain_too_short" })
+  .regex(/^[a-z0-9-]+$/, { message: "error_subdomain_invalid_chars" })
   .transform((subdomain) => subdomain.toLowerCase());
 export const EmailSchema = z
   .string()
   .trim()
-  .email("Por favor, introduce un email válido.");
+  .email({ message: "error_invalid_email" });
 export const PasswordSchema = z
   .string()
-  .min(8, "La contraseña debe tener al menos 8 caracteres.");
+  .min(8, { message: "error_password_too_short" });
 const slugify = (text: string): string => {
   const a =
     "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
@@ -55,15 +58,12 @@ const slugify = (text: string): string => {
     .replace(/-+$/, "");
 };
 
-export const SignUpSchema = z.object({
-  email: EmailSchema,
-  password: PasswordSchema,
-});
-export const SignInSchema = z.object({
-  email: EmailSchema,
-  password: z.string().min(1, "La contraseña es requerida."),
-});
+// --- ESQUEMAS DE AUTENTICACIÓN ---
+// Los schemas de SignIn y SignUp han sido eliminados para delegar la
+// validación a la UI de Supabase.
 export type RequestPasswordResetState = { error: string | null };
+
+// --- ESQUEMAS DE ENTIDADES ---
 
 export const CreateSiteClientSchema = z.object({
   name: NameSchema.optional(),
@@ -95,7 +95,7 @@ export const DeleteSiteSchema = z.object({ siteId: UuidSchema });
 export const CreateWorkspaceSchema = z
   .object({
     workspaceName: NameSchema,
-    icon: z.string().trim().min(1, "El ícono es requerido."),
+    icon: z.string().trim().min(1, { message: "error_icon_required" }),
   })
   .transform(keysToSnakeCase);
 
@@ -119,8 +119,8 @@ export const CreateCampaignSchema = z
     slug: z
       .string()
       .trim()
-      .min(3, "El slug debe tener al menos 3 caracteres.")
-      .regex(/^[a-z0-9-]+$/, "Solo se permiten minúsculas, números y guiones.")
+      .min(3, { message: "error_slug_too_short" })
+      .regex(/^[a-z0-9-]+$/, { message: "error_slug_invalid_chars" })
       .optional(),
     siteId: UuidSchema,
   })
@@ -129,9 +129,11 @@ export const CreateCampaignSchema = z
 
 export const DeleteCampaignSchema = z.object({ campaignId: UuidSchema });
 
+// --- ESQUEMAS DE TELEMETRÍA Y NEWSLETTER ---
+
 export const ClientVisitSchema = z.object({
   sessionId: UuidSchema,
-  fingerprint: z.string().min(1, "Fingerprint es requerido."),
+  fingerprint: z.string().min(1, { message: "error_fingerprint_required" }),
   screenWidth: z.number().int().positive().optional(),
   screenHeight: z.number().int().positive().optional(),
   userAgentClientHint: z
@@ -142,8 +144,8 @@ export const ClientVisitSchema = z.object({
 
 export const VisitorLogSchema = z.object({
   session_id: UuidSchema,
-  fingerprint: z.string().min(1, "Fingerprint es requerido."),
-  ip_address: z.string().ip("Dirección IP inválida."),
+  fingerprint: z.string().min(1, { message: "error_fingerprint_required" }),
+  ip_address: z.string().ip({ message: "error_invalid_ip" }),
   geo_data: z.record(z.any()).nullable().optional(),
   user_agent: z.string().nullable().optional(),
   utm_params: z.record(z.any()).nullable().optional(),
@@ -160,11 +162,12 @@ export const VisitorLogSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **SSoT de Validação**: ((Implementada)) Este arquivo centraliza toda a lógica de validação, servindo como uma SSoT para o formato dos dados em toda a aplicação.
- * 2. **Padrão Cliente/Servidor**: ((Implementada)) A separação de esquemas resolve um problema arquitetônico complexo de forma elegante, permitindo validações no cliente sem transformações e preparando os dados para o servidor.
+ * 1. **Full Internacionalización**: ((Implementada)) Todos los mensajes de error de validación han sido reemplazados por claves de i18n, eliminando la deuda técnica y preparando la aplicación para una localización completa.
+ * 2. **Patrón de Transformación de Datos**: ((Implementada)) La introducción de `keysToSnakeCase` en los schemas de servidor es una mejora de élite que automatiza la conversión de datos, reduce el código repetitivo en las Server Actions y previene errores.
+ * 3. **Simplificación Arquitectónica**: ((Implementada)) La eliminación de los schemas de autenticación obsoletos alinea este manifiesto con la nueva arquitectura delegada.
  *
  * @subsection Melhorias Futuras
- * 1. **Helper `keysToSnakeCase` Pendente**: ((Vigente)) Este arquivo depende do helper `keysToSnakeCase` de `lib/helpers/object-case-converter.ts`, que precisará ser migrado.
+ * 1. **Composición de Schemas**: ((Vigente)) Para entidades complejas, se podría usar `schema.extend()` o `schema.merge()` para componer schemas base, adhiriéndose aún más al principio DRY.
  *
  * =====================================================================
  */

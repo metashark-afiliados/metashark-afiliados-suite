@@ -1,0 +1,32 @@
+{
+  "en-US": {
+    "overview": "Overview",
+    "userManagement": "User Management",
+    "campaignViewer": "Campaign Viewer",
+    "telemetry": "Telemetry",
+    "auditLogs": "Audit Logs",
+    "routeViewer": "Project Route Viewer",
+    "loadingRoutes": "Loading routes...",
+    "signOut": "Sign Out"
+  },
+  "es-ES": {
+    "overview": "Resumen",
+    "userManagement": "Gestión de Usuarios",
+    "campaignViewer": "Visor de Campañas",
+    "telemetry": "Telemetría",
+    "auditLogs": "Logs de Auditoría",
+    "routeViewer": "Visor de Rutas del Proyecto",
+    "loadingRoutes": "Cargando rutas...",
+    "signOut": "Cerrar Sesión"
+  },
+  "pt-BR": {
+    "overview": "Visão Geral",
+    "userManagement": "Gerenciamento de Usuários",
+    "campaignViewer": "Visualizador de Campanhas",
+    "telemetry": "Telemetria",
+    "auditLogs": "Logs de Auditoria",
+    "routeViewer": "Visualizador de Rotas do Projeto",
+    "loadingRoutes": "Carregando rotas...",
+    "signOut": "Sair"
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "en-US": {
+    "navLink": "How it Works",
+    "tag": "The Process",
+    "title": "From Idea to Profit in 3 Simple Steps",
+    "description": "We've streamlined the entire workflow, so you can focus on strategy, not on technical details.",
+    "steps": [
+      {
+        "stepNumber": "01",
+        "iconName": "MousePointerClick",
+        "title": "Build & Customize",
+        "description": "Select a high-converting template and customize it in minutes with our intuitive AI-powered drag-and-drop editor. No coding required.",
+        "checklist": [
+          "Choose from a library of proven templates",
+          "AI-assisted copy generation",
+          "Integrate your brand identity"
+        ]
+      },
+      {
+        "stepNumber": "02",
+        "iconName": "Rocket",
+        "title": "Launch & Distribute",
+        "description": "Publish your campaign to a fast, global edge network with a single click. Use our free subdomain or connect your own.",
+        "checklist": [
+          "One-click publishing",
+          "Global CDN for maximum speed",
+          "Custom domain support"
+        ]
+      },
+      {
+        "stepNumber": "03",
+        "iconName": "BarChart3",
+        "title": "Analyze & Optimize",
+        "description": "Our predictive analytics dashboard gives you clear, actionable insights. Understand your traffic and optimize for maximum ROI.",
+        "checklist": [
+          "Real-time performance tracking",
+          "A/B testing suggestions",
+          "L.I.A. strategic recommendations"
+        ]
+      }
+    ]
+  },
+  "es-ES": {
+    "navLink": "Cómo Funciona",
+    "tag": "El Proceso",
+    "title": "De la Idea al Beneficio en 3 Simples Pasos",
+    "description": "Hemos optimizado todo el flujo de trabajo, para que puedas concentrarte en la estrategia, no en los detalles técnicos.",
+    "steps": [
+      {
+        "stepNumber": "01",
+        "iconName": "MousePointerClick",
+        "title": "Construye y Personaliza",
+        "description": "Selecciona una plantilla de alta conversión y personalízala en minutos con nuestro intuitivo editor de arrastrar y soltar, impulsado por IA. No se requiere código.",
+        "checklist": [
+          "Elige de una biblioteca de plantillas probadas",
+          "Generación de copy asistida por IA",
+          "Integra tu identidad de marca"
+        ]
+      },
+      {
+        "stepNumber": "02",
+        "iconName": "Rocket",
+        "title": "Lanza y Distribuye",
+        "description": "Publica tu campaña en una red global y rápida (edge network) con un solo clic. Usa nuestro subdominio gratuito o conecta el tuyo.",
+        "checklist": [
+          "Publicación con un solo clic",
+          "CDN global para máxima velocidad",
+          "Soporte para dominios personalizados"
+        ]
+      },
+      {
+        "stepNumber": "03",
+        "iconName": "BarChart3",
+        "title": "Analiza y Optimiza",
+        "description": "Nuestro panel de análisis predictivo te brinda insights claros y accionables. Entiende tu tráfico y optimiza para el máximo ROI.",
+        "checklist": [
+          "Seguimiento del rendimiento en tiempo real",
+          "Sugerencias de pruebas A/B",
+          "Recomendaciones estratégicas de L.I.A."
+        ]
+      }
+    ]
+  },
+  "pt-BR": {
+    "navLink": "Como Funciona",
+    "tag": "O Processo",
+    "title": "Da Ideia ao Lucro em 3 Passos Simples",
+    "description": "Otimizamos todo o fluxo de trabalho, para que você possa se concentrar na estratégia, não nos detalhes técnicos.",
+    "steps": [
+      {
+        "stepNumber": "01",
+        "iconName": "MousePointerClick",
+        "title": "Construa e Personalize",
+        "description": "Selecione um modelo de alta conversão e personalize-o em minutos com nosso editor intuitivo de arrastar e soltar, impulsionado por IA. Não é necessário codificar.",
+        "checklist": [
+          "Escolha de uma biblioteca de modelos comprovados",
+          "Geração de copy assistida por IA",
+          "Integre sua identidade de marca"
+        ]
+      },
+      {
+        "stepNumber": "02",
+        "iconName": "Rocket",
+        "title": "Lance e Distribua",
+        "description": "Publique sua campanha em uma rede global e rápida (edge network) com um único clique. Use nosso subdomínio gratuito ou conecte o seu próprio.",
+        "checklist": [
+          "Publicação com um único clique",
+          "CDN global para velocidade máxima",
+          "Suporte a domínios personalizados"
+        ]
+      },
+      {
+        "stepNumber": "03",
+        "iconName": "BarChart3",
+        "title": "Analise e Otimize",
+        "description": "Nosso painel de análise preditiva oferece insights claros e acionáveis. Entenda seu tráfego e otimize para o máximo ROI.",
+        "checklist": [
+          "Acompanhamento de desempenho em tempo real",
+          "Sugestões de testes A/B",
+          "Recomendações estratégicas da L.I.A."
+        ]
+      }
+    ]
+  }
+}

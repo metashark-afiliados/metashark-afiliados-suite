@@ -1,11 +1,10 @@
-// src/lib/types/database/enums.ts
 /**
  * @file enums.ts
  * @description Contiene las definiciones de tipo para todos los ENUMs de la base de datos.
- *              Ha sido sincronizado con los tipos autogenerados para resolver
- *              conflictos de compatibilidad.
- * @author Metashark (adaptado de Supabase CLI, expandido por L.I.A Legacy)
- * @version 2.0.0 (Schema Synchronization)
+ *              Ha sido nivelado para incluir el tipo `campaign_status`, resolviendo una
+ *              desincronización crítica de esquema que causaba errores de compilación.
+ * @author Raz Podestá
+ * @version 2.1.0
  */
 export type Enums = {
   app_role: "user" | "admin" | "developer";
@@ -36,6 +35,8 @@ export type Enums = {
   leaderboard_scope: "global" | "workspace" | "country";
   commission_type: "percentage" | "fixed_amount";
   product_status: "active" | "inactive" | "pending_approval";
+  // --- MEJORA DE ÉLITE: Sincronización de Esquema ---
+  campaign_status: "draft" | "active" | "paused" | "completed" | "archived";
 };
 
 /**
@@ -44,11 +45,10 @@ export type Enums = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato de Tipos Enum**: ((Implementada)) Este arquivo centraliza todos os tipos ENUM, fornecendo uma SSoT para os estados discretos em toda a aplicação e resolvendo uma dependência chave para os tipos de tabela.
+ * 1. **Sincronización de Esquema**: ((Implementada)) Se ha añadido el tipo `campaign_status`, alineando este manifiesto con el `schema.sql` y resolviendo la causa raíz del error `TS2339`.
  *
  * @subsection Melhorias Futuras
- * 1. **Geração Automática**: ((Vigente)) Idealmente, este arquivo deveria ser gerado automaticamente pela introspecção do esquema da base de dados para garantir uma sincronização contínua e sem erros.
+ * 1. **Generación Automática**: ((Vigente)) Este archivo debería ser generado automáticamente a partir de la introspección del esquema de la base de datos.
  *
  * =====================================================================
  */
-// src/lib/types/database/enums.ts
