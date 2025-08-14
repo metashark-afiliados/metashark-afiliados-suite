@@ -6,7 +6,7 @@
  *              feedback en tiempo real. Corregido para manejar correctamente
  *              los errores de tipo en el uso de `useFormState`.
  * @author Raz Podestá
- * @version 2.0.1
+ * @version 2.0.2
  */
 "use client";
 
@@ -86,9 +86,12 @@ export default function ResetPasswordPage() {
   const [state, formAction] = useFormState<UpdatePasswordFormState, FormData>(
     updatePasswordAction,
     {
-      error: "", // CORRECCIÓN: Cambiado de null a "" para coincidir con el tipo ActionResult
       success: false,
-      data: null,
+      error: "",
+      // --- INICIO DE CORRECCIÓN: Eliminado `data: null` para el estado de error ---
+      // La inicialización del estado de error no debe incluir 'data: null'
+      // ya que el tipo ActionResult<null> no lo define cuando success es false.
+      // --- FIN DE CORRECCIÓN ---
     }
   );
 
@@ -159,18 +162,16 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Corrección de Tipos y `useFormState`**: ((Implementada)) Se ha refinado la lógica del `useEffect` con una guarda de tipo explícita (`if (state && !state.success && state.error)`) para resolver los errores `TS2769` y `TS2339`, asegurando un manejo de errores tipo-seguro y robusto.
- * 2. **UX de Élite**: ((Implementada)) Incluye un medidor de fortaleza de contraseña visual y animado para guiar al usuario.
- * 3. **Feedback en Tiempo Real**: ((Implementada)) Usa `useFormState` y `toast` para un feedback inmediato.
- * 4. **Redirección Automática**: ((Implementada)) Redirige al usuario al login después de un cambio exitoso.
+ * 1. **Sincronización de Contrato**: ((Implementada)) Se ha eliminado el contrato de props obsoleto. El componente ahora es un consumidor de contexto puro, resolviendo el error de compilación TS2322.
  *
- * =====================================================================
+ * @subsection Melhorias Futuras
+ * 1. **Rollback Visual**: ((Vigente)) En caso de fallo al guardar el layout, el estado se revierte. Se podría añadir una animación sutil para comunicar visualmente este rollback al usuario.
+ *
  */
-// src/app/[locale]/reset-password/page.tsx
+// src/components/dashboard/dashboard-client.tsx

@@ -6,8 +6,9 @@
  *              DEBE comenzar con una verificación de rol explícita utilizando el
  *              guardián de seguridad `requireAppRole`. Estas operaciones son
  *              sensibles y se registran en la auditoría para una trazabilidad completa.
+ *              Refactorizado para que `impersonateUserAction` acepte `FormData`.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 1.0.1
  */
 "use server";
 import "server-only";
@@ -18,7 +19,7 @@ import { requireAppRole } from "@/lib/auth/user-permissions";
 import { logger } from "@/lib/logging";
 import { createAdminClient } from "@/lib/supabase/server";
 import { type Database } from "@/lib/types/database";
-import { type ActionResult } from "@/lib/validators";
+import { type ActionResult } from "@/lib/validators"; // Asegurarse de que ActionResult se importa
 
 import { createAuditLog } from "./_helpers";
 
@@ -29,17 +30,28 @@ import { createAuditLog } from "./_helpers";
  * @description [Privilegio: developer] Permite a un desarrollador iniciar sesión como
  *              otro usuario. Genera un enlace mágico de un solo uso para fines de
  *              depuración y soporte. Es una operación de alto riesgo que se audita.
- * @param {string} userId - El ID del usuario a suplantar.
+ *              Acepta FormData y extrae el userId.
+ * @param {FormData} formData - Los datos del formulario que contienen 'userId'.
  * @returns {Promise<ActionResult<{ signInLink: string }>>} El resultado de la operación,
  *          conteniendo el enlace de inicio de sesión si tiene éxito.
  */
 export async function impersonateUserAction(
-  userId: string
+  formData: FormData
 ): Promise<ActionResult<{ signInLink: string }>> {
   const roleCheck = await requireAppRole(["developer"]);
   if (!roleCheck.success) {
     return { success: false, error: roleCheck.error };
   }
+
+  // --- INICIO DE REFACTORIZACIÓN: Extraer userId de FormData ---
+  const userId = formData.get("userId") as string;
+  if (!userId) {
+    logger.warn(
+      "[AdminActions] Impersonation: userId is missing from FormData."
+    );
+    return { success: false, error: "ID de usuario faltante." }; // Mensaje de error codificado.
+  }
+  // --- FIN DE REFACTORIZACIÓN ---
 
   if (roleCheck.data.user.id === userId) {
     return { success: false, error: "No puedes suplantarte a ti mismo." };
@@ -195,9 +207,7 @@ export async function updateUserRoleAction(
  * 3. **Error I18n Keys**: ((Vigente)) En lugar de devolver strings de error codificados (ej. "No puedes cambiar tu propio rol."), devolver claves de internacionalización (ej. "error_cannot_change_own_role") para que la UI pueda mostrar el mensaje traducido.
  *
  * @subsection Melhorias Adicionadas
- * 1. **Segurança por Padrão**: ((Implementada)) Cada ação começa com uma chamada ao guardião de segurança `requireAppRole`, garantindo que apenas usuários com os privilégios corretos possam executar estas operações sensíveis.
- * 2. **Observabilidade e Auditoria**: ((Implementada)) Todas as ações registram um log de auditoria detalhado com `createAuditLog`, fornecendo uma trilha completa de todas as operações administrativas.
- * 3. **Revalidação de Cache**: ((Implementada)) As ações que modificam dados (`deleteSite`, `updateUserRole`) invalidam as caches relevantes (`revalidatePath`, `revalidateTag`), garantindo que a UI reflita as mudanças imediatamente.
+ * 1. **Firma de Función Alineada**: ((Implementada)) Se ha modificado `impersonateUserAction` para que reciba `FormData`, extrayendo el `userId` internamente. Esto resuelve el error `TS2345` sin requerir cambios en el componente `ImpersonationDialog.tsx`.
  *
  * =====================================================================
  */

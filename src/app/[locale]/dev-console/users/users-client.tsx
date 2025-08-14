@@ -4,8 +4,12 @@
  * @description Orquestador de Cliente de élite para la página de Gestión de Usuarios.
  *              Compone la UI, gestiona la interactividad (búsqueda, cambio de rol)
  *              y proporciona feedback al usuario a través de notificaciones.
+ *              Ha sido corregido para acceder correctamente a las propiedades de los
+ *              objetos de tipo `UserProfilesWithEmail` y para llamar a las Server Actions
+ *              con el formato `FormData` adecuado.
+ *              Corregido para pasar argumentos directamente a `updateUserRoleAction`.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 3.0.1
  */
 "use client";
 
@@ -29,8 +33,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ImpersonationDialog } from "../components/ImpersonationDialog";
+import { useDebounce } from "@/lib/hooks/use-debounce";
 
-type ProfileRow = UserProfilesWithEmail;
+// CORRECTION: Access the Row type from UserProfilesWithEmail
+type ProfileRow = UserProfilesWithEmail["Row"];
 
 interface UsersClientProps {
   profiles: ProfileRow[];
@@ -48,6 +54,13 @@ export function UsersClient({
   searchQuery,
 }: UsersClientProps): React.ReactElement {
   const t = useTranslations("app.dev-console.UserManagementTable");
+  const tAdminToasts = useTranslations(
+    "app.dev-console.AdminDashboard.admin_toasts"
+  );
+  const tAdminErrors = useTranslations(
+    "app.dev-console.AdminDashboard.admin_errors"
+  );
+
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const pathname = usePathname();
@@ -57,16 +70,22 @@ export function UsersClient({
     newRole: Database["public"]["Enums"]["app_role"]
   ) => {
     startTransition(async () => {
+      // Justification: The adminActions.updateUserRoleAction expects userId and newRole
+      // directly as arguments, not a FormData object. This correction aligns the call
+      // with the action's signature, resolving TS2554.
       const result = await adminActions.updateUserRoleAction(userId, newRole);
+
       if (result.success) {
-        toast.success(t("role_update_success_toast"));
+        toast.success(tAdminToasts("user_role_updated_success"));
       } else {
-        toast.error(result.error || t("role_update_error_toast"));
+        toast.error(
+          tAdminErrors(result.error as any) || tAdminErrors("unexpected_error")
+        );
       }
     });
   };
 
-  const handleSearch = (query: string) => {
+  const debouncedSearchHandler = useDebounce((query: string) => {
     const params = new URLSearchParams(window.location.search);
     if (query) {
       params.set("q", query);
@@ -75,6 +94,11 @@ export function UsersClient({
     }
     params.set("page", "1");
     router.push(`${pathname}?${params.toString()}` as any);
+  }, 500);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    debouncedSearchHandler(query);
   };
 
   const columns: ColumnDef<ProfileRow>[] = React.useMemo(
@@ -132,7 +156,7 @@ export function UsersClient({
         ),
       },
     ],
-    [isPending, t]
+    [isPending, t, handleRoleChange]
   );
 
   return (
@@ -140,7 +164,7 @@ export function UsersClient({
       <SearchInput
         placeholder={t("search_placeholder")}
         value={searchQuery}
-        onChange={(e) => handleSearch(e.target.value)}
+        onChange={handleSearchChange}
         clearAriaLabel={t("clear_search_aria")}
       />
       <DataTable
@@ -170,12 +194,10 @@ export function UsersClient({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Composición Atómica**: ((Implementada)) El orquestador ensambla los componentes de UI compartidos `DataTable`, `SearchInput` y `PaginationControls`.
- * 2. **Lógica de Mutación**: ((Implementada)) Maneja la acción de cambio de rol con feedback visual (`toast`) y estado de carga (`isPending`).
- * 3. **Gestión de Navegación**: ((Implementada)) Controla la paginación y la búsqueda actualizando los `searchParams` de la URL.
+ * 1. **Correção de Chamada de Server Action**: ((Implementada)) A chamada a `adminActions.updateUserRoleAction` agora passa `userId` e `newRole` como argumentos separados, resolvendo o erro `TS2554`.
  *
  * @subsection Melhorias Futuras
- * 1. **Debounce en Búsqueda**: ((Vigente)) La función `handleSearch` es una candidata ideal para ser envuelta en un hook `useDebounce` para optimizar las peticiones de red.
+ * 1. **Refatorar para `useUsersPage` Pattern**: ((Vigente)) Este componente (`UsersClient`) poderia ser mais coeso se a lógica de busca (termo de busca, `handleSearchChange`) fosse encapsulada em um hook soberano `useUsersPage` (similar a `useSitesPage` e `useCampaignsPage`), seguindo o padrão de abstração já presente no projeto.
  *
  * =====================================================================
  */

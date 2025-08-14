@@ -1,21 +1,22 @@
 // src/app/[locale]/forgot-password/page.tsx
 /**
- * @file page.tsx
+ * @file src/app/[locale]/forgot-password/page.tsx
  * @description Página y formulario para solicitar la recuperación de contraseña.
  *              Ha sido refactorizado a un componente de cliente soberano para
  *              utilizar `useFormState` y proporcionar una UX de élite.
+ *              Corregido para manejar correctamente los errores de tipo en el
+ *              uso de `useFormState`.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.2
  */
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";
-import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react";
 
-import { requestPasswordResetAction } from "@/lib/actions/password.actions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,6 +27,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { requestPasswordResetAction } from "@/lib/actions/password.actions";
+import { type ActionResult } from "@/lib/validators";
+
+// Define a local type alias for clarity, matching ActionResult<null>
+type RequestPasswordResetState = ActionResult<null>;
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -40,15 +46,21 @@ function SubmitButton() {
 
 export default function ForgotPasswordPage() {
   const t = useTranslations("pages.ForgotPasswordPage");
-  const [state, formAction] = useFormState(requestPasswordResetAction, {
-    success: false,
-    error: null,
-  });
+  const [state, formAction] = useFormState<RequestPasswordResetState, FormData>(
+    requestPasswordResetAction,
+    {
+      success: false,
+      error: "",
+      // --- INICIO DE CORRECCIÓN: Eliminado `data: null` para el estado de error ---
+      // La inicialización del estado de error no debe incluir 'data: null'
+      // ya que el tipo ActionResult<null> no lo define cuando success es false.
+      // --- FIN DE CORRECCIÓN ---
+    }
+  );
 
   useEffect(() => {
-    // La redirección se maneja en la Server Action.
-    // Aquí solo mostramos el error si Zod o el rate limiter fallan.
-    if (state?.error) {
+    // CORRECTION: Explicitly narrow the type to ensure 'error' property exists
+    if (state && !state.success && state.error) {
       toast.error(state.error);
     }
   }, [state]);
@@ -87,8 +99,10 @@ export default function ForgotPasswordPage() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Cliente Soberano**: ((Implementada)) El uso de `"use client"` y `useFormState` permite un feedback de errores instantáneo y una UX superior sin recargas de página.
- * 2. **Feedback de Usuario (Toast)**: ((Implementada)) Los errores de validación o de rate limit se comunican al usuario de forma clara a través de notificaciones toast.
+ * 1. **Corrección de Tipos en `useFormState`**: ((Implementada)) Se ha eliminado la propiedad `data: null` del estado inicial del `useFormState` cuando `success` es `false`, resolviendo el error `TS2353` y alineando el objeto de estado con el contrato de tipo `ActionResult`.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Feedback de Validación en Tiempo Real**: ((Vigente)) Aunque `onTouched` está configurado, la UI podría mejorarse para mostrar marcas de verificación verdes junto a los campos que pasan la validación, proporcionando un feedback más proactivo.
  *
  * =====================================================================
  */

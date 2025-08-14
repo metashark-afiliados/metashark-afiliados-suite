@@ -4,14 +4,15 @@
  * @description Página de servidor principal del constructor. Actúa como la capa de
  *              seguridad y obtención de datos, preparando e hidratando el estado
  *              inicial para la UI del cliente.
+ *              Corregido para importar el módulo de datos de campaña con su nombre de exportación correcto.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 import { notFound, redirect } from "next/navigation";
 
 import { Canvas } from "@/components/builder/Canvas";
 import { type CampaignConfig } from "@/lib/builder/types.d";
-import { campaigns as campaignsData } from "@/lib/data";
+import { campaignsData } from "@/lib/data"; // CORRECTION: Changed import to campaignsData
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 import { useBuilderStore } from "@/lib/builder/core/store";
@@ -87,14 +88,14 @@ export default async function BuilderPage({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Seguridad Robusta**: ((Implementada)) La página actúa como un guardián de seguridad, validando la sesión y los permisos a través de la capa de datos antes de renderizar.
- * 2. **Hidratación de Estado SSR**: ((Implementada)) El uso de `useBuilderStore.setState` en un Server Component es una técnica de élite que mejora significativamente el rendimiento de carga inicial.
- * 3. **Lógica de Fallback de UX**: ((Implementada)) Proporciona una configuración por defecto para campañas nuevas, asegurando que el usuario nunca vea un estado de error inesperado.
+ * 1. **Correção de Importação**: ((Implementada)) A importação de `campaignsData` foi corrigida para usar o nome de exportação correto do arquivo barril `src/lib/data/index.ts`, resolvendo o erro `TS2305`.
+ * 2. **Segurança Robusta**: ((Implementada)) A página atua como um guardião de segurança, validando a sessão e os permissões através da camada de dados antes de renderizar.
+ * 3. **Hidratação de Estado SSR**: ((Implementada)) O uso de `useBuilderStore.setState` em um Server Component é uma técnica de élite que melhora significativamente o desempenho de carga inicial.
+ * 4. **Lógica de Fallback de UX**: ((Implementada)) Fornece uma configuração por defeito para campanhas novas, garantindo que o usuário nunca veja um estado de erro inesperado.
  *
  * @subsection Melhorias Futuras
- * 1. **Cacheo de Datos de Campaña**: ((Vigente)) La consulta `getCampaignContentById` es un candidato ideal para ser cacheada con `unstable_cache` de Next.js.
- * 2. **Sistema de Plantillas de Campaña**: ((Vigente)) La estructura de campaña por defecto está codificada. Una mejora arquitectónica sería mover esta y otras plantillas a una tabla `campaign_templates`.
+ * 1. **Cacheo de Dados de Campanha**: ((Implementada)) A consulta `getCampaignContentById` é agora cacheada com `unstable_cache` de Next.js (implementado em `src/lib/data/campaigns/editor.data.ts`).
+ * 2. **Sistema de Plantillas de Campaña**: ((Vigente)) A estrutura de campanha por defeito está codificada. Uma melhoria arquitetónica seria mover esta e outras plantillas para uma tabela `campaign_templates`.
  *
  * =====================================================================
  */
-// src/app/[locale]/builder/[campaignId]/page.tsx
