@@ -1,0 +1,56 @@
+{
+  "en-US": {
+    "title": "Disclaimer",
+    "content": [
+      {
+        "title": "1. Affiliate Disclosure",
+        "body": [
+          "Some of the links on this website are affiliate links, which means that we may earn a commission if you click on the link or make a purchase using the link. When you make a purchase, the price you pay will be the same whether you use the affiliate link or go directly to the vendor's website using a non-affiliate link.",
+          "By using the affiliate links, you are helping support the ConvertiKit service, and we genuinely appreciate your support."
+        ]
+      },
+      {
+        "title": "2. Earnings Disclaimer",
+        "body": [
+          "While we make every effort to ensure that we accurately represent all the products and services reviewed on this website and their potential for income, it should be noted that earnings and income statements made by ConvertiKit and its advertisers / sponsors are estimates only of what we think you can possibly earn. There is no guarantee that you will make these levels of income and you accept the risk that the earnings and income statements differ by individual."
+        ]
+      }
+    ]
+  },
+  "es-ES": {
+    "title": "Descargo de Responsabilidad",
+    "content": [
+      {
+        "title": "1. Divulgación de Afiliados",
+        "body": [
+          "Algunos de los enlaces en este sitio web son enlaces de afiliados, lo que significa que podemos ganar una comisión si hace clic en el enlace o realiza una compra utilizando el enlace. Cuando realiza una compra, el precio que paga será el mismo ya sea que utilice el enlace de afiliado o vaya directamente al sitio web del proveedor utilizando un enlace no afiliado.",
+          "Al utilizar los enlaces de afiliados, está ayudando a apoyar el servicio de ConvertiKit, y agradecemos sinceramente su apoyo."
+        ]
+      },
+      {
+        "title": "2. Descargo de Responsabilidad de Ingresos",
+        "body": [
+          "Si bien hacemos todo lo posible para asegurarnos de que representamos con precisión todos los productos y servicios revisados en este sitio web y su potencial de ingresos, debe tenerse en cuenta que las declaraciones de ganancias e ingresos hechas por ConvertiKit y sus anunciantes / patrocinadores son solo estimaciones de lo que creemos que posiblemente puede ganar. No hay garantía de que alcanzará estos niveles de ingresos y acepta el riesgo de que las declaraciones de ganancias e ingresos difieran según el individuo."
+        ]
+      }
+    ]
+  },
+  "pt-BR": {
+    "title": "Isenção de Responsabilidade",
+    "content": [
+      {
+        "title": "1. Divulgação de Afiliados",
+        "body": [
+          "Alguns dos links neste site são links de afiliados, o que significa que podemos ganhar uma comissão se você clicar no link ou fizer uma compra usando o link. Ao fazer uma compra, o preço que você paga será o mesmo, quer você use o link de afiliado ou vá diretamente para o site do fornecedor usando um link não afiliado.",
+          "Ao usar os links de afiliados, você está ajudando a apoiar o serviço ConvertiKit, e agradecemos sinceramente seu apoio."
+        ]
+      },
+      {
+        "title": "2. Isenção de Responsabilidade de Ganhos",
+        "body": [
+          "Embora façamos todos os esforços para garantir que representamos com precisão todos os produtos e serviços analisados neste site e seu potencial de renda, deve-se notar que as declarações de ganhos e renda feitas pela ConvertiKit e seus anunciantes / patrocinadores são apenas estimativas do que achamos que você pode possivelmente ganhar. Não há garantia de que você atingirá esses níveis de renda e você aceita o risco de que as declarações de ganhos e renda difiram por indivíduo."
+        ]
+      }
+    ]
+  }
+}

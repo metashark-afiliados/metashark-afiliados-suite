@@ -1,0 +1,52 @@
+
+{
+  "en-US": {
+    "editing_block_title": "Editing: {blockType}",
+    "empty_panel": {
+      "title": "No Block Selected",
+      "description": "Click on a block in the canvas to see its settings."
+    },
+    "no_settings_for_block": {
+      "title": "No Settings",
+      "description": "There are no editable settings for the <strong>{blockType}</strong> block."
+    },
+    "unsupported_property_type": "Unsupported property type: {type}",
+    "tabs": {
+      "content": "Content",
+      "style": "Style"
+    }
+  },
+  "es-ES": {
+    "editing_block_title": "Editando: {blockType}",
+    "empty_panel": {
+      "title": "Ningún Bloque Seleccionado",
+      "description": "Haz clic en un bloque en el lienzo para ver sus ajustes."
+    },
+    "no_settings_for_block": {
+      "title": "Sin Ajustes",
+      "description": "No hay ajustes editables para el bloque <strong>{blockType}</strong>."
+    },
+    "unsupported_property_type": "Tipo de propiedad no soportado: {type}",
+    "tabs": {
+      "content": "Contenido",
+      "style": "Estilo"
+    }
+  },
+  "pt-BR": {
+    "editing_block_title": "Editando: {blockType}",
+    "empty_panel": {
+      "title": "Nenhum Bloco Selecionado",
+      "description": "Clique em um bloco na tela para ver suas configurações."
+    },
+    "no_settings_for_block": {
+      "title": "Sem Configurações",
+      "description": "Não há configurações editáveis para o bloco <strong>{blockType}</strong>."
+    },
+    "unsupported_property_type": "Tipo de propriedade não suportado: {type}",
+    "tabs": {
+      "content": "Conteúdo",
+      "style": "Estilo"
+    }
+  }
+}
+

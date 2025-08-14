@@ -1,0 +1,57 @@
+{
+  "en-US": {
+    "table_header": {
+      "email": "Email / User ID",
+      "full_name": "Full Name",
+      "role": "Role",
+      "actions": "Actions"
+    },
+    "search_placeholder": "Search by email or name...",
+    "clear_search_aria": "Clear search",
+    "table_empty_state": "No users found.",
+    "pagination": {
+      "previousPageLabel": "Previous page",
+      "nextPageLabel": "Next page",
+      "pageLabelTemplate": "Go to page {pageNumber}"
+    },
+    "role_update_success_toast": "User role updated successfully.",
+    "role_update_error_toast": "Failed to update user role."
+  },
+  "es-ES": {
+    "table_header": {
+      "email": "Email / ID de Usuario",
+      "full_name": "Nombre Completo",
+      "role": "Rol",
+      "actions": "Acciones"
+    },
+    "search_placeholder": "Buscar por email o nombre...",
+    "clear_search_aria": "Limpiar búsqueda",
+    "table_empty_state": "No se encontraron usuarios.",
+    "pagination": {
+      "previousPageLabel": "Página anterior",
+      "nextPageLabel": "Página siguiente",
+      "pageLabelTemplate": "Ir a la página {pageNumber}"
+    },
+    "role_update_success_toast": "Rol de usuario actualizado con éxito.",
+    "role_update_error_toast": "No se pudo actualizar el rol del usuario."
+  },
+  "pt-BR": {
+    "table_header": {
+      "email": "E-mail / ID do Usuário",
+      "full_name": "Nome Completo",
+      "role": "Função",
+      "actions": "Ações"
+    },
+    "search_placeholder": "Buscar por e-mail ou nome...",
+    "clear_search_aria": "Limpar busca",
+    "table_empty_state": "Nenhum usuário encontrado.",
+    "pagination": {
+      "previousPageLabel": "Página anterior",
+      "nextPageLabel": "Próxima página",
+      "pageLabelTemplate": "Ir para a página {pageNumber}"
+    },
+    "role_update_success_toast": "Função do usuário atualizada com sucesso.",
+    "role_update_error_toast": "Falha ao atualizar a função do usuário."
+  }
+}
+

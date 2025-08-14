@@ -16,11 +16,11 @@
       "template_gallery_placeholder": "Template gallery coming soon.",
       "ai_importer_placeholder": "AI page importer coming soon."
     },
-    "deleteDialog": {
-      "title": "Delete Campaign",
-      "description": "This action is irreversible. The campaign <strong>{campaignName}</strong> will be permanently deleted.",
-      "confirmButton": "Yes, delete campaign",
-      "confirmation_label": "To confirm, type <strong>{campaignName}</strong> below:"
+    "form": {
+      "name_label": "Campaign Name",
+      "name_placeholder": "e.g., Product X Launch",
+      "creating_button": "Creating Campaign...",
+      "create_button": "Create Campaign"
     },
     "filters": {
       "status_label": "Status",
@@ -45,7 +45,6 @@
       "action_duplicate": "Duplicate",
       "action_archive": "Archive",
       "action_delete": "Delete",
-      "action_delete_aria": "Delete campaign {campaignName}",
       "empty_state": "No campaigns have been created for this site yet."
     },
     "status": {
@@ -53,32 +52,37 @@
       "published": "Published",
       "archived": "Archived"
     },
+    "deleteDialog": {
+      "title": "Delete Campaign",
+      "description": "This action is irreversible. The campaign <strong>{campaignName}</strong> will be permanently deleted.",
+      "confirmButton": "Yes, delete campaign",
+      "confirmation_label": "To confirm, type <strong>{campaignName}</strong> below:"
+    },
     "pagination": {
       "previous": "Previous",
       "next": "Next",
       "page": "Go to page {pageNumber}"
     },
-    "form_name_label": "Campaign Name",
-    "form_name_placeholder": "e.g., Product X Launch",
-    "form_creating_button": "Creating Campaign...",
-    "form_create_button": "Create Campaign",
-    "error_unauthenticated": "Authentication error. Please sign in again.",
-    "error_site_not_found": "The associated site was not found.",
-    "error_permission_denied": "You do not have permission to perform this action.",
-    "error_creation_failed": "Failed to create the campaign.",
-    "error_deletion_failed": "Failed to delete the campaign.",
-    "error_duplication_failed": "Failed to duplicate the campaign.",
-    "error_archive_failed": "Failed to archive the campaign.",
-    "error_campaign_not_found": "The requested campaign could not be found.",
-    "error_data_integrity": "Data integrity error. Please contact support.",
-    "error_invalid_data": "Invalid data provided.",
-    "error_invalid_id": "Invalid ID provided.",
-    "error_unexpected": "An unexpected error occurred.",
-    "delete_success_toast": "Campaign deleted successfully.",
-    "duplicate_success_toast": "Campaign duplicated successfully.",
-    "archive_success_toast": "Campaign archived successfully.",
-    "duplicating_toast": "Duplicating campaign...",
-    "archiving_toast": "Archiving campaign..."
+    "toasts": {
+      "delete_success": "Campaign deleted successfully.",
+      "duplicate_success": "Campaign duplicated successfully.",
+      "archive_success": "Campaign archived successfully.",
+      "duplicating": "Duplicating campaign...",
+      "archiving": "Archiving campaign..."
+    },
+    "errors": {
+      "unauthenticated": "Authentication error. Please sign in again.",
+      "site_not_found": "The associated site was not found.",
+      "permission_denied": "You do not have permission to perform this action.",
+      "creation_failed": "Failed to create the campaign.",
+      "deletion_failed": "Failed to delete the campaign.",
+      "duplication_failed": "Failed to duplicate the campaign.",
+      "archive_failed": "Failed to archive the campaign.",
+      "campaign_not_found": "The requested campaign could not be found.",
+      "invalid_data": "Invalid data provided.",
+      "invalid_id": "Invalid ID provided.",
+      "unexpected": "An unexpected error occurred."
+    }
   },
   "es-ES": {
     "entityName": "Campaña",
@@ -97,11 +101,11 @@
       "template_gallery_placeholder": "Galería de plantillas próximamente.",
       "ai_importer_placeholder": "Importador con IA próximamente."
     },
-    "deleteDialog": {
-      "title": "Eliminar Campaña",
-      "description": "Esta acción es irreversible. La campaña <strong>{campaignName}</strong> será eliminada permanentemente.",
-      "confirmButton": "Sí, eliminar campaña",
-      "confirmation_label": "Para confirmar, escribe <strong>{campaignName}</strong> abajo:"
+    "form": {
+      "name_label": "Nombre de la Campaña",
+      "name_placeholder": "Ej: Lanzamiento Producto X",
+      "creating_button": "Creando Campaña...",
+      "create_button": "Crear Campaña"
     },
     "filters": {
       "status_label": "Estado",
@@ -126,7 +130,6 @@
       "action_duplicate": "Duplicar",
       "action_archive": "Archivar",
       "action_delete": "Eliminar",
-      "action_delete_aria": "Eliminar campaña {campaignName}",
       "empty_state": "Todavía no se han creado campañas para este sitio."
     },
     "status": {
@@ -134,32 +137,37 @@
       "published": "Publicada",
       "archived": "Archivada"
     },
+    "deleteDialog": {
+      "title": "Eliminar Campaña",
+      "description": "Esta acción es irreversible. La campaña <strong>{campaignName}</strong> será eliminada permanentemente.",
+      "confirmButton": "Sí, eliminar campaña",
+      "confirmation_label": "Para confirmar, escribe <strong>{campaignName}</strong> abajo:"
+    },
     "pagination": {
       "previous": "Anterior",
       "next": "Siguiente",
       "page": "Ir a la página {pageNumber}"
     },
-    "form_name_label": "Nombre de la Campaña",
-    "form_name_placeholder": "Ej: Lanzamiento Producto X",
-    "form_creating_button": "Creando Campaña...",
-    "form_create_button": "Crear Campaña",
-    "error_unauthenticated": "Error de autenticación. Por favor, inicia sesión de nuevo.",
-    "error_site_not_found": "No se encontró el sitio asociado.",
-    "error_permission_denied": "No tienes permiso para realizar esta acción.",
-    "error_creation_failed": "No se pudo crear la campaña.",
-    "error_deletion_failed": "No se pudo eliminar la campaña.",
-    "error_duplication_failed": "No se pudo duplicar la campaña.",
-    "error_archive_failed": "No se pudo archivar la campaña.",
-    "error_campaign_not_found": "No se pudo encontrar la campaña solicitada.",
-    "error_data_integrity": "Error de integridad de datos. Por favor, contacta a soporte.",
-    "error_invalid_data": "Los datos proporcionados son inválidos.",
-    "error_invalid_id": "El ID proporcionado es inválido.",
-    "error_unexpected": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo.",
-    "delete_success_toast": "Campaña eliminada con éxito.",
-    "duplicate_success_toast": "Campaña duplicada con éxito.",
-    "archive_success_toast": "Campaña archivada con éxito.",
-    "duplicating_toast": "Duplicando campaña...",
-    "archiving_toast": "Archivando campaña..."
+    "toasts": {
+      "delete_success": "Campaña eliminada con éxito.",
+      "duplicate_success": "Campaña duplicada con éxito.",
+      "archive_success": "Campaña archivada con éxito.",
+      "duplicating": "Duplicando campaña...",
+      "archiving": "Archivando campaña..."
+    },
+    "errors": {
+      "unauthenticated": "Error de autenticación. Por favor, inicia sesión de nuevo.",
+      "site_not_found": "No se encontró el sitio asociado.",
+      "permission_denied": "No tienes permiso para realizar esta acción.",
+      "creation_failed": "No se pudo crear la campaña.",
+      "deletion_failed": "No se pudo eliminar la campaña.",
+      "duplication_failed": "No se pudo duplicar la campaña.",
+      "archive_failed": "No se pudo archivar la campaña.",
+      "campaign_not_found": "No se pudo encontrar la campaña solicitada.",
+      "invalid_data": "Los datos proporcionados son inválidos.",
+      "invalid_id": "El ID proporcionado es inválido.",
+      "unexpected": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo."
+    }
   },
   "pt-BR": {
     "entityName": "Campanha",
@@ -178,11 +186,11 @@
       "template_gallery_placeholder": "Galeria de modelos em breve.",
       "ai_importer_placeholder": "Importador com IA em breve."
     },
-    "deleteDialog": {
-      "title": "Excluir Campanha",
-      "description": "Esta ação é irreversível. A campanha <strong>{campaignName}</strong> será excluída permanentemente.",
-      "confirmButton": "Sim, excluir campanha",
-      "confirmation_label": "Para confirmar, digite <strong>{campaignName}</strong> abaixo:"
+    "form": {
+      "name_label": "Nome da Campanha",
+      "name_placeholder": "Ex: Lançamento Produto X",
+      "creating_button": "Criando Campanha...",
+      "create_button": "Criar Campanha"
     },
     "filters": {
       "status_label": "Status",
@@ -207,7 +215,6 @@
       "action_duplicate": "Duplicar",
       "action_archive": "Arquivar",
       "action_delete": "Excluir",
-      "action_delete_aria": "Excluir campanha {campaignName}",
       "empty_state": "Nenhuma campanha foi criada para este site ainda."
     },
     "status": {
@@ -215,31 +222,36 @@
       "published": "Publicada",
       "archived": "Arquivada"
     },
+    "deleteDialog": {
+      "title": "Excluir Campanha",
+      "description": "Esta ação é irreversível. A campanha <strong>{campaignName}</strong> será excluída permanentemente.",
+      "confirmButton": "Sim, excluir campanha",
+      "confirmation_label": "Para confirmar, digite <strong>{campaignName}</strong> abaixo:"
+    },
     "pagination": {
       "previous": "Anterior",
       "next": "Próxima",
       "page": "Ir para a página {pageNumber}"
     },
-    "form_name_label": "Nome da Campanha",
-    "form_name_placeholder": "Ex: Lançamento Produto X",
-    "form_creating_button": "Criando Campanha...",
-    "form_create_button": "Criar Campanha",
-    "error_unauthenticated": "Erro de autenticação. Por favor, faça login novamente.",
-    "error_site_not_found": "O site associado não foi encontrado.",
-    "error_permission_denied": "Você não tem permissão para realizar esta ação.",
-    "error_creation_failed": "Não foi possível criar a campanha.",
-    "error_deletion_failed": "Não foi possível excluir a campanha.",
-    "error_duplication_failed": "Não foi possível duplicar a campanha.",
-    "error_archive_failed": "Não foi possível arquivar a campanha.",
-    "error_campaign_not_found": "A campanha solicitada não pôde ser encontrada.",
-    "error_data_integrity": "Erro de integridade dos dados. Por favor, contate o suporte.",
-    "error_invalid_data": "Dados fornecidos inválidos.",
-    "error_invalid_id": "ID fornecido inválido.",
-    "error_unexpected": "Ocorreu um erro inesperado. Por favor, tente novamente.",
-    "delete_success_toast": "Campanha excluída com sucesso.",
-    "duplicate_success_toast": "Campanha duplicada com sucesso.",
-    "archive_success_toast": "Campanha arquivada com sucesso.",
-    "duplicating_toast": "Duplicando campanha...",
-    "archiving_toast": "Arquivando campanha..."
+    "toasts": {
+      "delete_success": "Campanha excluída com sucesso.",
+      "duplicate_success": "Campanha duplicada com sucesso.",
+      "archive_success": "Campanha arquivada com sucesso.",
+      "duplicating": "Duplicando campanha...",
+      "archiving": "Arquivando campanha..."
+    },
+    "errors": {
+      "unauthenticated": "Erro de autenticação. Por favor, faça login novamente.",
+      "site_not_found": "O site associado não foi encontrado.",
+      "permission_denied": "Você não tem permissão para realizar esta ação.",
+      "creation_failed": "Não foi possível criar a campanha.",
+      "deletion_failed": "Não foi possível excluir a campanha.",
+      "duplication_failed": "Não foi possível duplicar a campanha.",
+      "archive_failed": "Não foi possível arquivar a campanha.",
+      "campaign_not_found": "A campanha solicitada não pôde ser encontrada.",
+      "invalid_data": "Dados fornecidos inválidos.",
+      "invalid_id": "ID fornecido inválido.",
+      "unexpected": "Ocorreu um erro inesperado. Por favor, tente novamente."
+    }
   }
 }

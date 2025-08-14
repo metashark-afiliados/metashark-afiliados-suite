@@ -36,11 +36,11 @@ DROP TYPE IF EXISTS public.app_role;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- --- PASO 2: ENUMS (TIPOS DE DATOS PERSONALIZADOS) ---
-CREATE TYPE public.app_role AS ENUM ('user', 'admin', 'developer');
-CREATE TYPE public.plan_type AS ENUM ('free', 'pro', 'enterprise');
-CREATE TYPE public.workspace_role AS ENUM ('owner', 'admin', 'member');
-CREATE TYPE public.site_status AS ENUM ('draft', 'published', 'archived');
-CREATE TYPE public.campaign_status AS ENUM ('draft', 'published', 'archived');
+CREATE TYPE public.app_role AS ENUM ('user', 'admin', 'developer','visitor');
+CREATE TYPE public.plan_type AS ENUM ('free', 'basic', 'pro', 'full', 'enterprise');
+CREATE TYPE public.workspace_role AS ENUM ('owner', 'admin', 'member', 'viewer');
+CREATE TYPE public.site_status AS ENUM ('borrador','escalada','testing','draft', 'published', 'archived', 'transfered', 'deleted');
+CREATE TYPE public.campaign_status AS ENUM ('borrador','escalada','testing','draft', 'published', 'archived', 'transfered', 'deleted');
 
 -- --- PASO 3: TABLAS CORE ---
 

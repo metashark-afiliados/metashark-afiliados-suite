@@ -1,70 +1,114 @@
 /**
- * @file CampaignsPage.schema.ts
+ * @file src/lib/validators/i18n/CampaignsPage.schema.ts
  * @description Define el contrato de datos para el namespace 'CampaignsPage'.
- *              Nivelado para incluir todas las claves de texto de la UI, acciones
- *              del menú contextual, y los nuevos errores de Server Action.
+ *              Nivelado a un estándar de élite con una estructura anidada que
+ *              refleja directamente los contratos de props de los componentes
+ *              de presentación y las claves de feedback de las Server Actions.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 4.0.0
  */
 import { z } from "zod";
 
 export const CampaignsPageSchema = z.object({
-  // ... (claves existentes sin cambios)
-  entityName: z.string(),
-  pageTitle: z.string(),
-  pageDescription: z.string(),
+  entityName: z
+    .string()
+    .describe("Nombre singular de la entidad, ej. 'Campaña'."),
+  pageTitle: z.string().describe("Título de la página (soporta HTML)."),
+  pageDescription: z.string().describe("Subtítulo de la página."),
   backToSitesButton: z.string(),
+
+  // Textos para el Hub de Creación y el Header
   createCampaignButton: z.string(),
-  createDialog: z.object({ title: z.string() }),
-  deleteDialog: z.object({
+  createDialog: z.object({
     title: z.string(),
     description: z.string(),
-    confirmButton: z.string(),
+    tabs: z.object({
+      from_scratch: z.string(),
+      from_template: z.string(),
+      from_image_ai: z.string(),
+    }),
+    template_gallery_placeholder: z.string(),
+    ai_importer_placeholder: z.string(),
   }),
-  search: z.object({ placeholder: z.string(), clear_aria: z.string() }),
+
+  // Textos para el Formulario de Creación
+  form: z.object({
+    name_label: z.string(),
+    name_placeholder: z.string(),
+    creating_button: z.string(),
+    create_button: z.string(),
+  }),
+
+  // Filtros y Búsqueda
+  filters: z.object({
+    status_label: z.string(),
+    status_placeholder: z.string(),
+    status_all: z.string(),
+    sort_label: z.string(),
+    sort_placeholder: z.string(),
+    sort_updated_desc: z.string(),
+    sort_name_asc: z.string(),
+  }),
+  search: z.object({
+    placeholder: z.string(),
+    clear_aria: z.string(),
+  }),
+
+  // Textos para la Tabla de Datos
   table: z.object({
     header_name: z.string(),
-    header_status: z.string(), // MEJORA
+    header_status: z.string(),
     header_lastUpdated: z.string(),
     header_actions: z.string(),
     action_edit: z.string(),
-    action_analytics: z.string(), // MEJORA
-    action_duplicate: z.string(), // MEJORA
-    action_archive: z.string(), // MEJORA
-    action_delete: z.string(), // MEJORA
-    action_delete_aria: z.string(),
+    action_analytics: z.string(),
+    action_duplicate: z.string(),
+    action_archive: z.string(),
+    action_delete: z.string(),
     empty_state: z.string(),
   }),
   status: z.object({
-    // MEJORA
     draft: z.string(),
     published: z.string(),
     archived: z.string(),
   }),
+
+  // Diálogo de Eliminación
+  deleteDialog: z.object({
+    title: z.string(),
+    description: z.string().describe("Soporta HTML."),
+    confirmButton: z.string(),
+    confirmation_label: z.string().describe("Soporta HTML."),
+  }),
+
+  // Paginación
   pagination: z.object({
     previous: z.string(),
     next: z.string(),
     page: z.string(),
   }),
-  form_name_label: z.string(),
-  form_name_placeholder: z.string(),
-  form_creating_button: z.string(),
-  form_create_button: z.string(),
-  // --- MEJORA: Claves de Error de Server Action ---
-  error_unauthenticated: z.string(),
-  error_site_not_found: z.string(),
-  error_permission_denied: z.string(),
-  error_creation_failed: z.string(),
-  error_deletion_failed: z.string(),
-  error_duplication_failed: z.string(),
-  error_archive_failed: z.string(),
-  error_campaign_not_found: z.string(),
-  error_data_integrity: z.string(),
-  error_invalid_data: z.string(),
-  error_invalid_id: z.string(),
-  error_unexpected: z.string(),
-  // --- MEJORA: Claves de Toast de Éxito ---
-  delete_success_toast: z.string(),
-  duplicate_success_toast: z.string(),
-  archive_success_toast: z.string(),
+
+  // Toasts de Feedback
+  toasts: z.object({
+    delete_success: z.string(),
+    duplicate_success: z.string(),
+    archive_success: z.string(),
+    duplicating: z.string(),
+    archiving: z.string(),
+  }),
+
+  // Claves de Error de Server Actions
+  errors: z.object({
+    unauthenticated: z.string(),
+    site_not_found: z.string(),
+    permission_denied: z.string(),
+    creation_failed: z.string(),
+    deletion_failed: z.string(),
+    duplication_failed: z.string(),
+    archive_failed: z.string(),
+    campaign_not_found: z.string(),
+    invalid_data: z.string(),
+    invalid_id: z.string(),
+    unexpected: z.string(),
+  }),
 });

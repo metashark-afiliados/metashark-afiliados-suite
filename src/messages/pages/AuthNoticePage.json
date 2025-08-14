@@ -1,0 +1,46 @@
+
+{
+  "en-US": {
+    "confirmation": {
+      "title": "Check Your Email",
+      "description": "We've sent a confirmation link to your inbox to verify your account."
+    },
+    "reset": {
+      "title": "Check Your Email",
+      "description": "We've sent a password reset link to your inbox. Please follow the instructions to set a new password."
+    },
+    "default": {
+      "title": "Notice",
+      "description": "Please check your email for further instructions."
+    }
+  },
+  "es-ES": {
+    "confirmation": {
+      "title": "Revisa tu Correo Electrónico",
+      "description": "Hemos enviado un enlace de confirmación a tu bandeja de entrada para verificar tu cuenta."
+    },
+    "reset": {
+      "title": "Revisa tu Correo Electrónico",
+      "description": "Hemos enviado un enlace para restablecer la contraseña a tu bandeja de entrada. Por favor, sigue las instrucciones para establecer una nueva contraseña."
+    },
+    "default": {
+      "title": "Aviso",
+      "description": "Por favor, revisa tu correo electrónico para más instrucciones."
+    }
+  },
+  "pt-BR": {
+    "confirmation": {
+      "title": "Verifique seu E-mail",
+      "description": "Enviamos um link de confirmação para sua caixa de entrada para verificar sua conta."
+    },
+    "reset": {
+      "title": "Verifique seu E-mail",
+      "description": "Enviamos um link para redefinir a senha para sua caixa de entrada. Por favor, siga as instruções para definir uma nova senha."
+    },
+    "default": {
+      "title": "Aviso",
+      "description": "Por favor, verifique seu e-mail para mais instruções."
+    }
+  }
+}
+

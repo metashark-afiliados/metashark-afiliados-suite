@@ -1,0 +1,50 @@
+{
+  "en-US": {
+    "title": "Visitor Telemetry Viewer",
+    "description": "Monitor visitor activity on the platform.",
+    "error_title": "Error Loading Logs",
+    "error_description": "Could not fetch telemetry information. Please try reloading the page.",
+    "header_timestamp": "Timestamp",
+    "header_user_session": "User / Session",
+    "header_ip_country": "IP / Country",
+    "header_fingerprint": "Fingerprint",
+    "header_actions": "Actions",
+    "action_view_geo": "View Geo Data",
+    "action_view_utms": "View UTMs",
+    "empty_state": "No visits have been recorded yet.",
+    "dialog_title_geo": "Geo Data",
+    "dialog_title_utms": "UTM Parameters"
+  },
+  "es-ES": {
+    "title": "Visor de Telemetría de Visitantes",
+    "description": "Supervisa la actividad de los visitantes en la plataforma.",
+    "error_title": "Error al Cargar los Logs",
+    "error_description": "No pudimos obtener la información de telemetría. Por favor, intenta recargar la página.",
+    "header_timestamp": "Fecha y Hora",
+    "header_user_session": "Usuario / Sesión",
+    "header_ip_country": "IP / País",
+    "header_fingerprint": "Huella Digital",
+    "header_actions": "Acciones",
+    "action_view_geo": "Ver Geo Datos",
+    "action_view_utms": "Ver UTMs",
+    "empty_state": "No se han registrado visitas todavía.",
+    "dialog_title_geo": "Datos Geográficos",
+    "dialog_title_utms": "Parámetros UTM"
+  },
+  "pt-BR": {
+    "title": "Visualizador de Telemetria de Visitantes",
+    "description": "Monitore a atividade dos visitantes na plataforma.",
+    "error_title": "Erro ao Carregar os Logs",
+    "error_description": "Não foi possível obter as informações de telemetria. Por favor, tente recarregar a página.",
+    "header_timestamp": "Data e Hora",
+    "header_user_session": "Usuário / Sessão",
+    "header_ip_country": "IP / País",
+    "header_fingerprint": "Impressão Digital",
+    "header_actions": "Ações",
+    "action_view_geo": "Ver Geo Dados",
+    "action_view_utms": "Ver UTMs",
+    "empty_state": "Nenhuma visita foi registrada ainda.",
+    "dialog_title_geo": "Dados Geográficos",
+    "dialog_title_utms": "Parâmetros UTM"
+  }
+}

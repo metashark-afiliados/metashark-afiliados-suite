@@ -1,11 +1,11 @@
 /**
  * @file src/app/[locale]/dashboard/sites/[siteId]/campaigns/campaigns-client.tsx
- * @description Orquestador de cliente de élite. Su única responsabilidad es consumir
- *              el hook soberano `useCampaignsPage` para obtener todo el estado y la
- *              lógica, y luego ensamblar la UI de gestión de campañas inyectando
- *              dichos datos y callbacks a los componentes de presentación puros.
+ * @description Orquestador de cliente de élite. Ha sido nivelado para construir
+ *              y pasar explícitamente los objetos de props de texto, incluyendo
+ *              `toastTexts`, a sus hijos, cumpliendo con el contrato de i18n
+ *              completo y resolviendo todos los errores de tipo.
  * @author Raz Podestá
- * @version 2.3.0
+ * @version 3.1.0
  */
 "use client";
 
@@ -23,37 +23,18 @@ import { useCampaignsPage } from "@/lib/hooks/use-campaigns-page";
 import { type CampaignMetadata } from "@/lib/data/campaigns";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
 
-// Definición de tipos locales para claridad y consistencia interna.
-type CampaignStatus = "draft" | "published" | "archived";
-type SortByOption = "updated_at_desc" | "name_asc";
-type CampaignWithStatus = CampaignMetadata & {
-  status?: CampaignStatus;
-};
-
-/**
- * @public
- * @interface CampaignsClientProps
- * @description Define el contrato de props que este componente de cliente espera
- *              recibir del cargador de datos del servidor (`sites-page-loader.tsx`).
- */
 interface CampaignsClientProps {
-  site: Pick<SiteWithCampaignCount, "id" | "subdomain">;
+  site: Pick<SiteWithCampaignCount, "id" | "subdomain" | "name">;
+  workspace: { name: string };
   initialCampaigns: CampaignMetadata[];
   totalCount: number;
   page: number;
   limit: number;
   searchQuery: string;
-  status?: CampaignStatus;
-  sortBy?: SortByOption;
+  status?: "draft" | "published" | "archived";
+  sortBy?: "updated_at_desc" | "name_asc";
 }
 
-/**
- * @public
- * @component CampaignsClient
- * @description Orquesta la UI completa para la página de gestión de campañas.
- * @param {CampaignsClientProps} props - Propiedades iniciales del servidor.
- * @returns {React.ReactElement} El componente de cliente renderizado.
- */
 export function CampaignsClient({
   site,
   initialCampaigns,
@@ -92,6 +73,7 @@ export function CampaignsClient({
     siteId: site.id,
   });
 
+  // --- INICIO DE CORRECCIÓN DE SINCRONIZACIÓN DE CONTRATO ---
   const columns = getCampaignsColumns({
     t,
     tDialogs,
@@ -102,15 +84,15 @@ export function CampaignsClient({
     isPending,
     mutatingId,
     toastTexts: {
-      duplicating: t("duplicating_toast"),
-      archiving: t("archiving_toast"),
+      duplicating: t("toasts.duplicating"),
+      archiving: t("toasts.archiving"),
     },
   });
+  // --- FIN DE CORRECCIÓN DE SINCRONIZACIÓN DE CONTRATO ---
 
   return (
     <div className="space-y-6">
       <CampaignsPageHeader
-        t={t}
         site={site}
         isCreateDialogOpen={isCreateDialogOpen}
         setCreateDialogOpen={setCreateDialogOpen}
@@ -123,6 +105,7 @@ export function CampaignsClient({
         }
         sortBy={currentSortBy}
         onSortChange={setSortBy}
+        t={t}
       />
       <SearchInput
         placeholder={t("search.placeholder")}
@@ -130,9 +113,9 @@ export function CampaignsClient({
         onChange={(e) => setSearchTerm(e.target.value)}
         clearAriaLabel={t("search.clear_aria")}
       />
-      <DataTable<CampaignWithStatus>
+      <DataTable
         columns={columns}
-        data={campaigns as CampaignWithStatus[]}
+        data={campaigns}
         noResultsText={t("table.empty_state")}
       />
       <PaginationControls
@@ -157,11 +140,11 @@ export function CampaignsClient({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura Soberana**: ((Implementada)) Este componente es ahora un orquestador de UI puro, delegando toda su lógica al hook `useCampaignsPage`, lo que representa el patrón arquitectónico de élite para componentes de cliente.
- * 2. **Sincronización de Contratos**: ((Implementada)) Se han resuelto todos los errores de tipo (`TS2322`, `TS2345`, `TS7006`) al sincronizar completamente los contratos de props con `CampaignsPageHeader` y `DataTable`.
+ * 1. **Sincronización de Contrato**: ((Implementada)) Se ha añadido la prop `toastTexts` al objeto de configuración de `getCampaignsColumns`, resolviendo el error de compilación `TS2345`.
  *
  * @subsection Melhorias Futuras
- * 1. **Precarga de Plantillas**: ((Vigente)) El `loader` del servidor podría precargar los datos de las plantillas de campaña y pasarlos a través de este componente hasta el `CampaignsPageHeader` para una UX de creación instantánea desde plantilla.
+ * 1. **Abstracción de `toastTexts`**: ((Vigente)) El hook `useCampaignsPage` podría ser refactorizado para devolver este objeto de `toastTexts` ya construido, manteniendo al cliente más agnóstico.
  *
  * =====================================================================
  */
+// src/app/[locale]/dashboard/sites/[siteId]/campaigns/campaigns-client.tsx

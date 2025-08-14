@@ -1,0 +1,82 @@
+
+{
+  "en-US": {
+    "back_to_dashboard": "Back to Dashboard",
+    "back_to_dashboard_aria": "Navigate back to the main dashboard",
+    "preview_button": "Preview",
+    "preview_aria": "Open a live preview of the campaign",
+    "History": {
+      "undo_tooltip": "Undo (Ctrl+Z)",
+      "undo_aria": "Undo last action",
+      "redo_tooltip": "Redo (Ctrl+Y)",
+      "redo_aria": "Redo last undone action"
+    },
+    "DevicePreview": {
+      "desktop_tooltip": "Desktop View",
+      "tablet_tooltip": "Tablet View",
+      "mobile_tooltip": "Mobile View"
+    },
+    "SaveButton": {
+      "save_changes": "Save Changes",
+      "save_aria": "Save all pending changes to the campaign",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "save_success": "Campaign saved successfully!",
+      "save_error_no_config": "Error: No campaign data loaded to save.",
+      "save_error_default": "Failed to save campaign. Please try again."
+    }
+  },
+  "es-ES": {
+    "back_to_dashboard": "Volver al Dashboard",
+    "back_to_dashboard_aria": "Navegar de vuelta al dashboard principal",
+    "preview_button": "Previsualizar",
+    "preview_aria": "Abrir una previsualización en vivo de la campaña",
+    "History": {
+      "undo_tooltip": "Deshacer (Ctrl+Z)",
+      "undo_aria": "Deshacer última acción",
+      "redo_tooltip": "Rehacer (Ctrl+Y)",
+      "redo_aria": "Rehacer última acción deshecha"
+    },
+    "DevicePreview": {
+      "desktop_tooltip": "Vista de Escritorio",
+      "tablet_tooltip": "Vista de Tableta",
+      "mobile_tooltip": "Vista Móvil"
+    },
+    "SaveButton": {
+      "save_changes": "Guardar Cambios",
+      "save_aria": "Guardar todos los cambios pendientes en la campaña",
+      "saving": "Guardando...",
+      "saved": "Guardado",
+      "save_success": "¡Campaña guardada con éxito!",
+      "save_error_no_config": "Error: No hay datos de campaña cargados para guardar.",
+      "save_error_default": "No se pudo guardar la campaña. Por favor, inténtalo de nuevo."
+    }
+  },
+  "pt-BR": {
+    "back_to_dashboard": "Voltar ao Painel",
+    "back_to_dashboard_aria": "Navegar de volta para o painel principal",
+    "preview_button": "Pré-visualizar",
+    "preview_aria": "Abrir uma pré-visualização ao vivo da campanha",
+    "History": {
+      "undo_tooltip": "Desfazer (Ctrl+Z)",
+      "undo_aria": "Desfazer última ação",
+      "redo_tooltip": "Refazer (Ctrl+Y)",
+      "redo_aria": "Refazer última ação desfeita"
+    },
+    "DevicePreview": {
+      "desktop_tooltip": "Visualização de Desktop",
+      "tablet_tooltip": "Visualização de Tablet",
+      "mobile_tooltip": "Visualização Móvel"
+    },
+    "SaveButton": {
+      "save_changes": "Salvar Alterações",
+      "save_aria": "Salvar todas as alterações pendentes na campanha",
+      "saving": "Salvando...",
+      "saved": "Salvo",
+      "save_success": "Campanha salva com sucesso!",
+      "save_error_no_config": "Erro: Nenhum dado de campanha carregado para salvar.",
+      "save_error_default": "Não foi possível salvar a campanha. Por favor, tente novamente."
+    }
+  }
+}
+

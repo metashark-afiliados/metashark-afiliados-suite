@@ -2,17 +2,14 @@
 /**
  * @file src/app/[locale]/dashboard/dashboard-client.tsx
  * @description Orquestador de cliente puro para la página principal del dashboard.
- *              Este componente es responsable de gestionar la interactividad, como
- *              arrastrar y soltar los módulos, y de ensamblar los componentes
- *              de presentación atómicos (`ActionCard`, `RecentCampaigns`).
+ *              Ha sido refactorizado para ser un componente sin props que consume
+ *              el 100% de sus datos (incluyendo `recentCampaigns`) directamente
+ *              del hook `useDashboard`, resolviendo el error de tipos TS2322.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.1.0
  */
 "use client";
 
-import React, { useState, useTransition } from "react";
-import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
 import {
   DndContext,
   type DragEndEvent,
@@ -28,6 +25,9 @@ import {
 } from "@dnd-kit/sortable";
 import { motion } from "framer-motion";
 import { HelpCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
+import React, { useState, useTransition } from "react";
+import toast from "react-hot-toast";
 
 import { ActionCard } from "@/components/dashboard/ActionCard";
 import { RecentCampaigns } from "@/components/dashboard/RecentCampaigns";
@@ -40,23 +40,17 @@ import {
 import { updateDashboardLayoutAction } from "@/lib/actions/profiles.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { logger } from "@/lib/logging";
-import { type Tables } from "@/lib/types/database";
 
 /**
  * @public
  * @component DashboardClient
  * @description Ensambla y gestiona la interactividad de la página del dashboard.
- * @param {object} props - Propiedades del componente.
- * @param {Tables<"campaigns">[]} props.recentCampaigns - Array de campañas recientes.
+ *              No acepta props; consume todo su estado del `useDashboard` hook.
  * @returns {React.ReactElement}
  */
-export function DashboardClient({
-  recentCampaigns,
-}: {
-  recentCampaigns: Tables<"campaigns">[];
-}) {
+export function DashboardClient(): React.ReactElement {
   const t = useTranslations("DashboardPage");
-  const { user, modules: initialModules } = useDashboard();
+  const { user, modules: initialModules, recentCampaigns } = useDashboard();
   const [modules, setModules] = useState(initialModules);
   const [, startTransition] = useTransition();
   const username = user.user_metadata?.full_name || user.email;
@@ -74,15 +68,12 @@ export function DashboardClient({
       const oldIndex = modules.findIndex((m) => m.id === active.id);
       const newIndex = modules.findIndex((m) => m.id === over!.id);
       const newOrder = arrayMove(modules, oldIndex, newIndex);
-      setModules(newOrder); // Actualización optimista de la UI
+      setModules(newOrder);
 
       const moduleIds = newOrder.map((m) => m.id);
       logger.trace(
         "[DashboardClient] Usuario reordenó los módulos, guardando layout.",
-        {
-          userId: user.id,
-          newOrder: moduleIds,
-        }
+        { userId: user.id, newOrder: moduleIds }
       );
 
       startTransition(async () => {
@@ -93,7 +84,7 @@ export function DashboardClient({
             userId: user.id,
             error: result.error,
           });
-          setModules(modules); // Rollback de la UI al estado anterior
+          setModules(modules);
         }
       });
     }
@@ -158,13 +149,8 @@ export function DashboardClient({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Esqueleto de Carga Composto**: ((Vigente)) O esqueleto de carregamento na `page.tsx` poderia ser composto usando `ActionCardSkeleton` e `RecentCampaignsSkeleton` para um estado de carregamento mais fiel à UI final.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Orquestração da UI do Dashboard**: ((Implementada)) Este componente finaliza a reconstrução da UI principal do dashboard, orquestrando `ActionCard` e `RecentCampaigns` e implementando a lógica de arrastar e soltar.
- * 2. **Atualização Otimista com Rollback**: ((Implementada)) A lógica `handleDragEnd` implementa uma atualização otimista da UI para o reordenamento de módulos, proporcionando feedback instantâneo, com uma lógica de rollback que garante a consistência dos dados em caso de falha no servidor.
- * 3. **Observabilidade Completa**: ((Implementada)) Todas as interações críticas do usuário são registradas, fornecendo visibilidade sobre o uso das funcionalidades e possíveis erros.
+ * 1. **Sincronización de Contrato**: ((Implementada)) Se ha eliminado el contrato de props obsoleto. El componente ahora es un consumidor de contexto puro, resolviendo el error de compilación TS2322.
  *
  * =====================================================================
  */

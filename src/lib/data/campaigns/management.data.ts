@@ -1,36 +1,36 @@
+// src/lib/data/campaigns/management.data.ts
 /**
  * @file src/lib/data/campaigns/management.data.ts
- * @description Aparato de datos atómico. Su única responsabilidad es obtener
- *              datos de campañas para los paneles de gestión del usuario.
+ * @description Aparato de datos atómico. Ha sido nivelado para soportar
+ *              Inyección de Dependencias.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use server";
 
 import { unstable_cache as cache } from "next/cache";
+import { type SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/server";
-import { type Tables } from "@/lib/types/database";
+import { createClient as createServerClient } from "@/lib/supabase/server";
 
 import { type CampaignMetadata } from "./types";
 
+type Database = import("@/lib/types/database").Database;
+type Supabase = SupabaseClient<Database, "public">;
+
 export async function getCampaignsMetadataBySiteId(
   siteId: string,
-  {
-    page,
-    limit,
-    query,
-    status,
-    sortBy,
-  }: {
+  options: {
     page: number;
     limit: number;
     query?: string;
     status?: "draft" | "published" | "archived";
     sortBy?: "updated_at_desc" | "name_asc";
-  }
+  },
+  supabaseClient?: Supabase
 ): Promise<{ campaigns: CampaignMetadata[]; totalCount: number }> {
+  const { page, limit, query, status, sortBy } = options;
   const cacheKey = `campaigns-meta-${siteId}-p${page}-q${
     query || ""
   }-s${status || ""}-o${sortBy || ""}`;
@@ -41,7 +41,7 @@ export async function getCampaignsMetadataBySiteId(
       logger.info(
         `[Cache MISS] Cargando metadatos de campañas para: ${cacheKey}`
       );
-      const supabase = createClient();
+      const supabase = supabaseClient || createServerClient();
       const from = (page - 1) * limit;
       const to = from + limit - 1;
 
@@ -90,14 +90,18 @@ export async function getCampaignsMetadataBySiteId(
 
 export async function getRecentCampaignsByWorkspaceId(
   workspaceId: string,
-  limit: number = 4
-): Promise<Tables<"campaigns">[]> {
+  limit: number = 4,
+  supabaseClient?: Supabase
+): Promise<import("@/lib/types/database").Tables<"campaigns">[]> {
+  const cacheKey = `recent-campaigns-${workspaceId}`;
+  const cacheTags = [`workspaces:${workspaceId}:recent-campaigns`];
+
   return cache(
     async () => {
       logger.info(
         `[Cache MISS] Cargando campañas recientes para workspace ${workspaceId}.`
       );
-      const supabase = createClient();
+      const supabase = supabaseClient || createServerClient();
       const { data: sites, error: sitesError } = await supabase
         .from("sites")
         .select("id")
@@ -129,7 +133,19 @@ export async function getRecentCampaignsByWorkspaceId(
       }
       return campaigns || [];
     },
-    [`recent-campaigns-${workspaceId}`],
-    { tags: [`workspaces:${workspaceId}:recent-campaigns`] }
+    [cacheKey],
+    { tags: cacheTags }
   )();
 }
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Inyección de Dependencias**: ((Implementada)) Las funciones ahora aceptan `supabaseClient`, permitiendo su uso seguro en contextos cacheados.
+ *
+ * =====================================================================
+ */
+// src/lib/data/campaigns/management.data.ts

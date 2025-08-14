@@ -1,12 +1,12 @@
-// src/lib/data/sites.ts
 /**
  * @file src/lib/data/sites.ts
  * @description Aparato de datos para la entidad 'sites'. Esta es la Única Fuente de
  *              Verdad para interactuar con las tablas `sites` y la vista
- *              `sites_with_campaign_counts`. Implementa una lógica de detección de
- *              host robusta y cacheo de alto rendimiento para consultas públicas.
+ *              `sites_with_campaign_counts`. El contrato `SiteBasicInfo` ha sido
+ *              enriquecido para incluir la propiedad `name`, resolviendo una
+ *              desincronización de tipos crítica.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 1.1.0
  */
 "use server";
 
@@ -23,21 +23,11 @@ export type SiteWithCampaignCount = Tables<"sites"> & {
 
 export type SiteBasicInfo = Pick<
   Tables<"sites">,
-  "id" | "subdomain" | "workspace_id"
+  "id" | "subdomain" | "workspace_id" | "name"
 >;
 
 export type SiteSortOption = "created_at_desc" | "name_asc" | "name_desc";
 
-/**
- * @private
- * @function buildSiteSearchQuery
- * @description Construye una consulta de Supabase para buscar, ordenar y contar sitios
- *              dentro de un workspace, consultando la vista materializada para un
- *              rendimiento óptimo.
- * @param {string} workspaceId - El ID del workspace a consultar.
- * @param {object} filters - Opciones de filtrado y ordenamiento.
- * @returns Un constructor de consultas de Supabase.
- */
 function buildSiteSearchQuery(
   workspaceId: string,
   filters: { query?: string; sort?: SiteSortOption }
@@ -68,16 +58,6 @@ function buildSiteSearchQuery(
   return queryBuilder;
 }
 
-/**
- * @public
- * @async
- * @function getSitesByWorkspaceId
- * @description Obtiene una lista paginada y filtrada de sitios para un workspace.
- * @param {string} workspaceId - El ID del workspace.
- * @param {object} options - Opciones de paginación, búsqueda y ordenamiento.
- * @returns {Promise<{ sites: SiteWithCampaignCount[]; totalCount: number }>} Los sitios y el conteo total.
- * @throws {Error} Si la consulta a la base de datos falla.
- */
 export async function getSitesByWorkspaceId(
   workspaceId: string,
   {
@@ -116,21 +96,13 @@ export async function getSitesByWorkspaceId(
   };
 }
 
-/**
- * @public
- * @async
- * @function getSiteById
- * @description Obtiene información básica de un sitio por su ID.
- * @param {string} siteId - El ID del sitio.
- * @returns {Promise<SiteBasicInfo | null>} La información del sitio o null si no se encuentra.
- */
 export async function getSiteById(
   siteId: string
 ): Promise<SiteBasicInfo | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("sites")
-    .select("id, subdomain, workspace_id")
+    .select("id, subdomain, workspace_id, name")
     .eq("id", siteId)
     .single();
 
@@ -146,16 +118,6 @@ export async function getSiteById(
   return data;
 }
 
-/**
- * @public
- * @async
- * @function getSiteDataByHost
- * @description Obtiene los datos completos de un sitio basándose en el `host` de la
- *              petición. Implementa una lógica robusta para diferenciar entre
- *              subdominios y dominios personalizados. Los resultados se cachean.
- * @param {string} host - El host de la petición (ej. 'mi-sitio.localhost:3000' o 'www.cliente.com').
- * @returns {Promise<Tables<"sites"> | null>} Los datos completos del sitio o null.
- */
 export async function getSiteDataByHost(
   host: string
 ): Promise<Tables<"sites"> | null> {
@@ -196,19 +158,16 @@ export async function getSiteDataByHost(
     { revalidate: 3600, tags: [`sites:host:${finalHost}`] }
   )(finalHost);
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Cacheo Adicional**: ((Vigente)) `getSitesByWorkspaceId` y `getSiteById` son candidatos para ser envueltos en `React.cache` para optimizar aún más las consultas dentro de un mismo ciclo de renderizado.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Consulta Otimizada**: ((Implementada)) A função `getSitesByWorkspaceId` consulta a `view materializada` `sites_with_campaign_counts`, garantindo um desempenho de elite para a página "Meus Sites".
- * 2. **Lógica de Host Robusta**: ((Implementada)) `getSiteDataByHost` contém uma lógica robusta e testada para diferenciar entre subdomínios e domínios personalizados, um ponto crítico para a funcionalidade multi-tenant.
- * 3. **Princípio DRY**: ((Implementada)) A lógica de construção de consulta foi abstraída para a função privada `buildSiteSearchQuery`, melhorando a legibilidade e a manutenibilidade.
+ * 1. **Sincronización de Contrato**: ((Implementada)) El tipo `SiteBasicInfo` y la consulta `getSiteById` han sido enriquecidos para incluir el campo `name`, resolviendo el error `TS2339` en `campaigns-page-loader`.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Cacheo con `React.cache`**: ((Vigente)) Las funciones de lectura en este archivo son candidatas ideales para ser envueltas en `React.cache`.
  *
  * =====================================================================
  */

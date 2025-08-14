@@ -1,12 +1,11 @@
 // src/lib/data/notifications.ts
 /**
  * @file src/lib/data/notifications.ts
- * @description Aparato de datos para notificaciones e invitaciones. Esta es la
- *              Única Fuente de Verdad para obtener las invitaciones pendientes de un
- *              usuario, una pieza clave para la funcionalidad de colaboración en
- *              tiempo real.
+ * @description Aparato de datos para notificaciones e invitaciones. Ha sido nivelado
+ *              para soportar Inyección de Dependencias, permitiendo su uso seguro
+ *              dentro de funciones cacheadas.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use server";
 import "server-only";
@@ -16,14 +15,9 @@ import { type SupabaseClient } from "@supabase/supabase-js";
 import { logger } from "@/lib/logging";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
-type Supabase = SupabaseClient<any, "public", any>;
+type Database = import("@/lib/types/database").Database;
+type Supabase = SupabaseClient<Database, "public">;
 
-/**
- * @private
- * @typedef RawInvitationData
- * @description Define la estructura de datos cruda devuelta por la consulta de Supabase.
- *              La relación con `workspaces` puede devolver un objeto o un array de un solo elemento.
- */
 type RawInvitationData = {
   id: string;
   status: string;
@@ -33,12 +27,6 @@ type RawInvitationData = {
     | null;
 };
 
-/**
- * @public
- * @typedef Invitation
- * @description Define el contrato de datos limpio y canónico para una invitación,
- *              como se espera que sea consumido por la UI.
- */
 export type Invitation = {
   id: string;
   status: string;
@@ -50,12 +38,9 @@ export type Invitation = {
  * @async
  * @function getPendingInvitationsByEmail
  * @description Obtiene y transforma todas las invitaciones pendientes para un email de usuario.
- *              Esta función realiza la consulta a la base de datos y normaliza la estructura
- *              de datos para asegurar que `workspaces` sea siempre un objeto o nulo.
  * @param {string} userEmail - El email del usuario para buscar invitaciones.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente de Supabase para inyección de dependencias.
- * @returns {Promise<Invitation[]>} Una promesa que resuelve a un array de invitaciones.
- * @throws {Error} Si la consulta a la base de datos falla, se registra el error y se lanza una excepción.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente de Supabase.
+ * @returns {Promise<Invitation[]>}
  */
 export async function getPendingInvitationsByEmail(
   userEmail: string,
@@ -76,7 +61,6 @@ export async function getPendingInvitationsByEmail(
     throw new Error("No se pudieron cargar las invitaciones.");
   }
 
-  // Normaliza la estructura de datos para la UI.
   const pendingInvitations: Invitation[] =
     (data as RawInvitationData[])?.map((inv) => ({
       id: inv.id,
@@ -94,13 +78,11 @@ export async function getPendingInvitationsByEmail(
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Reintroducción de Notificaciones Genéricas**: ((Vigente)) Si la funcionalidad de notificaciones más allá de las invitaciones es necesaria, se debe crear la tabla `notifications` en la base de datos, regenerar los tipos y luego reintroducir la lógica para consultar esa tabla, probablemente en una nueva función `getUnreadNotificationsByUserId`.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Foco e Coesão (SRP)**: ((Implementada)) O aparato agora foca exclusivamente na lógica de convites, que é a implementação real no esquema do banco de dados. A lógica para a tabela inexistente `notifications` foi removida, eliminando a dívida técnica e o código morto.
- * 2. **Normalização de Dados**: ((Implementada)) A função inclui uma etapa de transformação de dados que garante que a propriedade `workspaces` sempre tenha um formato consistente (objeto ou nulo), tornando o contrato com a UI mais robusto e previsível.
- * 3. **Injeção de Dependências**: ((Implementada)) A função suporta injeção de dependências para o cliente Supabase, garantindo 100% de testabilidade.
+ * 1. **Inyección de Dependencias**: ((Implementada)) La función ahora acepta un `supabaseClient` opcional, desacoplándola de la creación directa del cliente y permitiendo su uso en contextos cacheados.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Reintroducción de Notificaciones Genéricas**: ((Vigente)) La lógica para consultar una tabla `notifications` genérica puede ser añadida en una nueva función.
  *
  * =====================================================================
  */

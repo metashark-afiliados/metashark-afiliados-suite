@@ -1,12 +1,11 @@
 // src/lib/data/modules.ts
 /**
  * @file src/lib/data/modules.ts
- * @description Aparato de datos para la entidad 'feature_modules'. Esta es la
- *              Única Fuente de Verdad para obtener la lista de módulos de
- *              funcionalidades disponibles para un usuario, respetando su plan
- *              de suscripción y su layout personalizado.
+ * @description Aparato de datos para la entidad 'feature_modules'. Ha sido nivelado
+ *              para soportar Inyección de Dependencias, permitiendo su uso seguro
+ *              dentro de funciones cacheadas.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use server";
 
@@ -27,18 +26,9 @@ export type FeatureModule = {
 };
 
 type PlanHierarchy = "free" | "pro" | "enterprise";
-type Supabase = SupabaseClient<any, "public", any>;
+type Database = import("@/lib/types/database").Database;
+type Supabase = SupabaseClient<Database, "public">;
 
-/**
- * @private
- * @async
- * @function getBaseModules
- * @description Obtiene la lista base de todos los módulos de funcionalidades
- *              desde la base de datos. El resultado se cachea agresivamente
- *              ya que esta información cambia con poca frecuencia.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
- * @returns {Promise<any[]>} Un array de los módulos base.
- */
 const getBaseModules = cache(
   async (supabaseClient?: Supabase) => {
     logger.info(
@@ -65,12 +55,9 @@ const getBaseModules = cache(
  * @async
  * @function getFeatureModulesForUser
  * @description Obtiene y personaliza la lista de módulos para un usuario específico.
- *              Determina el estado de cada módulo ('active', 'soon', 'locked')
- *              basándose en el plan del usuario y ordena los módulos según el
- *              layout personalizado guardado en su perfil.
  * @param {User} user - El objeto de usuario autenticado.
  * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
- * @returns {Promise<FeatureModule[]>} La lista final de módulos para el usuario.
+ * @returns {Promise<FeatureModule[]>}
  */
 export async function getFeatureModulesForUser(
   user: User,
@@ -144,14 +131,8 @@ export async function getFeatureModulesForUser(
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Tipado Fuerte para `app_metadata`**: ((Vigente)) Extender el tipo `User` de Supabase para incluir `app_metadata.plan` y así eliminar el `as PlanHierarchy`. Esto se puede lograr a través de la aumentación de tipos en el cliente de Supabase.
- * 2. **Tipado de Módulo de Base de Datos**: ((Vigente)) Reemplazar el tipo `any` en `baseModules.map((mod: any) => ...)` con un tipo explícito `Tables<"feature_modules">` para una máxima seguridad de tipos.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Lógica de Negócio de Personalização**: ((Implementada)) Este aparato contém a lógica de negócio essencial para personalizar a experiência do dashboard do usuário, mostrando os módulos corretos com base em seu plano e em seu layout salvo.
- * 2. **Otimização de Cache**: ((Implementada)) A consulta à tabela `feature_modules`, que muda com pouca frequência, é agressivamente cacheada para garantir um desempenho de carregamento rápido para o layout do dashboard.
- * 3. **Injeção de Dependências**: ((Implementada)) A função aceita um cliente Supabase opcional, tornando-a testável de forma isolada.
+ * 1. **Inyección de Dependencias**: ((Implementada)) La función ahora acepta un `supabaseClient` opcional, permitiendo su uso seguro en contextos cacheados.
  *
  * =====================================================================
  */

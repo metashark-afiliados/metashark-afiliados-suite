@@ -1,11 +1,10 @@
 // src/lib/helpers/client-fingerprint.ts
 /**
- * @file lib/helpers/client-fingerprint.ts
- * @description Genera una huella digital única del navegador del cliente
- *              utilizando la librería `@fingerprintjs/fingerprintjs`.
- *              Este helper se encarga de la carga diferida y la gestión
- *              de errores para la generación de la huella.
- * @author L.I.A Legacy
+ * @file client-fingerprint.ts
+ * @description Helper atómico que genera una huella digital única del navegador
+ *              del cliente utilizando `@fingerprintjs/fingerprintjs`. Gestiona la
+ *              carga diferida y el manejo de errores.
+ * @author Raz Podestá
  * @version 1.0.0
  */
 "use client";
@@ -17,27 +16,32 @@ import { logger } from "@/lib/logging";
 let fpPromise: ReturnType<typeof FingerprintJS.load> | null = null;
 
 /**
+ * @public
  * @async
  * @function getClientFingerprint
  * @description Obtiene la huella digital (visitorId) del navegador del cliente.
- *              Si FingerprintJS aún no ha sido cargado, lo carga de forma asíncrona.
+ *              La instancia de FingerprintJS se carga de forma diferida y se cachea
+ *              para optimizar el rendimiento en llamadas subsiguientes.
  * @returns {Promise<string | null>} Una promesa que resuelve con la huella digital
- *                                    del cliente (string) o `null` si ocurre un error
- *                                    durante la carga o la generación de la huella.
+ *                                    del cliente (string) o `null` si ocurre un error.
  */
 export async function getClientFingerprint(): Promise<string | null> {
   try {
     if (!fpPromise) {
+      logger.trace("[Fingerprint] Cargando instancia de FingerprintJS...");
       fpPromise = FingerprintJS.load();
     }
     const fp = await fpPromise;
     const result = await fp.get();
-    logger.trace("Huella digital del cliente generada con éxito.", {
+    logger.trace("[Fingerprint] Huella digital del cliente generada.", {
       visitorId: result.visitorId,
     });
     return result.visitorId;
   } catch (error) {
-    logger.error("Error al generar la huella digital del cliente:", error);
+    logger.error(
+      "[Fingerprint] Error al generar la huella digital del cliente:",
+      error
+    );
     return null;
   }
 }
@@ -48,11 +52,12 @@ export async function getClientFingerprint(): Promise<string | null> {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Helper de Telemetria**: ((Implementada)) Este componente fornece uma capacidade de telemetria chave, permitindo a identificação de visitantes únicos para análise e segurança.
+ * 1. **Carga Diferida y Cacheo**: ((Implementada)) La librería se carga de forma asíncrona y se cachea en una promesa global, asegurando una única inicialización y un rendimiento óptimo.
+ * 2. **Manejo de Errores Robusto**: ((Implementada)) Incluye `try/catch` para gestionar errores, evitando que un fallo en la telemetría afecte la experiencia del usuario.
+ * 3. **Full Observabilidad**: ((Implementada)) Registra eventos de `trace` y `error` para una visibilidad completa.
  *
  * @subsection Melhorias Futuras
- * 1. **Carga Diferida Condicional Avançada**: ((Vigente)) Para uma otimização extrema do LCP, o `FingerprintJS.load()` poderia ser movido para dentro de um `useEffect` com um `setTimeout`, para que o script só seja carregado quando o navegador estiver inativo.
- * 2. **Contexto de Confiança do VisitorId**: ((Vigente)) A biblioteca fornece uma pontuação de `confidence` com o `visitorId`. Este valor poderia ser incluído no log para avaliar a confiabilidade da "fingerprint", útil para detecção avançada de fraudes.
+ * 1. **Contexto de Confianza**: ((Vigente)) La librería `FingerprintJS` proporciona una puntuación de `confidence`. Este valor podría ser enviado a la Server Action para evaluar la fiabilidad de la huella, útil para la detección avanzada de fraudes.
  *
  * =====================================================================
  */

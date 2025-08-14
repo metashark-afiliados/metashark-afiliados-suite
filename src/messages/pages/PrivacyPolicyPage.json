@@ -1,0 +1,88 @@
+
+{
+  "en-US": {
+    "title": "Privacy Policy",
+    "content": [
+      {
+        "title": "1. Information We Collect",
+        "body": [
+          "We collect information you provide directly to us, such as when you create an account, create content, or otherwise communicate with us. This may include personal data like your name, email address, and payment information.",
+          "We also collect technical data automatically, such as your IP address, browser type, and usage information through cookies and similar technologies to improve our service."
+        ]
+      },
+      {
+        "title": "2. How We Use Your Information",
+        "body": [
+          "To provide, maintain, and improve our services, including processing transactions and personalizing your experience on ConvertiKit.",
+          "To communicate with you about products, services, offers, and provide customer support.",
+          "To monitor and analyze trends, usage, and activities in connection with our services and for marketing or advertising purposes.",
+          "To detect, investigate, and prevent fraudulent transactions and other illegal activities and protect the rights and property of MetaShark Tech and others."
+        ]
+      },
+      {
+        "title": "3. Information Sharing",
+        "body": [
+          "We do not sell your personal data. We may share information with vendors, consultants, and other service providers who need access to such information to carry out work on our behalf (e.g., payment processors like Stripe).",
+          "We may also share information in response to a request for information if we believe disclosure is in accordance with, or required by, any applicable law or legal process."
+        ]
+      }
+    ]
+  },
+  "es-ES": {
+    "title": "Política de Privacidad",
+    "content": [
+      {
+        "title": "1. Información que Recopilamos",
+        "body": [
+          "Recopilamos la información que nos proporcionas directamente, como cuando creas una cuenta, creas contenido o te comunicas con nosotros. Esto puede incluir datos personales como tu nombre, dirección de correo electrónico e información de pago.",
+          "También recopilamos datos técnicos automáticamente, como tu dirección IP, tipo de navegador e información de uso a través de cookies y tecnologías similares para mejorar nuestro servicio."
+        ]
+      },
+      {
+        "title": "2. Cómo Usamos tu Información",
+        "body": [
+          "Para proporcionar, mantener y mejorar nuestros servicios, incluyendo el procesamiento de transacciones y la personalización de tu experiencia en ConvertiKit.",
+          "Para comunicarnos contigo sobre productos, servicios, ofertas y proporcionar soporte al cliente.",
+          "Para monitorear y analizar tendencias, uso y actividades en conexión con nuestros servicios y para fines de marketing o publicidad.",
+          "Para detectar, investigar y prevenir transacciones fraudulentas y otras actividades ilegales y proteger los derechos y la propiedad de MetaShark Tech y otros."
+        ]
+      },
+      {
+        "title": "3. Intercambio de Información",
+        "body": [
+          "No vendemos tus datos personales. Podemos compartir información con proveedores, consultores y otros proveedores de servicios que necesitan acceso a dicha información para realizar trabajos en nuestro nombre (ej., procesadores de pago como Stripe).",
+          "También podemos compartir información en respuesta a una solicitud de información si creemos que la divulgación está de acuerdo con, o es requerida por, cualquier ley o proceso legal aplicable."
+        ]
+      }
+    ]
+  },
+  "pt-BR": {
+    "title": "Política de Privacidade",
+    "content": [
+      {
+        "title": "1. Informações que Coletamos",
+        "body": [
+          "Coletamos as informações que você nos fornece diretamente, como quando você cria uma conta, cria conteúdo ou se comunica conosco. Isso pode incluir dados pessoais como seu nome, endereço de e-mail e informações de pagamento.",
+          "Também coletamos dados técnicos automaticamente, como seu endereço IP, tipo de navegador e informações de uso por meio de cookies e tecnologias semelhantes para melhorar nosso serviço."
+        ]
+      },
+      {
+        "title": "2. Como Usamos Suas Informações",
+        "body": [
+          "Para fornecer, manter e melhorar nossos serviços, incluindo o processamento de transações e a personalização de sua experiência na ConvertiKit.",
+          "Para nos comunicarmos com você sobre produtos, serviços, ofertas e fornecer suporte ao cliente.",
+          "Para monitorar e analisar tendências, uso e atividades em conexão com nossos serviços e для fins de marketing ou publicidade.",
+          "Para detectar, investigar e prevenir transações fraudulentas e outras atividades ilegais e proteger os direitos e a propriedade da MetaShark Tech e de outros."
+        ]
+      },
+      {
+        "title": "3. Compartilhamento de Informações",
+        "body": [
+          "Não vendemos seus dados pessoais. Podemos compartilhar informações com fornecedores, consultores e outros prestadores de serviços que precisam de acesso a tais informações para realizar trabalhos em nosso nome (ex., processadores de pagamento como o Stripe).",
+          "Também podemos compartilhar informações em resposta a um pedido de informação se acreditarmos que a divulgação está de acordo com, ou é exigida por, qualquer lei ou processo legal aplicável."
+        ]
+      }
+    ]
+  }
+}
+

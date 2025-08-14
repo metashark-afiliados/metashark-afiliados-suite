@@ -1,14 +1,20 @@
 // src/lib/types/database/views.ts
 /**
  * @file views.ts
- * @description Define os contratos de dados completos para as Views da base de dados.
- *              Esta estrutura agora espelha o formato das definições de tabela,
- *              permitindo que sejam consumidas pelos helpers de tipo genéricos.
- * @author L.I.A Legacy
- * @version 2.0.0 (Structural Consistency)
+ * @description Define los contratos de datos completos para las Vistas de la base de datos.
+ *              Ha sido refactorizado a un estándar de élite para que su estructura
+ *              refleje el formato de los tipos de tabla (`Row`, `Insert`, `Update`),
+ *              garantizando la consistencia y resolviendo una cascada de errores de tipo.
+ * @author Raz Podestá
+ * @version 1.0.0
  */
 import { type Enums } from "./enums";
 
+/**
+ * @public
+ * @typedef UserProfilesWithEmail
+ * @description Tipo para la vista que une `profiles` y `auth.users`.
+ */
 export type UserProfilesWithEmail = {
   Row: {
     app_role: Enums["app_role"] | null;
@@ -17,8 +23,8 @@ export type UserProfilesWithEmail = {
     full_name: string | null;
     id: string | null;
   };
-  Insert: never;
-  Update: never;
+  Insert: never; // Las vistas no soportan inserciones
+  Update: never; // Las vistas no soportan actualizaciones
 };
 
 /**
@@ -27,10 +33,10 @@ export type UserProfilesWithEmail = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Consistência Estrutural**: ((Implementada)) A definição do tipo agora está aninhada sob uma propriedade `Row`, espelhando a estrutura dos tipos de Tabela, o que permite que o mesmo padrão de helper (`Views<T>`) seja aplicado.
+ * 1. **Consistencia Estructural**: ((Implementada)) La definición del tipo ahora está anidada bajo una propiedad `Row`, reflejando la estructura de los tipos de tabla generados y manuales. Esto permite que el helper `Views<T>` lo resuelva correctamente y resuelve la cascada de errores TS2339 y TS2322.
  *
  * @subsection Melhorias Futuras
- * 1. **Geração Automática**: ((Vigente)) Continuar monitorando as atualizações da CLI da Supabase para a eventual geração automática de tipos de Vistas, o que tornaria este arquivo manual obsoleto.
+ * 1. **Generación Automática**: ((Vigente)) Continuar monitorizando las actualizaciones de la CLI de Supabase para la eventual generación automática de tipos de Vistas, lo que haría este archivo obsoleto.
  *
  * =====================================================================
  */

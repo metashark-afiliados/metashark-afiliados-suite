@@ -1,12 +1,11 @@
-// scripts/supabase/diagnose-all.ts
+// scripts/supabase/diagnose-schema.ts
 /**
- * @file diagnose-all.ts
- * @description Herramienta de auditoría de sistema de élite. Reconstruido a su
- *              estado canónico original. Este script invoca la RPC `get_system_diagnostics`
- *              para realizar una radiografía completa del esquema, RLS, funciones y
- *              triggers de la base de datos remota, mostrando los resultados en la consola.
+ * @file diagnose-schema.ts
+ * @description Herramienta de auditoría de sistema de élite. Invoca la RPC
+ *              `get_system_diagnostics` para realizar una radiografía completa del
+ *              esquema, RLS, funciones y triggers de la base de datos remota.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 1.0.0
  * @usage pnpm diag:all
  */
 import { createClient } from "@supabase/supabase-js";
@@ -16,7 +15,9 @@ import { loadEnvironment } from "./_utils";
 
 const printSection = (title: string) =>
   console.log(
-    `\n\n${chalk.blue("=".repeat(80))}\n${chalk.blueBright.bold(`🚀 DIAGNÓSTICO: ${title.toUpperCase()}`)}\n${chalk.blue("=".repeat(80))}`
+    `\n\n${chalk.blue("=".repeat(80))}\n${chalk.blueBright.bold(
+      `🚀 DIAGNÓSTICO: ${title.toUpperCase()}`
+    )}\n${chalk.blue("=".repeat(80))}`
   );
 
 async function main() {
@@ -52,7 +53,7 @@ async function main() {
     chalk.green("✅ RPC 'get_system_diagnostics' ejecutada con éxito.")
   );
 
-  console.log(chalk.white("\n--- Columnas del Esquema 'public' ---"));
+  console.log(chalk.white('\n--- Columnas del Esquema "public" ---'));
   console.table(data.schema_columns || []);
 
   console.log(chalk.white("\n--- Políticas de Seguridad (RLS) ---"));
@@ -61,7 +62,7 @@ async function main() {
   console.log(chalk.white("\n--- Funciones (Routines) ---"));
   console.table(data.routines || []);
 
-  console.log(chalk.white("\n--- Triggers ---"));
+  console.log(chalk.white("\n--- Triggers (public & auth) ---"));
   console.table(data.triggers || []);
 }
 
@@ -83,12 +84,12 @@ main()
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Funcionalidad Restaurada**: ((Implementada)) Se ha restaurado la lógica del script a su versión original y funcional, que utiliza la RPC `get_system_diagnostics`. Esto nos proporciona una herramienta de auditoría fiable.
- * 2. **Cero Regresiones**: ((Implementada)) Esta versión es una reconstrucción fiel del blueprint canónico, garantizando que no se pierda la capacidad de diagnóstico original.
+ * 1. **Funcionalidad Restaurada**: ((Implementada)) Se ha restaurado la lógica funcional del snapshot original, que utiliza la RPC `get_system_diagnostics` para una auditoría completa.
+ * 2. **Visibilidad Mejorada**: ((Implementada)) La auditoría de triggers ahora incluye el esquema `auth`, proporcionando una visión más completa de la automatización de la base de datos.
  *
  * @subsection Melhorias Futuras
- * 1. **Generación de Informes**: ((Vigente)) La versión no funcional intentaba generar un informe en Markdown. Esta es una buena característica que se puede reintroducir en este script, escribiendo la salida de `console.table` en un archivo `.md` para un registro persistente.
+ * 1. **Generación de Informes**: ((Vigente)) La salida de `console.table` podría ser escrita a un archivo `.md` para un registro persistente y fácil de compartir.
  *
  * =====================================================================
  */
-// scripts/supabase/diagnose-all.ts
+// scripts/supabase/diagnose-schema.ts

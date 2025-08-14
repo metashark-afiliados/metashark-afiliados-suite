@@ -1,0 +1,41 @@
+{
+  "en-US": {
+    "title": "Campaign Viewer",
+    "description": "Monitor all campaigns created on the platform.",
+    "error_title": "Error Loading Campaigns",
+    "error_description": "Could not fetch campaign data from the data layer.",
+    "header_name": "Campaign Name",
+    "header_site": "Site (Subdomain)",
+    "header_created": "Created At",
+    "header_updated": "Last Updated",
+    "header_actions": "Actions",
+    "action_view_json": "View JSON",
+    "dialog_title": "Content for: {campaignName}"
+  },
+  "es-ES": {
+    "title": "Visor de Campañas",
+    "description": "Supervisa todas las campañas creadas en la plataforma.",
+    "error_title": "Error al Cargar Campañas",
+    "error_description": "No se pudo obtener la información de las campañas desde la capa de datos.",
+    "header_name": "Nombre de Campaña",
+    "header_site": "Sitio (Subdominio)",
+    "header_created": "Fecha de Creación",
+    "header_updated": "Última Actualización",
+    "header_actions": "Acciones",
+    "action_view_json": "Ver JSON",
+    "dialog_title": "Contenido para: {campaignName}"
+  },
+  "pt-BR": {
+    "title": "Visualizador de Campanhas",
+    "description": "Monitore todas as campanhas criadas na plataforma.",
+    "error_title": "Erro ao Carregar Campanhas",
+    "error_description": "Não foi possível obter os dados das campanhas da camada de dados.",
+    "header_name": "Nome da Campanha",
+    "header_site": "Site (Subdomínio)",
+    "header_created": "Data de Criação",
+    "header_updated": "Última Atualização",
+    "header_actions": "Ações",
+    "action_view_json": "Ver JSON",
+    "dialog_title": "Conteúdo para: {campaignName}"
+  }
+}

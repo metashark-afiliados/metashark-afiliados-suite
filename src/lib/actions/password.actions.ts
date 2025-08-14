@@ -1,11 +1,11 @@
 // src/lib/actions/password.actions.ts
 /**
- * @file src/lib/actions/password.actions.ts
+ * @file password.actions.ts
  * @description Aparato canónico para las Server Actions del ciclo de vida de la contraseña.
  *              Contiene la lógica segura para solicitar un restablecimiento y para
- *              actualizar la contraseña. Implementa un flujo de seguridad anti-enumeración
- *              y utiliza helpers de limitación de tasa y auditoría.
- * @author L.I.A. Legacy
+ *              actualizar la contraseña, implementando un flujo de seguridad
+ *              anti-enumeración y utilizando helpers de limitación de tasa y auditoría.
+ * @author Raz Podestá
  * @version 1.0.0
  */
 "use server";
@@ -15,11 +15,15 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import {
+  createAuditLog,
+  EmailService,
+  checkRateLimit,
+} from "@/lib/actions/_helpers";
 import { logger } from "@/lib/logging";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { EmailSchema, type RequestPasswordResetState } from "@/lib/validators";
-
-import { createAuditLog, EmailService, rateLimiter } from "./_helpers";
+import { EmailSchema } from "@/lib/validators";
+import { type ActionResult } from "@/lib/validators";
 
 const ResetPasswordSchema = z
   .object({
@@ -33,68 +37,69 @@ const ResetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-type UpdatePasswordFormState = { error: string | null; success: boolean };
+type RequestPasswordResetState = ActionResult<null>;
+type UpdatePasswordFormState = ActionResult<null>;
 
 /**
  * @public
  * @async
  * @function requestPasswordResetAction
  * @description Inicia el flujo de restablecimiento de contraseña. Es seguro contra
- *              ataques de enumeración de usuarios: no revela si un correo electrónico
- *              existe en el sistema. Siempre redirige a una página de aviso genérica.
- * @param {RequestPasswordResetState} prevState - Estado anterior del formulario.
+ *              ataques de enumeración de usuarios. Siempre redirige a una página de aviso.
+ * @param {unknown} prevState - Estado anterior del formulario, para compatibilidad con `useFormState`.
  * @param {FormData} formData - Datos del formulario que contienen el email.
- * @returns {Promise<RequestPasswordResetState>} El nuevo estado del formulario,
- *          conteniendo un error en caso de fallo de validación o de rate limit.
+ * @returns {Promise<RequestPasswordResetState>} El nuevo estado del formulario.
  */
 export async function requestPasswordResetAction(
-  prevState: RequestPasswordResetState,
+  prevState: unknown,
   formData: FormData
 ): Promise<RequestPasswordResetState> {
-  const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
-  const limit = await rateLimiter.check(ip, "password_reset");
+  const ip = headers().get("x-forwarded-for");
+  const limit = await checkRateLimit(ip, "password_reset");
 
   if (!limit.success) {
-    return {
-      error:
-        limit.error || "Demasiadas solicitudes. Intente nuevamente más tarde.",
-    };
+    return { success: false, error: limit.error || "Demasiadas solicitudes." };
   }
 
-  const email = formData.get("email");
-  const validation = EmailSchema.safeParse(email);
-  if (!validation.success) {
-    return { error: "Por favor, introduce un email válido." };
+  const emailResult = EmailSchema.safeParse(formData.get("email"));
+  if (!emailResult.success) {
+    return { success: false, error: "Por favor, introduce un email válido." };
   }
+  const email = emailResult.data;
 
-  const validatedEmail = validation.data;
   const adminSupabase = createAdminClient();
+  const origin = headers().get("origin");
 
-  // Flujo de seguridad canónico: no se verifica si el usuario existe.
-  // Se llama a generateLink incondicionalmente.
+  // Flujo de seguridad anti-enumeración:
+  // 1. Siempre se intenta generar el enlace.
+  // 2. Nunca se revela si el usuario existe o no.
+  // 3. Siempre se registra el intento.
+  // 4. Siempre se redirige a la misma página de éxito.
   const { data, error } = await adminSupabase.auth.admin.generateLink({
     type: "recovery",
-    email: validatedEmail,
+    email,
+    options: {
+      redirectTo: `${origin}/reset-password`,
+    },
   });
 
   if (error) {
-    // Solo se registra el error en el servidor, no se revela al cliente.
     logger.error(
-      `[PasswordActions] Error al generar link de recuperación para ${validatedEmail}:`,
+      `[PasswordActions] Error al generar link de recuperación para ${email}`,
       error
     );
+    // No devolver error al cliente.
   } else {
     await EmailService.sendPasswordResetEmail(
-      validatedEmail,
+      email,
       data.properties.action_link
     );
   }
 
   await createAuditLog("password_reset_request", {
-    metadata: { targetEmail: validatedEmail, ipAddress: ip },
+    metadata: { targetEmail: email, ipAddress: ip },
   });
 
-  // Siempre se redirige para no dar información sobre la existencia del email.
   redirect("/auth-notice?message=check-email-for-reset");
 }
 
@@ -104,67 +109,56 @@ export async function requestPasswordResetAction(
  * @function updatePasswordAction
  * @description Completa el flujo de restablecimiento, actualizando la contraseña del
  *              usuario. Valida que el usuario tenga una sesión de recuperación válida.
- * @param {UpdatePasswordFormState} prevState - Estado anterior del formulario.
+ * @param {unknown} prevState - Estado anterior del formulario.
  * @param {FormData} formData - Datos del formulario con la nueva contraseña.
  * @returns {Promise<UpdatePasswordFormState>} El nuevo estado del formulario.
  */
 export async function updatePasswordAction(
-  prevState: UpdatePasswordFormState,
+  prevState: unknown,
   formData: FormData
 ): Promise<UpdatePasswordFormState> {
   const validation = ResetPasswordSchema.safeParse(
-    Object.fromEntries(formData.entries())
+    Object.fromEntries(formData)
   );
   if (!validation.success) {
-    const formErrors = validation.error.flatten().fieldErrors;
     const errorMessage =
-      formErrors.password?.[0] ||
-      formErrors.confirmPassword?.[0] ||
+      validation.error.flatten().fieldErrors.confirmPassword?.[0] ||
+      validation.error.flatten().fieldErrors.password?.[0] ||
       "Datos inválidos.";
-    return { error: errorMessage, success: false };
+    return { success: false, error: errorMessage };
   }
 
   const supabase = createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return {
-      error:
-        "Sesión de recuperación inválida o expirada. Por favor, solicita un nuevo enlace.",
-      success: false,
-    };
-  }
-
   const { error } = await supabase.auth.updateUser({
     password: validation.data.password,
   });
 
   if (error) {
-    logger.error(
-      `[PasswordActions] Error al actualizar la contraseña para ${user.id}:`,
-      error.message
-    );
+    logger.error(`[PasswordActions] Error al actualizar la contraseña`, {
+      message: error.message,
+    });
     if (error.message.includes("token has expired")) {
       return {
+        success: false,
         error:
           "El enlace de reseteo ha expirado. Por favor, solicita uno nuevo.",
-        success: false,
       };
     }
     return {
-      error: "No fue posible actualizar la contraseña. Intente nuevamente.",
       success: false,
+      error: "No fue posible actualizar la contraseña. Intente nuevamente.",
     };
   }
 
-  await createAuditLog("password_reset_success", { userId: user.id });
-  // Por seguridad, cerramos todas las demás sesiones activas del usuario.
-  await supabase.auth.signOut({ scope: "others" });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    await createAuditLog("password_reset_success", { userId: user.id });
+    await supabase.auth.signOut({ scope: "others" });
+  }
 
-  return { error: null, success: true };
+  return { success: true, data: null };
 }
 
 /**
@@ -172,13 +166,13 @@ export async function updatePasswordAction(
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Notificación de Cambio de Contraseña**: ((Vigente)) Después de una actualización exitosa, enviar un correo electrónico de notificación al usuario informándole que su contraseña ha sido cambiada, como una medida de seguridad adicional.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Segurança Anti-Enumeração**: ((Implementada)) A ação `requestPasswordResetAction` segue as melhores práticas de segurança ao não revelar a existência de um e-mail no sistema, prevenindo ataques de enumeração de usuários.
- * 2. **Ciclo de Vida Completo**: ((Implementada)) Este aparato fornece a lógica completa para o ciclo de vida de redefinição de senha, desde a solicitação até a atualização segura.
- * 3. **Observabilidade e Auditoria**: ((Implementada)) Ambas as ações são instrumentadas com logs de erro e de auditoria, garantindo a rastreabilidade de eventos de segurança críticos.
+ * 1. **Seguridad Anti-Enumeración**: ((Implementada)) `requestPasswordResetAction` no revela la existencia de un email, una práctica de seguridad de élite.
+ * 2. **Ciclo de Vida Completo**: ((Implementada)) Proporciona la lógica completa para la recuperación de contraseñas.
+ * 3. **Full Observabilidad y Auditoría**: ((Implementada)) Todas las acciones son registradas con logs de error y de auditoría.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Notificación de Cambio**: ((Vigente)) Después de una actualización exitosa, enviar un email al usuario informándole que su contraseña ha sido cambiada, como medida de seguridad.
  *
  * =====================================================================
  */

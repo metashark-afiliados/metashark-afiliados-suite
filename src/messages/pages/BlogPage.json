@@ -1,0 +1,88 @@
+
+{
+  "en-US": {
+    "hero": {
+      "title": "ConvertiKit Blog",
+      "subtitle": "Insights, strategies, and updates from the forefront of affiliate marketing and AI."
+    },
+    "searchPlaceholder": "Search articles...",
+    "allPostsTitle": "All Posts",
+    "posts": [
+      {
+        "slug": "mastering-ai-copywriting",
+        "title": "Mastering AI Copywriting for Higher Conversions",
+        "excerpt": "Discover the prompts and techniques that turn our AI into a world-class copywriter, boosting your campaign's ROI.",
+        "imageUrl": "https://images.unsplash.com/photo-1587620962725-abab7fe55159?q=80&w=1920&auto=format&fit=crop",
+        "category": "AI & Automation",
+        "author": "L.I.A. Legacy",
+        "date": "August 15, 2025"
+      },
+      {
+        "slug": "bridge-page-anatomy",
+        "title": "The Anatomy of a Perfect Bridge Page",
+        "excerpt": "We break down the essential components of a bridge page that builds trust and drives clicks, based on data from thousands of campaigns.",
+        "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1920&auto=format&fit=crop",
+        "category": "Strategy",
+        "author": "Raz Podestá",
+        "date": "August 10, 2025"
+      }
+    ]
+  },
+  "es-ES": {
+    "hero": {
+      "title": "Blog de ConvertiKit",
+      "subtitle": "Ideas, estrategias y actualizaciones desde la vanguardia del marketing de afiliados y la IA."
+    },
+    "searchPlaceholder": "Buscar artículos...",
+    "allPostsTitle": "Todos los Artículos",
+    "posts": [
+      {
+        "slug": "dominando-copywriting-ia",
+        "title": "Dominando el Copywriting con IA para Mayores Conversiones",
+        "excerpt": "Descubre los prompts y técnicas que convierten a nuestra IA en un redactor de clase mundial, impulsando el ROI de tu campaña.",
+        "imageUrl": "https://images.unsplash.com/photo-1587620962725-abab7fe55159?q=80&w=1920&auto=format&fit=crop",
+        "category": "IA y Automatización",
+        "author": "L.I.A. Legacy",
+        "date": "15 de Agosto, 2025"
+      },
+      {
+        "slug": "anatomia-bridge-page",
+        "title": "La Anatomía de una Bridge Page Perfecta",
+        "excerpt": "Desglosamos los componentes esenciales de una bridge page que genera confianza e impulsa los clics, basándonos en datos de miles de campañas.",
+        "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1920&auto=format&fit=crop",
+        "category": "Estrategia",
+        "author": "Raz Podestá",
+        "date": "10 de Agosto, 2025"
+      }
+    ]
+  },
+  "pt-BR": {
+    "hero": {
+      "title": "Blog da ConvertiKit",
+      "subtitle": "Insights, estratégias e atualizações da vanguarda do marketing de afiliados e IA."
+    },
+    "searchPlaceholder": "Buscar artigos...",
+    "allPostsTitle": "Todos os Artigos",
+    "posts": [
+      {
+        "slug": "dominando-copywriting-ia",
+        "title": "Dominando o Copywriting com IA para Maiores Conversões",
+        "excerpt": "Descubra os prompts e técnicas que transformam nossa IA em um redator de classe mundial, impulsionando o ROI de sua campanha.",
+        "imageUrl": "https://images.unsplash.com/photo-1587620962725-abab7fe55159?q=80&w=1920&auto=format&fit=crop",
+        "category": "IA e Automação",
+        "author": "L.I.A. Legacy",
+        "date": "15 de Agosto, 2025"
+      },
+      {
+        "slug": "anatomia-bridge-page",
+        "title": "A Anatomia de uma Bridge Page Perfeita",
+        "excerpt": "Analisamos os componentes essenciais de uma bridge page que constrói confiança e gera cliques, com base em dados de milhares de campanhas.",
+        "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1920&auto=format&fit=crop",
+        "category": "Estratégia",
+        "author": "Raz Podestá",
+        "date": "10 de Agosto, 2025"
+      }
+    ]
+  }
+}
+

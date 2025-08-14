@@ -1,0 +1,22 @@
+
+{
+  "en-US": {
+    "title": "Add Blocks",
+    "unknown_block_preview": "Unknown Block: {blockType}",
+    "block_name_Header1": "Header - Corporate",
+    "block_name_Hero1": "Hero - Primary"
+  },
+  "es-ES": {
+    "title": "Añadir Bloques",
+    "unknown_block_preview": "Bloque Desconocido: {blockType}",
+    "block_name_Header1": "Encabezado - Corporativo",
+    "block_name_Hero1": "Héroe - Principal"
+  },
+  "pt-BR": {
+    "title": "Adicionar Blocos",
+    "unknown_block_preview": "Bloco Desconhecido: {blockType}",
+    "block_name_Header1": "Cabeçalho - Corporativo",
+    "block_name_Hero1": "Herói - Principal"
+  }
+}
+

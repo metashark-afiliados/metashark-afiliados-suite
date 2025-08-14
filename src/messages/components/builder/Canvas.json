@@ -1,0 +1,27 @@
+{
+  "en-US": {
+    "loading_config": "Loading campaign...",
+    "empty_canvas": {
+      "title": "Empty Canvas",
+      "description": "Drag a block from the left panel to start building your page."
+    },
+    "unknown_block_error": "Error: Unknown block type '{blockType}'. Please contact support."
+  },
+  "es-ES": {
+    "loading_config": "Cargando campaña...",
+    "empty_canvas": {
+      "title": "Lienzo Vacío",
+      "description": "Arrastra un bloque desde el panel izquierdo para empezar a construir tu página."
+    },
+    "unknown_block_error": "Error: Tipo de bloque desconocido '{blockType}'. Por favor, contacta a soporte."
+  },
+  "pt-BR": {
+    "loading_config": "Carregando campanha...",
+    "empty_canvas": {
+      "title": "Tela em Branco",
+      "description": "Arraste um bloco do painel esquerdo para começar a construir sua página."
+    },
+    "unknown_block_error": "Erro: Tipo de bloco desconhecido '{blockType}'. Por favor, entre em contato com o suporte."
+  }
+}
+

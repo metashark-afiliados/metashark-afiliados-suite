@@ -1,0 +1,121 @@
+
+{
+  "en-US": {
+    "hero": {
+      "title": "Get in Touch",
+      "subtitle": "We're here to help. Whether you have a question about features, pricing, or anything else, our team is ready to answer all your questions."
+    },
+    "form": {
+      "title": "Send us a Message",
+      "nameLabel": "Full Name",
+      "emailLabel": "Email Address",
+      "inquiryLabel": "Type of Inquiry",
+      "inquiryOptions": {
+        "sales": "Sales",
+        "support": "Technical Support",
+        "general": "General Inquiry"
+      },
+      "messageLabel": "Your Message",
+      "submitButton": "Send Message",
+      "sendingButton": "Sending..."
+    },
+    "contactInfo": {
+      "title": "Other Ways to Reach Us",
+      "cards": [
+        {
+          "icon": "Mail",
+          "title": "Email",
+          "description": "For general inquiries.",
+          "value": "contact@convertikit.com",
+          "href": "mailto:contact@convertikit.com"
+        },
+        {
+          "icon": "BookUser",
+          "title": "Knowledge Base",
+          "description": "Find answers yourself.",
+          "value": "Explore Docs & FAQs",
+          "href": "/docs"
+        }
+      ]
+    }
+  },
+  "es-ES": {
+    "hero": {
+      "title": "Ponte en Contacto",
+      "subtitle": "Estamos aquí para ayudar. Si tienes una pregunta sobre características, precios o cualquier otra cosa, nuestro equipo está listo para responder a todas tus preguntas."
+    },
+    "form": {
+      "title": "Envíanos un Mensaje",
+      "nameLabel": "Nombre Completo",
+      "emailLabel": "Correo Electrónico",
+      "inquiryLabel": "Tipo de Consulta",
+      "inquiryOptions": {
+        "sales": "Ventas",
+        "support": "Soporte Técnico",
+        "general": "Consulta General"
+      },
+      "messageLabel": "Tu Mensaje",
+      "submitButton": "Enviar Mensaje",
+      "sendingButton": "Enviando..."
+    },
+    "contactInfo": {
+      "title": "Otras Formas de Contactarnos",
+      "cards": [
+        {
+          "icon": "Mail",
+          "title": "Correo Electrónico",
+          "description": "Para consultas generales.",
+          "value": "contacto@convertikit.com",
+          "href": "mailto:contacto@convertikit.com"
+        },
+        {
+          "icon": "BookUser",
+          "title": "Base de Conocimiento",
+          "description": "Encuentra respuestas por ti mismo.",
+          "value": "Explorar Docs y FAQs",
+          "href": "/docs"
+        }
+      ]
+    }
+  },
+  "pt-BR": {
+    "hero": {
+      "title": "Entre em Contato",
+      "subtitle": "Estamos aqui para ajudar. Se você tem uma pergunta sobre recursos, preços ou qualquer outra coisa, nossa equipe está pronta para responder a todas as suas perguntas."
+    },
+    "form": {
+      "title": "Envie-nos uma Mensagem",
+      "nameLabel": "Nome Completo",
+      "emailLabel": "Endereço de E-mail",
+      "inquiryLabel": "Tipo de Consulta",
+      "inquiryOptions": {
+        "sales": "Vendas",
+        "support": "Suporte Técnico",
+        "general": "Consulta Geral"
+      },
+      "messageLabel": "Sua Mensagem",
+      "submitButton": "Enviar Mensagem",
+      "sendingButton": "Enviando..."
+    },
+    "contactInfo": {
+      "title": "Outras Formas de nos Alcançar",
+      "cards": [
+        {
+          "icon": "Mail",
+          "title": "E-mail",
+          "description": "Para consultas gerais.",
+          "value": "contato@convertikit.com",
+          "href": "mailto:contato@convertikit.com"
+        },
+        {
+          "icon": "BookUser",
+          "title": "Base de Conhecimento",
+          "description": "Encontre respostas você mesmo.",
+          "value": "Explorar Docs e FAQs",
+          "href": "/docs"
+        }
+      ]
+    }
+  }
+}
+

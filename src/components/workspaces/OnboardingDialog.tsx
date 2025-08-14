@@ -3,11 +3,11 @@
  * @file src/components/workspaces/OnboardingDialog.tsx
  * @description Aparato de UI atómico y de alta cohesión. Su única responsabilidad
  *              es gestionar y mostrar el diálogo de bienvenida y onboarding para
- *              nuevos usuarios, guiándolos para crear su primer workspace. Este
- *              componente es modal y no se puede cerrar, forzando la acción.
- *              Ha sido corregido para eliminar una prop inválida.
- * @author L.I.A. Legacy
- * @version 1.1.0
+ *              nuevos usuarios. Ha sido refactorizado para utilizar `router.push`
+ *              y corregir el flujo de redirección, además de alinearse con la API
+ *              canónica del componente Dialog.
+ * @author Raz Podestá
+ * @version 2.0.0
  */
 "use client";
 
@@ -29,10 +29,8 @@ import { CreateWorkspaceForm } from "./CreateWorkspaceForm";
  * @public
  * @component OnboardingDialog
  * @description Muestra un diálogo modal forzado para usuarios sin workspaces.
- *              Contiene el `CreateWorkspaceForm` para guiar al usuario en su
- *              primera acción crítica. Tras una creación exitosa, fuerza una
- *              recarga completa de los datos del servidor (`router.refresh()`)
- *              para reinicializar el contexto del dashboard con el nuevo workspace.
+ *              Tras una creación exitosa, ejecuta una navegación completa al
+ *              dashboard para reinicializar el estado de la aplicación.
  * @returns {React.ReactElement} El componente de diálogo de onboarding.
  */
 export function OnboardingDialog(): React.ReactElement {
@@ -40,17 +38,17 @@ export function OnboardingDialog(): React.ReactElement {
   const router = useRouter();
 
   const handleSuccess = () => {
-    router.refresh();
+    // CORRECCIÓN DE LÓGICA: Usar router.push para una navegación completa a la
+    // nueva ruta, en lugar de router.refresh() que solo recarga los datos de la ruta actual.
+    router.push("/dashboard");
   };
 
   return (
     <Dialog open={true}>
       {/*
-        CORRECCIÓN: Se ha eliminado la prop `showCloseButton={false}`.
-        La librería Radix/Shadcn UI gestiona el botón de cierre internamente.
-        Para prevenir el cierre, simplemente evitamos pasar `onOpenChange` al `Dialog`
-        y mantenemos `open={true}`. El `DialogContent` ya incluye un `DialogPrimitive.Close`
-        por defecto, pero el usuario no puede cerrar el diálogo si el estado `open` está forzado.
+        CORRECCIÓN DE CONTRATO: Se ha eliminado la prop inválida `showCloseButton={false}`.
+        El diálogo no se puede cerrar porque su estado `open` está forzado a `true`
+        y no se proporciona un callback `onOpenChange`.
       */}
       <DialogContent>
         <DialogHeader>
@@ -70,11 +68,13 @@ export function OnboardingDialog(): React.ReactElement {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Tour Guiado**: ((Vigente)) O callback `onSuccess` poderia iniciar um tour guiado (ex: com `react-joyride`) em vez de apenas atualizar a página.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Correção de Contrato de API**: ((Implementada)) A prop inválida `showCloseButton` foi removida do componente `DialogContent`, resolvendo o erro de compilação `TS2322` e alinhando o componente com a API canônica da biblioteca de UI.
+ * 1. **Corrección de Flujo de Redirección**: ((Implementada)) El uso de `router.push('/dashboard')` resuelve el bug crítico que dejaba al usuario "pegado" en la página de bienvenida, completando el flujo de onboarding.
+ * 2. **Corrección de Contrato de API**: ((Implementada)) Se ha eliminado la prop inválida `showCloseButton` del componente `DialogContent`, resolviendo el error de compilación `TS2322` y alineando el aparato con la API canónica de la librería de UI.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Prueba E2E (Playwright)**: ((Vigente)) El flujo de onboarding es un candidato perfecto para una prueba End-to-End que simule el registro de un nuevo usuario y verifique que aterriza correctamente en el dashboard.
+ * 2. **Tour Guiado**: ((Vigente)) El callback `onSuccess` podría iniciar un tour guiado (ej. con `react-joyride`) además de redirigir, para mejorar la experiencia del nuevo usuario.
  *
  * =====================================================================
  */

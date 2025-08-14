@@ -1,16 +1,18 @@
 /**
- * @file page.tsx
- * @description Punto de entrada para la ruta de gestión de campañas. Su única
- *              responsabilidad es renderizar el `Suspense boundary` y el cargador de datos.
+ * @file src/app/[locale]/dashboard/sites/[siteId]/campaigns/page.tsx
+ * @description Punto de entrada para la ruta de gestión de campañas. Ha sido
+ *              nivelado para consumir el nuevo cargador de datos atomizado
+ *              `CampaignsPageLoader`, completando la refactorización
+ *              estructural de la capa de servidor.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 import type { Metadata } from "next";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import CampaignsPageSkeleton from "./loading";
-import { CampaignsPageLoader } from "./sites-page-loader";
+import { CampaignsPageLoader } from "./campaigns-page-loader"; // <-- CORRECCIÓN DE IMPORTACIÓN
 
 export async function generateMetadata({
   params: { locale },
@@ -37,3 +39,14 @@ export default function CampaignsPage({
     </Suspense>
   );
 }
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Alineación Arquitectónica**: ((Implementada)) El componente ahora importa y renderiza el cargador de datos correcto (`campaigns-page-loader`), restaurando la arquitectura canónica. Cero regresiones de funcionalidad.
+ *
+ * =====================================================================
+ */
+// src/app/[locale]/dashboard/sites/[siteId]/campaigns/page.tsx

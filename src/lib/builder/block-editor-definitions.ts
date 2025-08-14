@@ -5,7 +5,7 @@
  *              editables y los estilos de cada tipo de bloque en el constructor.
  *              Esta es la Única Fuente de Verdad para la configuración de la UI
  *              del `SettingsPanel`, adhiriéndose al principio de "Configuración sobre Código".
- * @author L.I.A. Legacy
+ * @author Raz Podestá
  * @version 1.0.0
  */
 import { type BlockEditableDefinition } from "./types.d";
@@ -103,13 +103,13 @@ export const blockEditorDefinitions: Record<string, BlockEditableDefinition> = {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Validação Zod para Definições**: ((Vigente)) Definir esquemas Zod para `EditablePropertyDefinition` e `BlockEditableDefinition` e validar `blockEditorDefinitions` em tempo de desenvolvimento para garantir a consistência do manifesto.
- * 2. **Tipos de Controles Avançados**: ((Vigente)) Expandir `BlockPropertyType` para incluir tipos como `number` (com min/max/step), `select` (com opções), ou `image` (com seletor de assets da `asset_library`).
- *
  * @subsection Melhorias Adicionadas
- * 1. **SSoT para Editor**: ((Implementada)) Este manifesto atua como a fonte única da verdade para a configuração da UI de edição, melhorando drasticamente a manutenibilidade e a escalabilidade do construtor. Adicionar um novo campo editável a um bloco agora requer apenas uma modificação neste arquivo.
- * 2. **Arquitetura Declarativa**: ((Implementada)) Adere ao princípio de "Configuração sobre Código", desacoplando a definição da UI da sua implementação no `SettingsPanel`.
+ * 1. **SSoT para el Editor**: ((Implementada)) Este manifiesto actúa como la fuente única de verdad para la configuración de la UI de edición, mejorando drásticamente la mantenibilidad y la escalabilidad del constructor. Añadir un nuevo campo editable a un bloque ahora requiere únicamente una modificación en este archivo.
+ * 2. **Arquitectura Declarativa**: ((Implementada)) Se adhiere al principio de "Configuración sobre Código", desacoplando la definición de la UI de su implementación en el `SettingsPanel`.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Validación Zod para Definiciones**: ((Vigente)) Definir esquemas Zod para `EditablePropertyDefinition` y `BlockEditableDefinition` y validar este objeto `blockEditorDefinitions` en tiempo de desarrollo para garantizar la consistencia del manifiesto.
+ * 2. **Tipos de Controles Avanzados**: ((Vigente)) Expandir `BlockPropertyType` en `types.d.ts` para incluir tipos como `number` (con min/max/step), `select` (con opciones), o `image` (para un futuro selector de assets).
  *
  * =====================================================================
  */

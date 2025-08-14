@@ -1,4 +1,4 @@
-
+// tsconfig.json
 {
   "compilerOptions": {
     "strict": true,
@@ -20,6 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "@tests/*": ["./tests/*"],
       "server-only": ["./tests/mocks/server-only.ts"]
     },
     "plugins": [
@@ -38,3 +39,14 @@
   ],
   "exclude": ["node_modules"]
 }
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Resolución de Rutas de Pruebas**: ((Implementada)) Se ha añadido el alias `@tests/*` al `tsconfig.json`. Esto crea una ruta absoluta y canónica para todos los módulos dentro del directorio de pruebas, resolviendo la causa raíz del error TS2307 y mejorando la mantenibilidad.
+ *
+ * =====================================================================
+ */
+// tsconfig.json

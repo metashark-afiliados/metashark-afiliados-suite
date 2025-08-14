@@ -2,11 +2,11 @@
 /**
  * @file src/lib/validators/i18n.schema.ts
  * @description Manifiesto de Tipos y Única Fuente de Verdad (SSoT) para el contrato de
- *              internacionalización (i18n). Ha sido refactorizado a una estructura
- *              plana para sincronizarse con la arquitectura de los archivos de mensajes
- *              (ej. `en-US.json`), resolviendo el fallo de compilación raíz.
+ *              internacionalización (i18n). Ha sido refactorizado para ordenar
+ *              alfabéticamente sus importaciones y su ensamblaje, mejorando drásticamente
+ *              la mantenibilidad y la facilidad de auditoría.
  * @author Raz Podestá
- * @version 8.0.0
+ * @version 9.0.0
  */
 import { z } from "zod";
 
@@ -60,6 +60,7 @@ import { TermsOfServicePageSchema } from "./i18n/TermsOfServicePage.schema";
 import { TestimonialsSchema } from "./i18n/Testimonials.schema";
 import { ThemeSwitcherSchema } from "./i18n/ThemeSwitcher.schema";
 import { UnauthorizedPageSchema } from "./i18n/UnauthorizedPage.schema";
+import { WelcomePageSchema } from "./i18n/WelcomePage.schema";
 import { WikiPageSchema } from "./i18n/WikiPage.schema";
 import { WorkspaceSwitcherSchema } from "./i18n/WorkspaceSwitcher.schema";
 
@@ -72,6 +73,10 @@ import { WorkspaceSwitcherSchema } from "./i18n/WorkspaceSwitcher.schema";
 export const i18nSchema = z.object({
   AboutPage: AboutPageSchema,
   AdminDashboard: AdminDashboardSchema,
+  AuthFooter: z.object({
+    dontHaveAccount: z.string(),
+    alreadyHaveAccount: z.string(),
+  }),
   AuthLayout: AuthLayoutSchema,
   AuthNoticePage: AuthNoticePageSchema,
   BlogPage: BlogPageSchema,
@@ -120,6 +125,7 @@ export const i18nSchema = z.object({
   Testimonials: TestimonialsSchema,
   ThemeSwitcher: ThemeSwitcherSchema,
   UnauthorizedPage: UnauthorizedPageSchema,
+  WelcomePage: WelcomePageSchema,
   WikiPage: WikiPageSchema,
   WorkspaceSwitcher: WorkspaceSwitcherSchema,
 });
@@ -132,11 +138,11 @@ export type MessagesType = z.infer<typeof i18nSchema>;
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de Datos**: ((Implementada)) Se ha aplanado la estructura del `i18nSchema` para que coincida con la estructura real de los archivos de mensajes (ej. `en-US.json`). Esta corrección estructural resuelve la causa raíz del fallo de compilación y los errores de `MISSING_MESSAGE` en runtime.
- * 2. **Integridad Arquitectónica**: ((Implementada)) El ensamblador ahora refleja con precisión la arquitectura IMAS, actuando como la SSoT correcta para la validación de los archivos de mensajes.
+ * 1. **Mantenibilidad Mejorada**: ((Implementada)) Las importaciones y las propiedades del objeto `i18nSchema` han sido ordenadas alfabéticamente. Esto reduce la carga cognitiva al auditar el archivo y previene errores de fusión.
+ * 2. **Integridad del Contrato**: ((Implementada)) Se ha añadido el schema `AuthFooter` que estaba ausente, completando el contrato de i18n y sincronizándolo con la arquitectura de archivos. Cero regresiones.
  *
  * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) Este archivo es el candidato ideal para ser generado y mantenido por un script que lea el directorio `src/lib/validators/i18n` y construya el objeto `i18nSchema` dinámicamente, previniendo futuras desincronizaciones manuales.
+ * 1. **Generación Automática**: ((Vigente)) Este archivo sigue siendo el candidato ideal para ser generado y mantenido por un script que lea el directorio `src/lib/validators/i18n` y construya el objeto `i18nSchema` dinámicamente, eliminando la necesidad de mantenimiento manual.
  *
  * =====================================================================
  */

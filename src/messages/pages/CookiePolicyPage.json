@@ -1,0 +1,58 @@
+
+{
+  "en-US": {
+    "title": "Cookie Policy",
+    "content": [
+      {
+        "title": "1. What Are Cookies?",
+        "body": [
+          "Cookies are small text files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work, or work more efficiently, as well as to provide information to the owners of the site."
+        ]
+      },
+      {
+        "title": "2. How We Use Cookies",
+        "body": [
+          "We use cookies for several purposes. Some cookies are required for technical reasons in order for our Services to operate, and we refer to these as 'essential' or 'strictly necessary' cookies. For example, we use cookies to manage your session and keep you logged in.",
+          "Other cookies enable us to track and target the interests of our users to enhance the experience on our Services. We use 'performance' or 'analytics' cookies to collect information about traffic and how users interact with our Services."
+        ]
+      }
+    ]
+  },
+  "es-ES": {
+    "title": "Política de Cookies",
+    "content": [
+      {
+        "title": "1. ¿Qué son las Cookies?",
+        "body": [
+          "Las cookies son pequeños archivos de texto que se colocan en su computadora o dispositivo móvil cuando visita un sitio web. Se utilizan ampliamente para hacer que los sitios web funcionen, o funcionen de manera más eficiente, así como para proporcionar información a los propietarios del sitio."
+        ]
+      },
+      {
+        "title": "2. Cómo Usamos las Cookies",
+        "body": [
+          "Utilizamos cookies para varios propósitos. Algunas cookies son necesarias por razones técnicas para que nuestros Servicios funcionen, y nos referimos a estas como cookies 'esenciales' o 'estrictamente necesarias'. Por ejemplo, utilizamos cookies para gestionar su sesión y mantenerlo conectado.",
+          "Otras cookies nos permiten rastrear y dirigir los intereses de nuestros usuarios para mejorar la experiencia en nuestros Servicios. Utilizamos cookies de 'rendimiento' o 'analíticas' para recopilar información sobre el tráfico y cómo los usuarios interactúan con nuestros Servicios."
+        ]
+      }
+    ]
+  },
+  "pt-BR": {
+    "title": "Política de Cookies",
+    "content": [
+      {
+        "title": "1. O que são Cookies?",
+        "body": [
+          "Cookies são pequenos arquivos de texto que são colocados no seu computador ou dispositivo móvel quando você visita um site. Eles são amplamente utilizados para fazer os sites funcionarem, ou funcionarem de forma mais eficiente, bem como para fornecer informações aos proprietários do site."
+        ]
+      },
+      {
+        "title": "2. Como Usamos os Cookies",
+        "body": [
+          "Usamos cookies para diversos fins. Alguns cookies são necessários por razões técnicas para que nossos Serviços operem, e nos referimos a estes como cookies 'essenciais' ou 'estritamente necessários'. Por exemplo, usamos cookies para gerenciar sua sessão e mantê-lo conectado.",
+          "Outros cookies nos permitem rastrear e direcionar os interesses de nossos usuários para aprimorar a experiência em nossos Serviços. Usamos cookies de 'desempenho' ou 'analíticos' para coletar informações sobre o tráfego e como os usuários interagem com nossos Serviços."
+        ]
+      }
+    ]
+  }
+}
+

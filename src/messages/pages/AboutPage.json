@@ -1,11 +1,102 @@
 {
   "en-US": {
-    "title": "About Us"
+    "hero": {
+      "title": "About ConvertiKit"
+    },
+    "mission": {
+      "title": "Our Mission",
+      "content": [
+        "To empower affiliate marketers by transforming complex data into clear, actionable strategies. We build tools that are not just powerful, but intuitive, turning guesswork into a science of conversion.",
+        "We believe in speed, precision, and intelligence. Our goal is to be the strategic co-pilot for the next generation of digital entrepreneurs."
+      ]
+    },
+    "team": {
+      "title": "The Core Team",
+      "subtitle": "The architects and engineers building the future of affiliate marketing.",
+      "members": [
+        {
+          "name": "Raz Podestá",
+          "role": "Chief Software Architect",
+          "imageUrl": "https://avatars.githubusercontent.com/u/1024025?v=4",
+          "social": {
+            "linkedin": "https://www.linkedin.com/in/razpodesta/",
+            "twitter": "https://twitter.com/razpodesta"
+          }
+        },
+        {
+          "name": "L.I.A. Legacy",
+          "role": "Lead Software Engineer",
+          "imageUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=lia-legacy&backgroundColor=transparent&baseColor=adff2f",
+          "social": {}
+        }
+      ]
+    }
   },
   "es-ES": {
-    "title": "Sobre Nosotros"
+    "hero": {
+      "title": "Sobre ConvertiKit"
+    },
+    "mission": {
+      "title": "Nuestra Misión",
+      "content": [
+        "Empoderar a los marketers de afiliados transformando datos complejos en estrategias claras y accionables. Construimos herramientas que no solo son potentes, sino intuitivas, convirtiendo la especulación en una ciencia de la conversión.",
+        "Creemos en la velocidad, la precisión y la inteligencia. Nuestro objetivo es ser el copiloto estratégico para la próxima generación de emprendedores digitales."
+      ]
+    },
+    "team": {
+      "title": "El Equipo Central",
+      "subtitle": "Los arquitectos e ingenieros que construyen el futuro del marketing de afiliados.",
+      "members": [
+        {
+          "name": "Raz Podestá",
+          "role": "Arquitecto de Software Principal",
+          "imageUrl": "https://avatars.githubusercontent.com/u/1024025?v=4",
+          "social": {
+            "linkedin": "https://www.linkedin.com/in/razpodesta/",
+            "twitter": "https://twitter.com/razpodesta"
+          }
+        },
+        {
+          "name": "L.I.A. Legacy",
+          "role": "Ingeniera de Software Líder",
+          "imageUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=lia-legacy&backgroundColor=transparent&baseColor=adff2f",
+          "social": {}
+        }
+      ]
+    }
   },
   "pt-BR": {
-    "title": "Sobre Nós"
+    "hero": {
+      "title": "Sobre a ConvertiKit"
+    },
+    "mission": {
+      "title": "Nossa Missão",
+      "content": [
+        "Capacitar os profissionais de marketing de afiliados, transformando dados complexos em estratégias claras e acionáveis. Construímos ferramentas que não são apenas poderosas, mas intuitivas, transformando a adivinhação em uma ciência da conversão.",
+        "Acreditamos na velocidade, precisão e inteligência. Nosso objetivo é ser o copiloto estratégico para a próxima geração de empreendedores digitais."
+      ]
+    },
+    "team": {
+      "title": "A Equipe Principal",
+      "subtitle": "Os arquitetos e engenheiros que constroem o futuro do marketing de afiliados.",
+      "members": [
+        {
+          "name": "Raz Podestá",
+          "role": "Arquiteto de Software Chefe",
+          "imageUrl": "https://avatars.githubusercontent.com/u/1024025?v=4",
+          "social": {
+            "linkedin": "https://www.linkedin.com/in/razpodesta/",
+            "twitter": "https://twitter.com/razpodesta"
+          }
+        },
+        {
+          "name": "L.I.A. Legacy",
+          "role": "Engenheira de Software Líder",
+          "imageUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=lia-legacy&backgroundColor=transparent&baseColor=adff2f",
+          "social": {}
+        }
+      ]
+    }
   }
 }
+

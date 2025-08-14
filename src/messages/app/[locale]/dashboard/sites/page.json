@@ -1,31 +1,41 @@
 {
   "en-US": {
     "entityName": "Site",
-    "header_title": "My Sites",
-    "header_description": "Manage and search your sites. Each site can have multiple campaigns.",
-    "search_placeholder": "Search by subdomain...",
-    "clear_search_aria": "Clear search",
-    "createSite_button": "Create Site",
-    "createSiteDialog_title": "Create a new site",
-    "form_name_label": "Site name",
-    "form_name_placeholder": "My First Website",
-    "form_subdomain_label": "Subdomain",
-    "subdomain_in_use_error": "This subdomain is already in use.",
-    "form_description_label": "Description (optional)",
-    "form_description_placeholder": "A site for my new affiliate campaign.",
-    "form_creating_button": "Creating Site...",
-    "form_create_button": "Create Site",
-    "emptyState_title": "No sites found",
-    "emptyState_description": "Try another search or create a new site.",
-    "campaignCount": "{count, plural, one {# Campaign} other {# Campaigns}}",
-    "manageCampaigns_button": "Manage Campaigns",
-    "delete_site_aria_label": "Delete site {subdomain}",
-    "open_site_aria_label": "Open site in a new tab",
-    "popover_title": "Quick Preview",
-    "popover_description": "A preview of the site will appear here. (Feature in development).",
-    "deleteDialog_title": "Are you sure?",
-    "deleteDialog_description": "This action is irreversible. The site <strong>{subdomain}</strong>, along with all its campaigns and data, will be permanently deleted.",
-    "deleteDialog_confirmButton": "Yes, delete site",
+    "header": {
+      "title": "My Sites",
+      "description": "Manage and search your sites. Each site can have multiple campaigns.",
+      "searchPlaceholder": "Search by subdomain...",
+      "clearSearchAria": "Clear search",
+      "createSiteButton": "Create Site",
+      "createDialogTitle": "Create a new site"
+    },
+    "form": {
+      "nameLabel": "Site name",
+      "namePlaceholder": "My First Website",
+      "subdomainLabel": "Subdomain",
+      "subdomainInUseError": "This subdomain is already in use.",
+      "descriptionLabel": "Description (optional)",
+      "descriptionPlaceholder": "A site for my new affiliate campaign.",
+      "creatingButton": "Creating Site...",
+      "createButton": "Create Site"
+    },
+    "grid": {
+      "emptyStateTitle": "No sites found",
+      "emptyStateDescription": "Try another search or create a new site."
+    },
+    "card": {
+      "campaignCount": "{count, plural, one {# Campaign} other {# Campaigns}}",
+      "manageCampaignsButton": "Manage Campaigns",
+      "deleteSiteAriaLabel": "Delete site {subdomain}",
+      "openSiteAriaLabel": "Open site in a new tab",
+      "popoverTitle": "Quick Preview",
+      "popoverDescription": "A preview of the site will appear here. (Feature in development)."
+    },
+    "deleteDialog": {
+      "title": "Are you sure?",
+      "description": "This action is irreversible. The site <strong>{subdomain}</strong>, along with all its campaigns and data, will be permanently deleted.",
+      "confirmButton": "Yes, delete site"
+    },
     "errorState": {
       "title": "Error Loading Sites",
       "description": "Could not retrieve site information. Please try refreshing the page."
@@ -35,38 +45,50 @@
       "next": "Next",
       "page": "Go to page {pageNumber}"
     },
-    "error_name_required": "Site name is required.",
-    "error_name_too_short": "Name must be at least 3 characters.",
-    "error_subdomain_too_short": "Subdomain must be at least 3 characters.",
-    "error_subdomain_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed."
+    "validationErrors": {
+      "name_required": "Site name is required.",
+      "name_too_short": "Name must be at least 3 characters.",
+      "subdomain_too_short": "Subdomain must be at least 3 characters.",
+      "subdomain_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed."
+    }
   },
   "es-ES": {
     "entityName": "Sitio",
-    "header_title": "Mis Sitios",
-    "header_description": "Gestiona y busca en tus sitios. Cada sitio puede tener múltiples campañas.",
-    "search_placeholder": "Buscar por subdominio...",
-    "clear_search_aria": "Limpiar búsqueda",
-    "createSite_button": "Crear Sitio",
-    "createSiteDialog_title": "Crear un nuevo sitio",
-    "form_name_label": "Nombre del sitio",
-    "form_name_placeholder": "Mi Primer Sitio Web",
-    "form_subdomain_label": "Subdominio",
-    "subdomain_in_use_error": "Este subdominio ya está en uso.",
-    "form_description_label": "Descripción (opcional)",
-    "form_description_placeholder": "Un sitio para mi nueva campaña de afiliados.",
-    "form_creating_button": "Creando Sitio...",
-    "form_create_button": "Crear Sitio",
-    "emptyState_title": "No se encontraron sitios",
-    "emptyState_description": "Intenta con otra búsqueda o crea un nuevo sitio.",
-    "campaignCount": "{count, plural, one {# Campaña} other {# Campañas}}",
-    "manageCampaigns_button": "Gestionar Campañas",
-    "delete_site_aria_label": "Eliminar sitio {subdomain}",
-    "open_site_aria_label": "Abrir sitio en una nueva pestaña",
-    "popover_title": "Previsualización Rápida",
-    "popover_description": "Una previsualización del sitio aparecerá aquí. (Funcionalidad en desarrollo).",
-    "deleteDialog_title": "¿Estás seguro?",
-    "deleteDialog_description": "Esta acción es irreversible. El sitio <strong>{subdomain}</strong>, junto con todas sus campañas y datos, será eliminado permanentemente.",
-    "deleteDialog_confirmButton": "Sí, eliminar sitio",
+    "header": {
+      "title": "Mis Sitios",
+      "description": "Gestiona y busca en tus sitios. Cada sitio puede tener múltiples campañas.",
+      "searchPlaceholder": "Buscar por subdominio...",
+      "clearSearchAria": "Limpiar búsqueda",
+      "createSiteButton": "Crear Sitio",
+      "createDialogTitle": "Crear un nuevo sitio"
+    },
+    "form": {
+      "nameLabel": "Nombre del sitio",
+      "namePlaceholder": "Mi Primer Sitio Web",
+      "subdomainLabel": "Subdominio",
+      "subdomainInUseError": "Este subdominio ya está en uso.",
+      "descriptionLabel": "Descripción (opcional)",
+      "descriptionPlaceholder": "Un sitio para mi nueva campaña de afiliados.",
+      "creatingButton": "Creando Sitio...",
+      "createButton": "Crear Sitio"
+    },
+    "grid": {
+      "emptyStateTitle": "No se encontraron sitios",
+      "emptyStateDescription": "Intenta con otra búsqueda o crea un nuevo sitio."
+    },
+    "card": {
+      "campaignCount": "{count, plural, one {# Campaña} other {# Campañas}}",
+      "manageCampaignsButton": "Gestionar Campañas",
+      "deleteSiteAriaLabel": "Eliminar sitio {subdomain}",
+      "openSiteAriaLabel": "Abrir sitio en una nueva pestaña",
+      "popoverTitle": "Previsualización Rápida",
+      "popoverDescription": "Una previsualización del sitio aparecerá aquí. (Funcionalidad en desarrollo)."
+    },
+    "deleteDialog": {
+      "title": "¿Estás seguro?",
+      "description": "Esta acción es irreversible. El sitio <strong>{subdomain}</strong>, junto con todas sus campañas y datos, será eliminado permanentemente.",
+      "confirmButton": "Sí, eliminar sitio"
+    },
     "errorState": {
       "title": "Error al Cargar Sitios",
       "description": "No se pudo obtener la información de los sitios. Por favor, intenta recargar la página."
@@ -76,38 +98,50 @@
       "next": "Siguiente",
       "page": "Ir a la página {pageNumber}"
     },
-    "error_name_required": "El nombre del sitio es requerido.",
-    "error_name_too_short": "El nombre debe tener al menos 3 caracteres.",
-    "error_subdomain_too_short": "El subdominio debe tener al menos 3 caracteres.",
-    "error_subdomain_invalid_chars": "Solo se permiten letras minúsculas, números y guiones."
+    "validationErrors": {
+      "name_required": "El nombre del sitio es requerido.",
+      "name_too_short": "El nombre debe tener al menos 3 caracteres.",
+      "subdomain_too_short": "El subdominio debe tener al menos 3 caracteres.",
+      "subdomain_invalid_chars": "Solo se permiten letras minúsculas, números y guiones."
+    }
   },
   "pt-BR": {
     "entityName": "Site",
-    "header_title": "Meus Sites",
-    "header_description": "Gerencie e pesquise seus sites. Cada site pode ter múltiplas campanhas.",
-    "search_placeholder": "Buscar por subdomínio...",
-    "clear_search_aria": "Limpar busca",
-    "createSite_button": "Criar Site",
-    "createSiteDialog_title": "Criar um novo site",
-    "form_name_label": "Nome do site",
-    "form_name_placeholder": "Meu Primeiro Site Web",
-    "form_subdomain_label": "Subdomínio",
-    "subdomain_in_use_error": "Este subdomínio já está em uso.",
-    "form_description_label": "Descrição (opcional)",
-    "form_description_placeholder": "Um site para minha nova campanha de afiliados.",
-    "form_creating_button": "Criando Site...",
-    "form_create_button": "Criar Site",
-    "emptyState_title": "Nenhum site encontrado",
-    "emptyState_description": "Tente outra busca ou crie um novo site.",
-    "campaignCount": "{count, plural, one {# Campanha} other {# Campanhas}}",
-    "manageCampaigns_button": "Gerenciar Campanhas",
-    "delete_site_aria_label": "Excluir site {subdomain}",
-    "open_site_aria_label": "Abrir site em uma nova aba",
-    "popover_title": "Visualização Rápida",
-    "popover_description": "Uma prévia do site aparecerá aqui. (Funcionalidade em desenvolvimento).",
-    "deleteDialog_title": "Você tem certeza?",
-    "deleteDialog_description": "Esta ação é irreversível. O site <strong>{subdomain}</strong>, junto com todas as suas campanhas e dados, será excluído permanentemente.",
-    "deleteDialog_confirmButton": "Sim, excluir site",
+    "header": {
+      "title": "Meus Sites",
+      "description": "Gerencie e pesquise seus sites. Cada site pode ter múltiplas campanhas.",
+      "searchPlaceholder": "Buscar por subdomínio...",
+      "clearSearchAria": "Limpar busca",
+      "createSiteButton": "Criar Site",
+      "createDialogTitle": "Criar um novo site"
+    },
+    "form": {
+      "nameLabel": "Nome do site",
+      "namePlaceholder": "Meu Primeiro Site Web",
+      "subdomainLabel": "Subdomínio",
+      "subdomainInUseError": "Este subdomínio já está em uso.",
+      "descriptionLabel": "Descrição (opcional)",
+      "descriptionPlaceholder": "Um site para minha nova campanha de afiliados.",
+      "creatingButton": "Criando Site...",
+      "createButton": "Criar Site"
+    },
+    "grid": {
+      "emptyStateTitle": "Nenhum site encontrado",
+      "emptyStateDescription": "Tente outra busca ou crie um novo site."
+    },
+    "card": {
+      "campaignCount": "{count, plural, one {# Campanha} other {# Campanhas}}",
+      "manageCampaignsButton": "Gerenciar Campanhas",
+      "deleteSiteAriaLabel": "Excluir site {subdomain}",
+      "openSiteAriaLabel": "Abrir site em uma nova aba",
+      "popoverTitle": "Visualização Rápida",
+      "popoverDescription": "Uma prévia do site aparecerá aqui. (Funcionalidade em desenvolvimento)."
+    },
+    "deleteDialog": {
+      "title": "Você tem certeza?",
+      "description": "Esta ação é irreversível. O site <strong>{subdomain}</strong>, junto com todas as suas campanhas e dados, será excluído permanentemente.",
+      "confirmButton": "Sim, excluir site"
+    },
     "errorState": {
       "title": "Erro ao Carregar Sites",
       "description": "Não foi possível obter as informações dos sites. Por favor, tente recarregar a página."
@@ -117,9 +151,11 @@
       "next": "Próxima",
       "page": "Ir para a página {pageNumber}"
     },
-    "error_name_required": "O nome do site é obrigatório.",
-    "error_name_too_short": "O nome deve ter pelo menos 3 caracteres.",
-    "error_subdomain_too_short": "O subdomínio deve ter pelo menos 3 caracteres.",
-    "error_subdomain_invalid_chars": "Apenas letras minúsculas, números e hífens são permitidos."
+    "validationErrors": {
+      "name_required": "O nome do site é obrigatório.",
+      "name_too_short": "O nome deve ter pelo menos 3 caracteres.",
+      "subdomain_too_short": "O subdomínio deve ter pelo menos 3 caracteres.",
+      "subdomain_invalid_chars": "Apenas letras minúsculas, números e hífens são permitidos."
+    }
   }
 }

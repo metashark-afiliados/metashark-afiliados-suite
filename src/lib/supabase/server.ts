@@ -2,13 +2,13 @@
 /**
  * @file src/lib/supabase/server.ts
  * @description Aparato de utilidad para la creación de clientes Supabase de servidor.
- *              Esta es la Única Fuente de Verdad para instanciar clientes de Supabase
- *              en entornos de servidor (Server Components, Server Actions, Route Handlers).
- *              Proporciona dos factorías: una para operaciones con los permisos del
- *              usuario actual y otra con privilegios de administrador.
+ *              Ha sido nivelado para soportar Inyección de Dependencias, aceptando
+ *              un `cookieStore` explícito. Esto permite su uso dentro de funciones
+ *              cacheadas (`unstable_cache`) sin violar las reglas de funciones dinámicas.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
  */
+import { type ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 import { cookies } from "next/headers";
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
 
@@ -17,14 +17,12 @@ import { type Database } from "@/lib/types/database";
 /**
  * @public
  * @function createClient
- * @description Factoría para crear un cliente de Supabase del lado del servidor que opera
- *              con los permisos del usuario actualmente autenticado. Lee las cookies
- *              de la petición entrante para gestionar la sesión.
- * @returns {import('@supabase/supabase-js').SupabaseClient<Database>} Una instancia del cliente
- *          de Supabase, fuertemente tipada, para operaciones seguras a nivel de fila (RLS).
+ * @description Factoría para crear un cliente de Supabase del lado del servidor.
+ * @param {ReadonlyRequestCookies} [cookieStore] - Instancia opcional de `cookies()`. Si se omite, se invoca `cookies()` dinámicamente.
+ * @returns {import('@supabase/supabase-js').SupabaseClient<Database>}
  */
-export function createClient() {
-  const cookieStore = cookies();
+export function createClient(cookieStore?: ReadonlyRequestCookies) {
+  const store = cookieStore || cookies();
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,21 +30,20 @@ export function createClient() {
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value;
+          return store.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
           try {
-            cookieStore.set({ name, value, ...options });
+            store.set({ name, value, ...options });
           } catch (_error) {
-            // Se ignora de forma segura. Ocurre en Server Components de renderizado estático
-            // que no pueden modificar cookies.
+            // Ignorado de forma segura.
           }
         },
         remove(name: string, options: CookieOptions) {
           try {
-            cookieStore.set({ name, value: "", ...options });
+            store.set({ name, value: "", ...options });
           } catch (_error) {
-            // Se ignora de forma segura por la misma razón anterior.
+            // Ignorado de forma segura.
           }
         },
       },
@@ -57,36 +54,33 @@ export function createClient() {
 /**
  * @public
  * @function createAdminClient
- * @description Factoría para crear un cliente de Supabase del lado del servidor con
- *              privilegios de administrador (service_role). Este cliente puede
- *              eludir las políticas de Row Level Security (RLS) y debe ser utilizado
- *              exclusivamente en Server Actions y capas de datos donde se requiere
- *              acceso privilegiado y se han validado los permisos previamente.
- * @returns {import('@supabase/supabase-js').SupabaseClient<Database>} Una instancia del cliente
- *          de Supabase con privilegios de administrador, fuertemente tipada.
+ * @description Factoría para crear un cliente de Supabase con privilegios de administrador.
+ * @param {ReadonlyRequestCookies} [cookieStore] - Instancia opcional de `cookies()`.
+ * @returns {import('@supabase/supabase-js').SupabaseClient<Database>}
  */
-export function createAdminClient() {
-  const cookieStore = cookies();
+export function createAdminClient(cookieStore?: ReadonlyRequestCookies) {
+  const store = cookieStore || cookies();
+
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value;
+          return store.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
           try {
-            cookieStore.set({ name, value, ...options });
+            store.set({ name, value, ...options });
           } catch (_error) {
-            // Ignorado de forma segura.
+            // Ignorado
           }
         },
         remove(name: string, options: CookieOptions) {
           try {
-            cookieStore.set({ name, value: "", ...options });
+            store.set({ name, value: "", ...options });
           } catch (_error) {
-            // Ignorado de forma segura.
+            // Ignorado
           }
         },
       },
@@ -103,14 +97,9 @@ export function createAdminClient() {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Cacheo de Instancia por Petición**: ((Vigente)) Para una optimización de élite en Server Components, las factorías podrían ser envueltas en `React.cache` para garantizar que solo se cree una instancia de cliente por cada ciclo de renderizado de petición, reduciendo la sobrecarga.
- * 2. **Validación de Variables de Entorno**: ((Vigente)) Implementar una validación con Zod al inicio de la aplicación para asegurar que las variables de entorno de Supabase están presentes, previniendo fallos en tiempo de ejecución.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Alinhamento Estrutural**: ((Implementada)) O aparato foi posicionado corretamente dentro de `src/lib/supabase/`, seguindo a nova estrutura canônica do projeto.
- * 2. **Documentação TSDoc de Elite**: ((Implementada)) O propósito de cada factoría (`createClient` vs `createAdminClient`) foi documentado de forma verbosa e explícita para garantir seu uso correto e seguro.
- * 3. **Intenção Explícita**: ((Implementada)) As variáveis de erro nos blocos `catch` foram renomeadas para `_error`, comunicando explicitamente que são ignoradas de forma deliberada e segura, alinhando-se com as melhores práticas de código limpo.
+ * 1. **Soporte para Inyección de Dependencias**: ((Implementada)) Las factorías ahora aceptan `cookieStore` como argumento, desacoplando la creación del cliente de la invocación dinámica de `cookies()`.
+ * 2. **Resolución de Error de Cache**: ((Implementada)) Este cambio es el primer paso crítico para resolver el error de `unstable_cache`.
  *
  * =====================================================================
  */

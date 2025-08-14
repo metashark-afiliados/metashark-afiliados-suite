@@ -1,0 +1,64 @@
+
+{
+  "en-US": {
+    "title": "Legal Notice / Imprint",
+    "content": [
+      {
+        "title": "1. Corporate Information",
+        "body": [
+          "MetaShark Tech, Florianópolis/SC, Brazil.",
+          "Represented by: Raz Podestá, Chief Executive Officer.",
+          "Contact: legal@convertikit.com"
+        ]
+      },
+      {
+        "title": "2. Liability for Content",
+        "body": [
+          "As service providers, we are liable for own contents of these websites according to Sec. 7, paragraph 1 German Telemedia Act (TMG). However, according to Sec. 8 to 10 German Telemedia Act (TMG), service providers are not obligated to permanently monitor submitted or stored information or to search for evidences that indicate illegal activities.",
+          "Legal obligations to removing information or to blocking the use of information remain unchallenged. In this case, liability is only possible at the time of knowledge about a specific violation of law."
+        ]
+      }
+    ]
+  },
+  "es-ES": {
+    "title": "Aviso Legal / Imprint",
+    "content": [
+      {
+        "title": "1. Información Corporativa",
+        "body": [
+          "MetaShark Tech, Florianópolis/SC, Brasil.",
+          "Representada por: Raz Podestá, Director Ejecutivo.",
+          "Contacto: legal@convertikit.com"
+        ]
+      },
+      {
+        "title": "2. Responsabilidad por el Contenido",
+        "body": [
+          "Como proveedores de servicios, somos responsables de los contenidos propios de estos sitios web de acuerdo con el § 7, párrafo 1 de la Ley alemana de Telemedia (TMG). Sin embargo, de acuerdo con los §§ 8 a 10 de la TMG, los proveedores de servicios no están obligados a monitorear permanentemente la información transmitida o almacenada ni a buscar evidencias que indiquen actividades ilegales.",
+          "Las obligaciones legales de eliminar información o bloquear el uso de la información no se ven afectadas. En este caso, la responsabilidad solo es posible en el momento del conocimiento de una violación específica de la ley."
+        ]
+      }
+    ]
+  },
+  "pt-BR": {
+    "title": "Aviso Legal / Imprint",
+    "content": [
+      {
+        "title": "1. Informações Corporativas",
+        "body": [
+          "MetaShark Tech, Florianópolis/SC, Brasil.",
+          "Representado por: Raz Podestá, Diretor Executivo.",
+          "Contato: legal@convertikit.com"
+        ]
+      },
+      {
+        "title": "2. Responsabilidade pelo Conteúdo",
+        "body": [
+          "Como provedores de serviços, somos responsáveis pelos nossos próprios conteúdos nestes sites de acordo com o § 7, parágrafo 1 da Lei Alemã de Telemídia (TMG). No entanto, de acordo com os §§ 8 a 10 da TMG, os provedores de serviços não são obrigados a monitorar permanentemente as informações transmitidas ou armazenadas ou a procurar evidências que indiquem atividades ilegais.",
+          "As obrigações legais de remover informações ou de bloquear o uso de informações permanecem inalteradas. Neste caso, a responsabilidade só é possível no momento do conhecimento de uma violação específica da lei."
+        ]
+      }
+    ]
+  }
+}
+

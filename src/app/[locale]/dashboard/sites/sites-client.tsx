@@ -1,13 +1,11 @@
-// src/app/[locale]/dashboard/sites/sites-client.tsx
 /**
  * @file src/app/[locale]/dashboard/sites/sites-client.tsx
- * @description Orquestador de UI puro para la página "Mis Sitios". Este componente
- *              de cliente consume el hook soberano `useSitesPage` para obtener toda
- *              su lógica y estado. Su única responsabilidad es ensamblar los
- *              componentes de presentación atómicos y proveerles los datos y
- *              callbacks necesarios, junto con los textos internacionalizados.
+ * @description Orquestador de UI puro para la página "Mis Sitios". Ha sido
+ *              nivelado a un estándar de élite para construir y pasar
+ *              explícitamente los objetos de props de texto (`texts`) a sus
+ *              componentes hijos, resolviendo un `TypeError` crítico en runtime.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
@@ -18,7 +16,7 @@ import { PaginationControls } from "@/components/shared/pagination-controls";
 import { SitesGrid } from "@/components/sites/SitesGrid";
 import { SitesHeader } from "@/components/sites/SitesHeader";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { useSitesPage } from "@/lib/hooks/useSitesPage";
+import { useSitesPage } from "@/lib/hooks/use-sites-page";
 
 interface SitesClientProps {
   initialSites: SiteWithCampaignCount[];
@@ -28,13 +26,6 @@ interface SitesClientProps {
   searchQuery: string;
 }
 
-/**
- * @public
- * @component SitesClient
- * @description Orquesta la UI para la página "Mis Sitios".
- * @param {SitesClientProps} props - Propiedades iniciales del servidor.
- * @returns {React.ReactElement | null} El componente cliente renderizado.
- */
 export function SitesClient({
   initialSites,
   totalCount,
@@ -58,51 +49,51 @@ export function SitesClient({
   } = useSitesPage({ initialSites });
 
   if (!activeWorkspaceId) {
-    // Este caso no debería ocurrir si el layout funciona correctamente,
-    // pero es una guarda de seguridad.
     return null;
   }
 
+  // --- INICIO DE CORRECCIÓN CRÍTICA ---
+  // Construcción de los objetos de props de texto, alineados con el schema.
   const texts = {
     header: {
-      title: t("header_title"),
-      description: t("header_description"),
-      searchPlaceholder: t("search_placeholder"),
-      clearSearchAria: t("clear_search_aria"),
-      createSiteButton: t("createSite_button"),
-      createDialogTitle: t("createSiteDialog_title"),
+      title: t("header.title"),
+      description: t("header.description"),
+      searchPlaceholder: t("header.searchPlaceholder"),
+      clearSearchAria: t("header.clearSearchAria"),
+      createSiteButton: t("header.createSiteButton"),
+      createDialogTitle: t("header.createDialogTitle"),
     },
     form: {
-      nameLabel: t("form_name_label"),
-      namePlaceholder: t("form_name_placeholder"),
-      subdomainLabel: t("form_subdomain_label"),
-      subdomainInUseError: t("subdomain_in_use_error"),
-      descriptionLabel: t("form_description_label"),
-      descriptionPlaceholder: t("form_description_placeholder"),
-      creatingButton: t("form_creating_button"),
-      createButton: t("form_create_button"),
+      nameLabel: t("form.nameLabel"),
+      namePlaceholder: t("form.namePlaceholder"),
+      subdomainLabel: t("form.subdomainLabel"),
+      subdomainInUseError: t("form.subdomainInUseError"),
+      descriptionLabel: t("form.descriptionLabel"),
+      descriptionPlaceholder: t("form.descriptionPlaceholder"),
+      creatingButton: t("form.creatingButton"),
+      createButton: t("form.createButton"),
     },
     grid: {
-      emptyStateTitle: t("emptyState_title"),
-      emptyStateDescription: t("emptyState_description"),
+      emptyStateTitle: t("grid.emptyStateTitle"),
+      emptyStateDescription: t("grid.emptyStateDescription"),
     },
     card: {
-      campaignCount: (count: number) => t("campaignCount", { count }),
-      manageCampaignsButton: t("manageCampaigns_button"),
+      campaignCount: (count: number) => t("card.campaignCount", { count }),
+      manageCampaignsButton: t("card.manageCampaignsButton"),
       deleteSiteAriaLabel: (subdomain: string) =>
-        t("delete_site_aria_label", { subdomain }),
-      openSiteAriaLabel: t("open_site_aria_label"),
-      popoverTitle: t("popover_title"),
-      popoverDescription: t("popover_description"),
+        t("card.deleteSiteAriaLabel", { subdomain }),
+      openSiteAriaLabel: t("card.openSiteAriaLabel"),
+      popoverTitle: t("card.popoverTitle"),
+      popoverDescription: t("card.popoverDescription"),
     },
     deleteDialog: {
-      title: t("deleteDialog_title"),
+      title: t("deleteDialog.title"),
       description: (subdomain: string) =>
-        t.rich("deleteDialog_description", {
+        t.rich("deleteDialog.description", {
           subdomain,
           strong: (chunks) => <strong>{chunks}</strong>,
         }),
-      confirmButton: t("deleteDialog_confirmButton"),
+      confirmButton: t("deleteDialog.confirmButton"),
       cancelButton: tDialogs("generic_cancelButton"),
     },
     pagination: {
@@ -111,6 +102,7 @@ export function SitesClient({
       pageLabelTemplate: t("pagination.page"),
     },
   };
+  // --- FIN DE CORRECCIÓN CRÍTICA ---
 
   return (
     <div className="space-y-6 relative">
@@ -151,12 +143,12 @@ export function SitesClient({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Memoización de `texts`**: ((Vigente)) El objeto `texts` se reconstruye en cada render. Para una optimización de élite, podría ser memoizado con `useMemo`, con `t` y `tDialogs` como dependencias.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura Soberana**: ((Implementada)) Este componente es un ejemplo canónico de la arquitectura de UI del proyecto: un orquestador puro que consume un hook soberano y compone piezas de UI atómicas.
- * 2. **Full Internacionalización**: ((Implementada)) El componente actúa como la capa que obtiene todas las traducciones necesarias y las inyecta en los componentes de presentación puros.
+ * 1. **Resolución de Error de Runtime Crítico**: ((Implementada)) El componente ahora construye y pasa los objetos de `texts` a sus hijos, resolviendo el `TypeError` que rompía la página.
+ * 2. **Alineación Arquitectónica**: ((Implementada)) Se ha restaurado la comunicación correcta entre el orquestador de cliente y los componentes de presentación.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Memoización de `texts`**: ((Vigente)) El objeto `texts` se reconstruye en cada render. Para una optimización de élite, podría ser memoizado con `useMemo`.
  *
  * =====================================================================
  */
