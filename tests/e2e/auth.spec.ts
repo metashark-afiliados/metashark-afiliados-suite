@@ -1,22 +1,24 @@
 // tests/e2e/auth.spec.ts
 /**
  * @file auth.spec.ts
- * @description Arnés de pruebas E2E consolidado para el ciclo de vida del usuario.
- *              Valida el registro, onboarding, cierre de sesión e inicio de sesión.
- *              Utiliza factorías de helpers para máxima legibilidad y mantenibilidad.
+ * @description Arnés de pruebas E2E de élite para el ciclo de vida del usuario.
+ *              Refactorizado para validar la Arquitectura v9.1 "Workspace Creativo".
+ *              Valida el registro, el onboarding con el WelcomeModal sobre el dashboard,
+ *              el cierre de sesión y el re-login.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 import { test, expect, type Page } from "@playwright/test";
 
-// --- Factorías de Helpers de Interacción ---
+// --- Factorías de Helpers de Interacción Atómicos ---
 
 const generateUniqueUser = () => {
   const timestamp = Date.now();
   return {
     email: `e2e-user-${timestamp}@convertikit.dev`,
     password: `password-${timestamp}!`,
-    workspaceName: `Proyecto E2E ${timestamp}`,
+    // El nombre del workspace por defecto se genera automáticamente por el trigger de la BD.
+    expectedWorkspaceName: `e2e-user-${timestamp}@convertikit.dev's Workspace`,
   };
 };
 
@@ -30,20 +32,22 @@ const performSignUp = async (
   await page.getByRole("button", { name: /crear cuenta/i }).click();
 };
 
-const performFirstWorkspaceCreation = async (
-  page: Page,
-  workspaceName: string
-) => {
-  await page.waitForURL("**/welcome**");
-  await expect(
-    page.getByRole("heading", { name: /¡Bienvenido a ConvertiKit!/i })
-  ).toBeVisible();
-  await page.getByLabel(/nombre del workspace/i).fill(workspaceName);
-  await page.getByRole("button", { name: /crear workspace/i }).click();
+const performWelcomeModalInteraction = async (page: Page) => {
+  // 1. Espera a ser redirigido al dashboard y que el modal aparezca.
+  await page.waitForURL("**/dashboard**");
+  const welcomeModalTitle = page.getByRole("heading", {
+    name: /¡Bienvenido a ConvertiKit!/i,
+  });
+  await expect(welcomeModalTitle).toBeVisible();
+
+  // 2. Interactúa con el modal.
+  await page.getByRole("button", { name: /¡Vamos allá!/i }).click();
+
+  // 3. Verifica que el modal se ha cerrado.
+  await expect(welcomeModalTitle).not.toBeVisible();
 };
 
 const performLogout = async (page: Page) => {
-  // Asume que el usuario está en el dashboard y el UserMenu es accesible
   await page.getByRole("button", { name: /raz podestá/i }).click();
   await page.getByRole("menuitem", { name: /cerrar sesión/i }).click();
   await page.waitForURL("**/");
@@ -61,57 +65,59 @@ const performLogin = async (
 
 // --- Test Suite ---
 
-test.describe("Flujo E2E de Ciclo de Vida del Usuario", () => {
+test.describe("Flujo E2E v9.1: Ciclo de Vida del Usuario en Workspace Creativo", () => {
   const user = generateUniqueUser();
 
-  test("debe permitir a un nuevo usuario registrarse, crear un workspace, cerrar sesión y volver a iniciar sesión", async ({
+  test("debe registrar un usuario, mostrar el modal de bienvenida, y permitir el logout y login", async ({
     page,
   }) => {
-    // 1. Registro
+    // === Fase 1: Registro y Onboarding ===
     await performSignUp(page, user);
+    await performWelcomeModalInteraction(page);
 
-    // 2. Onboarding: Creación del Primer Workspace
-    await performFirstWorkspaceCreation(page, user.workspaceName);
-
-    // 3. Verificación en el Dashboard
-    await page.waitForURL("**/dashboard**");
+    // === Fase 2: Verificación del Dashboard Post-Onboarding ===
     await expect(
-      page.getByRole("heading", { name: /Bienvenido,/i })
+      page.getByRole("heading", { name: /¿Qué vamos a convertir hoy/i })
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: new RegExp(user.workspaceName, "i") })
+      page.getByRole("button", {
+        name: new RegExp(user.expectedWorkspaceName, "i"),
+      })
     ).toBeVisible();
 
-    // 4. Cierre de Sesión
+    // === Fase 3: Cierre de Sesión ===
     await performLogout(page);
     await expect(
       page.getByRole("link", { name: /iniciar sesión/i })
     ).toBeVisible();
 
-    // 5. Inicio de Sesión
+    // === Fase 4: Re-Login ===
     await performLogin(page, user);
 
-    // 6. Verificación Final en el Dashboard
+    // === Fase 5: Verificación Final del Dashboard ===
     await page.waitForURL("**/dashboard**");
+    // Crítico: El modal de bienvenida NO debe aparecer en el segundo login.
     await expect(
-      page.getByRole("heading", { name: /Bienvenido,/i })
+      page.getByRole("heading", { name: /¡Bienvenido a ConvertiKit!/i })
+    ).not.toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /¿Qué vamos a convertir hoy/i })
     ).toBeVisible();
   });
 });
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Principio DRY y Atomicidad**: ((Implementada)) La lógica de interacción se ha abstraído en helpers, haciendo el flujo de la prueba más legible y mantenible.
- * 2. **Cobertura de Ciclo de Vida Completo**: ((Implementada)) La prueba ahora valida el flujo completo desde el registro hasta el re-login, proporcionando una confianza de extremo a extremo mucho mayor.
- * 3. **Robustez de Selectores**: ((Implementada)) Se utilizan expresiones regulares insensibles a mayúsculas/minúsculas para que las pruebas sean más resistentes a cambios de texto.
+ * 1. **Alineación con Arquitectura v9.1**: ((Implementada)) La suite de pruebas ahora valida el nuevo flujo de onboarding con el `WelcomeModal` sobre el dashboard, en lugar de la página `/welcome` obsoleta.
+ * 2. **Validación de Persistencia de Onboarding**: ((Implementada)) Se ha añadido una verificación crítica para asegurar que el `WelcomeModal` no aparezca después del primer login, validando que la `completeOnboardingAction` funciona correctamente.
+ * 3. **Helpers Atómicos Refactorizados**: ((Implementada)) Se ha creado el helper `performWelcomeModalInteraction` y se ha eliminado el obsoleto `performFirstWorkspaceCreation`, manteniendo el código de prueba limpio y legible.
  *
  * @subsection Melhorias Futuras
- * 1. **Limpieza de Datos de Prueba**: ((Vigente)) Implementar un hook `globalTeardown` en Playwright para eliminar los usuarios y workspaces de prueba de la base de datos después de la ejecución.
- * 2. **Page Object Model (POM)**: ((Vigente)) Para una escalabilidad de élite, abstraer las interacciones de página a clases de "Page Object", desacoplando aún más las pruebas de la estructura del DOM.
+ * 1. **Limpieza de Datos de Prueba (Teardown)**: ((Vigente)) Implementar un hook `globalTeardown` para eliminar los usuarios de prueba de la base de datos después de la ejecución.
+ * 2. **Page Object Model (POM)**: ((Vigente)) Abstraer las interacciones a clases de "Page Object" para una escalabilidad de élite.
  *
  * =====================================================================
  */

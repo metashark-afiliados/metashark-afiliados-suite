@@ -1,11 +1,11 @@
+// src/app/[locale]/dashboard/sites/[siteId]/campaigns/campaigns-client.tsx
 /**
- * @file src/app/[locale]/dashboard/sites/[siteId]/campaigns/campaigns-client.tsx
- * @description Orquestador de cliente de élite. Ha sido nivelado para construir
- *              y pasar explícitamente los objetos de props de texto, incluyendo
- *              `toastTexts`, a sus hijos, cumpliendo con el contrato de i18n
- *              completo y resolviendo todos los errores de tipo.
+ * @file campaigns-client.tsx
+ * @description Orquestador de UI de élite. Ha sido refactorizado para
+ *              ensamblar la nueva arquitectura de hooks soberanos y
+ *              delegar la lógica de creación al `CampaignsPageHeader`.
  * @author Raz Podestá
- * @version 3.1.0
+ * @version 6.0.0
  */
 "use client";
 
@@ -22,16 +22,18 @@ import { SearchInput } from "@/components/ui/SearchInput";
 import { useCampaignsPage } from "@/lib/hooks/use-campaigns-page";
 import { type CampaignMetadata } from "@/lib/data/campaigns";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
+import { logger } from "@/lib/logging";
+
+type CampaignStatus = "draft" | "published" | "archived";
 
 interface CampaignsClientProps {
-  site: Pick<SiteWithCampaignCount, "id" | "subdomain" | "name">;
-  workspace: { name: string };
+  site: Pick<SiteWithCampaignCount, "id" | "name" | "subdomain">;
   initialCampaigns: CampaignMetadata[];
   totalCount: number;
   page: number;
   limit: number;
   searchQuery: string;
-  status?: "draft" | "published" | "archived";
+  status?: CampaignStatus;
   sortBy?: "updated_at_desc" | "name_asc";
 }
 
@@ -45,6 +47,7 @@ export function CampaignsClient({
   status,
   sortBy,
 }: CampaignsClientProps): React.ReactElement {
+  logger.trace("[CampaignsClient] Renderizando orquestador de UI.");
   const t = useTranslations("CampaignsPage");
   const tDialogs = useTranslations("Dialogs");
   const format = useFormatter();
@@ -59,12 +62,10 @@ export function CampaignsClient({
     setStatusFilter,
     sortBy: currentSortBy,
     setSortBy,
-    isCreateDialogOpen,
-    setCreateDialogOpen,
-    handleCreateCampaign,
     handleDelete,
     handleArchiveCampaign,
     handleDuplicateCampaign,
+    handleCreateCampaign,
   } = useCampaignsPage({
     initialCampaigns,
     initialSearchQuery: searchQuery,
@@ -73,12 +74,15 @@ export function CampaignsClient({
     siteId: site.id,
   });
 
-  // --- INICIO DE CORRECCIÓN DE SINCRONIZACIÓN DE CONTRATO ---
+  const handleStatusChange = (newStatus: CampaignStatus | "all") => {
+    setStatusFilter(newStatus === "all" ? undefined : newStatus);
+  };
+
   const columns = getCampaignsColumns({
     t,
     tDialogs,
     format,
-    handleDelete,
+    handleDelete: handleDelete!,
     handleArchive: handleArchiveCampaign,
     handleDuplicate: handleDuplicateCampaign,
     isPending,
@@ -88,31 +92,28 @@ export function CampaignsClient({
       archiving: t("toasts.archiving"),
     },
   });
-  // --- FIN DE CORRECCIÓN DE SINCRONIZACIÓN DE CONTRATO ---
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <CampaignsPageHeader
+        t={t}
         site={site}
-        isCreateDialogOpen={isCreateDialogOpen}
-        setCreateDialogOpen={setCreateDialogOpen}
-        handleCreate={handleCreateCampaign}
+        handleCreate={handleCreateCampaign!}
         isPending={isPending}
         mutatingId={mutatingId}
         statusFilter={statusFilter}
-        onStatusChange={(newStatus) =>
-          setStatusFilter(newStatus === "all" ? undefined : newStatus)
-        }
+        onStatusChange={handleStatusChange}
         sortBy={currentSortBy}
         onSortChange={setSortBy}
-        t={t}
       />
-      <SearchInput
-        placeholder={t("search.placeholder")}
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        clearAriaLabel={t("search.clear_aria")}
-      />
+      <div className="w-full md:w-1/3">
+        <SearchInput
+          placeholder={t("search.placeholder")}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          clearAriaLabel={t("search.clear_aria")}
+        />
+      </div>
       <DataTable
         columns={columns}
         data={campaigns}
@@ -133,17 +134,17 @@ export function CampaignsClient({
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato**: ((Implementada)) Se ha añadido la prop `toastTexts` al objeto de configuración de `getCampaignsColumns`, resolviendo el error de compilación `TS2345`.
+ * 1. **Componente de Ensamblaje Puro**: ((Implementada)) El componente ahora es un ensamblador puro que consume el hook orquestador `useCampaignsPage` y delega la lógica y el estado a sus hijos, cumpliendo la "Filosofía LEGO".
+ * 2. **Sincronización de Contrato de Hook**: ((Implementada)) El componente ha sido completamente sincronizado con la nueva API del hook `useCampaignsPage`, eliminando código obsoleto.
  *
  * @subsection Melhorias Futuras
- * 1. **Abstracción de `toastTexts`**: ((Vigente)) El hook `useCampaignsPage` podría ser refactorizado para devolver este objeto de `toastTexts` ya construido, manteniendo al cliente más agnóstico.
+ * 1. **Estado de Carga de Búsqueda**: ((Vigente)) El `SearchInput` podría recibir la prop `isLoading` del futuro hook `useUrlStateSync` para mostrar un spinner mientras se actualiza la URL.
  *
  * =====================================================================
  */

@@ -9,9 +9,8 @@
  * @version 1.0.0
  */
 import { Suspense } from "react";
-
+import { logger } from "@/lib/logging";
 import { Card } from "@/components/ui/card";
-
 import { SitesPageLoader } from "./sites-page-loader";
 
 /**
@@ -20,7 +19,7 @@ import { SitesPageLoader } from "./sites-page-loader";
  * @description Renderiza un esqueleto de carga que imita la estructura de la página final.
  * @returns {React.ReactElement}
  */
-const SitesPageSkeleton = () => (
+const SitesPageSkeleton = (): React.ReactElement => (
   <div className="space-y-6 relative animate-pulse">
     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div>
@@ -43,34 +42,38 @@ const SitesPageSkeleton = () => (
 /**
  * @public
  * @page SitesPage
- * @description Ensambla el `Suspense boundary` para el flujo de carga de datos.
- * @param {object} props
- * @param {{ page?: string; q?: string }} props.searchParams
+ * @description Ensambla el `Suspense boundary` para el flujo de carga de datos de la página de sitios.
+ * @param {object} props - Propiedades de la página.
+ * @param {{ page?: string; q?: string }} props.searchParams - Parámetros de búsqueda de la URL.
  * @returns {React.ReactElement}
  */
 export default function SitesPage({
   searchParams,
 }: {
   searchParams: { page?: string; q?: string };
-}) {
+}): React.ReactElement {
+  logger.trace(
+    "[SitesPage] Renderizando punto de entrada y Suspense boundary."
+  );
   return (
     <Suspense fallback={<SitesPageSkeleton />}>
       <SitesPageLoader searchParams={searchParams} />
     </Suspense>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Esqueleto de Carga Detallado**: ((Vigente)) El esqueleto podría ser aún más detallado, por ejemplo, mostrando sub-esqueletos dentro de las tarjetas para imitar con mayor precisión la UI final y reducir el Layout Shift (CLS).
- *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Carga de Élite**: ((Implementada)) El uso del patrón `Page` -> `Suspense` -> `Loader` es la implementación canónica y de más alto rendimiento para la carga de datos en el App Router de Next.js.
- * 2. **Experiencia de Usuario Instantánea**: ((Implementada)) Al mostrar un esqueleto de carga de inmediato, se mejora drásticamente la experiencia de usuario percibida, eliminando pantallas en blanco durante la obtención de datos.
+ * 1. **Full Observabilidad**: ((Implementada)) Se ha añadido `logger.trace` para monitorear el renderizado de este punto de entrada.
+ * 2. **Documentación TSDoc de Élite**: ((Implementada)) Se ha añadido documentación verbosa para formalizar el rol del aparato y su esqueleto de carga.
+ * 3. **Arquitectura de Carga de Élite**: ((Vigente)) El uso del patrón `Page` -> `Suspense` -> `Loader` es la implementación canónica y de más alto rendimiento para la carga de datos en el App Router de Next.js.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Mover a `loading.tsx`**: ((Vigente)) Para una adhesión 100% canónica a las convenciones de Next.js, el componente `SitesPageSkeleton` podría ser movido a su propio archivo `loading.tsx` en el mismo directorio.
+ * 2. **Esqueleto de Carga Detallado**: ((Vigente)) El esqueleto podría ser aún más detallado, por ejemplo, mostrando sub-esqueletos dentro de las tarjetas para imitar con mayor precisión la UI final y reducir el Cumulative Layout Shift (CLS).
  *
  * =====================================================================
  */

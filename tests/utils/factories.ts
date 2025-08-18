@@ -2,19 +2,17 @@
 /**
  * @file tests/utils/factories.ts
  * @description Manifiesto de Factorías de Pruebas de Élite.
- *              Ha sido nivelado para integrar `@faker-js/faker`, generando datos
- *              de prueba realistas y dinámicos que mejoran la robustez y
- *              fidelidad de las pruebas. Es la SSoT para la creación de datos
- *              y mocks consistentes.
+ *              Ha sido nivelado para alinear la factoría `createMockSite` con el
+ *              contrato de datos estricto de la tabla `sites`, resolviendo un
+ *              error de compilación de TypeScript.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.3.0
  */
 import { faker } from "@faker-js/faker";
 import { type User } from "@supabase/supabase-js";
 import { vi } from "vitest";
 
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { type Tables } from "@/lib/types/database";
 
 // --- Factorías de Datos de Prueba con Faker ---
 
@@ -56,6 +54,7 @@ export const createMockSite = (
   workspace_id: faker.string.uuid(),
   owner_id: faker.string.uuid(),
   custom_domain: null,
+  status: "draft", // <-- CORRECCIÓN: Se añade el valor por defecto requerido.
   campaign_count: faker.number.int({ min: 0, max: 20 }),
   ...overrides,
 });
@@ -68,6 +67,8 @@ export type MockSupabaseClient = {
     mockFrom: ReturnType<typeof vi.fn>;
     mockSelect: ReturnType<typeof vi.fn>;
     mockInsert: ReturnType<typeof vi.fn>;
+    mockUpdate: ReturnType<typeof vi.fn>;
+    mockDelete: ReturnType<typeof vi.fn>;
     mockEq: ReturnType<typeof vi.fn>;
     mockIlike: ReturnType<typeof vi.fn>;
     mockOr: ReturnType<typeof vi.fn>;
@@ -76,6 +77,8 @@ export type MockSupabaseClient = {
     mockSingle: ReturnType<typeof vi.fn>;
     mockRpc: ReturnType<typeof vi.fn>;
     mockLimit: ReturnType<typeof vi.fn>;
+    mockGetUser: ReturnType<typeof vi.fn>;
+    mockSignOut: ReturnType<typeof vi.fn>;
   };
 };
 
@@ -86,48 +89,56 @@ export type MockSupabaseClient = {
  * @returns {MockSupabaseClient} Un objeto con la instancia simulada y los espías.
  */
 export const createMockSupabaseClient = (): MockSupabaseClient => {
-  const mockSingle = vi.fn();
-  const mockRange = vi.fn();
-  const mockInsert = vi.fn();
-  const mockRpc = vi.fn();
-  const mockOr = vi.fn();
-  const mockIlike = vi.fn();
-  const mockOrder = vi.fn();
-  const mockSelect = vi.fn();
-  const mockEq = vi.fn();
-  const mockLimit = vi.fn();
-
-  const queryBuilderMock = {
-    select: mockSelect.mockReturnThis(),
-    insert: mockInsert,
-    eq: mockEq.mockReturnThis(),
-    ilike: mockIlike.mockReturnThis(),
-    or: mockOr.mockReturnThis(),
-    order: mockOrder.mockReturnThis(),
-    single: mockSingle,
-    range: mockRange,
-    limit: mockLimit.mockReturnThis(),
+  const mocks = {
+    mockSelect: vi.fn(),
+    mockInsert: vi.fn(),
+    mockUpdate: vi.fn(),
+    mockDelete: vi.fn(),
+    mockEq: vi.fn(),
+    mockIlike: vi.fn(),
+    mockOr: vi.fn(),
+    mockOrder: vi.fn(),
+    mockRange: vi.fn(),
+    mockSingle: vi.fn(),
+    mockRpc: vi.fn(),
+    mockLimit: vi.fn(),
+    mockGetUser: vi.fn(),
+    mockSignOut: vi.fn(),
   };
 
-  const mockFrom = vi.fn(() => queryBuilderMock);
-  const supabase = { from: mockFrom, rpc: mockRpc };
+  const queryBuilderMock = {
+    select: mocks.mockSelect.mockReturnThis(),
+    insert: mocks.mockInsert.mockReturnThis(),
+    update: mocks.mockUpdate.mockReturnThis(),
+    delete: mocks.mockDelete.mockReturnThis(),
+    eq: mocks.mockEq.mockReturnThis(),
+    ilike: mocks.mockIlike.mockReturnThis(),
+    or: mocks.mockOr.mockReturnThis(),
+    order: mocks.mockOrder.mockReturnThis(),
+    range: mocks.mockRange.mockReturnThis(),
+    limit: mocks.mockLimit.mockReturnThis(),
+    single: mocks.mockSingle,
+  };
 
-  mockOrder.mockReturnValue(queryBuilderMock);
+  mocks.mockInsert.mockReturnValue(queryBuilderMock);
+  mocks.mockUpdate.mockReturnValue(queryBuilderMock);
+  mocks.mockDelete.mockReturnValue(queryBuilderMock);
+
+  const mockFrom = vi.fn(() => queryBuilderMock);
+  const supabase = {
+    from: mockFrom,
+    rpc: mocks.mockRpc,
+    auth: {
+      getUser: mocks.mockGetUser,
+      signOut: mocks.mockSignOut,
+    },
+  };
 
   return {
     supabase,
     mocks: {
+      ...mocks,
       mockFrom,
-      mockSelect,
-      mockInsert,
-      mockEq,
-      mockIlike,
-      mockOr,
-      mockOrder,
-      mockRange,
-      mockSingle,
-      mockRpc,
-      mockLimit,
     },
   };
 };
@@ -138,10 +149,10 @@ export const createMockSupabaseClient = (): MockSupabaseClient => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Datos de Prueba Realistas**: ((Implementada)) La integración con `@faker-js/faker` asegura que las pruebas se ejecuten con datos variados y más parecidos a los de producción, aumentando la probabilidad de descubrir casos borde.
+ * 1. **Sincronización de Contrato de Datos**: ((Implementada)) La factoría `createMockSite` ahora provee un valor por defecto para la propiedad `status`, alineando la generación de datos de prueba con el contrato estricto del esquema de la base de datos y resolviendo el error de compilación.
  *
  * @subsection Melhorias Futuras
- * 1. **Seed Consistente**: ((Vigente)) Se puede usar `faker.seed()` al inicio de una suite de pruebas para que la data generada sea la misma en cada ejecución, haciendo las pruebas 100% deterministas.
+ * 1. **Factorías Adicionales**: ((Vigente)) Crear factorías para otras entidades (`Campaign`, `Workspace`) para mantener el banco de mocks centralizado y robusto.
  *
  * =====================================================================
  */

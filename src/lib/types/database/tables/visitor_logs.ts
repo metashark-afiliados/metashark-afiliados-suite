@@ -2,9 +2,10 @@
 /**
  * @file visitor_logs.ts
  * @description Define el contrato de datos para `visitor_logs`. Ha sido enriquecido
- *              para incluir datos de atribución, contexto y seguridad.
- * @author L.I.A Legacy
- * @version 3.0.0 (Enriched Telemetry)
+ *              y sincronizado para incluir los campos de seguridad `is_bot` y
+ *              `is_known_abuser`.
+ * @author Raz Podestá
+ * @version 3.1.0 (Enriched Telemetry)
  */
 import { type Json } from "../_shared";
 
@@ -14,7 +15,7 @@ export type VisitorLogs = {
     session_id: string;
     user_id: string | null;
     fingerprint: string;
-    ip_address: string;
+    ip_address: string | null; // <-- Corregido a nullable según schema
     geo_data: Json | null;
     user_agent: string | null;
     utm_params: Json | null;
@@ -22,15 +23,15 @@ export type VisitorLogs = {
     referrer: string | null;
     landing_page: string | null;
     browser_context: Json | null;
-    is_bot: boolean;
-    is_known_abuser: boolean;
+    is_bot: boolean; // <-- SINCRONIZADO
+    is_known_abuser: boolean; // <-- SINCRONIZADO
   };
   Insert: {
     id?: string;
     session_id: string;
     user_id?: string | null;
     fingerprint: string;
-    ip_address: string;
+    ip_address?: string | null; // <-- Corregido a nullable
     geo_data?: Json | null;
     user_agent?: string | null;
     utm_params?: Json | null;
@@ -52,17 +53,13 @@ export type VisitorLogs = {
     },
   ];
 };
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato de Telemetria Avançada**: ((Implementada)) Este tipo de dados estabelece a base para um sistema de telemetria e análise de visitantes de nível de produção.
- *
- * @subsection Melhorias Futuras
- * 1. **Tipado Fuerte para `Json`**: ((Vigente)) Definir esquemas Zod específicos para `geo_data`, `utm_params` e `browser_context` e usar `z.infer` para substituir o tipo `Json`, garantindo a integridade dos dados de telemetria.
+ * 1. **Sincronización de Esquema**: ((Implementada)) Se han añadido `is_bot` y `is_known_abuser` al contrato, alineándolo con el `schema.sql` y el `TelemetryHandler`.
  *
  * =====================================================================
  */

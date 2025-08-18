@@ -1,0 +1,13 @@
+
+{
+  "en-US": {
+    "signInWithProvider": "Continue with {provider}"
+  },
+  "es-ES": {
+    "signInWithProvider": "Continuar con {provider}"
+  },
+  "pt-BR": {
+    "signInWithProvider": "Continuar com {provider}"
+  }
+}
+

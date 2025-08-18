@@ -1,30 +1,25 @@
 // src/middleware/handlers/telemetry/index.ts
 /**
  * @file src/middleware/handlers/telemetry/index.ts
- * @description Manejador de middleware para la inteligencia de visitante. Inicia
- *              el registro de una nueva sesión de visitante en el primer contacto,
- *              enriqueciendo los datos con información del servidor (IP, Geo, UTMs)
- *              y estableciendo una cookie de sesión para su posterior enriquecimiento
- *              por parte del cliente.
+ * @description Manejador de telemetría, refactorizado para consumir el cliente
+ *              Supabase específico del Edge, garantizando su compatibilidad
+ *              y aislamiento de runtime.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
  */
 import { type NextRequest, type NextResponse } from "next/server";
 import { ZodError } from "zod";
 
 import { logger } from "@/lib/logging";
 import { lookupIpAddress } from "@/lib/services/geoip.service";
-import { createClient } from "@/lib/supabase/middleware";
 import { VisitorLogSchema } from "@/lib/validators";
+import { createEdgeClient } from "@/middleware/lib/supabase-edge.client";
 
 /**
  * @public
  * @async
  * @function handleTelemetry
  * @description Si no existe una cookie de sesión, crea un nuevo registro de `visitor_logs`.
- *              Esta operación es "fire-and-forget" y no bloquea el pipeline; no
- *              devuelve una respuesta, sino que modifica la `response` entrante
- *              añadiendo una cookie.
  * @param {NextRequest} request - El objeto de la petición entrante.
  * @param {NextResponse} response - La respuesta a modificar.
  */
@@ -32,7 +27,6 @@ export async function handleTelemetry(
   request: NextRequest,
   response: NextResponse
 ): Promise<void> {
-  // Si ya hemos registrado esta sesión, no hacer nada.
   if (request.cookies.has("metashark_session_id")) {
     logger.trace(
       "[TelemetryHandler] Omitiendo log, la cookie de sesión ya existe."
@@ -48,7 +42,7 @@ export async function handleTelemetry(
 
     const logPayload = {
       session_id: sessionId,
-      fingerprint: "server_placeholder", // Será enriquecido por el cliente
+      fingerprint: "server_placeholder",
       ip_address: ip,
       geo_data: enrichedGeoData
         ? { ...request.geo, ...enrichedGeoData }
@@ -60,11 +54,11 @@ export async function handleTelemetry(
       is_bot: /bot|crawl|slurp|spider|mediapartners/i.test(
         request.headers.get("user-agent") || ""
       ),
-      is_known_abuser: false, // Lógica de lista negra a implementar
+      is_known_abuser: false,
     };
 
     const validatedPayload = VisitorLogSchema.parse(logPayload);
-    const { supabase } = await createClient(request);
+    const supabase = createEdgeClient(request, response);
     const { error } = await supabase
       .from("visitor_logs")
       .insert(validatedPayload);
@@ -98,21 +92,13 @@ export async function handleTelemetry(
     }
   }
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Lista Negra de IPs**: ((Vigente)) Implementar una lógica `checkIpBlacklist` que consulte una lista de IPs (desde una variable de entorno o una tabla) y establezca `is_known_abuser` en `true` si hay una coincidencia.
- * 2. **Enriquecimiento de `user_id`**: ((Vigente)) Después de la autenticación, una Server Action podría actualizar el `visitor_log` de esta sesión para asociarlo con el `user_id`, conectando la actividad anónima con un usuario registrado.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Inicio de Telemetría**: ((Implementada)) Este aparato restaura el sistema de seguimiento de visitantes anónimos, una capacidad fundamental para la analítica de marketing.
- * 2. **Enriquecimiento de Datos en el Edge**: ((Implementada)) La lógica enriquece los datos de la sesión con información de GeoIP y parámetros UTM directamente en el middleware, asegurando que los datos se capturen incluso si el usuario no interactúa con el JavaScript del cliente.
- * 3. **Validación de Contrato con Zod**: ((Implementada)) El payload se valida rigurosamente con `VisitorLogSchema` antes de la inserción, garantizando la integridad de los datos de telemetría.
+ * 1. **Aislamiento de Runtime Completo**: ((Implementada)) Al actualizar la importación para usar `createEdgeClient`, este manejador queda completamente aislado y es seguro para el Edge.
  *
- * =====================================================================
  */
 // src/middleware/handlers/telemetry/index.ts

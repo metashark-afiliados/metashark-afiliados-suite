@@ -1,42 +1,53 @@
 // src/lib/hooks/use-sites-page.ts
 /**
  * @file src/lib/hooks/use-sites-page.ts
- * @description Hook Soberano y Única Fuente de Verdad para la lógica de cliente
- *              de la página de gestión de sitios. Ha sido refactorizado para
- *              alinearse con la arquitectura canónica del proyecto, corrigiendo
- *              su nomenclatura y dependencias de importación.
+ * @description Hook Soberano refactorizado. Ahora actúa como un orquestador que
+ *              compone hooks atómicos (`useDialogState`, `useSearchSync`,
+ *              `useOptimisticResourceManagement`) para construir la lógica
+ *              completa de la página "Mis Sitios".
  * @author L.I.A. Legacy
- * @version 2.0.0
+ * @version 3.0.0
  */
 "use client";
 
-import { useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { sites as sitesActions } from "@/lib/actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
 import { useOptimisticResourceManagement } from "@/lib/hooks/use-optimistic-resource-management";
+import { useDialogState } from "@/lib/hooks/ui/useDialogState";
+import { useSearchSync } from "@/lib/hooks/ui/useSearchSync";
 import { logger } from "@/lib/logging";
-import { usePathname, useRouter } from "@/lib/navigation"; // <-- CORRECCIÓN
-import { debounce } from "@/lib/utils";
 
 /**
  * @public
- * @exports useSitesPage
- * @description Hook soberano que encapsula toda la lógica de la página "Mis Sitios".
- * @param {object} params - Parámetros de inicialización.
- * @param {SiteWithCampaignCount[]} params.initialSites - La lista inicial de sitios.
+ * @function useSitesPage
+ * @description Hook orquestador que encapsula toda la lógica de la página "Mis Sitios".
+ * @param {{ initialSites: SiteWithCampaignCount[], initialSearchQuery: string }} params
  * @returns Un objeto con todo el estado y los manejadores necesarios para la UI.
  */
 export function useSitesPage({
   initialSites,
+  initialSearchQuery,
 }: {
   initialSites: SiteWithCampaignCount[];
+  initialSearchQuery: string;
 }) {
-  const { activeWorkspace } = useDashboard();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
+  logger.trace("[useSitesPage] Hook orquestador inicializado.");
+  const t = useTranslations("SitesPage");
+  const { activeWorkspace, user } = useDashboard();
+
+  // --- Consumo de Hooks Atómicos ---
+  const { searchTerm, setSearchTerm } = useSearchSync({
+    initialQuery: initialSearchQuery,
+  });
+  const {
+    isOpen: isCreateDialogOpen,
+    open: openCreateDialog,
+    close: closeCreateDialog,
+    setIsOpen: setCreateDialogOpen,
+  } = useDialogState();
 
   const {
     items: sites,
@@ -46,26 +57,12 @@ export function useSitesPage({
     handleDelete,
   } = useOptimisticResourceManagement<SiteWithCampaignCount>({
     initialItems: initialSites,
-    entityName: "Site",
+    entityName: t("entityName"),
     createAction: sitesActions.createSiteAction,
     deleteAction: sitesActions.deleteSiteAction,
   });
 
-  const handleSearch = useCallback(
-    debounce((query: string) => {
-      logger.trace(`[useSitesPage] Búsqueda activada`, { query });
-      const params = new URLSearchParams(window.location.search);
-      if (query) {
-        params.set("q", query);
-      } else {
-        params.delete("q");
-      }
-      params.set("page", "1");
-      router.push(`${pathname}?${params.toString()}` as any); // Type assertion is acceptable here
-    }, 500),
-    [pathname, router]
-  );
-
+  // --- Lógica de Negocio Específica de la Entidad ---
   const handleCreate = (formData: FormData) => {
     const name = formData.get("name") as string;
     const subdomain = formData.get("subdomain") as string;
@@ -83,13 +80,14 @@ export function useSitesPage({
       icon: "🌐",
       created_at: new Date().toISOString(),
       updated_at: null,
-      owner_id: "optimistic-user-placeholder",
+      owner_id: user.id,
       custom_domain: null,
+      status: "draft",
       campaign_count: 0,
     };
 
     genericHandleCreate(formData, optimisticSite);
-    setCreateDialogOpen(false);
+    closeCreateDialog();
   };
 
   return {
@@ -97,25 +95,26 @@ export function useSitesPage({
     activeWorkspaceId: activeWorkspace?.id,
     isPending,
     mutatingId,
-    handleSearch,
-    handleCreate,
-    handleDelete,
+    searchTerm,
+    setSearchTerm,
+    handleDelete: handleDelete!,
     isCreateDialogOpen,
     setCreateDialogOpen,
+    openCreateDialog,
+    handleCreate,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica**: ((Implementada)) Se ha corregido la nomenclatura del archivo y las rutas de importación, alineando el aparato con la SSoT de navegación y la estructura canónica del proyecto.
+ * 1. **Arquitectura de Composición (LEGO)**: ((Implementada)) El hook ya no contiene lógica monolítica. Ahora compone hooks atómicos y reutilizables, lo que mejora drásticamente su legibilidad, mantenibilidad y adhesión a los principios de diseño de élite.
+ * 2. **Principio de Responsabilidad Única (SRP)**: ((Implementada)) La responsabilidad de `useSitesPage` se ha reducido a orquestar otros hooks y contener la lógica de negocio específica de la entidad "sitio", como la construcción del objeto optimista.
  *
  * @subsection Melhorias Futuras
- * 1. **Estado de Edición**: ((Vigente)) Para una futura funcionalidad de edición de sitios, este hook podría expandirse para gestionar el estado de un diálogo de edición y la lógica de `handleUpdate`.
- * 2. **Gestión de Ordenamiento**: ((Vigente)) Añadir estado y un manejador `handleSort` para permitir al usuario cambiar el orden de la lista de sitios.
+ * 1. **Abstracción de Lógica Optimista**: ((Vigente)) La lógica de construcción del `optimisticSite` podría ser abstraída a una función `createOptimisticSite` en un archivo helper (`tests/utils/factories.ts`), haciendo que el `handleCreate` sea aún más conciso y reutilizable en pruebas.
  *
  * =====================================================================
  */

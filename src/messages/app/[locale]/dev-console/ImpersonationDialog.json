@@ -1,0 +1,29 @@
+{
+  "en-US": {
+    "aria_label": "Impersonate user {email}",
+    "title": "Impersonate User",
+    "description": "Are you sure you want to impersonate <strong>{email}</strong>? You will be logged in as this user in a new tab.",
+    "cancel_button": "Cancel",
+    "confirm_button": "Yes, Impersonate",
+    "success_toast": "Impersonation link generated. Check your new tab!",
+    "default_error_toast": "Failed to impersonate user. Please try again."
+  },
+  "es-ES": {
+    "aria_label": "Suplantar usuario {email}",
+    "title": "Suplantar Usuario",
+    "description": "¿Estás seguro de que quieres suplantar a <strong>{email}</strong>? Iniciarás sesión como este usuario en una nueva pestaña.",
+    "cancel_button": "Cancelar",
+    "confirm_button": "Sí, Suplantar",
+    "success_toast": "Enlace de suplantación generado. ¡Revisa tu nueva pestaña!",
+    "default_error_toast": "No se pudo suplantar al usuario. Por favor, inténtalo de nuevo."
+  },
+  "pt-BR": {
+    "aria_label": "Impersonar usuário {email}",
+    "title": "Impersonar Usuário",
+    "description": "Tem certeza de que deseja impersonar <strong>{email}</strong>? Você será logado como este usuário em uma nova aba.",
+    "cancel_button": "Cancelar",
+    "confirm_button": "Sim, Impersonar",
+    "success_toast": "Link de impersonação gerado. Verifique sua nova aba!",
+    "default_error_toast": "Falha ao impersonar usuário. Por favor, tente novamente."
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "en-US": {
+    "no_emoji_found": "No emoji found.",
+    "select_an_emoji": "Select an emoji…"
+  },
+  "es-ES": {
+    "no_emoji_found": "No se encontraron emojis.",
+    "select_an_emoji": "Seleccionar un emoji…"
+  },
+  "pt-BR": {
+    "no_emoji_found": "Nenhum emoji encontrado.",
+    "select_an_emoji": "Selecionar um emoji…"
+  }
+}

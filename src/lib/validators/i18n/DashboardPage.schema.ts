@@ -2,37 +2,40 @@
 /**
  * @file DashboardPage.schema.ts
  * @description Define el contrato de datos para el namespace 'DashboardPage'.
+ *              Sincronizado con la arquitectura "Hub de Creación Soberano" v12.0.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 3.0.0
  */
 import { z } from "zod";
 
 export const DashboardPageSchema = z.object({
-  error_title: z.string(),
-  error_description: z.string(),
-  tooltip: z.string(),
-  welcomeMessage: z.string(),
-  subtitle: z.string(),
-  layoutSaveError: z.string(),
-  RecentCampaigns: z.object({
+  breadcrumbs: z.object({
+    dashboard: z.string(),
+  }),
+  welcomeHero: z.object({
     title: z.string(),
-    emptyState: z.object({
-      title: z.string(),
-      ctaTitle: z.string(),
-      ctaDescription: z.string(),
-      ctaButton: z.string(),
+    searchPlaceholder: z.string(), // Texto actualizado: "Personaliza tus campañas como quieras"
+    tabs: z.object({
+      myDesigns: z.string(),
+      templates: z.string(),
+      aiTools: z.string(),
     }),
+  }),
+  RecentActivity: z.object({
+    title: z.string(),
+    cardAriaLabel: z.string(),
     lastEdited: z.string(),
-    preview: z.string(),
+    no_recent_activity: z.string(),
   }),
 });
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
+ *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad**: ((Implementada)) Schema aislado para su namespace.
+ * 1. **Alineación con PUV**: ((Implementada)) El schema ahora refleja el contrato para el nuevo `searchPlaceholder`, alineándose con la Propuesta Única de Valor.
+ *
  * =====================================================================
  */
 // src/lib/validators/i18n/DashboardPage.schema.ts

@@ -2,37 +2,33 @@
 /**
  * @file workspaces.ts
  * @description Define el contrato de datos atómico para la tabla `workspaces`.
- *              Sincronizado con el esquema remoto para eliminar el campo obsoleto
- *              `storage_used_mb`.
- * @author L.I.A Legacy
- * @version 2.0.0 (Remote Schema Synchronized)
+ *              Sincronizado con la arquitectura v8.0 para eliminar el campo `icon`.
+ * @author Raz Podestá
+ * @version 3.0.0
  */
 export type Workspaces = {
   Row: {
-    created_at: string;
-    current_site_count: number;
     id: string;
-    icon: string | null;
     name: string;
     owner_id: string;
+    current_site_count: number;
+    created_at: string;
     updated_at: string | null;
   };
   Insert: {
-    created_at?: string;
-    current_site_count?: number;
     id?: string;
-    icon?: string | null;
     name: string;
     owner_id: string;
+    current_site_count?: number;
+    created_at?: string;
     updated_at?: string | null;
   };
   Update: {
-    created_at?: string;
-    current_site_count?: number;
     id?: string;
-    icon?: string | null;
     name?: string;
     owner_id?: string;
+    current_site_count?: number;
+    created_at?: string;
     updated_at?: string | null;
   };
   Relationships: [
@@ -45,17 +41,16 @@ export type Workspaces = {
     },
   ];
 };
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato de Entidade Multi-Tenant**: ((Implementada)) Este tipo de dados define a estrutura da entidade `workspace`, o contêiner de mais alto nível na hierarquia de dados do usuário.
+ * 1. **Simplificación de Esquema**: ((Implementada)) Se ha eliminado la propiedad `icon` del contrato de datos, alineándolo con la nueva directiva de diseño.
  *
  * @subsection Melhorias Futuras
- * 1. **Limites de Recursos**: ((Vigente)) Considerar adicionar colunas como `max_sites` ou `max_members` que possam ser configuradas de acordo com o plano do workspace.
+ * 1. **Limites de Recursos**: ((Vigente)) Considerar añadir columnas como `max_sites` o `max_members` que puedan ser configuradas de acuerdo con el `plan_type` del workspace.
  *
  * =====================================================================
  */

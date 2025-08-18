@@ -1,11 +1,77 @@
 {
   "en-US": {
-    "title": "Trusted by the world's best affiliate marketers"
+    "title": "Trusted by the world's best affiliate marketers",
+    "logos": [
+      {
+        "name": "Vercel",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/vercel.svg"
+      },
+      {
+        "name": "Supabase",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/supabase.svg"
+      },
+      {
+        "name": "Next.js",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/nextjs.svg"
+      },
+      {
+        "name": "Sentry",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/sentry.svg"
+      },
+      {
+        "name": "Stripe",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/stripe.svg"
+      }
+    ]
   },
   "es-ES": {
-    "title": "Con la confianza de los mejores marketers de afiliados del mundo"
+    "title": "Con la confianza de los mejores marketers de afiliados del mundo",
+    "logos": [
+      {
+        "name": "Vercel",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/vercel.svg"
+      },
+      {
+        "name": "Supabase",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/supabase.svg"
+      },
+      {
+        "name": "Next.js",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/nextjs.svg"
+      },
+      {
+        "name": "Sentry",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/sentry.svg"
+      },
+      {
+        "name": "Stripe",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/stripe.svg"
+      }
+    ]
   },
   "pt-BR": {
-    "title": "Com a confiança dos melhores profissionais de marketing de afiliados do mundo"
+    "title": "Com a confiança dos melhores profissionais de marketing de afiliados do mundo",
+    "logos": [
+      {
+        "name": "Vercel",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/vercel.svg"
+      },
+      {
+        "name": "Supabase",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/supabase.svg"
+      },
+      {
+        "name": "Next.js",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/nextjs.svg"
+      },
+      {
+        "name": "Sentry",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/sentry.svg"
+      },
+      {
+        "name": "Stripe",
+        "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/stripe.svg"
+      }
+    ]
   }
 }

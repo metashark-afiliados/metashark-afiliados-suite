@@ -1,160 +1,31 @@
 // src/lib/validators/index.ts
 /**
  * @file validators/index.ts
- * @description Manifiesto de Validadores de Élite. Este aparato es la Única
- *              Fuente de Verdad (SSoT) para todos los contratos de datos y
- *              reglas de validación en la aplicación. Implementa un patrón
- *              de separación Cliente/Servidor para transformaciones de datos
- *              y utiliza claves de i18n para los mensajes de error, cumpliendo
- *              con los más altos estándares de arquitectura.
+ * @description Manifiesto de Validadores de Élite y ensamblador principal.
+ *              Este aparato es la Única Fuente de Verdad (SSoT) que exporta
+ *              todos los contratos de datos y reglas de validación de la aplicación.
+ *              Ha sido refactorizado para ser un ensamblador puro, delegando la
+ *              definición de schemas a módulos atómicos para máxima cohesión.
  * @author Raz Podestá
- * @version 19.0.0
+ * @version 21.0.0
  */
-import { z } from "zod";
 
-import { keysToSnakeCase } from "@/lib/helpers/object-case-converter";
+// --- RE-EXPORTACIÓN DE LA BIBLIOTECA DE SCHEMAS ---
+export * from "./schemas";
 
 // --- RE-EXPORTACIÓN DE CONTRATOS COMPARTIDOS ---
 export * from "./i18n.schema";
 
+/**
+ * @public
+ * @typedef ActionResult
+ * @description Contrato de tipo genérico para el retorno de todas las Server Actions.
+ *              Define una unión discriminada para resultados exitosos o fallidos.
+ * @template T - El tipo de los datos devueltos en caso de éxito.
+ */
 export type ActionResult<T = unknown> =
   | { success: true; data: T }
   | { success: false; error: string };
-
-// --- ESQUEMAS BASE ATÓMICOS (INTERNACIONALIZADOS) ---
-
-const UuidSchema = z.string().uuid({ message: "error_invalid_id" });
-const NameSchema = z
-  .string({ required_error: "error_name_required" })
-  .trim()
-  .min(3, { message: "error_name_too_short" });
-const SubdomainSchema = z
-  .string()
-  .trim()
-  .min(3, { message: "error_subdomain_too_short" })
-  .regex(/^[a-z0-9-]+$/, { message: "error_subdomain_invalid_chars" })
-  .transform((subdomain) => subdomain.toLowerCase());
-export const EmailSchema = z
-  .string()
-  .trim()
-  .email({ message: "error_invalid_email" });
-export const PasswordSchema = z
-  .string()
-  .min(8, { message: "error_password_too_short" });
-const slugify = (text: string): string => {
-  const a =
-    "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
-  const b =
-    "aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrssssssttuuuuuuuuuwxyyzzz------";
-  const p = new RegExp(a.split("").join("|"), "g");
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(p, (c) => b.charAt(a.indexOf(c)))
-    .replace(/&/g, "-and-")
-    .replace(/[^\w\-]+/g, "")
-    .replace(/\-\-+/g, "-")
-    .replace(/-+$/, "");
-};
-
-// --- ESQUEMAS DE AUTENTICACIÓN ---
-// Los schemas de SignIn y SignUp han sido eliminados para delegar la
-// validación a la UI de Supabase.
-export type RequestPasswordResetState = { error: string | null };
-
-// --- ESQUEMAS DE ENTIDADES ---
-
-export const CreateSiteClientSchema = z.object({
-  name: NameSchema.optional(),
-  subdomain: SubdomainSchema,
-  description: z.string().optional(),
-  workspaceId: UuidSchema,
-});
-
-export const CreateSiteServerSchema = CreateSiteClientSchema.transform(
-  (data) => ({
-    ...data,
-    name: data.name || data.subdomain,
-    description: data.description || null,
-    icon: null,
-  })
-).transform(keysToSnakeCase);
-
-export const UpdateSiteSchema = z
-  .object({
-    siteId: UuidSchema,
-    name: NameSchema.optional(),
-    subdomain: SubdomainSchema.optional(),
-    description: z.string().optional(),
-  })
-  .transform(keysToSnakeCase);
-
-export const DeleteSiteSchema = z.object({ siteId: UuidSchema });
-
-export const CreateWorkspaceSchema = z
-  .object({
-    workspaceName: NameSchema,
-    icon: z.string().trim().min(1, { message: "error_icon_required" }),
-  })
-  .transform(keysToSnakeCase);
-
-export const InvitationClientSchema = z.object({
-  email: EmailSchema,
-  role: z.enum(["admin", "member", "owner"]),
-  workspaceId: UuidSchema,
-});
-
-export const InvitationServerSchema = InvitationClientSchema.transform(
-  (data) => ({
-    invitee_email: data.email,
-    role: data.role,
-    workspace_id: data.workspaceId,
-  })
-);
-
-export const CreateCampaignSchema = z
-  .object({
-    name: NameSchema,
-    slug: z
-      .string()
-      .trim()
-      .min(3, { message: "error_slug_too_short" })
-      .regex(/^[a-z0-9-]+$/, { message: "error_slug_invalid_chars" })
-      .optional(),
-    siteId: UuidSchema,
-  })
-  .transform((data) => ({ ...data, slug: data.slug || slugify(data.name) }))
-  .transform(keysToSnakeCase);
-
-export const DeleteCampaignSchema = z.object({ campaignId: UuidSchema });
-
-// --- ESQUEMAS DE TELEMETRÍA Y NEWSLETTER ---
-
-export const ClientVisitSchema = z.object({
-  sessionId: UuidSchema,
-  fingerprint: z.string().min(1, { message: "error_fingerprint_required" }),
-  screenWidth: z.number().int().positive().optional(),
-  screenHeight: z.number().int().positive().optional(),
-  userAgentClientHint: z
-    .array(z.object({ brand: z.string(), version: z.string() }))
-    .nullable()
-    .optional(),
-});
-
-export const VisitorLogSchema = z.object({
-  session_id: UuidSchema,
-  fingerprint: z.string().min(1, { message: "error_fingerprint_required" }),
-  ip_address: z.string().ip({ message: "error_invalid_ip" }),
-  geo_data: z.record(z.any()).nullable().optional(),
-  user_agent: z.string().nullable().optional(),
-  utm_params: z.record(z.any()).nullable().optional(),
-  referrer: z.string().url().nullable().optional(),
-  landing_page: z.string().nullable().optional(),
-  browser_context: z.record(z.any()).nullable().optional(),
-  is_bot: z.boolean().optional(),
-  is_known_abuser: z.boolean().optional(),
-});
 
 /**
  * =====================================================================
@@ -162,12 +33,12 @@ export const VisitorLogSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Full Internacionalización**: ((Implementada)) Todos los mensajes de error de validación han sido reemplazados por claves de i18n, eliminando la deuda técnica y preparando la aplicación para una localización completa.
- * 2. **Patrón de Transformación de Datos**: ((Implementada)) La introducción de `keysToSnakeCase` en los schemas de servidor es una mejora de élite que automatiza la conversión de datos, reduce el código repetitivo en las Server Actions y previene errores.
- * 3. **Simplificación Arquitectónica**: ((Implementada)) La eliminación de los schemas de autenticación obsoletos alinea este manifiesto con la nueva arquitectura delegada.
+ * 1. **Cohesión y SRP (Principio de Responsabilidad Única)**: ((Implementada)) Este archivo ahora actúa como un ensamblador puro, delegando la definición de schemas a `schemas.ts`. Esto mejora drásticamente la organización y la mantenibilidad de la capa de validación.
+ * 2. **Cero Regresiones**: ((Implementada)) La refactorización es estructural y no funcional. Todas las exportaciones del archivo original se han mantenido, garantizando que no haya regresiones en los aparatos consumidores.
+ * 3. **Documentación de Élite**: ((Implementada)) La documentación TSDoc ha sido mejorada para reflejar la nueva arquitectura y el propósito de este aparato como ensamblador.
  *
  * @subsection Melhorias Futuras
- * 1. **Composición de Schemas**: ((Vigente)) Para entidades complejas, se podría usar `schema.extend()` o `schema.merge()` para componer schemas base, adhiriéndose aún más al principio DRY.
+ * 1. **Generación Automática**: ((Vigente)) Este tipo de archivo barril/ensamblador es un candidato ideal para ser generado y mantenido por un script de build, eliminando la necesidad de actualizaciones manuales.
  *
  * =====================================================================
  */

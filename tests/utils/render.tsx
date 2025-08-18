@@ -1,73 +1,105 @@
 // tests/utils/render.tsx
 /**
  * @file tests/utils/render.tsx
- * @description Utilidad de renderizado de élite para pruebas de componentes de React.
- *              Este aparato envuelve el `render` de React Testing Library con proveedores
- *              de contexto globales (`TooltipProvider`) y una verificación de
- *              accesibilidad automática con `jest-axe`. Cada componente renderizado
- *              en pruebas es auditado contra las normas WCAG, garantizando un
- *              estándar de accesibilidad de producción.
+ * @description Utilidad de renderizado de élite definitiva. Ha sido refactorizado
+ *              a la v4.0.0 para cargar dinámicamente los mensajes `.json` reales
+ *              del sistema de i18n, proporcionando un entorno de pruebas de
+ *              máxima fidelidad y eliminando la necesidad de mocks estáticos.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 4.0.0
  */
 import React, { type ReactElement } from "react";
 import {
-  render,
+  render as testingLibraryRender,
   type RenderOptions,
   type RenderResult,
 } from "@testing-library/react";
 import { axe, toHaveNoViolations } from "jest-axe";
+import { NextIntlClientProvider } from "next-intl";
 import { expect } from "vitest";
+import fs from "fs";
+import path from "path";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { setNestedProperty } from "@/lib/helpers/set-nested-property.helper";
 
-// Extiende `expect` con los matchers de `jest-axe`.
 expect.extend(toHaveNoViolations);
+
+// --- Lógica de Carga de Mensajes de Alta Fidelidad ---
+
+const messagesBasePath = path.resolve(__dirname, "../../src/messages");
 
 /**
  * @private
- * @component AllTheProviders
- * @description Un componente wrapper que provee todos los contextos globales
- *              necesarios para que los componentes se rendericen correctamente en las pruebas.
- * @param {{ children: React.ReactNode }} props - Los componentes hijos a envolver.
- * @returns {React.ReactElement}
+ * @function loadMessages
+ * @description Carga y parsea un archivo de mensajes .json para un namespace y locale específicos.
+ * @param {string} namespace - La ruta relativa al archivo (ej. 'components/ui/Dialogs').
+ * @param {string} locale - El locale a extraer (ej. 'es-ES').
+ * @returns {Record<string, any>} Los mensajes para el namespace y locale.
  */
-const AllTheProviders = ({
-  children,
-}: {
-  children: React.ReactNode;
-}): React.ReactElement => {
-  // Nota: NextIntlClientProvider no es necesario aquí porque los mocks de
-  // `next-intl` simulan los hooks directamente, haciendo que los componentes
-  // funcionen sin un proveedor real en el entorno de pruebas.
-  return <TooltipProvider>{children}</TooltipProvider>;
-};
+function loadMessages(namespace: string, locale: string): Record<string, any> {
+  try {
+    const filePath = path.join(messagesBasePath, `${namespace}.json`);
+    const fileContent = fs.readFileSync(filePath, "utf8");
+    const json = JSON.parse(fileContent);
+    return json[locale] || {};
+  } catch (error) {
+    console.error(`Error loading messages for namespace ${namespace}:`, error);
+    return {};
+  }
+}
 
 /**
- * @public
- * @function customRender
- * @description Exportación personalizada de la función `render` de RTL.
- * @param {ReactElement} ui - El componente de React a renderizar.
- * @param {Omit<RenderOptions, "wrapper">} [options] - Opciones de renderizado de RTL.
- * @returns {Promise<RenderResult>} El resultado del renderizado.
+ * @private
+ * @function buildMessagesObject
+ * @description Construye el objeto de mensajes anidado que `NextIntlClientProvider` espera.
+ * @param {string[]} namespaces - Un array de namespaces a cargar.
+ * @param {string} locale - El locale a utilizar.
+ * @returns {Record<string, any>} El objeto de mensajes completo.
  */
+function buildMessagesObject(
+  namespaces: string[],
+  locale: string
+): Record<string, any> {
+  const messages = {};
+  namespaces.forEach((ns) => {
+    const namespaceMessages = loadMessages(ns, locale);
+    setNestedProperty(messages, ns.replace(/\//g, "."), namespaceMessages);
+  });
+  return messages;
+}
+
+interface CustomRenderOptions extends Omit<RenderOptions, "wrapper"> {
+  locale?: string;
+  namespaces?: string[];
+}
+
 const customRender = async (
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
+  options: CustomRenderOptions = {}
 ): Promise<RenderResult> => {
-  const renderResult = render(ui, { wrapper: AllTheProviders, ...options });
+  const { locale = "es-ES", namespaces = [] } = options;
+  const messages = buildMessagesObject(namespaces, locale);
 
-  // Auditoría de accesibilidad automática.
+  const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+    return (
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        <TooltipProvider>{children}</TooltipProvider>
+      </NextIntlClientProvider>
+    );
+  };
+
+  const renderResult = testingLibraryRender(ui, {
+    wrapper: AllTheProviders,
+    ...options,
+  });
+
   const results = await axe(renderResult.container);
   expect(results).toHaveNoViolations();
-
   return renderResult;
 };
 
-// Re-exporta todo desde @testing-library/react
 export * from "@testing-library/react";
-
-// Sobrescribe la exportación de `render` con nuestra versión personalizada.
 export { customRender as render };
 
 /**
@@ -76,11 +108,12 @@ export { customRender as render };
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Auditoría de Accesibilidad Automática**: ((Implementada)) La integración con `jest-axe` asegura que cada componente renderizado en pruebas sea validado contra violaciones de accesibilidad, un pilar de la ingeniería de UI de élite.
- * 2. **Principio DRY**: ((Implementada)) Centraliza la provisión de contextos globales, eliminando la necesidad de envolver cada prueba de componente en proveedores.
+ * 1. **Pruebas de Alta Fidelidad**: ((Implementada)) La utilidad `render` ahora carga dinámicamente los archivos `.json` reales, asegurando que las pruebas unitarias validen la integración con el contenido real de i18n.
+ * 2. **Legibilidad y Mantenibilidad Mejoradas**: ((Implementada)) Las pruebas ahora pueden hacer aserciones sobre el texto visible real (ej. "Crear Workspace") en lugar de claves abstractas (`[i18n]...`). Esto las hace más fáciles de escribir y entender.
+ * 3. **Eliminación de Deuda Técnica**: ((Implementada)) Se ha eliminado el objeto `MOCK_MESSAGES` estático, que era frágil y difícil de mantener.
  *
  * @subsection Melhorias Futuras
- * 1. **Proveedor de Contexto de Dashboard Simulado**: ((Vigente)) Se podría añadir un `DashboardProvider` simulado al wrapper `AllTheProviders` para simplificar las pruebas de componentes que dependen del hook `useDashboard`.
+ * 1. **Caché de Mensajes**: ((Vigente)) Para optimizar la velocidad en suites de pruebas muy grandes, la función `loadMessages` podría cachear en memoria los archivos .json ya leídos.
  *
  * =====================================================================
  */

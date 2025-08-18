@@ -1,0 +1,50 @@
+{
+  "en-US": {
+    "invalid_uuid": "Invalid identifier.",
+    "name_required": "Name is required.",
+    "name_too_short": "Name must be at least 3 characters.",
+    "name_too_long": "Name cannot exceed 40 characters.",
+    "subdomain_too_short": "Subdomain must be at least 3 characters.",
+    "subdomain_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed.",
+    "invalid_email": "Please enter a valid email address.",
+    "password_too_short": "Password must be at least 8 characters.",
+    "slug_too_short": "Slug must be at least 3 characters.",
+    "slug_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed.",
+    "fingerprint_required": "Client fingerprint is required.",
+    "invalid_ip": "Invalid IP address format.",
+    "icon_required": "Icon is required.",
+    "error_server_generic": "A server error occurred. Please try again."
+  },
+  "es-ES": {
+    "invalid_uuid": "Identificador inválido.",
+    "name_required": "El nombre es requerido.",
+    "name_too_short": "El nombre debe tener al menos 3 caracteres.",
+    "name_too_long": "El nombre no puede exceder los 40 caracteres.",
+    "subdomain_too_short": "El subdominio debe tener al menos 3 caracteres.",
+    "subdomain_invalid_chars": "Solo se permiten letras minúsculas, números y guiones.",
+    "invalid_email": "Por favor, introduce un correo electrónico válido.",
+    "password_too_short": "La contraseña debe tener al menos 8 caracteres.",
+    "slug_too_short": "El slug debe tener al menos 3 caracteres.",
+    "slug_invalid_chars": "Solo se permiten letras minúsculas, números y guiones.",
+    "fingerprint_required": "La huella digital del cliente es requerida.",
+    "invalid_ip": "Formato de dirección IP inválido.",
+    "icon_required": "El ícono es requerido.",
+    "error_server_generic": "Ocurrió un error en el servidor. Por favor, inténtalo de nuevo."
+  },
+  "pt-BR": {
+    "invalid_uuid": "Identificador inválido.",
+    "name_required": "O nome é obrigatório.",
+    "name_too_short": "O nome deve ter pelo menos 3 caracteres.",
+    "name_too_long": "O nome não pode exceder 40 caracteres.",
+    "subdomain_too_short": "O subdomínio deve ter pelo menos 3 caracteres.",
+    "subdomain_invalid_chars": "Apenas letras minúsculas, números e hifens são permitidos.",
+    "invalid_email": "Por favor, insira um e-mail válido.",
+    "password_too_short": "A senha deve ter pelo menos 8 caracteres.",
+    "slug_too_short": "O slug deve ter pelo menos 3 caracteres.",
+    "slug_invalid_chars": "Apenas letras minúsculas, números e hifens são permitidos.",
+    "fingerprint_required": "A impressão digital do cliente é necessária.",
+    "invalid_ip": "Formato de endereço IP inválido.",
+    "icon_required": "O ícone é obrigatório.",
+    "error_server_generic": "Ocorreu um erro no servidor. Por favor, tente novamente."
+  }
+}

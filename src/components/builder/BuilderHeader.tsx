@@ -1,16 +1,15 @@
 // src/components/builder/BuilderHeader.tsx
 /**
  * @file BuilderHeader.tsx
- * @description Orquestador de UI para la cabecera del constructor. Ensambla
- *              los componentes atómicos (`HistoryControls`, `DevicePreviewControls`,
- *              `SaveStatusButton`), gestiona la lógica de "dirty state" y
- *              orquesta la acción de guardado.
+ * @description Orquestador de UI para la cabecera del constructor. Refactorizado
+ *              para consumir el estado `isDirty` directamente desde el `useBuilderStore`
+ *              resiliente, simplificando su lógica de estado interna.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
-import React, { useCallback, useEffect, useState, useTransition } from "react";
+import React, { useCallback, useTransition } from "react";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { shallow } from "zustand/shallow";
@@ -25,22 +24,16 @@ import { DevicePreviewControls } from "./ui/DevicePreviewControls";
 import { HistoryControls } from "./ui/HistoryControls";
 import { SaveStatusButton } from "./ui/SaveStatusButton";
 
-/**
- * @public
- * @component BuilderHeader
- * @description Orquesta la barra de herramientas superior del constructor.
- * @returns {React.ReactElement}
- */
 export function BuilderHeader(): React.ReactElement {
   const t = useTranslations("components.builder.BuilderHeader");
   const [isPending, startTransition] = useTransition();
-  const [isDirty, setIsDirty] = useState(false);
-  const [initialState, setInitialState] = useState<string | null>(null);
 
   const {
     campaignConfig,
     isSaving,
     setIsSaving,
+    isDirty,
+    setAsSaved,
     devicePreview,
     setDevicePreview,
     pastStates,
@@ -52,6 +45,8 @@ export function BuilderHeader(): React.ReactElement {
       campaignConfig: state.campaignConfig,
       isSaving: state.isSaving,
       setIsSaving: state.setIsSaving,
+      isDirty: state.isDirty,
+      setAsSaved: state.setAsSaved,
       devicePreview: state.devicePreview,
       setDevicePreview: state.setDevicePreview,
       pastStates: state.pastStates,
@@ -62,36 +57,13 @@ export function BuilderHeader(): React.ReactElement {
     shallow
   );
 
-  useEffect(() => {
-    if (campaignConfig && initialState === null) {
-      logger.trace(
-        "[BuilderHeader] Inicializando estado de la campaña para detección de cambios."
-      );
-      setInitialState(JSON.stringify(campaignConfig));
-    }
-  }, [campaignConfig, initialState]);
-
-  useEffect(() => {
-    if (campaignConfig && initialState !== null) {
-      const currentState = JSON.stringify(campaignConfig);
-      setIsDirty(currentState !== initialState);
-    }
-  }, [campaignConfig, initialState]);
-
   const handleSave = useCallback(() => {
     if (!campaignConfig) {
-      logger.warn(
-        "[BuilderHeader] Intento de guardado sin configuración de campaña cargada."
-      );
       toast.error(t("SaveButton.save_error_no_config"));
       return;
     }
 
     setIsSaving(true);
-    logger.info("[BuilderHeader] Guardando cambios de la campaña.", {
-      campaignId: campaignConfig.id,
-    });
-
     startTransition(async () => {
       const result = await builderActions.updateCampaignContentAction(
         campaignConfig.id,
@@ -100,17 +72,13 @@ export function BuilderHeader(): React.ReactElement {
 
       if (result.success) {
         toast.success(t("SaveButton.save_success"));
-        logger.info("[BuilderHeader] Campaña guardada con éxito.");
-        setInitialState(JSON.stringify(campaignConfig)); // Actualiza el estado base
+        setAsSaved(); // Marca el estado como guardado en el store
       } else {
         toast.error(result.error || t("SaveButton.save_error_default"));
-        logger.error("[BuilderHeader] Fallo al guardar la campaña.", {
-          error: result.error,
-        });
       }
       setIsSaving(false);
     });
-  }, [campaignConfig, setIsSaving, t, initialState]);
+  }, [campaignConfig, setIsSaving, t, setAsSaved]);
 
   const isLoading = isSaving || isPending;
 
@@ -151,20 +119,14 @@ export function BuilderHeader(): React.ReactElement {
     </header>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Orquestación Pura**: ((Implementada)) El componente ahora delega toda la renderización de la UI a sus aparatos atómicos hijos, actuando como un orquestador puro.
- * 2. **Gestión de Estado "Dirty"**: ((Implementada)) Se ha introducido una lógica robusta para detectar cambios (`isDirty`) comparando el estado actual con su estado inicial, proporcionando un feedback preciso al `SaveStatusButton`.
- * 3. **Full Observabilidad**: ((Implementada)) El proceso de guardado está completamente instrumentado con `logger`, proporcionando una visibilidad clara de las acciones del usuario.
- *
- * @subsection Melhorias Futuras
- * 1. **Atajos de Teclado**: ((Vigente)) Implementar listeners de eventos de teclado globales en este componente para capturar `Ctrl+S` (guardar), `Ctrl+Z` (deshacer), y `Ctrl+Y` (rehacer), invocando las acciones correspondientes.
- * 2. **Prevenir Cierre sin Guardar**: ((Vigente)) Utilizar el evento `beforeunload` para detectar si `isDirty` es `true` y mostrar un diálogo nativo al usuario para prevenir la pérdida de trabajo.
+ * 1. **Simplificación de Lógica**: ((Implementada)) Se ha eliminado toda la lógica de `useState` y `useEffect` para detectar cambios. El componente ahora consume `isDirty` directamente del `useBuilderStore`, adhiriéndose a un patrón de SSoT.
+ * 2. **Sincronización de Estado**: ((Implementada)) La función `handleSave` ahora invoca `setAsSaved()` en el store tras un guardado exitoso, asegurando que toda la UI (Header, StatusBar) se actualice de forma consistente.
  *
  * =====================================================================
  */

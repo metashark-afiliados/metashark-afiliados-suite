@@ -1,17 +1,17 @@
 // src/components/feedback/CommandPalette.tsx
 /**
  * @file src/components/feedback/CommandPalette.tsx
- * @description Componente de paleta de comandos global. Proporciona una interfaz
- *              de búsqueda para navegar rápidamente por la aplicación y ejecutar
- *              acciones contextuales. Consume datos del `DashboardContext` y
- *              gestiona su estado con el store `useCommandPaletteStore`.
+ * @description Componente de paleta de comandos global. Ha sido refactorizado
+ *              para eliminar una referencia a la propiedad obsoleta `workspace.icon`,
+ *              resolviendo un error de compilación crítico (TS2339).
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.1
  */
 "use client";
 
 import React from "react";
-import { LayoutDashboard, LogOut, User } from "lucide-react";
+import { LayoutDashboard, LogOut, User, LayoutGrid } from "lucide-react"; // Añadido LayoutGrid
+import { useTranslations } from "next-intl";
 
 import {
   CommandDialog,
@@ -38,6 +38,8 @@ export function CommandPalette() {
   const router = useRouter();
   const [search, setSearch] = React.useState("");
   const [pages, setPages] = React.useState<"root" | "workspaces">("root");
+
+  const t = useTranslations("CommandPalette");
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -72,22 +74,22 @@ export function CommandPalette() {
   return (
     <CommandDialog open={isOpen} onOpenChange={close}>
       <CommandInput
-        placeholder="Escribe un comando o busca..."
+        placeholder={t("search_placeholder")}
         value={search}
         onValueChange={setSearch}
       />
       <CommandList>
-        <CommandEmpty>No se encontraron resultados.</CommandEmpty>
+        <CommandEmpty>{t("empty_results")}</CommandEmpty>
         {pages === "root" && (
           <>
-            <CommandGroup heading="Navegación">
+            <CommandGroup heading={t("navigation_group_heading")}>
               {mainNavLinks.map((link) => (
                 <CommandItem
                   key={link.href}
                   onSelect={() =>
                     runCommand(() => router.push(link.href as any), link.title)
                   }
-                  value={`Ir a ${link.title}`}
+                  value={t("go_to", { title: link.title })}
                 >
                   <DynamicIcon name={link.icon} className="mr-2 h-4 w-4" />
                   <span>{link.title}</span>
@@ -95,40 +97,43 @@ export function CommandPalette() {
               ))}
             </CommandGroup>
             <CommandSeparator />
-            <CommandGroup heading="Workspaces">
+            <CommandGroup heading={t("workspaces_group_heading")}>
               <CommandItem onSelect={() => setPages("workspaces")}>
                 <LayoutDashboard className="mr-2 h-4 w-4" />
-                Buscar y cambiar de workspace...
+                {t("search_workspaces_command")}
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
-            <CommandGroup heading="Cuenta">
+            <CommandGroup heading={t("account_group_heading")}>
               <CommandItem
                 onSelect={() =>
                   runCommand(
                     () => router.push("/dashboard/settings"),
-                    "Go to Settings"
+                    t("my_profile_command_name")
                   )
                 }
-                value="Ajustes de Cuenta"
+                value={t("my_profile_command_value")}
               >
                 <User className="mr-2 h-4 w-4" />
-                <span>Mi Perfil</span>
+                <span>{t("my_profile")}</span>
               </CommandItem>
               <CommandItem
                 onSelect={() =>
-                  runCommand(sessionActions.signOutAction, "Sign Out")
+                  runCommand(
+                    sessionActions.signOutAction,
+                    t("sign_out_command_name")
+                  )
                 }
-                value="Cerrar Sesión"
+                value={t("sign_out_command_value")}
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Cerrar Sesión</span>
+                <span>{t("sign_out")}</span>
               </CommandItem>
             </CommandGroup>
           </>
         )}
         {pages === "workspaces" && (
-          <CommandGroup heading="Workspaces">
+          <CommandGroup heading={t("workspaces_group_heading")}>
             {workspaces
               .filter((workspace) =>
                 workspace.name.toLowerCase().includes(search.toLowerCase())
@@ -140,13 +145,20 @@ export function CommandPalette() {
                     runCommand(
                       () =>
                         workspaceActions.setActiveWorkspaceAction(workspace.id),
-                      `Switch to ${workspace.name}`
+                      t("switch_to_workspace", {
+                        workspaceName: workspace.name,
+                      })
                     )
                   }
                   value={workspace.name}
                   disabled={workspace.id === activeWorkspace?.id}
                 >
-                  <span className="mr-2 text-lg">{workspace.icon || "🏢"}</span>
+                  {/* --- INICIO DE CORRECCIÓN (TS2339) --- */}
+                  {/* La propiedad 'icon' fue eliminada del tipo 'Workspace'. Se utiliza un icono genérico como fallback. */}
+                  <span className="mr-2 text-lg">
+                    <LayoutGrid className="h-4 w-4 text-muted-foreground" />
+                  </span>
+                  {/* --- FIN DE CORRECCIÓN --- */}
                   <span>{workspace.name}</span>
                 </CommandItem>
               ))}
@@ -156,20 +168,18 @@ export function CommandPalette() {
     </CommandDialog>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Internacionalización**: ((Vigente)) Todos los textos estáticos ("Navegación", "Workspaces", "Cerrar Sesión", etc.) están codificados en duro y deben ser movidos a la capa de i18n y consumidos con `useTranslations`.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Cascada de Errores**: ((Implementada)) La reconstrucción de este aparato resuelve la última dependencia faltante, eliminando todos los errores de compilación `TS2307` y estabilizando completamente el `DashboardLayout`.
- * 2. **Funcionalidad de Productividad Clave**: ((Implementada)) Restaura una de las características de UX más importantes de la aplicación, proporcionando a los usuarios una forma rápida de navegar y ejecutar acciones.
- * 3. **Full Observabilidad**: ((Implementada)) La ejecución de comandos se registra con `logger.trace`, proporcionando visibilidad sobre el uso de esta funcionalidad.
+ * 1. **Resolución de Error Crítico (TS2339)**: ((Implementada)) Se ha eliminado la referencia a la propiedad obsoleta `workspace.icon`, resolviendo el error de compilación.
+ * 2. **Sincronización de Contrato**: ((Implementada)) El componente ahora refleja correctamente el contrato de datos del tipo `Workspace`, eliminando la deuda técnica de sincronización.
+ * 3. **Fallback Visual Consistente**: ((Implementada)) Se ha sustituido el emoji codificado por un icono `LayoutGrid` de `lucide-react`, manteniendo la consistencia visual con el resto de la aplicación.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Reintroducción de Iconos**: ((Vigente)) Si la funcionalidad de iconos por workspace es un requisito de negocio, el plan de acción correcto es reintroducir el campo `icon` en la tabla `workspaces` (y su tipo correspondiente) a través de una migración de base de datos controlada.
  *
  * =====================================================================
  */
-// src/components/feedback/CommandPalette.tsx

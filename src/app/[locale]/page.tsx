@@ -3,12 +3,10 @@
  * @file src/app/[locale]/page.tsx
  * @description Página de Inicio Pública (Landing Page) de élite. Este Server Component
  *              orquesta la obtención de todo el contenido de la UI desde la capa de
- *              internacionalización y lo pasa como props serializables a los
- *              componentes de cliente puros. Ha sido nivelado para corregir las
- *              regresiones de datos (iconos), de activos (imágenes), y alineado
- *              con el nuevo manifiesto de diseño y branding.
+ *              internacionalización y lo pasa como props a los componentes de cliente
+ *              puros. Ha sido completamente sincronizado y validado para la Arquitectura v9.1.
  * @author Raz Podestá
- * @version 5.1.0
+ * @version 6.0.0
  */
 import { redirect } from "next/navigation";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
@@ -25,92 +23,49 @@ import { Testimonials } from "@/components/landing/Testimonials";
 import { LandingFooter } from "@/components/layout/LandingFooter";
 import { LandingHeader } from "@/components/layout/LandingHeader";
 import { CursorTrail } from "@/components/ui/CursorTrail";
+import { getMappedIconName } from "@/config/icon-map";
+import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 
+const DICEBEAR_API_URL =
+  process.env.NEXT_PUBLIC_DICEBEAR_API_URL ||
+  "https://api.dicebear.com/7.x/personas/svg";
+
+/**
+ * @public
+ * @async
+ * @page HomePage
+ * @description Orquesta y ensambla la landing page completa.
+ * @param {object} props - Propiedades de la página, incluyendo `params`.
+ * @returns {Promise<JSX.Element>} El componente de la página de inicio renderizado.
+ */
 export default async function HomePage({
   params: { locale },
 }: {
   params: { locale: string };
 }): Promise<JSX.Element> {
   unstable_setRequestLocale(locale);
+  logger.trace(
+    "[HomePage] Renderizando página de inicio para el locale:",
+    locale
+  );
+
   const supabase = createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
   if (session) {
+    logger.info(
+      `[HomePage] Sesión activa detectada. Redirigiendo al dashboard.`,
+      { userId: session.user.id }
+    );
     redirect("/dashboard");
   }
 
   const t = await getTranslations();
 
-  // --- Construcción de Props para Componentes Hijos (Nivelada y Corregida) ---
-
-  const socialProofProps = {
-    title: t("SocialProof.title"),
-    logos: [
-      {
-        name: "LogoPlaceholder1",
-        src: "https://via.placeholder.com/158x48/1A1A1A/666666.svg?text=CLIENT",
-      },
-      {
-        name: "LogoPlaceholder2",
-        src: "https://via.placeholder.com/158x48/1A1A1A/666666.svg?text=PARTNER",
-      },
-      {
-        name: "LogoPlaceholder3",
-        src: "https://via.placeholder.com/158x48/1A1A1A/666666.svg?text=COMPANY",
-      },
-      {
-        name: "LogoPlaceholder4",
-        src: "https://via.placeholder.com/158x48/1A1A1A/666666.svg?text=AGENCY",
-      },
-      {
-        name: "LogoPlaceholder5",
-        src: "https://via.placeholder.com/158x48/1A1A1A/666666.svg?text=BRAND",
-      },
-    ],
-  };
-
-  const featuresProps = {
-    title: t("FeaturesSection.title"),
-    subtitle: t("FeaturesSection.subtitle"),
-    features: t.raw("FeaturesSection.features").map((feature: any) => ({
-      ...feature,
-      // --- INICIO DE CORRECCIÓN DE ICONOS ---
-      icon:
-        feature.icon === "PenSquare"
-          ? "FilePen" // Corregido de "FilePenSquare"
-          : feature.icon === "PieChart"
-            ? "ChartPie"
-            : feature.icon,
-      // --- FIN DE CORRECCIÓN DE ICONOS ---
-    })),
-  };
-
-  const processStepsProps = {
-    tag: t("ProcessSteps.tag"),
-    title: t("ProcessSteps.title"),
-    description: t("ProcessSteps.description"),
-    steps: t.raw("ProcessSteps.steps").map((step: any) => ({
-      ...step,
-      // --- INICIO DE CORRECCIÓN DE ICONOS ---
-      iconName: step.iconName === "BarChart" ? "BarChartBig" : step.iconName, // Corregido de "BarChart3"
-      // --- FIN DE CORRECCIÓN DE ICONOS ---
-    })),
-  };
-
-  const testimonialsProps = {
-    tag: t("Testimonials.tag"),
-    title: t("Testimonials.title"),
-    subtitle: t("Testimonials.subtitle"),
-    testimonials: t
-      .raw("Testimonials.testimonials")
-      .map((testimonial: any) => ({
-        ...testimonial,
-        authorImage: `https://api.dicebear.com/7.x/personas/svg?seed=${testimonial.authorName.replace(/\s/g, "")}&size=64&backgroundColor=transparent`,
-      })),
-  };
+  // --- Construcción de Props para Componentes Hijos ---
 
   const headerProps = {
     navLinks: [
@@ -128,6 +83,42 @@ export default async function HomePage({
     subtitle: t("HeroSection.subtitle"),
     ctaPrimaryText: t("HeroSection.ctaPrimary"),
     ctaSecondaryText: t("HeroSection.ctaSecondary"),
+  };
+
+  const socialProofProps = {
+    title: t("SocialProof.title"),
+    logos: t.raw("SocialProof.logos"),
+  };
+
+  const featuresProps = {
+    title: t("FeaturesSection.title"),
+    subtitle: t("FeaturesSection.subtitle"),
+    features: t.raw("FeaturesSection.features").map((feature: any) => ({
+      ...feature,
+      icon: getMappedIconName(feature.icon),
+    })),
+  };
+
+  const processStepsProps = {
+    tag: t("ProcessSteps.tag"),
+    title: t("ProcessSteps.title"),
+    description: t("ProcessSteps.description"),
+    steps: t.raw("ProcessSteps.steps").map((step: any) => ({
+      ...step,
+      iconName: getMappedIconName(step.iconName),
+    })),
+  };
+
+  const testimonialsProps = {
+    tag: t("Testimonials.tag"),
+    title: t("Testimonials.title"),
+    subtitle: t("Testimonials.subtitle"),
+    testimonials: t
+      .raw("Testimonials.testimonials")
+      .map((testimonial: any) => ({
+        ...testimonial,
+        authorImage: `${DICEBEAR_API_URL}?seed=${testimonial.authorName.replace(/\s/g, "")}&size=64&backgroundColor=transparent`,
+      })),
   };
 
   const metricsProps = { metrics: t.raw("Metrics.metrics") };
@@ -171,8 +162,8 @@ export default async function HomePage({
       { href: "/pricing", label: t("LandingHeader.pricing") },
     ],
     companyLinks: [
-      { href: "/about", label: t("AboutPage.title") },
-      { href: "/blog", label: t("BlogPage.title") },
+      { href: "/about", label: t("AboutPage.hero.title") },
+      { href: "/blog", label: t("BlogPage.hero.title") },
     ],
     legalLinks: [
       { href: "/privacy", label: t("PrivacyPolicyPage.title") },
@@ -205,17 +196,20 @@ export default async function HomePage({
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Corrección de Regresión Visual**: ((Implementada)) Se ha corregido el mapeo de nombres de iconos para que coincidan con la librería `lucide-react`, eliminando las advertencias `[DynamicIcon]` de los logs y restaurando los iconos faltantes en la UI. Cero regresiones funcionales.
+ * 1. **Full Observabilidad**: ((Implementada)) Se ha añadido `logger.trace` para monitorear el renderizado de la página, complementando el log de redirección existente.
+ * 2. **Documentación TSDoc de Élite**: ((Implementada)) Se ha añadido documentación TSDoc verbosa al componente principal de la página.
+ * 3. **Sincronización de Contratos I18n**: ((Vigente)) El componente ya consume los datos de i18n de forma correcta y sincronizada con los schemas.
+ * 4. **Datos desde SSoT**: ((Vigente)) La lógica de obtención de datos desde la capa de i18n (`t` y `t.raw`) está correctamente implementada.
  *
  * @subsection Melhorias Futuras
- * 1. **Mapeo Centralizado de Iconos**: ((Vigente)) Para una mantenibilidad de élite, se podría crear un manifiesto de configuración `icon-map.ts` que centralice todos los mapeos de iconos, evitando que esta lógica de negocio resida en un componente de presentación.
+ * 1. **Carga de Datos desde CMS**: ((Vigente)) Para una flexibilidad de élite, el contenido de la landing page (especialmente `features`, `testimonials`, `faq`) podría ser obtenido desde un CMS Headless en lugar de los archivos de mensajes, permitiendo al equipo de marketing actualizar el contenido sin necesidad de un despliegue de código.
+ * 2. **Abstracción de Lógica de Props**: ((Vigente)) La construcción de los objetos de `props` para cada componente hijo podría ser abstraída a funciones helper (ej. `getHeroProps(t)`) para mejorar la legibilidad y atomicidad de la página principal.
  *
  * =====================================================================
  */

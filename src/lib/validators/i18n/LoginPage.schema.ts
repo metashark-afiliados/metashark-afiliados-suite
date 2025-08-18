@@ -2,30 +2,21 @@
 /**
  * @file src/lib/validators/i18n/LoginPage.schema.ts
  * @description Define el contrato de datos para el namespace 'LoginPage'.
- *              Ha sido nivelado para la arquitectura de autenticación delegada,
- *              conteniendo solo los textos de la página contenedora.
+ *              Ha sido sincronizado para incluir la clave `dontHaveAccount`
+ *              utilizada por el `AuthFooter`.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
 import { z } from "zod";
 
-/**
- * @public
- * @constant LoginPageSchema
- * @description Define la estructura y los tipos de datos esperados para las
- *              traducciones relacionadas con la página de inicio de sesión.
- */
 export const LoginPageSchema = z.object({
-  /** Título para la metadata de la página (ej. "Iniciar Sesión | ConvertiKit"). */
   metadataTitle: z.string(),
-  /** Título principal mostrado en la página (ej. "Bienvenido de nuevo"). */
   title: z.string(),
-  /** Subtítulo o texto descriptivo debajo del título principal. */
   subtitle: z.string(),
-  /** Texto para el botón de envío del formulario de Supabase UI. */
   signInButton: z.string(),
-  /** Texto que se muestra en el footer para cambiar a la vista de registro. */
+  // --- INICIO DE CORRECCIÓN (SINCRONIZACIÓN DE CONTRATO) ---
   dontHaveAccount: z.string(),
+  // --- FIN DE CORRECCIÓN ---
 });
 
 /**
@@ -34,10 +25,10 @@ export const LoginPageSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica**: ((Implementada)) El schema ha sido simplificado para reflejar la delegación de la UI del formulario a Supabase.
+ * 1. **Sincronización de Contrato**: ((Implementada)) Se ha añadido la clave `dontHaveAccount`, resolviendo un `IntlError: MISSING_MESSAGE` y sincronizando el schema con el uso real del componente `AuthFooter`.
  *
  * @subsection Melhorias Futuras
- * 1. **Contrato de Errores de URL**: ((Vigente)) Añadir claves para los mensajes de error que se muestran cuando el `auth/callback` falla (ej. `error_session_exchange_failed`).
+ * 1. **Contrato de Errores de URL**: ((Vigente)) Añadir claves para los mensajes de error que se muestran cuando el `auth/callback` falla.
  *
  * =====================================================================
  */

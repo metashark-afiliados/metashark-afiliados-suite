@@ -2,13 +2,14 @@
 /**
  * @file store.ts
  * @description Orquestador de estado global de Zustand para el constructor.
- *              Ensambla los slices atómicos (`uiSlice`, `historySlice`, etc.)
- *              y coordina las interacciones entre ellos, como registrar el
- *              historial antes de ejecutar una mutación.
+ *              Refactorizado a un estándar de élite con el middleware `persist`
+ *              para una resiliencia de datos "Local-First" y una gestión de
+ *              estado explícita (`isDirty`, `lastSaved`).
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 import { create, type StateCreator } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { type CampaignConfig } from "@/lib/builder/types.d";
 import { logger } from "@/lib/logging";
 
@@ -23,25 +24,17 @@ import {
 import { createHistorySlice, type HistorySlice } from "./historySlice";
 import { createUISlice, type UISlice } from "./uiSlice";
 
-/**
- * @public
- * @typedef BuilderState
- * @description El tipo de estado completo y unificado para el store del constructor.
- */
 export type BuilderState = UISlice &
   BlockMutationSlice &
   CampaignStructureSlice &
   HistorySlice & {
     isSaving: boolean;
+    isDirty: boolean;
+    lastSaved: string | null;
     setIsSaving: (isSaving: boolean) => void;
+    setAsSaved: () => void;
   };
 
-/**
- * @public
- * @function builderStoreCreator
- * @description La factoría principal que ensambla todos los slices en un único store.
- *              Sobrescribe las acciones de mutación para añadir la lógica de historial.
- */
 export const builderStoreCreator: StateCreator<BuilderState> = (
   set,
   get,
@@ -59,42 +52,43 @@ export const builderStoreCreator: StateCreator<BuilderState> = (
     ...historySlice,
 
     isSaving: false,
+    isDirty: false,
+    lastSaved: null,
     setIsSaving: (isSaving) => set({ isSaving }),
+    setAsSaved: () =>
+      set({ isDirty: false, lastSaved: new Date().toISOString() }),
 
     // --- ORQUESTACIÓN DE ACCIONES ---
-    // Sobrescribe las acciones originales para añadir lógica de coordinación.
-
     setCampaignConfig: (config: CampaignConfig | null) => {
       historySlice.clearHistory();
       campaignStructureSlice.setCampaignConfig(config);
       uiSlice.setSelectedBlockId(null);
-      logger.trace(
-        "[BuilderStore] Configuración de campaña establecida e historial limpiado."
-      );
+      set({ isDirty: false, lastSaved: new Date().toISOString() });
     },
 
+    // --- ACCIONES DE MUTACIÓN CON GESTIÓN DE ESTADO "DIRTY" ---
     updateBlockProp: (blockId, propName, value) => {
       const currentConfig = get().campaignConfig;
       if (currentConfig) {
         historySlice.addStateToHistory(currentConfig);
         blockMutationSlice.updateBlockProp(blockId, propName, value);
+        set({ isDirty: true });
       }
     },
-
     updateBlockStyle: (blockId, styleName, value) => {
       const currentConfig = get().campaignConfig;
       if (currentConfig) {
         historySlice.addStateToHistory(currentConfig);
         blockMutationSlice.updateBlockStyle(blockId, styleName, value);
+        set({ isDirty: true });
       }
     },
-
     addBlock: (blockType, initialProvidedProps) => {
       const currentConfig = get().campaignConfig;
       if (currentConfig) {
         historySlice.addStateToHistory(currentConfig);
         campaignStructureSlice.addBlock(blockType, initialProvidedProps);
-        // Seleccionar el nuevo bloque añadido
+        set({ isDirty: true });
         const newBlocks = get().campaignConfig?.blocks ?? [];
         if (newBlocks.length > 0) {
           const newBlockId = newBlocks[newBlocks.length - 1].id;
@@ -102,74 +96,89 @@ export const builderStoreCreator: StateCreator<BuilderState> = (
         }
       }
     },
-
     deleteBlock: (blockId: string) => {
       const currentConfig = get().campaignConfig;
       if (currentConfig) {
         historySlice.addStateToHistory(currentConfig);
         campaignStructureSlice.deleteBlock(blockId);
+        set({ isDirty: true });
         if (get().selectedBlockId === blockId) {
           uiSlice.setSelectedBlockId(null);
         }
       }
     },
-
     moveBlock: (activeId: string, overId: string) => {
       const currentConfig = get().campaignConfig;
       if (currentConfig) {
         historySlice.addStateToHistory(currentConfig);
         campaignStructureSlice.moveBlock(activeId, overId);
+        set({ isDirty: true });
       }
     },
-
     moveBlockByStep: (blockId: string, direction: "up" | "down") => {
       const currentConfig = get().campaignConfig;
       if (currentConfig) {
         historySlice.addStateToHistory(currentConfig);
         campaignStructureSlice.moveBlockByStep(blockId, direction);
+        set({ isDirty: true });
       }
     },
-
     duplicateBlock: (blockId: string) => {
       const currentConfig = get().campaignConfig;
       if (currentConfig) {
         historySlice.addStateToHistory(currentConfig);
         campaignStructureSlice.duplicateBlock(blockId);
+        set({ isDirty: true });
       }
     },
 
+    // --- ACCIONES DE HISTORIAL CON GESTIÓN DE ESTADO "DIRTY" ---
     undo: () => {
       const previousState = historySlice.undo();
       if (previousState) {
-        set({ campaignConfig: previousState, selectedBlockId: null });
+        set({
+          campaignConfig: previousState,
+          selectedBlockId: null,
+          isDirty: true,
+        });
       }
       return previousState;
     },
-
     redo: () => {
       const nextState = historySlice.redo();
       if (nextState) {
-        set({ campaignConfig: nextState, selectedBlockId: null });
+        set({
+          campaignConfig: nextState,
+          selectedBlockId: null,
+          isDirty: true,
+        });
       }
       return nextState;
     },
   };
 };
 
-export const useBuilderStore = create<BuilderState>()(builderStoreCreator);
-
+export const useBuilderStore = create<BuilderState>()(
+  persist(builderStoreCreator, {
+    name: "convertikit-builder-storage",
+    storage: createJSONStorage(() => localStorage),
+    partialize: (state) => ({
+      campaignConfig: state.campaignConfig,
+      devicePreview: state.devicePreview,
+    }),
+  })
+);
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Composición de Slices**: ((Implementada)) Este orquestador implementa el patrón de composición de slices de Zustand, resultando en una base de código de gestión de estado modular, desacoplada y altamente mantenible.
- * 2. **Coordinación de Historial**: ((Implementada)) Sobrescribe las acciones de mutación para añadir automáticamente el estado actual al historial antes de cada cambio, una lógica de orquestación de élite.
- * 3. **Mejora de UX**: ((Implementada)) La acción `addBlock` ahora selecciona automáticamente el bloque recién añadido, mejorando el flujo de trabajo del usuario.
+ * 1. **Persistencia Local-First**: ((Implementada)) La integración del middleware `persist` guarda automáticamente el estado del constructor en `localStorage`, protegiendo el trabajo del usuario contra recargas de página o cierres accidentales.
+ * 2. **Gestión de Estado Explícita**: ((Implementada)) Se han añadido los estados `isDirty` y `lastSaved`, y la acción `setAsSaved`. Todas las acciones de mutación ahora marcan el estado como "sucio", proporcionando una fuente de verdad única para la UI.
  *
  * @subsection Melhorias Futuras
- * 1. **Middleware de Zustand**: ((Vigente)) Investigar el uso de middlewares de Zustand como `immer` para simplificar la inmutabilidad y `persist` para guardar el estado del constructor en `localStorage`, protegiendo el trabajo del usuario.
+ * 1. **Sincronización Multi-Pestaña**: ((Vigente)) Utilizar el `storage` event de `BroadcastChannel` para sincronizar el estado del store entre múltiples pestañas del navegador.
  *
  * =====================================================================
  */

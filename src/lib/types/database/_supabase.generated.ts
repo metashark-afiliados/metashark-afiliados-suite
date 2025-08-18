@@ -1,16 +1,15 @@
 // src/lib/types/database/_supabase.generated.ts
 /**
-@file _supabase.generated.ts
-@description Manifiesto de tipos de base de datos canónico y ensamblado.
-code
-Code
-Actualizado para incluir la nueva tabla `system_errors`.
-@author Raz Podestá
-@version 2025-08-13T02:00:00.000Z
-*/
+ * @file _supabase.generated.ts
+ * @description Manifiesto de tipos de base de datos canónico y ensamblado.
+ *              Actualizado para incluir la tabla `feature_modules`.
+ * @author Raz Podestá
+ * @version 2025-08-15T19:30:00.000Z
+ */
 import { type Enums } from "./enums";
 import { type Functions } from "./functions";
 import * as Tables from "./tables";
+
 export type Database = {
   public: {
     Tables: {
@@ -23,7 +22,7 @@ export type Database = {
       coupons: Tables.Coupons;
       custom_blocks: Tables.CustomBlocks;
       customers: Tables.Customers;
-      feature_flags: Tables.FeatureFlags;
+      feature_modules: Tables.FeatureModules; // <-- SINCRONIZADO
       invitations: Tables.Invitations;
       notifications: Tables.Notifications;
       prices: Tables.Prices;
@@ -34,7 +33,7 @@ export type Database = {
       sites: Tables.Sites;
       subscribers: Tables.Subscribers;
       subscriptions: Tables.Subscriptions;
-      system_errors: Tables.SystemErrors; // <-- NUEVO
+      system_errors: Tables.SystemErrors;
       template_categories: Tables.TemplateCategories;
       ticket_messages: Tables.TicketMessages;
       tickets: Tables.Tickets;

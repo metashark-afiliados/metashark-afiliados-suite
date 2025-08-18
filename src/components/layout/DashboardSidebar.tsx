@@ -1,70 +1,53 @@
 // src/components/layout/DashboardSidebar.tsx
 /**
  * @file src/components/layout/DashboardSidebar.tsx
- * @description Componente ensamblador para la barra lateral del dashboard.
- *              Este aparato es un componente de cliente puro que compone los
- *              aparatos atómicos `SidebarLogo`, `NavList` y `UserMenu` para
- *              construir la interfaz de navegación completa.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Barra lateral principal del dashboard. Refactorizada a la Arquitectura v9.1
+ *              para actuar como el centro de navegación y contexto soberano, integrando
+ *              el `WorkspaceSwitcher` en su parte superior.
+ * @author Raz Podestá
+ * @version 2.0.0
  */
 "use client";
 
 import React from "react";
 
+import { WorkspaceSwitcher } from "@/components/workspaces/WorkspaceSwitcher";
 import { NavList } from "./sidebar/NavList";
-import { SidebarLogo } from "./sidebar/SidebarLogo";
 import { UserMenu } from "./sidebar/UserMenu";
 
 /**
  * @public
- * @component DashboardSidebarContent
- * @description Contenido principal de la barra lateral. Ensambla el logo,
- *              la navegación principal y el menú de usuario. Se exporta por
- *              separado para ser reutilizado en el menú móvil (`Sheet`).
- * @returns {React.ReactElement}
- */
-export function DashboardSidebarContent(): React.ReactElement {
-  return (
-    <>
-      <SidebarLogo />
-      <div className="flex-1 overflow-auto">
-        <NavList />
-      </div>
-      <UserMenu />
-    </>
-  );
-}
-
-/**
- * @public
  * @component DashboardSidebar
- * @description Componente estructural que define el contenedor de la barra lateral
- *              para la vista de escritorio y controla su visibilidad.
+ * @description Componente estructural que define el contenedor y el contenido de la
+ *              barra lateral para la vista de escritorio.
  * @returns {React.ReactElement}
  */
 export function DashboardSidebar(): React.ReactElement {
   return (
-    <aside className="hidden border-r bg-card md:block">
+    <aside className="hidden border-r bg-card md:flex md:flex-col md:w-64">
       <div className="flex h-full max-h-screen flex-col gap-2">
-        <DashboardSidebarContent />
+        <div className="flex h-[60px] items-center border-b px-6">
+          <WorkspaceSwitcher />
+        </div>
+        <div className="flex-1 overflow-auto">
+          <NavList />
+        </div>
+        <UserMenu />
       </div>
     </aside>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Sidebar Colapsable**: ((Vigente)) Implementar un botón (probablemente en el `DashboardHeader` o en el pie de la sidebar) para colapsar/expandir esta barra lateral, mostrando solo los iconos para un uso más compacto del espacio. Esto requeriría gestionar un estado de `isCollapsed` y pasarlo a los componentes hijos.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia Crítica**: ((Implementada)) La reconstrucción de este aparato resuelve una de las dependencias clave de `DashboardLayout`, acercándonos a la eliminación de la cascada de errores `TS2307`.
- * 2. **Composición Atómica**: ((Implementada)) El componente sigue perfectamente la "Filosofía LEGO", actuando como un simple ensamblador de sus partes atómicas, lo que resulta en un código limpio, legible y mantenible.
- * 3. **Reutilización para Móvil**: ((Implementada)) Al exportar `DashboardSidebarContent`, se establece un patrón de élite que permite reutilizar la misma estructura de navegación en el menú móvil (`Sheet`) sin duplicar código.
+ * 1. **Implementación de Arquitectura v9.1**: ((Implementada)) El `WorkspaceSwitcher` ha sido movido a la parte superior de la sidebar, fusionando la selección de contexto con la navegación principal. El `SidebarLogo` ha sido eliminado, ya que esta función ahora es responsabilidad del `WorkspaceSwitcher`.
+ * 2. **Cohesión de Contexto**: ((Implementada)) La nueva estructura sigue el patrón de diseño de élite donde el contexto (workspace) se establece jerárquicamente por encima de las acciones (navegación), mejorando la claridad de la UI.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Sidebar Colapsable**: ((Vigente)) Implementar la lógica para colapsar la sidebar, mostrando solo iconos y el logo del workspace, para una UX más compacta.
  *
  * =====================================================================
  */

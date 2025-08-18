@@ -1,11 +1,11 @@
 // src/components/ui/input.tsx
 /**
  * @file src/components/ui/input.tsx
- * @description Componente de Input de élite, con reenvío de ref, un contrato
- *              de props explícito y un sistema de variantes robusto. Ha sido
- *              refactorizado para resolver una colisión de tipos en la prop `size`.
+ * @description Componente de Input de élite. Ha sido nivelado para incluir un
+ *              estado de error visual (`hasError`), estandarizando el feedback
+ *              de validación en toda la aplicación.
  * @author Raz Podestá
- * @version 5.1.0
+ * @version 6.0.0
  */
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -35,17 +35,21 @@ export const inputVariants = cva(
 );
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement>,
-    VariantProps<typeof inputVariants> {}
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
+    VariantProps<typeof inputVariants> {
+  hasError?: boolean;
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  // --- INICIO DE CORRECCIÓN (Desestructuración Explícita) ---
-  ({ className, type, variant, size, ...props }, ref) => {
-    // --- FIN DE CORRECCIÓN ---
+  ({ className, type, variant, size, hasError = false, ...props }, ref) => {
     return (
       <input
         type={type}
-        className={cn(inputVariants({ variant, size, className }))}
+        className={cn(
+          inputVariants({ variant, size, className }),
+          hasError &&
+            "border-destructive text-destructive focus-visible:ring-destructive"
+        )}
         ref={ref}
         {...props}
       />
@@ -62,12 +66,11 @@ export { Input };
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Colisión de Tipos**: ((Implementada)) Se ha desacoplado la desestructuración de las props de CVA (`variant`, `size`) de las props nativas (`...props`). Esto resuelve la ambigüedad para el compilador de TypeScript, eliminando los errores `TS2320` y `TS2322`.
+ * 1. **Estado de Error Visual**: ((Implementada)) Se ha añadido la prop `hasError` que aplica clases de estilo destructivas, estandarizando el feedback de validación de errores.
  *
  * @subsection Melhorias Futuras
- * 1. **Estado de Error Visual**: ((Vigente)) Se podría añadir una prop `hasError: boolean` que aplique clases de borde y anillo de color destructivo.
+ * 1. **Iconos de Estado**: ((Vigente)) Añadir props `leftIcon` y `rightIcon` para renderizar iconos dentro del campo de entrada, útiles para mostrar iconos de validación (check, x) o decorativos.
  *
  * =====================================================================
  */
 // src/components/ui/input.tsx
-

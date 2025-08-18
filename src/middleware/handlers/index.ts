@@ -6,7 +6,7 @@
  * @author L.I.A. Legacy
  * @version 1.0.0
  */
-export * from "./auth";
+export * from "./auth/index";
 export * from "./i18n";
 export * from "./maintenance";
 export * from "./multitenancy";

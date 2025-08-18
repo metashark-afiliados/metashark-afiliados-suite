@@ -1,43 +1,30 @@
 // src/middleware/handlers/auth/index.ts
 /**
  * @file src/middleware/handlers/auth/index.ts
- * @description Motor de reglas de autorización de élite para el middleware.
- *              Este aparato consume el manifiesto de enrutamiento (`routing-manifest.ts`)
- *              para aplicar de forma centralizada las políticas de seguridad a todas
- *              las rutas de la aplicación. Es la única fuente de verdad para la
- *              autorización a nivel de enrutamiento.
+ * @description Motor de reglas de autorización. Actualizado para reconocer
+ *              sesiones simuladas en modo de desarrollo, rompiendo el bucle
+ *              de redirección de autenticación.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 3.0.0
  */
 import { type NextRequest, NextResponse } from "next/server";
 
+import { logger } from "@/lib/logging";
 import {
   getAuthDataForMiddleware,
   type UserAuthData,
-} from "@/lib/auth/middleware-permissions";
-import { logger } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/middleware";
-import { ROUTE_MANIFEST, type RouteSecurityRule } from "@/lib/routing-manifest";
+} from "@/middleware/lib/permissions-edge";
+import {
+  ROUTE_MANIFEST,
+  type RouteSecurityRule,
+} from "@/middleware/lib/routing-manifest-edge";
 
-/**
- * @private
- * @function findMatchingRouteRule
- * @description Busca en `ROUTE_MANIFEST` la regla más específica que coincida con el pathname.
- * @param {string} pathname - La ruta a verificar.
- * @returns {RouteSecurityRule | undefined} La regla encontrada o undefined.
- */
 function findMatchingRouteRule(
   pathname: string
 ): RouteSecurityRule | undefined {
   return ROUTE_MANIFEST.find((rule) => pathname.startsWith(rule.path));
 }
 
-/**
- * @private
- * @function handleUnauthenticated
- * @description Maneja la lógica para usuarios no autenticados.
- * @returns {NextResponse | null} Una redirección si es necesario, o null.
- */
 function handleUnauthenticated(
   request: NextRequest,
   rule: RouteSecurityRule,
@@ -56,15 +43,9 @@ function handleUnauthenticated(
   return null;
 }
 
-/**
- * @private
- * @function handleAuthenticated
- * @description Maneja la lógica para usuarios autenticados, incluyendo la verificación de roles.
- * @returns {NextResponse | null} Una redirección si es necesario, o null.
- */
 function handleAuthenticated(
   request: NextRequest,
-  authData: UserAuthData,
+  authData: UserAuthData | { isDevMock: true },
   rule: RouteSecurityRule,
   pathname: string,
   locale: string
@@ -80,7 +61,12 @@ function handleAuthenticated(
     return NextResponse.redirect(dashboardUrl);
   }
 
-  if (rule.classification === "protected" && rule.requiredRoles) {
+  // Solo se valida el rol para usuarios reales, no para el mock.
+  if (
+    !("isDevMock" in authData) &&
+    rule.classification === "protected" &&
+    rule.requiredRoles
+  ) {
     if (!rule.requiredRoles.includes(authData.appRole)) {
       logger.warn(
         "[AUTH_HANDLER] VIOLACIÓN DE PERMISOS: Acceso denegado a la ruta.",
@@ -99,17 +85,6 @@ function handleAuthenticated(
   return null;
 }
 
-/**
- * @public
- * @async
- * @function handleAuth
- * @description Orquesta el flujo de autorización. Obtiene la sesión del usuario,
- *              encuentra la regla de seguridad aplicable y delega la decisión a los
- *              helpers `handleUnauthenticated` o `handleAuthenticated`.
- * @param {NextRequest} request - La petición entrante.
- * @param {NextResponse} response - La respuesta del manejador anterior.
- * @returns {Promise<NextResponse>} La respuesta final, que puede ser una redirección o la original.
- */
 export async function handleAuth(
   request: NextRequest,
   response: NextResponse
@@ -117,21 +92,24 @@ export async function handleAuth(
   const { pathname } = request.nextUrl;
   logger.trace("==> [AUTH_HANDLER] START <==", { path: pathname });
 
+  const isDevMode = process.env.DEV_MODE_ENABLED === "true";
+  let authData: UserAuthData | { isDevMock: true } | null = null;
+
+  // --- LÓGICA DE MODO DESARROLLADOR ---
+  if (isDevMode && request.cookies.has("dev_session")) {
+    logger.trace("[AUTH_HANDLER:DevMock] Sesión simulada detectada.");
+    authData = { isDevMock: true };
+  } else {
+    authData = await getAuthDataForMiddleware(request, response);
+  }
+
   const locale = response.headers.get("x-app-locale") || "pt-BR";
   const pathnameWithoutLocale =
     pathname.replace(new RegExp(`^/${locale}`), "") || "/";
 
-  // El cliente de Supabase se crea aquí para que la sesión sea accesible.
-  const { response: supabaseResponse } = await createClient(request, response);
-  const authData = await getAuthDataForMiddleware();
-
   let rule = findMatchingRouteRule(pathnameWithoutLocale);
 
   if (!rule) {
-    logger.warn(
-      "[AUTH_HANDLER] No se encontró regla explícita en el manifiesto. Aplicando default seguro (protected).",
-      { path: pathnameWithoutLocale }
-    );
     rule = { path: pathnameWithoutLocale, classification: "protected" };
   }
 
@@ -153,5 +131,16 @@ export async function handleAuth(
     action: redirectResponse ? "REDIRECT" : "PASS",
   });
 
-  return redirectResponse || supabaseResponse;
+  return redirectResponse || response;
 }
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Soporte para Sesión Simulada**: ((Implementada)) El manejador ahora detecta la cookie `dev_session` en modo de desarrollo y simula una sesión autenticada, rompiendo el bucle de redirección y permitiendo el acceso al dashboard.
+ * 2. **Tipado Robusto**: ((Implementada)) Se ha actualizado el tipo del parámetro `authData` en `handleAuthenticated` para aceptar tanto un `UserAuthData` real como un objeto de mock, manteniendo la seguridad de tipos.
+ *
+ */
+// src/middleware/handlers/auth/index.ts

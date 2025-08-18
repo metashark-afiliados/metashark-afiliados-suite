@@ -4,16 +4,15 @@
  * @description Arnés de pruebas de integración de élite para las Server Actions de Sitios.
  *              Valida la lógica de negocio, seguridad y contratos de datos, utilizando
  *              la infraestructura de mocks de alta fidelidad para un control total.
- *              Corregido para simular correctamente el contrato de retorno de `requireWorkspacePermission`.
  * @author Raz Podestá
- * @version 1.0.1
+ * @version 1.4.0
  */
 import { revalidatePath } from "next/cache";
 import {
   createMockSupabaseClient,
   createMockUser,
   type MockSupabaseClient,
-} from "tests/utils/factories"; // Import createMockUser
+} from "tests/utils/factories";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createSiteAction } from "@/lib/actions/sites.actions";
@@ -21,6 +20,7 @@ import { requireWorkspacePermission } from "@/lib/auth/user-permissions";
 import { createClient } from "@/lib/supabase/server";
 
 // --- Mocks de Dependencias ---
+// LIMPIEZA: Mock local eliminado. Ahora es gestionado globalmente por `tests/setup.ts`.
 vi.mock("@/lib/supabase/server");
 vi.mock("@/lib/auth/user-permissions");
 vi.mock("@/lib/actions/_helpers");
@@ -29,8 +29,15 @@ vi.mock("@/lib/logging");
 
 describe("Arnés de Pruebas: lib/actions/sites.actions.ts", () => {
   let supabaseMocks: MockSupabaseClient["mocks"];
-  const MOCK_WORKSPACE_ID = "ws-12345";
-  const MOCK_USER = { id: "user-abcde" };
+  const MOCK_WORKSPACE_ID = "00000000-0000-0000-0000-000000000001";
+  const MOCK_USER = createMockUser({
+    id: "00000000-0000-0000-0000-000000000002",
+  });
+  const MOCK_USER_AUTHDATA = {
+    user: MOCK_USER,
+    appRole: "developer" as const,
+    activeWorkspaceId: MOCK_WORKSPACE_ID,
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -42,15 +49,10 @@ describe("Arnés de Pruebas: lib/actions/sites.actions.ts", () => {
   describe("Acción: createSiteAction", () => {
     it("Seguridad: debe fallar si el guardián de permisos `requireWorkspacePermission` falla", async () => {
       // Arrange
-      // CORRECCIÓN: Proporcionar un mock de UserAuthData para el caso de PERMISSION_DENIED
       vi.mocked(requireWorkspacePermission).mockResolvedValue({
         success: false,
         error: "PERMISSION_DENIED",
-        data: {
-          user: createMockUser({ id: MOCK_USER.id, email: "test@example.com" }),
-          appRole: "user",
-          activeWorkspaceId: null,
-        },
+        data: MOCK_USER_AUTHDATA,
       });
       const formData = new FormData();
       formData.append("workspaceId", MOCK_WORKSPACE_ID);
@@ -63,7 +65,7 @@ describe("Arnés de Pruebas: lib/actions/sites.actions.ts", () => {
       // Assert
       expect(requireWorkspacePermission).toHaveBeenCalledWith(
         MOCK_WORKSPACE_ID,
-        ["owner", "admin"]
+        ["owner", "admin", "member"]
       );
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -76,7 +78,7 @@ describe("Arnés de Pruebas: lib/actions/sites.actions.ts", () => {
       // Arrange
       vi.mocked(requireWorkspacePermission).mockResolvedValue({
         success: true,
-        data: MOCK_USER as any, // This part might still be an issue if MOCK_USER is not UserAuthData, but the focus is on the error case.
+        data: MOCK_USER_AUTHDATA,
       });
       supabaseMocks.mockSingle.mockResolvedValue({
         data: { id: "new-site-uuid" },
@@ -86,6 +88,7 @@ describe("Arnés de Pruebas: lib/actions/sites.actions.ts", () => {
       formData.append("workspaceId", MOCK_WORKSPACE_ID);
       formData.append("name", "Mi Sitio Élite");
       formData.append("subdomain", "elite");
+      formData.append("description", "Descripción de prueba");
 
       // Act
       const result = await createSiteAction(formData);
@@ -108,7 +111,7 @@ describe("Arnés de Pruebas: lib/actions/sites.actions.ts", () => {
       // Arrange
       vi.mocked(requireWorkspacePermission).mockResolvedValue({
         success: true,
-        data: MOCK_USER as any,
+        data: MOCK_USER_AUTHDATA,
       });
       supabaseMocks.mockSingle.mockResolvedValue({
         data: null,
@@ -137,12 +140,10 @@ describe("Arnés de Pruebas: lib/actions/sites.actions.ts", () => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Corrección de Contrato de Mocks**: ((Implementada)) Se ha modificado el mock de `requireWorkspacePermission` para que el objeto `data` esté presente y sea del tipo `UserAuthData` cuando `success` es `false` y `error` es `PERMISSION_DENIED`. Esto resuelve el error `TS2345` en el arnés de pruebas.
- * 2. **Integridad de Pruebas**: ((Implementada)) La prueba ahora refleja con mayor precisión el contrato de la función real, mejorando la robustez y la confiabilidad del test.
+ * 1. **Principio DRY**: ((Implementada)) El mock local para `React.cache` ha sido eliminado, ya que ahora es gestionado globalmente por `tests/setup.ts`. Esto limpia el archivo y se adhiere a las mejores prácticas.
  *
  * @subsection Melhorias Futuras
  * 1. **Cobertura de Acciones CRUD**: ((Vigente)) Expandir esta suite para incluir pruebas para `updateSiteAction` y `deleteSiteAction`.
- * 2. **Pruebas de Propiedad (Property-Based Testing)**: ((Vigente)) Implementar pruebas de propiedad para validar el `CreateSiteServerSchema` con datos generados aleatoriamente.
  *
  * =====================================================================
  */

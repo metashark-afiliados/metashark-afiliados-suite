@@ -1,16 +1,16 @@
 // src/lib/validators/i18n.schema.ts
 /**
  * @file src/lib/validators/i18n.schema.ts
- * @description Manifiesto de Tipos y Única Fuente de Verdad (SSoT) para el contrato de
- *              internacionalización (i18n). Ha sido refactorizado para ordenar
- *              alfabéticamente sus importaciones y su ensamblaje, mejorando drásticamente
- *              la mantenibilidad y la facilidad de auditoría.
+ * @description Manifiesto de Tipos y SSoT para el contrato de i18n. Ha sido
+ *              actualizado para integrar el nuevo schema de `SiteAssignmentControl`.
  * @author Raz Podestá
- * @version 9.0.0
+ * @version 16.0.0
  */
 import { z } from "zod";
 
+// --- Importaciones de Schemas Atómicos (Orden Alfabético) ---
 import { AboutPageSchema } from "./i18n/AboutPage.schema";
+import { ActionDockSchema } from "./i18n/ActionDock.schema";
 import { AdminDashboardSchema } from "./i18n/AdminDashboard.schema";
 import { AuthLayoutSchema } from "./i18n/AuthLayout.schema";
 import { AuthNoticePageSchema } from "./i18n/AuthNoticePage.schema";
@@ -21,16 +21,17 @@ import { BridgepagesGalleryPageSchema } from "./i18n/BridgepagesGalleryPage.sche
 import { BuilderPageSchema } from "./i18n/BuilderPage.schema";
 import { CampaignsPageSchema } from "./i18n/CampaignsPage.schema";
 import { ChooseLanguagePageSchema } from "./i18n/ChooseLanguagePage.schema";
+import { CommandPaletteSchema } from "./i18n/CommandPalette.schema";
 import { ContactPageSchema } from "./i18n/ContactPage.schema";
 import { CookiePolicyPageSchema } from "./i18n/CookiePolicyPage.schema";
 import { DashboardHeaderSchema } from "./i18n/DashboardHeader.schema";
 import { DashboardPageSchema } from "./i18n/DashboardPage.schema";
 import { DashboardSidebarSchema } from "./i18n/DashboardSidebar.schema";
-import { DevConsoleSchema } from "./i18n/DevConsole.schema";
 import { DevConsoleSidebarSchema } from "./i18n/DevConsoleSidebar.schema";
 import { DialogsSchema } from "./i18n/Dialogs.schema";
 import { DisclaimerPageSchema } from "./i18n/DisclaimerPage.schema";
 import { DocsPageSchema } from "./i18n/DocsPage.schema";
+import { EmojiPickerSchema } from "./i18n/EmojiPicker.schema";
 import { FAQSchema } from "./i18n/FAQ.schema";
 import { FeaturesSectionSchema } from "./i18n/FeaturesSection.schema";
 import { ForgotPasswordPageSchema } from "./i18n/ForgotPasswordPage.schema";
@@ -50,6 +51,7 @@ import { ProcessStepsSchema } from "./i18n/ProcessSteps.schema";
 import { PublicSitePageSchema } from "./i18n/PublicSitePage.schema";
 import { ResetPasswordPageSchema } from "./i18n/ResetPasswordPage.schema";
 import { SignUpPageSchema } from "./i18n/SignUpPage.schema";
+import { SiteAssignmentControlSchema } from "./i18n/SiteAssignmentControl.schema"; // <-- NUEVA IMPORTACIÓN
 import { SitesPageSchema } from "./i18n/SitesPage.schema";
 import { SmartLinkSchema } from "./i18n/SmartLink.schema";
 import { SocialProofSchema } from "./i18n/SocialProof.schema";
@@ -60,23 +62,15 @@ import { TermsOfServicePageSchema } from "./i18n/TermsOfServicePage.schema";
 import { TestimonialsSchema } from "./i18n/Testimonials.schema";
 import { ThemeSwitcherSchema } from "./i18n/ThemeSwitcher.schema";
 import { UnauthorizedPageSchema } from "./i18n/UnauthorizedPage.schema";
-import { WelcomePageSchema } from "./i18n/WelcomePage.schema";
+import { ValidationErrorsSchema } from "./i18n/ValidationErrors.schema";
+import { WelcomeModalSchema } from "./i18n/WelcomeModal.schema";
 import { WikiPageSchema } from "./i18n/WikiPage.schema";
 import { WorkspaceSwitcherSchema } from "./i18n/WorkspaceSwitcher.schema";
 
-/**
- * @public
- * @constant i18nSchema
- * @description El schema Zod que define la estructura completa de los archivos de mensajes (ej. en-US.json).
- *              Esta es la SSoT para todas las traducciones de la aplicación.
- */
 export const i18nSchema = z.object({
   AboutPage: AboutPageSchema,
+  ActionDock: ActionDockSchema,
   AdminDashboard: AdminDashboardSchema,
-  AuthFooter: z.object({
-    dontHaveAccount: z.string(),
-    alreadyHaveAccount: z.string(),
-  }),
   AuthLayout: AuthLayoutSchema,
   AuthNoticePage: AuthNoticePageSchema,
   BlogPage: BlogPageSchema,
@@ -86,16 +80,17 @@ export const i18nSchema = z.object({
   BuilderPage: BuilderPageSchema,
   CampaignsPage: CampaignsPageSchema,
   ChooseLanguagePage: ChooseLanguagePageSchema,
+  CommandPalette: CommandPaletteSchema,
   ContactPage: ContactPageSchema,
   CookiePolicyPage: CookiePolicyPageSchema,
   DashboardHeader: DashboardHeaderSchema,
   DashboardPage: DashboardPageSchema,
   DashboardSidebar: DashboardSidebarSchema,
-  DevConsole: DevConsoleSchema,
   DevConsoleSidebar: DevConsoleSidebarSchema,
   Dialogs: DialogsSchema,
   DisclaimerPage: DisclaimerPageSchema,
   DocsPage: DocsPageSchema,
+  EmojiPicker: EmojiPickerSchema,
   FAQ: FAQSchema,
   FeaturesSection: FeaturesSectionSchema,
   ForgotPasswordPage: ForgotPasswordPageSchema,
@@ -115,34 +110,31 @@ export const i18nSchema = z.object({
   PublicSitePage: PublicSitePageSchema,
   ResetPasswordPage: ResetPasswordPageSchema,
   SignUpPage: SignUpPageSchema,
+  SiteAssignmentControl: SiteAssignmentControlSchema, // <-- NUEVO NAMESPACE
   SitesPage: SitesPageSchema,
   SmartLink: SmartLinkSchema,
   SocialProof: SocialProofSchema,
-  SupabaseAuthUI: SupabaseAuthUISchema,
+  SupabaseAuthUISchema: SupabaseAuthUISchema,
   SupportCTA: SupportCTASchema,
   SupportPage: SupportPageSchema,
   TermsOfServicePage: TermsOfServicePageSchema,
   Testimonials: TestimonialsSchema,
   ThemeSwitcher: ThemeSwitcherSchema,
   UnauthorizedPage: UnauthorizedPageSchema,
-  WelcomePage: WelcomePageSchema,
+  ValidationErrors: ValidationErrorsSchema,
+  WelcomeModal: WelcomeModalSchema,
   WikiPage: WikiPageSchema,
   WorkspaceSwitcher: WorkspaceSwitcherSchema,
 });
 
 export type MessagesType = z.infer<typeof i18nSchema>;
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Mantenibilidad Mejorada**: ((Implementada)) Las importaciones y las propiedades del objeto `i18nSchema` han sido ordenadas alfabéticamente. Esto reduce la carga cognitiva al auditar el archivo y previene errores de fusión.
- * 2. **Integridad del Contrato**: ((Implementada)) Se ha añadido el schema `AuthFooter` que estaba ausente, completando el contrato de i18n y sincronizándolo con la arquitectura de archivos. Cero regresiones.
- *
- * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) Este archivo sigue siendo el candidato ideal para ser generado y mantenido por un script que lea el directorio `src/lib/validators/i18n` y construya el objeto `i18nSchema` dinámicamente, eliminando la necesidad de mantenimiento manual.
+ * 1. **Integración de Contrato**: ((Implementada)) El schema principal de i18n ahora importa e integra el nuevo `SiteAssignmentControlSchema`, haciendo que el sistema de tipos sea consciente del nuevo namespace.
  *
  * =====================================================================
  */

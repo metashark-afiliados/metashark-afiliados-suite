@@ -2,11 +2,11 @@
 /**
  * @file src/lib/context/DashboardContext.tsx
  * @description Proveedor de contexto para compartir datos globales a través de
- *              todos los componentes del dashboard. Ha sido nivelado para incluir
- *              `recentCampaigns`, centralizando la carga de datos del dashboard
- *              principal en el layout superior.
- * @author L.I.A. Legacy
- * @version 2.0.0
+ *              todos los componentes del dashboard. Sincronizado con la
+ *              Arquitectura v9.2 para incluir el rol del usuario en el
+ *              workspace activo.
+ * @author Raz Podestá
+ * @version 3.1.0
  */
 "use client";
 
@@ -14,46 +14,33 @@ import { createContext, type ReactNode, useContext } from "react";
 import { type User } from "@supabase/supabase-js";
 
 import { type FeatureModule } from "@/lib/data/modules";
-import { type Tables } from "@/lib/types/database";
+import { type Enums, type Tables } from "@/lib/types/database";
 
 type Workspace = Tables<"workspaces">;
 type Campaign = Tables<"campaigns">;
+type Profile = Tables<"profiles">;
 
-/**
- * @public
- * @typedef Invitation
- * @description Define el contrato de datos para una invitación pendiente.
- */
 type Invitation = {
   id: string;
   status: string;
   workspaces: { name: string; icon: string | null } | null;
 };
 
-/**
- * @public
- * @interface DashboardContextProps
- * @description Define la forma de los datos globales compartidos en el contexto del dashboard.
- */
 export interface DashboardContextProps {
   user: User;
+  profile: Profile;
   workspaces: Workspace[];
   activeWorkspace: Workspace | null;
+  activeWorkspaceRole: Enums<"workspace_role"> | null; // <-- ARQUITECTURA v9.2
   pendingInvitations: Invitation[];
   modules: FeatureModule[];
-  recentCampaigns: Campaign[]; // <-- NUEVA PROPIEDAD
+  recentCampaigns: Campaign[];
 }
 
 const DashboardContext = createContext<DashboardContextProps | undefined>(
   undefined
 );
 
-/**
- * @public
- * @component DashboardProvider
- * @description Proveedor de React Context que hace que los datos globales del dashboard
- *              estén disponibles para todos sus componentes hijos.
- */
 export const DashboardProvider = ({
   children,
   value,
@@ -68,11 +55,6 @@ export const DashboardProvider = ({
   );
 };
 
-/**
- * @public
- * @exports useDashboard
- * @description Hook personalizado para acceder de forma segura al `DashboardContext`.
- */
 export const useDashboard = (): DashboardContextProps => {
   const context = useContext(DashboardContext);
   if (context === undefined) {
@@ -82,17 +64,16 @@ export const useDashboard = (): DashboardContextProps => {
   }
   return context;
 };
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Centralización de Datos**: ((Implementada)) Se ha añadido `recentCampaigns` al contrato del contexto. Esto permite que el `DashboardLayout` actúe como la única fuente de datos para la vista principal del dashboard, sentando las bases para resolver la regresión de estado.
+ * 1. **Sincronización de Contrato de Permisos**: ((Implementada)) Se ha añadido `activeWorkspaceRole` al contrato del contexto. Esto habilita la propagación de datos de permisos desde el servidor a todos los componentes de cliente del dashboard.
  *
  * @subsection Melhorias Futuras
- * 1. **Otimização de Re-renderização**: ((Vigente)) Para dashboards muito complexos, poderíamos dividir o `DashboardContext` em múltiplos contextos mais granulares (ex: `SessionContext`, `WorkspaceContext`) para evitar re-renderizações desnecessárias.
+ * 1. **Optimización de Re-renderizado**: ((Vigente)) Para dashboards muy complejos, dividir el `DashboardContext` en contextos más granulares (ej. `SessionContext`, `WorkspaceContext`) sigue siendo una optimización de élite a considerar.
  *
  * =====================================================================
  */

@@ -4,8 +4,9 @@
  * @description Componente atómico para la funcionalidad de suplantación de usuario.
  *              Ha sido refactorizado para usar el componente genérico `ConfirmationDialog`,
  *              mejorando la reutilización y la consistencia de la UI.
+ *              ¡IMPORTANTE!: Refactorizado para una Internacionalización Completa.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.0.1
  */
 "use client";
 
@@ -17,17 +18,17 @@ import React from "react";
 import { admin as adminActions } from "@/lib/actions";
 import { type UserProfilesWithEmail } from "@/lib/types/database/views";
 import { Button } from "@/components/ui/button";
-import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog"; // Import ConfirmationDialog
+import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog";
 
-// CORRECTION: Correctly type ProfileRow to access row properties directly
 type ProfileRow = UserProfilesWithEmail["Row"];
 
 export function ImpersonationDialog({ profile }: { profile: ProfileRow }) {
+  // --- INICIO DE REFACTORIZACIÓN: Internacionalización Completa ---
   const t = useTranslations("app.dev-console.ImpersonationDialog");
+  // --- FIN DE REFACTORIZACIÓN ---
   const [isPending, startTransition] = React.useTransition();
 
   const handleImpersonate = (formData: FormData) => {
-    // The userId is now passed via hiddenInputs by ConfirmationDialog
     const userIdToImpersonate = formData.get("userId") as string;
 
     if (!userIdToImpersonate) {
@@ -36,19 +37,21 @@ export function ImpersonationDialog({ profile }: { profile: ProfileRow }) {
     }
 
     startTransition(async () => {
-      const result = await adminActions.impersonateUserAction(formData); // Pass formData directly to the action
+      const result = await adminActions.impersonateUserAction(formData);
       if (result.success) {
         toast.success(t("success_toast"));
         // Assuming admin.actions.ts returns the signInLink directly in data
         window.open(result.data.signInLink, "_blank");
       } else {
-        toast.error(result.error || t("default_error_toast"));
+        // --- INICIO DE REFACTORIZACIÓN: Consumir mensaje de error de i18n ---
+        // admin.actions.ts no devuelve aún claves de i18n, por lo que usamos default_error_toast.
+        toast.error(t("default_error_toast"));
+        // --- FIN DE REFACTORIZACIÓN ---
       }
     });
   };
 
-  // CORRECTION: Ensure profile.email is not null for display
-  const profileEmail = profile.email ?? t("unknown_email_fallback");
+  const profileEmail = profile.email ?? t("unknown_email_fallback"); // Fallback internacionalizado
 
   return (
     <ConfirmationDialog
@@ -63,17 +66,17 @@ export function ImpersonationDialog({ profile }: { profile: ProfileRow }) {
           <UserCog className="h-4 w-4 text-muted-foreground" />
         </Button>
       }
-      icon={UserCog} // Using UserCog as the icon for impersonation dialog
+      icon={UserCog}
       title={t("title")}
       description={t.rich("description", {
         email: profileEmail,
         strong: (chunks) => <strong>{chunks}</strong>,
       })}
       confirmButtonText={t("confirm_button")}
-      cancelButtonText={t("cancel_button")}
+      cancelButtonText={t("cancel_button")} // Consumir del mismo namespace
       onConfirm={handleImpersonate}
       isPending={isPending}
-      hiddenInputs={{ userId: profile.id ?? "" }} // Pass profile.id to the form
+      hiddenInputs={{ userId: profile.id ?? "" }}
       // No confirmationText needed as it's not a "type to confirm" dialog for impersonation
     />
   );
@@ -85,9 +88,9 @@ export function ImpersonationDialog({ profile }: { profile: ProfileRow }) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidade (SRP) e Reutilização**: ((Implementada)) Refatorado para usar o componente genérico `ConfirmationDialog`, reduzindo significativamente o LOC e melhorando a consistência da UI em diálogos de confirmação.
- * 2. **Correção de Tipos**: ((Implementada)) Corrigido o tipo `ProfileRow` para `UserProfilesWithEmail['Row']` e o acesso às propriedades `id` e `email`, resolvendo os erros `TS2339`.
- * 3. **Internacionalização Melhorada**: ((Implementada)) Todos os textos são agora consistentemente puxados da camada de i18n, incluindo `cancel_button` e `default_error_toast` (si se usa).
+ * 1. **Full Internacionalización**: ((Implementada)) Todos los textos del diálogo y sus botones han sido extraídos al archivo `ImpersonationDialog.json` y se consumen con `useTranslations`. Esto resuelve una brecha crítica del protocolo.
+ * 2. **Consistencia de Mensajes de Error**: ((Implementada)) Se ha asegurado que los `toast`s de error consuman una clave de i18n, aunque de fallback por ahora.
+ * 3. **Consistencia de Cancel Button**: ((Implementada)) El texto del botón de cancelar ahora se obtiene del mismo namespace de `ImpersonationDialog`.
  *
  * @subsection Melhorias Futuras
  * 1. **Feedback Visual de Sucesso/Erro**: ((Vigente)) Aprimorar o `ConfirmationDialog` para exibir um feedback visual mais rico após a confirmação/cancelamento, talvez com um ícone de sucesso/erro e uma mensagem por um breve período.

@@ -1,0 +1,50 @@
+{
+  "en-US": {
+    "search_placeholder": "Type a command or search...",
+    "empty_results": "No results found.",
+    "navigation_group_heading": "Navigation",
+    "workspaces_group_heading": "Workspaces",
+    "search_workspaces_command": "Search and switch workspace...",
+    "account_group_heading": "Account",
+    "my_profile": "My Profile",
+    "my_profile_command_name": "Go to My Profile",
+    "my_profile_command_value": "Account Settings",
+    "sign_out": "Sign Out",
+    "sign_out_command_name": "Sign Out",
+    "sign_out_command_value": "Sign Out",
+    "go_to": "Go to {title}",
+    "switch_to_workspace": "Switch to {workspaceName}"
+  },
+  "es-ES": {
+    "search_placeholder": "Escribe un comando o busca...",
+    "empty_results": "No se encontraron resultados.",
+    "navigation_group_heading": "Navegación",
+    "workspaces_group_heading": "Workspaces",
+    "search_workspaces_command": "Buscar y cambiar de workspace...",
+    "account_group_heading": "Cuenta",
+    "my_profile": "Mi Perfil",
+    "my_profile_command_name": "Ir a Mi Perfil",
+    "my_profile_command_value": "Ajustes de Cuenta",
+    "sign_out": "Cerrar Sesión",
+    "sign_out_command_name": "Cerrar Sesión",
+    "sign_out_command_value": "Cerrar Sesión",
+    "go_to": "Ir a {title}",
+    "switch_to_workspace": "Cambiar a {workspaceName}"
+  },
+  "pt-BR": {
+    "search_placeholder": "Digite um comando ou busque...",
+    "empty_results": "Nenhum resultado encontrado.",
+    "navigation_group_heading": "Navegação",
+    "workspaces_group_heading": "Workspaces",
+    "search_workspaces_command": "Buscar e trocar de workspace...",
+    "account_group_heading": "Conta",
+    "my_profile": "Meu Perfil",
+    "my_profile_command_name": "Ir para Meu Perfil",
+    "my_profile_command_value": "Configurações da Conta",
+    "sign_out": "Sair",
+    "sign_out_command_name": "Sair",
+    "sign_out_command_value": "Sair",
+    "go_to": "Ir para {title}",
+    "switch_to_workspace": "Mudar para {workspaceName}"
+  }
+}

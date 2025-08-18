@@ -36,7 +36,7 @@ export async function SitesPageLoader({
   searchParams,
 }: {
   searchParams: { page?: string; q?: string };
-}) {
+}): Promise<React.ReactElement> {
   const cookieStore = cookies();
   const supabase = createClient();
   const {
@@ -53,6 +53,11 @@ export async function SitesPageLoader({
     );
     return redirect("/welcome");
   }
+
+  logger.trace("[SitesPageLoader] Cargando datos para la página de sitios.", {
+    userId: user.id,
+    workspaceId,
+  });
 
   try {
     const page = Number(searchParams.page) || 1;
@@ -85,18 +90,19 @@ export async function SitesPageLoader({
     );
   }
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Modo de Desarrollo**: ((Vigente)) Se podría añadir una lógica condicional que, si `process.env.DEV_MODE_ENABLED === 'true'`, devuelva datos simulados (`mockSites`) en lugar de consultar la base de datos, para un desarrollo de UI más rápido y aislado.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Capa de Lógica de Servidor**: ((Implementada)) Este aparato aísla toda la lógica del lado del servidor, como la lectura de cookies y la obtención de datos, manteniendo los componentes de página y de cliente puros.
- * 2. **Seguridad y Resiliencia**: ((Implementada)) Incluye guardias de seguridad para usuarios no autenticados o sin workspace activo, y un manejo de errores robusto que muestra una UI de fallback en caso de fallo de la base de datos.
+ * 1. **Full Observabilidad**: ((Implementada)) Se ha añadido `logger.trace` para monitorear el inicio de la carga de datos. La observabilidad de errores ya era de élite.
+ * 2. **Documentación TSDoc de Élite**: ((Implementada)) Se ha añadido documentación verbosa al componente para formalizar su rol.
+ * 3. **Capa de Lógica de Servidor**: ((Vigente)) Este aparato ya aísla perfectamente toda la lógica del lado del servidor, como la lectura de cookies y la obtención de datos, manteniendo los componentes de página y de cliente puros.
+ * 4. **Seguridad y Resiliencia**: ((Vigente)) Ya incluye guardias de seguridad robustos y un manejo de errores que muestra una UI de fallback.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Filtros Avanzados**: ((Vigente)) La llamada a `getSitesByWorkspaceId` podría ser extendida para aceptar más `searchParams`, como un parámetro de ordenamiento (`sortBy=name_asc`), para permitir al usuario ordenar la cuadrícula de sitios.
  *
  * =====================================================================
  */

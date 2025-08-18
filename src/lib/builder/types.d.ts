@@ -1,23 +1,14 @@
 // src/lib/builder/types.d.ts
 /**
  * @file src/lib/builder/types.d.ts
- * @description Define las interfaces y los esquemas de validación de Zod que
- *              gobiernan la estructura de una campaña, así como la definición
- *              declarativa de las propiedades editables de los bloques.
- *              Este archivo actúa como el "contrato de datos" oficial para
- *              todo el sistema del constructor.
+ * @description Contrato de datos canónico para el sistema del constructor. Ha sido
+ *              refactorizado para incluir `site_id` nullable en la configuración de la campaña,
+ *              resolviendo la desincronización arquitectónica y permitiendo campañas "huérfanas".
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 import { z } from "zod";
 
-// --- Esquemas de Validación (Zod) ---
-
-/**
- * @public
- * @constant BlockStylesSchema
- * @description Define las propiedades de estilo CSS personalizables para un bloque.
- */
 export const BlockStylesSchema = z.object({
   backgroundColor: z.string().optional(),
   textColor: z.string().optional(),
@@ -27,11 +18,6 @@ export const BlockStylesSchema = z.object({
   marginBottom: z.string().optional(),
 });
 
-/**
- * @public
- * @constant PageBlockSchema
- * @description Define la estructura de un único bloque (componente) dentro de una página.
- */
 export const PageBlockSchema = z.object({
   id: z.string(),
   type: z.string(),
@@ -39,11 +25,6 @@ export const PageBlockSchema = z.object({
   styles: BlockStylesSchema,
 });
 
-/**
- * @public
- * @constant CampaignThemeSchema
- * @description Define los ajustes de tema globales para una campaña.
- */
 export const CampaignThemeSchema = z.object({
   globalFont: z.string(),
   globalColors: z.record(z.string()),
@@ -53,10 +34,12 @@ export const CampaignThemeSchema = z.object({
  * @public
  * @constant CampaignConfigSchema
  * @description El esquema raíz que representa la configuración completa de una campaña.
+ *              Incluye `site_id` como nullable para soportar campañas "huérfanas".
  */
 export const CampaignConfigSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
+  site_id: z.string().uuid().nullable(), // <-- ARQUITECTURA v12.0
   theme: CampaignThemeSchema,
   blocks: z.array(PageBlockSchema),
 });
@@ -73,11 +56,6 @@ export type PageBlock<T = Record<string, any>> = {
 export type CampaignTheme = z.infer<typeof CampaignThemeSchema>;
 export type CampaignConfig = z.infer<typeof CampaignConfigSchema>;
 
-/**
- * @public
- * @typedef BlockPropertyType
- * @description Define los tipos de controles de UI que se pueden usar para editar una propiedad.
- */
 export type BlockPropertyType =
   | "text"
   | "textarea"
@@ -87,21 +65,11 @@ export type BlockPropertyType =
   | "select"
   | "image";
 
-/**
- * @public
- * @interface SelectOption
- * @description Define la estructura para una opción en un control de tipo 'select'.
- */
 export interface SelectOption {
   value: string;
   label: string;
 }
 
-/**
- * @public
- * @interface EditablePropertyDefinition
- * @description Define la estructura para una única propiedad editable de un bloque.
- */
 export interface EditablePropertyDefinition {
   label: string;
   type: BlockPropertyType;
@@ -110,19 +78,8 @@ export interface EditablePropertyDefinition {
   options?: SelectOption[];
 }
 
-/**
- * @public
- * @typedef BlockPropertiesSchema
- * @description Un mapa de definiciones de propiedades editables.
- */
 export type BlockPropertiesSchema = Record<string, EditablePropertyDefinition>;
 
-/**
- * @public
- * @interface BlockEditableDefinition
- * @description Define la estructura completa para la edición de un tipo de bloque,
- *              separando propiedades de contenido y de estilo.
- */
 export interface BlockEditableDefinition {
   properties: BlockPropertiesSchema;
   styles: BlockPropertiesSchema;
@@ -134,12 +91,10 @@ export interface BlockEditableDefinition {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato de Datos del Constructor**: ((Implementada)) Este aparato establece el contrato de datos completo y la SSoT para toda la funcionalidad del constructor de campañas, una dependencia crítica para todos los aparatos del builder.
- * 2. **Documentación de Élite**: ((Implementada)) Se ha mejorado la documentación TSDoc para cumplir con los estándares del protocolo.
+ * 1. **Sincronización de Contrato Arquitectónico**: ((Implementada)) Se ha modificado `site_id` a `z.string().uuid().nullable()`. Este cambio fundamental alinea el contrato de datos con la nueva lógica de negocio, permitiendo la existencia de campañas no asignadas.
  *
  * @subsection Melhorias Futuras
- * 1. **Tipado Genérico Avanzado en Zod**: ((Vigente)) El esquema `PageBlockSchema` usa `z.record(z.any())` para las props. Se podría crear una función genérica para generar esquemas de bloque específicos y validar las props de cada tipo de bloque con su propio esquema Zod.
- * 2. **Versionado de Esquema**: ((Vigente)) Añadir un campo `version: z.number()` a `CampaignConfigSchema` para facilitar futuras migraciones de datos si la estructura cambia.
+ * 1. **Versionado de Esquema**: ((Vigente)) Añadir un campo `version: z.number()` a `CampaignConfigSchema` para facilitar futuras migraciones de datos de `content` si la estructura del bloque cambia.
  *
  * =====================================================================
  */

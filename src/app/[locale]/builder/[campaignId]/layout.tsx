@@ -1,17 +1,18 @@
 // src/app/[locale]/builder/[campaignId]/layout.tsx
 /**
  * @file layout.tsx
- * @description Layout principal del constructor de campañas. Es un orquestador de UI
- *              de alto nivel que configura el contexto de Drag and Drop y ensambla
- *              todos los componentes principales del editor.
+ * @description Layout principal del constructor. Refactorizado para integrar
+ *              la `StatusBar`, completando la arquitectura de resiliencia
+ *              "Guardián de Datos".
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
+import { LayoutTemplate, Settings } from "lucide-react";
 
 import {
   BlocksPalette,
@@ -19,25 +20,24 @@ import {
 } from "@/components/builder/BlocksPalette";
 import { BuilderHeader } from "@/components/builder/BuilderHeader";
 import { SettingsPanel } from "@/components/builder/SettingsPanel";
+import { StatusBar } from "@/components/builder/ui/StatusBar";
 import { blockRegistry } from "@/components/templates";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBuilderStore } from "@/lib/builder/core/store";
 import { useBuilderDnD } from "@/lib/hooks/useBuilderDnD";
-import { LayoutTemplate, Settings } from "lucide-react";
 
 export default function BuilderLayout({
   children,
 }: {
   children: React.ReactNode;
 }): React.ReactElement {
-  const t = useTranslations("components.builder.BuilderHeader"); // Usado para los tabs
+  const t = useTranslations("BuilderPage.Header.Tabs");
   const { selectedBlockId, campaignConfig } = useBuilderStore();
   const [activeTab, setActiveTab] = useState("add");
   const { sensors, activeId, handleDragStart, handleDragEnd } = useBuilderDnD();
 
   useEffect(() => {
-    // Cambia automáticamente a la pestaña 'add' si se deselecciona un bloque
     if (!selectedBlockId && activeTab === "edit") {
       setActiveTab("add");
     }
@@ -66,11 +66,11 @@ export default function BuilderLayout({
               <TabsList className="grid w-full grid-cols-2 m-2">
                 <TabsTrigger value="add">
                   <LayoutTemplate className="w-4 h-4 mr-2" />
-                  {t("Tabs.add")}
+                  {t("add")}
                 </TabsTrigger>
                 <TabsTrigger value="edit" disabled={!selectedBlockId}>
                   <Settings className="w-4 h-4 mr-2" />
-                  {t("Tabs.settings")}
+                  {t("settings")}
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="add" className="flex-1 overflow-y-auto">
@@ -83,6 +83,7 @@ export default function BuilderLayout({
           </aside>
           <main className="flex-1 h-full overflow-auto">{children}</main>
         </div>
+        <StatusBar /> {/* <-- INTEGRACIÓN DE ÉLITE */}
       </div>
       <DragOverlay>
         {activeId ? (
@@ -103,18 +104,16 @@ export default function BuilderLayout({
     </DndContext>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Consumo de Hook Atómico**: ((Implementada)) Toda la lógica de D&D ha sido extraída y ahora se consume desde el hook `useBuilderDnD`, convirtiendo este layout en un orquestador de UI mucho más limpio.
- * 2. **Composición de Orquestadores**: ((Implementada)) Este componente ensambla los orquestadores de UI de nivel inferior (`BuilderHeader`, `BlocksPalette`, `SettingsPanel`), demostrando un patrón de composición de élite.
+ * 1. **Integración del "Guardián de Datos"**: ((Implementada)) Se ha añadido la `StatusBar` al layout, completando la implementación de la arquitectura de resiliencia y proporcionando al usuario una visibilidad constante del estado de su trabajo.
  *
  * @subsection Melhorias Futuras
- * 1. **Paneles Redimensionables**: ((Vigente)) Integrar una librería como `react-resizable-panels` para permitir al usuario redimensionar el panel lateral de ajustes.
+ * 1. **Paneles Redimensionables**: ((Vigente)) Integrar `react-resizable-panels` para permitir al usuario redimensionar el panel lateral de ajustes.
  *
  * =====================================================================
  */

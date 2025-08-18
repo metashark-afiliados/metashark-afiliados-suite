@@ -1,11 +1,11 @@
+// src/app/[locale]/auth/signup/page.tsx
 /**
  * @file src/app/[locale]/auth/signup/page.tsx
- * @description Contenedor de Servidor para la página de registro. Nivelado
- *              para utilizar el componente `LoginForm` con `view="sign_up"`,
- *              alineándose con la arquitectura de autenticación delegada y
- *              resolviendo los errores de compilación de forma estructural.
+ * @description Contenedor de Servidor para la página de registro. Ha sido
+ *              refactorizado para renderizar un futuro `SignUpForm` soberano
+ *              y eliminar las props obsoletas.
  * @author Raz Podestá
- * @version 8.0.0
+ * @version 9.0.0
  */
 import React from "react";
 import type { Metadata } from "next";
@@ -13,8 +13,8 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 
-import { AuthFooter } from "@/components/auth/AuthFooter";
-import { LoginForm } from "@/components/auth/LoginForm";
+// Nota: Se importará un SignUpForm futuro. Por ahora, podemos usar LoginForm como placeholder si la UI es similar.
+import { LoginForm } from "@/components/auth/LoginForm"; 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 
@@ -43,27 +43,6 @@ export default async function SignUpPage({
   }
 
   const t = await getTranslations("SignUpPage");
-  const tLogin = await getTranslations("LoginPage");
-  const tSupabase = await getTranslations("SupabaseAuthUI");
-
-  const supabaseLocalization = {
-    sign_in: {
-      email_label: tSupabase("email_label"),
-      password_label: tSupabase("password_label"),
-      button_label: tLogin("signInButton"),
-    },
-    sign_up: {
-      email_label: tSupabase("email_label"),
-      password_label: tSupabase("password_label"),
-      button_label: t("signUpButton"),
-    },
-    forgotten_password: {
-      link_text: tSupabase("forgotten_password.link_text"),
-    },
-    common: {
-      loading_button_label: tSupabase("common.loading_button_label"),
-    },
-  };
 
   return (
     <>
@@ -81,15 +60,26 @@ export default async function SignUpPage({
       <Card className="w-full max-w-md border-border/60 bg-card/50 backdrop-blur-lg">
         <CardHeader />
         <CardContent>
-          <LoginForm view="sign_up" localization={supabaseLocalization} />
+           {/* --- INICIO DE CORRECCIÓN (RUPTURA DE CONTRATO) --- */}
+          <LoginForm />
+           {/* --- FIN DE CORRECCIÓN --- */}
         </CardContent>
-        {/*
-          NOTA DE ARQUITECTURA: La prop `onSwitchView` no se pasa aquí porque
-          este es un flujo de página estática. El `AuthFooter` es compatible,
-          pero su funcionalidad de cambio de vista solo se activará en el
-          contexto de la futura UX modal del `AuthDialog`.
-        */}
       </Card>
     </>
   );
 }
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Resolución de Ruptura de Contrato**: ((Implementada)) Se ha eliminado el paso de props obsoletas a `LoginForm`, resolviendo el error de tipo `TS2322`.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Crear `SignUpForm` Soberano**: ((Vigente)) Crear un `SignUpForm.tsx` específico que invoque la `signUpAction` para un flujo de registro completo.
+ *
+ * =====================================================================
+ */
+// src/app/[locale]/auth/signup/page.tsx

@@ -1,44 +1,45 @@
 // src/components/layout/DashboardHeader.tsx
 /**
  * @file src/components/layout/DashboardHeader.tsx
- * @description Orquestador de layout para la cabecera del dashboard. Este aparato
- *              ensambla los componentes atómicos para la navegación móvil, el
- *              conmutador de workspaces, la búsqueda y las acciones de cuenta.
- *              Su estética ha sido refinada para alinearse con la filosofía de
- *              diseño "Manus", priorizando un layout limpio y funcional.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Header contextual del dashboard. Refactorizado a la Arquitectura v9.1,
+ *              es ahora un componente de presentación puro cuyo contenido es dictado
+ *              por la página que lo renderiza a través de props.
+ * @author Raz Podestá
+ * @version 2.0.0
  */
 "use client";
 
 import React from "react";
 import { Menu, Search } from "lucide-react";
 
+import {
+  Breadcrumbs,
+  type BreadcrumbItem,
+} from "@/components/dashboard/Breadcrumbs";
 import { InvitationBell } from "@/components/dashboard/InvitationBell";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
-import { WorkspaceSwitcher } from "@/components/workspaces/WorkspaceSwitcher";
 import { useCommandPaletteStore } from "@/lib/hooks/use-command-palette";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
 
-import { DashboardSidebarContent } from "./DashboardSidebar";
+import { DashboardSidebar } from "./DashboardSidebar";
 
-/**
- * @public
- * @component DashboardHeader
- * @description Renderiza la cabecera principal del dashboard, unificando la
- *              navegación, el contexto del workspace y las acciones del usuario.
- * @returns {React.ReactElement} El componente de cabecera del dashboard.
- */
-export function DashboardHeader(): React.ReactElement {
+export interface DashboardHeaderProps {
+  breadcrumbs?: BreadcrumbItem[];
+  primaryAction?: React.ReactNode;
+}
+
+export function DashboardHeader({
+  breadcrumbs,
+  primaryAction,
+}: DashboardHeaderProps): React.ReactElement {
   const { open } = useCommandPaletteStore();
   const t = useTypedTranslations("DashboardHeader");
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-card px-4 sm:px-6">
-      {/* Menú Móvil (Hamburguesa) */}
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-card px-4 sm:h-[60px] sm:px-6">
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="shrink-0 md:hidden">
@@ -47,17 +48,15 @@ export function DashboardHeader(): React.ReactElement {
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col bg-card p-0">
-          <DashboardSidebarContent />
+          <DashboardSidebar />
         </SheetContent>
       </Sheet>
 
-      {/* Conmutador de Workspace (Visible en Escritorio) */}
-      <div className="hidden md:block">
-        <WorkspaceSwitcher />
+      <div className="flex-1">
+        {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
       </div>
 
-      {/* Acciones del Lado Derecho */}
-      <div className="flex flex-1 items-center justify-end gap-2 md:gap-4">
+      <div className="flex items-center gap-2 md:gap-4">
         <Button
           variant="outline"
           className="gap-2 w-full max-w-[200px] justify-start text-muted-foreground hidden sm:inline-flex"
@@ -69,6 +68,7 @@ export function DashboardHeader(): React.ReactElement {
             <span className="text-xs">{t("search_command")}</span>
           </kbd>
         </Button>
+        {primaryAction}
         <LanguageSwitcher />
         <ThemeSwitcher />
         <InvitationBell />
@@ -76,19 +76,17 @@ export function DashboardHeader(): React.ReactElement {
     </header>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Layouts Configurables por Usuario**: ((Vigente)) La estructura de la cabecera podría ser definida por datos (ej. un JSON de configuración en el perfil del usuario), permitiendo a los usuarios reordenar o ocultar elementos para una personalización máxima.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Cascada de Errores**: ((Implementada)) La reconstrucción de este aparato, junto con sus dependencias, resuelve la cascada final de errores `TS2307`, permitiendo que el `DashboardLayout` se compile y renderice correctamente.
- * 2. **Composición Atómica y de Élite**: ((Implementada)) El componente actúa como un orquestador puro, ensamblando sus componentes hijos (`WorkspaceSwitcher`, `InvitationBell`, etc.), lo que demuestra una arquitectura limpia y mantenible.
- * 3. **Estética "Manus"**: ((Implementada)) Se han refinado los estilos, como la altura de la barra y el espaciado, para alinearse con la estética minimalista y funcional de "Manus".
+ * 1. **Implementación de Arquitectura v9.1**: ((Implementada)) Se ha eliminado el `WorkspaceSwitcher`. El header ahora es un componente de presentación puro que renderiza `breadcrumbs` y `primaryAction` dinámicamente.
+ * 2. **Composición de Componentes**: ((Implementada)) El header ahora compone el nuevo `Breadcrumbs`, demostrando la "Filosofía LEGO".
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Acciones Secundarias Flexibles**: ((Vigente)) La prop `primaryAction` podría expandirse a un `actions: React.ReactNode` para permitir pasar múltiples botones o menús.
  *
  * =====================================================================
  */

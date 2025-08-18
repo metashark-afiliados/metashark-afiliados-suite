@@ -7,6 +7,7 @@
     "inviteMember_button": "Invite Member",
     "inviteMember_description": "Invite a new member to your workspace <strong>{workspaceName}</strong>.",
     "workspaceSettings_button": "Workspace Settings",
+    "deleteWorkspace_button": "Delete Workspace",
     "changing_status": "Switching...",
     "onboarding_title": "Create your first Workspace",
     "onboarding_welcome_title": "Welcome to ConvertiKit!",
@@ -14,11 +15,13 @@
     "create_form": {
       "name_label": "Workspace Name",
       "name_placeholder": "e.g., My New Project",
-      "icon_label": "Icon",
-      "icon_placeholder": "Select an icon",
       "creating_button": "Creating...",
       "create_button": "Create Workspace",
       "success_toast": "Workspace created successfully!"
+    },
+    "edit_form": {
+      "name_aria_label": "Edit workspace name",
+      "success_toast": "Workspace name updated!"
     },
     "invite_form": {
       "email_label": "Member's Email",
@@ -30,7 +33,13 @@
       "sending_button": "Sending...",
       "send_button": "Send Invitation"
     },
-    "error_icon_required": "Icon is required."
+    "delete_dialog": {
+      "title": "Delete Workspace",
+      "description": "This is a permanent action. All sites and campaigns within <strong>{workspaceName}</strong> will be deleted. This cannot be undone.",
+      "confirmation_label": "To confirm, type <strong>{workspaceName}</strong> below:",
+      "confirm_button": "Yes, delete workspace",
+      "success_toast": "Workspace deleted."
+    }
   },
   "es-ES": {
     "selectWorkspace_label": "Seleccionar workspace",
@@ -40,6 +49,7 @@
     "inviteMember_button": "Invitar Miembro",
     "inviteMember_description": "Invita a un nuevo miembro a tu workspace <strong>{workspaceName}</strong>.",
     "workspaceSettings_button": "Ajustes del Workspace",
+    "deleteWorkspace_button": "Eliminar Workspace",
     "changing_status": "Cambiando...",
     "onboarding_title": "Crea tu primer Workspace",
     "onboarding_welcome_title": "¡Bienvenido a ConvertiKit!",
@@ -47,11 +57,13 @@
     "create_form": {
       "name_label": "Nombre del Workspace",
       "name_placeholder": "Ej: Mi Nuevo Proyecto",
-      "icon_label": "Ícono",
-      "icon_placeholder": "Seleccionar un ícono",
       "creating_button": "Creando...",
       "create_button": "Crear Workspace",
       "success_toast": "¡Workspace creado con éxito!"
+    },
+    "edit_form": {
+      "name_aria_label": "Editar nombre del workspace",
+      "success_toast": "¡Nombre del workspace actualizado!"
     },
     "invite_form": {
       "email_label": "Correo del Miembro",
@@ -63,7 +75,13 @@
       "sending_button": "Enviando...",
       "send_button": "Enviar Invitación"
     },
-    "error_icon_required": "El ícono es requerido."
+    "delete_dialog": {
+      "title": "Eliminar Workspace",
+      "description": "Esta es una acción permanente. Todos los sitios y campañas dentro de <strong>{workspaceName}</strong> serán eliminados. Esto no se puede deshacer.",
+      "confirmation_label": "Para confirmar, escribe <strong>{workspaceName}</strong> abajo:",
+      "confirm_button": "Sí, eliminar workspace",
+      "success_toast": "Workspace eliminado."
+    }
   },
   "pt-BR": {
     "selectWorkspace_label": "Selecionar workspace",
@@ -73,6 +91,7 @@
     "inviteMember_button": "Convidar Membro",
     "inviteMember_description": "Convide um novo membro para o seu workspace <strong>{workspaceName}</strong>.",
     "workspaceSettings_button": "Configurações do Workspace",
+    "deleteWorkspace_button": "Excluir Workspace",
     "changing_status": "Trocando...",
     "onboarding_title": "Crie seu primeiro Workspace",
     "onboarding_welcome_title": "Bem-vindo(a) à ConvertiKit!",
@@ -80,11 +99,13 @@
     "create_form": {
       "name_label": "Nome do Workspace",
       "name_placeholder": "Ex: Meu Novo Projeto",
-      "icon_label": "Ícone",
-      "icon_placeholder": "Selecionar um ícone",
       "creating_button": "Criando...",
       "create_button": "Criar Workspace",
       "success_toast": "Workspace criado com sucesso!"
+    },
+    "edit_form": {
+      "name_aria_label": "Editar nome do workspace",
+      "success_toast": "Nome do workspace atualizado!"
     },
     "invite_form": {
       "email_label": "E-mail do Membro",
@@ -96,6 +117,13 @@
       "sending_button": "Enviando...",
       "send_button": "Enviar Convite"
     },
-    "error_icon_required": "O ícone é obrigatório."
+    "delete_dialog": {
+      "title": "Excluir Workspace",
+      "description": "Esta é uma ação permanente. Todos os sites e campanhas dentro de <strong>{workspaceName}</strong> serão excluídos. Isso não pode ser desfeito.",
+      "confirmation_label": "Para confirmar, digite <strong>{workspaceName}</strong> abaixo:",
+      "confirm_button": "Sim, excluir workspace",
+      "success_toast": "Workspace excluído."
+    }
   }
 }
+

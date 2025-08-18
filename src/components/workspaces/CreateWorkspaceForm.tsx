@@ -1,18 +1,16 @@
 // src/components/workspaces/CreateWorkspaceForm.tsx
 /**
  * @file src/components/workspaces/CreateWorkspaceForm.tsx
- * @description Formulario de cliente para la creación de nuevos workspaces.
- *              Este componente es un ejemplo de "componente de presentación inteligente",
- *              ya que gestiona su propio estado de formulario con `react-hook-form`
- *              y `zodResolver`, pero delega la mutación de datos a una Server Action
- *              recibida por props. Es completamente internacionalizado y observable.
+ * @description Formulario de cliente de élite para la creación de workspaces.
+ *              Ha sido refactorizado para eliminar el campo de selección de icono,
+ *              simplificando la UI y alineándose con la nueva directiva de diseño.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 3.0.0
  */
 "use client";
 
 import { useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,19 +18,8 @@ import { Loader2 } from "lucide-react";
 import type { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  EmojiPicker,
-  EmojiPickerContent,
-  EmojiPickerFooter,
-  EmojiPickerSearch,
-} from "@/components/ui/emoji-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { workspaces as workspaceActions } from "@/lib/actions";
 import { logger } from "@/lib/logging";
 import { CreateWorkspaceSchema } from "@/lib/validators";
@@ -41,18 +28,17 @@ type FormData = z.infer<typeof CreateWorkspaceSchema>;
 
 export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
   const t = useTranslations("WorkspaceSwitcher");
+  const t_errors = useTranslations("ValidationErrors");
   const [isPending, startTransition] = useTransition();
 
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(CreateWorkspaceSchema),
     defaultValues: {
       workspaceName: "",
-      icon: "🚀", // Emoji por defecto
     },
   });
 
@@ -63,7 +49,6 @@ export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
     startTransition(async () => {
       const formData = new FormData();
       formData.append("workspaceName", data.workspaceName);
-      formData.append("icon", data.icon);
 
       const result = await workspaceActions.createWorkspaceAction(formData);
 
@@ -74,7 +59,7 @@ export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
         });
         onSuccess();
       } else {
-        toast.error(result.error);
+        toast.error(t_errors(result.error as any));
         logger.error("[CreateWorkspaceForm] Fallo al crear workspace.", {
           error: result.error,
         });
@@ -96,43 +81,7 @@ export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
         />
         {errors.workspaceName?.message && (
           <p className="text-sm text-destructive" role="alert">
-            {String(errors.workspaceName.message)}
-          </p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label>{t("create_form.icon_label")}</Label>
-        <Controller
-          name="icon"
-          control={control}
-          render={({ field }) => (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start font-normal bg-input"
-                  type="button"
-                >
-                  <span className="mr-4 text-2xl">{field.value}</span>
-                  <span>{t("create_form.icon_placeholder")}</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 border-0">
-                <EmojiPicker
-                  onEmojiSelect={({ emoji }) => field.onChange(emoji)}
-                >
-                  <EmojiPickerSearch />
-                  <EmojiPickerContent />
-                  <EmojiPickerFooter />
-                </EmojiPicker>
-              </PopoverContent>
-            </Popover>
-          )}
-        />
-        {errors.icon?.message && (
-          <p className="text-sm text-destructive" role="alert">
-            {String(errors.icon.message)}
+            {t_errors(errors.workspaceName.message as any)}
           </p>
         )}
       </div>
@@ -152,13 +101,12 @@ export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Feedback de Validação em Tempo Real**: ((Vigente)) A configuração `mode: "onTouched"` em `useForm` já prepara o terreno. A UI poderia ser melhorada para mostrar os ícones de sucesso/erro de validação em tempo real à medida que o usuário preenche os campos.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Padrão de Formulário Soberano**: ((Implementada)) Este componente implementa o padrão canônico para formulários na aplicação, utilizando `react-hook-form` para a gestão do estado e `zodResolver` para a validação do lado do cliente, garantindo uma UX robusta.
- * 2. **Internacionalização Completa**: ((Implementada)) Todos os textos visíveis (labels, placeholders, botões) e mensagens de erro são consumidos da camada de `next-intl`, tornando o componente totalmente traduzível.
- * 3. **Observabilidade da Interação**: ((Implementada)) O componente registra eventos de `trace`, `info` e `error`, fornecendo uma visibilidade completa sobre o processo de criação de workspaces a partir da UI.
+ * 1. **Simplificación de UI**: ((Implementada)) Se ha eliminado el campo de `EmojiPicker` y toda la lógica de `Controller` asociada. El formulario ahora es más simple y se enfoca únicamente en el nombre del workspace.
+ * 2. **Sincronización de Contrato**: ((Implementada)) El formulario ya no intenta enviar el campo `icon`, alineándose con el `CreateWorkspaceSchema` actualizado.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Selección de Plantilla de Workspace**: ((Vigente)) En lugar de un ícono, el formulario podría incluir un selector para que el usuario cree un workspace a partir de una plantilla (ej. "Para Agencia", "Proyecto Personal"), que podría pre-configurar sitios o campañas iniciales.
  *
  * =====================================================================
  */

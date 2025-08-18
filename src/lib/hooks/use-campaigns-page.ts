@@ -1,10 +1,11 @@
+// src/lib/hooks/use-campaigns-page.ts
 /**
  * @file src/lib/hooks/use-campaigns-page.ts
- * @description Hook Soberano de élite. Ha sido nivelado para incluir todas sus
- *              dependencias, resolver la cascada de errores de compilación y
- *              cumplir con el 100% de los requisitos del protocolo de excelencia.
+ * @description Hook Orquestador de élite. Compone hooks atómicos para construir
+ *              la lógica completa de la página de gestión de campañas, incluyendo
+ *              UI optimista, sincronización de filtros de URL y gestión de estado.
  * @author Raz Podestá
- * @version 2.1.0
+ * @version 3.0.0
  */
 "use client";
 
@@ -14,11 +15,10 @@ import { useTranslations } from "next-intl";
 
 import { campaigns as campaignsActions } from "@/lib/actions";
 import { type CampaignMetadata } from "@/lib/data/campaigns";
-import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useOptimisticResourceManagement } from "@/lib/hooks/use-optimistic-resource-management";
 import { logger } from "@/lib/logging";
 import { usePathname, useRouter } from "@/lib/navigation";
-import { type ActionResult } from "@/lib/validators";
+import { useDebounce } from "./use-debounce";
 
 type CampaignStatus = "draft" | "published" | "archived";
 type SortByOption = "updated_at_desc" | "name_asc";
@@ -40,7 +40,6 @@ export function useCampaignsPage({
   const router = useRouter();
   const pathname = usePathname();
 
-  const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(initialSearchQuery);
   const [statusFilter, setStatusFilter] = useState<CampaignStatus | undefined>(
     initialStatus
@@ -52,48 +51,18 @@ export function useCampaignsPage({
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    params.set("q", debouncedSearchTerm);
-    params.set("status", statusFilter || "");
-    params.set("sortBy", sortBy);
-    params.set("page", "1");
+    const updateParam = (key: string, value: string | undefined) => {
+      if (value) params.set(key, value);
+      else params.delete(key);
+    };
 
-    if (!debouncedSearchTerm) params.delete("q");
-    if (!statusFilter) params.delete("status");
+    updateParam("q", debouncedSearchTerm);
+    updateParam("status", statusFilter);
+    updateParam("sortBy", sortBy);
+    params.set("page", "1"); // Reset pagination on filter change
 
-    const newUrl = `${pathname}?${params.toString()}`;
-    if (
-      newUrl !==
-      `${pathname}?${new URLSearchParams(window.location.search).toString()}`
-    ) {
-      router.push(newUrl as any);
-    }
-  }, [
-    debouncedSearchTerm,
-    statusFilter,
-    sortBy,
-    initialSearchQuery,
-    pathname,
-    router,
-  ]);
-
-  const showToastPromise = useCallback(
-    (
-      promise: Promise<ActionResult<any>>,
-      { loadingKey, successKey }: { loadingKey: string; successKey: string }
-    ) => {
-      toast.promise(promise, {
-        loading: t(loadingKey as any),
-        success: (result: ActionResult<any>) => {
-          if (result.success && result.data?.messageKey) {
-            return t(result.data.messageKey as any);
-          }
-          return t(successKey as any);
-        },
-        error: (err: Error) => t(err.message as any) || t("error_unexpected"),
-      });
-    },
-    [t]
-  );
+    router.push(`${pathname}?${params.toString()}` as any, { scroll: false });
+  }, [debouncedSearchTerm, statusFilter, sortBy, pathname, router]);
 
   const {
     items: campaigns,
@@ -108,42 +77,37 @@ export function useCampaignsPage({
     entityName: t("entityName"),
     createAction: campaignsActions.createCampaignAction,
     deleteAction: campaignsActions.deleteCampaignAction,
-    updateAction: campaignsActions.archiveCampaignAction as any,
+    updateAction: campaignsActions.archiveCampaignAction as any, // Mapeo de update a archive
     duplicateAction: campaignsActions.duplicateCampaignAction,
   });
 
-  const handleCreateCampaign = (formData: FormData) => {
-    const name = formData.get("name") as string;
-    const optimisticCampaign: Omit<CampaignMetadata, "id"> = {
-      name,
-      slug: name.toLowerCase().replace(/\s+/g, "-"),
-      site_id: siteId,
-      status: "draft",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      affiliate_url: null,
-    };
-    handleCreate?.(formData, optimisticCampaign);
-    setCreateDialogOpen(false);
-  };
+  const handleArchiveCampaign = useCallback(
+    (campaignId: string) => {
+      logger.trace(`[useCampaignsPage] Archivando campaña`, { campaignId });
+      const formData = new FormData();
+      formData.append("campaignId", campaignId);
+      handleUpdate?.(formData, { status: "archived" });
+      toast.promise(campaignsActions.archiveCampaignAction(campaignId), {
+        loading: t("toasts.archiving"),
+        success: t("toasts.archive_success"),
+        error: t("errors.archive_failed"),
+      });
+    },
+    [handleUpdate, t]
+  );
 
-  const handleArchiveCampaign = (campaignId: string) => {
-    const formData = new FormData();
-    formData.append("campaignId", campaignId);
-    showToastPromise(campaignsActions.archiveCampaignAction(campaignId), {
-      loadingKey: "archiving_toast",
-      successKey: "archive_success_toast",
-    });
-    handleUpdate?.(formData, { status: "archived" });
-  };
-
-  const handleDuplicateCampaign = (campaignId: string) => {
-    showToastPromise(campaignsActions.duplicateCampaignAction(campaignId), {
-      loadingKey: "duplicating_toast",
-      successKey: "duplicate_success_toast",
-    });
-    handleDuplicate?.(campaignId);
-  };
+  const handleDuplicateCampaign = useCallback(
+    (campaignId: string) => {
+      logger.trace(`[useCampaignsPage] Duplicando campaña`, { campaignId });
+      handleDuplicate?.(campaignId);
+      toast.promise(campaignsActions.duplicateCampaignAction(campaignId), {
+        loading: t("toasts.duplicating"),
+        success: t("toasts.duplicate_success"),
+        error: t("errors.duplication_failed"),
+      });
+    },
+    [handleDuplicate, t]
+  );
 
   return {
     campaigns,
@@ -155,26 +119,25 @@ export function useCampaignsPage({
     setStatusFilter,
     sortBy,
     setSortBy,
-    isCreateDialogOpen,
-    setCreateDialogOpen,
-    handleCreateCampaign,
-    handleDelete: handleDelete!,
+    handleCreateCampaign: handleCreate,
+    handleDelete,
     handleArchiveCampaign,
     handleDuplicateCampaign,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencias**: ((Implementada)) Se han añadido las importaciones de `toast` y `campaignActions`, resolviendo los errores `TS2304`.
- * 2. **Seguridad de Tipos**: ((Implementada)) Se han añadido los tipos explícitos a los parámetros de callback de `toast.promise`, resolviendo los errores `TS7006` de `any` implícito.
+ * 1. **Arquitectura de Orquestador Puro**: ((Implementada)) El hook ahora compone `useOptimisticResourceManagement` y la lógica de sincronización de URL, reduciendo su complejidad y mejorando su cohesión.
+ * 2. **Sincronización de Filtros Múltiples**: ((Implementada)) El `useEffect` ahora sincroniza `q`, `status` y `sortBy` con la URL, proporcionando una gestión de estado de filtros completa y robusta.
+ * 3. **Observabilidad Completa**: ((Implementada)) Las acciones de usuario ahora son registradas con `logger.trace`, y el feedback se gestiona con `toast.promise` para una UX consistente.
  *
  * @subsection Melhorias Futuras
- * 1. **Reset de Paginación**: ((Vigente)) El `useEffect` de sincronización de URL resetea correctamente a la página 1. El siguiente paso es asegurar que el `PaginationControls` reciba y utilice este estado.
+ * 1. **Abstracción de Sincronización de URL**: ((Vigente)) La lógica del `useEffect` para sincronizar múltiples parámetros es un candidato perfecto para ser abstraído a una versión avanzada de `useSearchSync` (ej. `useUrlStateSync`) que acepte un objeto de parámetros.
  *
  * =====================================================================
  */
+// src/lib/hooks/use-campaigns-page.ts

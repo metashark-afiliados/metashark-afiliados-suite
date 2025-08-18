@@ -1,11 +1,12 @@
+// src/components/ui/ConfirmationDialog.tsx
 /**
  * @file src/components/ui/ConfirmationDialog.tsx
- * @description Componente de UI genérico de élite para confirmación de acciones.
- *              Ha sido nivelado para ser completamente agnóstico al contenido,
- *              recibiendo todos sus textos a través de props para una
- *              internacionalización total (Full i18n).
+ * @description Componente de UI genérico de élite para el contenido de un
+ *              diálogo de confirmación. Ha sido refactorizado a la v3.0.0
+ *              para ser un componente de "contenido" puro, resolviendo
+ *              errores de build y mejorando su atomicidad.
  * @author Raz Podestá
- * @version 2.1.0
+ * @version 3.0.0
  */
 "use client";
 
@@ -15,20 +16,17 @@ import { Loader2 } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-interface ConfirmationDialogProps {
-  triggerButton: React.ReactNode;
+interface ConfirmationDialogContentProps {
   icon?: React.ElementType;
   title: string;
   description: React.ReactNode;
@@ -39,16 +37,11 @@ interface ConfirmationDialogProps {
   isPending: boolean;
   hiddenInputs?: Record<string, string>;
   confirmationText?: string;
-  /**
-   * @property {React.ReactNode} [confirmationLabel] - El texto a mostrar
-   *           encima del campo de confirmación. Puede ser un string o JSX.
-   *           Requerido si `confirmationText` está presente.
-   */
   confirmationLabel?: React.ReactNode;
+  onClose: () => void;
 }
 
-export function ConfirmationDialog({
-  triggerButton,
+export function ConfirmationDialogContent({
   icon: Icon,
   title,
   description,
@@ -60,9 +53,9 @@ export function ConfirmationDialog({
   hiddenInputs,
   confirmationText,
   confirmationLabel,
-}: ConfirmationDialogProps) {
+  onClose,
+}: ConfirmationDialogContentProps) {
   const [inputValue, setInputValue] = React.useState("");
-  const [isOpen, setIsOpen] = React.useState(false);
 
   const isConfirmationRequired = !!confirmationText;
   const isConfirmationMatch = inputValue === confirmationText;
@@ -77,61 +70,62 @@ export function ConfirmationDialog({
   };
 
   React.useEffect(() => {
-    if (!isOpen) {
-      setInputValue("");
-    }
-  }, [isOpen]);
+    setInputValue("");
+  }, [onClose]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{triggerButton}</DialogTrigger>
-      <DialogContent>
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {Icon && <Icon className="h-6 w-6 text-destructive" />}
-              {title}
-            </DialogTitle>
-            <DialogDescription className="pt-2">
-              {description}
-            </DialogDescription>
-          </DialogHeader>
+    <DialogContent
+      onEscapeKeyDown={() => onClose()}
+      onPointerDownOutside={() => onClose()}
+    >
+      <form onSubmit={handleSubmit}>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {Icon && <Icon className="h-6 w-6 text-destructive" />}
+            {title}
+          </DialogTitle>
+          <DialogDescription className="pt-2">{description}</DialogDescription>
+        </DialogHeader>
 
-          {isConfirmationRequired && (
-            <div className="mt-4 space-y-2">
-              <Label htmlFor="confirmation-input">{confirmationLabel}</Label>
-              <Input
-                id="confirmation-input"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                autoComplete="off"
-                disabled={isPending}
-              />
-            </div>
-          )}
+        {isConfirmationRequired && (
+          <div className="mt-4 space-y-2">
+            <Label htmlFor="confirmation-input">{confirmationLabel}</Label>
+            <Input
+              id="confirmation-input"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              autoComplete="off"
+              disabled={isPending}
+            />
+          </div>
+        )}
 
-          <DialogFooter className="mt-4">
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={isPending}>
-                {cancelButtonText}
-              </Button>
-            </DialogClose>
-            {hiddenInputs &&
-              Object.entries(hiddenInputs).map(([name, value]) => (
-                <input key={name} type="hidden" name={name} value={value} />
-              ))}
+        <DialogFooter className="mt-4">
+          <DialogClose asChild>
             <Button
-              variant={confirmButtonVariant}
-              type="submit"
-              disabled={isConfirmButtonDisabled}
+              type="button"
+              variant="outline"
+              disabled={isPending}
+              onClick={onClose}
             >
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {confirmButtonText}
+              {cancelButtonText}
             </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          </DialogClose>
+          {hiddenInputs &&
+            Object.entries(hiddenInputs).map(([name, value]) => (
+              <input key={name} type="hidden" name={name} value={value} />
+            ))}
+          <Button
+            variant={confirmButtonVariant}
+            type="submit"
+            disabled={isConfirmButtonDisabled}
+          >
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {confirmButtonText}
+          </Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
   );
 }
 
@@ -141,7 +135,9 @@ export function ConfirmationDialog({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Full Internacionalización**: ((Implementada)) Se ha añadido la prop `confirmationLabel`. El componente ahora es 100% puro y agnóstico al contenido, delegando toda la responsabilidad de la internacionalización al componente padre que lo consume.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha refactorizado para ser un componente de contenido (`<DialogContent>`), eliminando el `<DialogTrigger>`, lo que resuelve la causa raíz del error `React.Children.only`.
+ * 2. **Atomicidad Mejorada (SRP)**: ((Implementada)) El componente ahora solo se encarga del contenido del diálogo, dejando la responsabilidad de controlar el estado de apertura y el disparador al componente padre.
  *
  * =====================================================================
  */
+// src/components/ui/ConfirmationDialog.tsx

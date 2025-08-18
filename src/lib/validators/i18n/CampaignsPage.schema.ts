@@ -1,11 +1,11 @@
+// src/lib/validators/i18n/CampaignsPage.schema.ts
 /**
  * @file src/lib/validators/i18n/CampaignsPage.schema.ts
  * @description Define el contrato de datos para el namespace 'CampaignsPage'.
- *              Nivelado a un estándar de élite con una estructura anidada que
- *              refleja directamente los contratos de props de los componentes
- *              de presentación y las claves de feedback de las Server Actions.
+ *              Nivelado para incluir las claves de error de la acción de
+ *              asignación de sitio, completando su contrato de feedback.
  * @author Raz Podestá
- * @version 4.0.0
+ * @version 4.1.0
  */
 import { z } from "zod";
 
@@ -110,5 +110,21 @@ export const CampaignsPageSchema = z.object({
     invalid_data: z.string(),
     invalid_id: z.string(),
     unexpected: z.string(),
+    // --- NUEVAS CLAVES DE ERROR ---
+    permission_denied_site: z.string(),
+    assignment_not_allowed: z.string(),
+    update_failed: z.string(),
   }),
 });
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Completitud de Contrato de Feedback**: ((Implementada)) Se han añadido las claves de error para la acción de asignación de sitio, permitiendo que la UI muestre mensajes de error específicos y traducidos.
+ *
+ * =====================================================================
+ */
+// src/lib/validators/i18n/CampaignsPage.schema.ts

@@ -1,22 +1,34 @@
+// src/app/[locale]/dashboard/sites/sites-client.tsx
 /**
  * @file src/app/[locale]/dashboard/sites/sites-client.tsx
- * @description Orquestador de UI puro para la página "Mis Sitios". Ha sido
- *              nivelado a un estándar de élite para construir y pasar
- *              explícitamente los objetos de props de texto (`texts`) a sus
- *              componentes hijos, resolviendo un `TypeError` crítico en runtime.
- * @author L.I.A. Legacy
- * @version 2.0.0
+ * @description Orquestador de UI de élite para la página "Mis Sitios". Ha sido
+ *              sincronizado para consumir la API del hook `useSitesPage` atomizado,
+ *              alineando su contrato de props y manejadores de eventos.
+ * @author Raz Podestá
+ * @version 3.1.0
  */
 "use client";
 
 import React from "react";
 import { useTranslations } from "next-intl";
+import { PlusCircle } from "lucide-react";
 
+import { CreateSiteForm } from "@/components/sites/CreateSiteForm";
+import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { PaginationControls } from "@/components/shared/pagination-controls";
 import { SitesGrid } from "@/components/sites/SitesGrid";
-import { SitesHeader } from "@/components/sites/SitesHeader";
-import { type SiteWithCampaignCount } from "@/lib/data/sites";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { SearchInput } from "@/components/ui/SearchInput";
 import { useSitesPage } from "@/lib/hooks/use-sites-page";
+import { type SiteWithCampaignCount } from "@/lib/data/sites";
+import { logger } from "@/lib/logging";
 
 interface SitesClientProps {
   initialSites: SiteWithCampaignCount[];
@@ -26,6 +38,13 @@ interface SitesClientProps {
   searchQuery: string;
 }
 
+/**
+ * @public
+ * @component SitesClient
+ * @description Orquesta la UI interactiva para la página de gestión de sitios.
+ * @param {SitesClientProps} props - Propiedades con los datos iniciales del servidor.
+ * @returns {React.ReactElement | null} El componente renderizado o null si no hay workspace activo.
+ */
 export function SitesClient({
   initialSites,
   totalCount,
@@ -33,6 +52,7 @@ export function SitesClient({
   limit,
   searchQuery,
 }: SitesClientProps): React.ReactElement | null {
+  logger.trace("[SitesClient] Renderizando orquestador de UI del cliente.");
   const t = useTranslations("SitesPage");
   const tDialogs = useTranslations("Dialogs");
 
@@ -41,114 +61,123 @@ export function SitesClient({
     activeWorkspaceId,
     isPending,
     mutatingId,
-    handleSearch,
-    handleCreate,
+    searchTerm,
+    setSearchTerm,
     handleDelete,
     isCreateDialogOpen,
-    setCreateDialogOpen,
-  } = useSitesPage({ initialSites });
+    openCreateDialog,
+    handleCreate,
+  } = useSitesPage({ initialSites, initialSearchQuery: searchQuery });
 
   if (!activeWorkspaceId) {
     return null;
   }
 
-  // --- INICIO DE CORRECCIÓN CRÍTICA ---
-  // Construcción de los objetos de props de texto, alineados con el schema.
-  const texts = {
-    header: {
-      title: t("header.title"),
-      description: t("header.description"),
-      searchPlaceholder: t("header.searchPlaceholder"),
-      clearSearchAria: t("header.clearSearchAria"),
-      createSiteButton: t("header.createSiteButton"),
-      createDialogTitle: t("header.createDialogTitle"),
-    },
-    form: {
-      nameLabel: t("form.nameLabel"),
-      namePlaceholder: t("form.namePlaceholder"),
-      subdomainLabel: t("form.subdomainLabel"),
-      subdomainInUseError: t("form.subdomainInUseError"),
-      descriptionLabel: t("form.descriptionLabel"),
-      descriptionPlaceholder: t("form.descriptionPlaceholder"),
-      creatingButton: t("form.creatingButton"),
-      createButton: t("form.createButton"),
-    },
-    grid: {
-      emptyStateTitle: t("grid.emptyStateTitle"),
-      emptyStateDescription: t("grid.emptyStateDescription"),
-    },
-    card: {
-      campaignCount: (count: number) => t("card.campaignCount", { count }),
-      manageCampaignsButton: t("card.manageCampaignsButton"),
-      deleteSiteAriaLabel: (subdomain: string) =>
-        t("card.deleteSiteAriaLabel", { subdomain }),
-      openSiteAriaLabel: t("card.openSiteAriaLabel"),
-      popoverTitle: t("card.popoverTitle"),
-      popoverDescription: t("card.popoverDescription"),
-    },
-    deleteDialog: {
-      title: t("deleteDialog.title"),
-      description: (subdomain: string) =>
-        t.rich("deleteDialog.description", {
-          subdomain,
-          strong: (chunks) => <strong>{chunks}</strong>,
-        }),
-      confirmButton: t("deleteDialog.confirmButton"),
-      cancelButton: tDialogs("generic_cancelButton"),
-    },
-    pagination: {
-      previousPageLabel: t("pagination.previous"),
-      nextPageLabel: t("pagination.next"),
-      pageLabelTemplate: t("pagination.page"),
-    },
-  };
-  // --- FIN DE CORRECCIÓN CRÍTICA ---
+  const breadcrumbs = [
+    { label: t("breadcrumbs.dashboard"), href: "/dashboard" },
+    { label: t("breadcrumbs.sites") },
+  ];
+
+  const primaryAction = (
+    <Button onClick={openCreateDialog}>
+      <PlusCircle className="mr-2 h-4 w-4" />
+      {t("header.createSiteButton")}
+    </Button>
+  );
 
   return (
-    <div className="space-y-6 relative">
-      <SitesHeader
-        texts={texts.header}
-        formTexts={texts.form}
-        isCreateDialogOpen={isCreateDialogOpen}
-        setCreateDialogOpen={setCreateDialogOpen}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearch}
-        workspaceId={activeWorkspaceId}
-        onCreate={handleCreate}
-        isPending={isPending}
+    <div className="flex flex-col gap-6">
+      <DashboardHeader
+        breadcrumbs={breadcrumbs}
+        primaryAction={primaryAction}
       />
+      
+      <Dialog open={isCreateDialogOpen} onOpenChange={(isOpen) => !isOpen && openCreateDialog()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("header.createDialogTitle")}</DialogTitle>
+          </DialogHeader>
+          <CreateSiteForm
+            workspaceId={activeWorkspaceId}
+            onSuccess={handleCreate}
+            isPending={isPending}
+            texts={{
+              nameLabel: t("form.nameLabel"),
+              namePlaceholder: t("form.namePlaceholder"),
+              subdomainLabel: t("form.subdomainLabel"),
+              subdomainInUseError: t("form.subdomainInUseError"),
+              descriptionLabel: t("form.descriptionLabel"),
+              descriptionPlaceholder: t("form.descriptionPlaceholder"),
+              creatingButton: t("form.creatingButton"),
+              createButton: t("form.createButton"),
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <div className="w-full md:w-1/3">
+        <SearchInput
+          placeholder={t("header.searchPlaceholder")}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          clearAriaLabel={t("header.clearSearchAria")}
+        />
+      </div>
       <SitesGrid
         sites={sites}
-        onDelete={handleDelete}
+        onDelete={handleDelete!}
         isPending={isPending}
         deletingSiteId={mutatingId}
-        texts={texts.grid}
-        cardTexts={texts.card}
-        deleteDialogTexts={texts.deleteDialog}
+        texts={{
+          emptyStateTitle: t("grid.emptyStateTitle"),
+          emptyStateDescription: t("grid.emptyStateDescription"),
+        }}
+        cardTexts={{
+          campaignCount: (count: number) => t("card.campaignCount", { count }),
+          manageCampaignsButton: t("card.manageCampaignsButton"),
+          deleteSiteAriaLabel: (subdomain: string) =>
+            t("card.deleteSiteAriaLabel", { subdomain }),
+          openSiteAriaLabel: t("card.openSiteAriaLabel"),
+          popoverTitle: t("card.popoverTitle"),
+          popoverDescription: t("card.popoverDescription"),
+        }}
+        deleteDialogTexts={{
+          title: t("deleteDialog.title"),
+          description: (subdomain: string) =>
+            t.rich("deleteDialog.description", {
+              subdomain,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            }),
+          confirmButton: t("deleteDialog.confirmButton"),
+          cancelButton: tDialogs("generic_cancelButton"),
+        }}
       />
       <PaginationControls
         page={page}
         totalCount={totalCount}
         limit={limit}
         basePath="/dashboard/sites"
-        searchQuery={searchQuery}
-        texts={texts.pagination}
+        searchQuery={searchTerm}
+        texts={{
+          previousPageLabel: t("pagination.previous"),
+          nextPageLabel: t("pagination.next"),
+          pageLabelTemplate: t("pagination.page"),
+        }}
       />
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Runtime Crítico**: ((Implementada)) El componente ahora construye y pasa los objetos de `texts` a sus hijos, resolviendo el `TypeError` que rompía la página.
- * 2. **Alineación Arquitectónica**: ((Implementada)) Se ha restaurado la comunicación correcta entre el orquestador de cliente y los componentes de presentación.
+ * 1. **Sincronización de Contrato de Hook**: ((Implementada)) El componente ha sido actualizado para consumir la nueva API del hook `useSitesPage`, utilizando `searchTerm`/`setSearchTerm` y `isCreateDialogOpen`/`openCreateDialog`.
+ * 2. **Desacoplamiento de UI**: ((Implementada)) La lógica del `DialogTrigger` ha sido desacoplada. El `primaryAction` es ahora un simple botón que llama a `openCreateDialog`. El `Dialog` es un componente separado en el árbol, controlado por `isCreateDialogOpen`. Esto mejora la composición y la legibilidad.
  *
  * @subsection Melhorias Futuras
- * 1. **Memoización de `texts`**: ((Vigente)) El objeto `texts` se reconstruye en cada render. Para una optimización de élite, podría ser memoizado con `useMemo`.
+ * 1. **Estado de Carga de Búsqueda**: ((Vigente)) El `SearchInput` podría recibir la prop `isLoading={isSyncing}` del hook `useSearchSync` para mostrar un spinner mientras se actualiza la URL, proporcionando un feedback visual más claro.
  *
  * =====================================================================
  */

@@ -1,11 +1,11 @@
 // src/lib/navigation.ts
 /**
  * @file src/lib/navigation.ts
- * @description Manifiesto de Enrutamiento y Contrato de Navegación de Élite.
- *              Ha sido actualizado para incluir todas las rutas estáticas
- *              de la nueva `HomePage`, resolviendo errores de tipo en toda la aplicación.
- * @author L.I.A. Legacy
- * @version 4.0.0
+ * @description Manifiesto de Enrutamiento. Ha sido actualizado para eliminar
+ *              la ruta obsoleta `/welcome`, alineándose con la arquitectura de
+ *              onboarding v9.1 "Modal de Bienvenida".
+ * @author Raz Podestá
+ * @version 5.0.0
  */
 import {
   createLocalizedPathnamesNavigation,
@@ -16,7 +16,6 @@ export const locales = ["en-US", "es-ES", "pt-BR"] as const;
 export type AppLocale = (typeof locales)[number];
 export const localePrefix = "as-needed";
 
-// --- INICIO DE SINCRONIZACIÓN DE MANIFIESTO ---
 export const pathnames = {
   "/": "/",
   "/about": "/about",
@@ -39,22 +38,20 @@ export const pathnames = {
   "/dev-console/telemetry": "/dev-console/telemetry",
   "/dev-console/users": "/dev-console/users",
   "/disclaimer": "/disclaimer",
-  "/docs": "/docs", // <-- RUTA AÑADIDA
+  "/docs": "/docs",
   "/forgot-password": "/forgot-password",
   "/gallery/bridgepages": "/gallery/bridgepages",
   "/gallery/landings": "/gallery/landings",
   "/legal": "/legal",
   "/lia-chat": "/lia-chat",
   "/privacy": "/privacy",
-  "/pricing": "/pricing", // <-- RUTA AÑADIDA
+  "/pricing": "/pricing",
   "/reset-password": "/reset-password",
-  "/support": "/support", // <-- RUTA AÑADIDA
+  "/support": "/support",
   "/terms": "/terms",
   "/unauthorized": "/unauthorized",
-  "/welcome": "/welcome",
   "/wiki": "/wiki",
 } satisfies Pathnames<typeof locales>;
-// --- FIN DE SINCRONIZACIÓN DE MANIFIESTO ---
 
 export const { Link, redirect, usePathname, useRouter } =
   createLocalizedPathnamesNavigation({ locales, localePrefix, pathnames });
@@ -67,17 +64,13 @@ export type AppPathname =
       pathname: PathnameKeys;
       params?: Record<string, string | number>;
     };
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Rutas**: ((Implementada)) Se han añadido las rutas `/docs`, `/support` y `/pricing` al manifiesto `pathnames`. Esto sincroniza el contrato de tipos de navegación con los componentes que las usan, resolviendo el error `TS2322`.
- *
- * @subsection Melhorias Futuras
- * 1. **Generación Automática de Rutas**: ((Vigente)) La gestión manual de `pathnames` es propensa a errores. La mejora de élite sigue siendo la refactorización del script `generate-routes-manifest.mjs` para que genere este objeto y el tipo `AppPathname` automáticamente.
+ * 1. **Alineación Arquitectónica**: ((Implementada)) La eliminación de la ruta `/welcome` sincroniza el enrutamiento con el nuevo flujo de onboarding modal.
  *
  * =====================================================================
  */

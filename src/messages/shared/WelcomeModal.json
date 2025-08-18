@@ -1,0 +1,20 @@
+{
+  "en-US": {
+    "title": "Welcome to ConvertiKit, {username}!",
+    "description": "You're all set. Let's start by creating your first site and launching a campaign.",
+    "ctaButton": "Let's Go!",
+    "errorToast": "Could not complete onboarding. Please try again."
+  },
+  "es-ES": {
+    "title": "¡Bienvenido a ConvertiKit, {username}!",
+    "description": "Todo está listo. Empecemos creando tu primer sitio y lanzando una campaña.",
+    "ctaButton": "¡Vamos allá!",
+    "errorToast": "No se pudo completar el onboarding. Por favor, inténtalo de nuevo."
+  },
+  "pt-BR": {
+    "title": "Bem-vindo(a) à ConvertiKit, {username}!",
+    "description": "Tudo pronto. Vamos começar criando seu primeiro site e lançando uma campanha.",
+    "ctaButton": "Vamos lá!",
+    "errorToast": "Não foi possível completar o onboarding. Por favor, tente novamente."
+  }
+}

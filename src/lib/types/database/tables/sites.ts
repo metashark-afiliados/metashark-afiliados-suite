@@ -2,11 +2,13 @@
 /**
  * @file sites.ts
  * @description Define el contrato de datos atómico para la tabla `sites`.
- *              Sincronizado con el esquema remoto para reflejar la nulidad
- *              de `owner_id` y la presencia de todos los campos.
+ *              Sincronizado para incluir la propiedad `status`, resolviendo una
+ *              desincronización crítica con el esquema de la base de datos.
  * @author L.I.A Legacy
- * @version 2.0.0 (Remote Schema Synchronized)
+ * @version 2.1.0 (Schema Synchronized)
  */
+import { type Enums } from "../enums";
+
 export type Sites = {
   Row: {
     created_at: string;
@@ -19,6 +21,7 @@ export type Sites = {
     subdomain: string | null;
     updated_at: string | null;
     workspace_id: string;
+    status: Enums["site_status"]; // <-- PROPIEDAD RESTAURADA
   };
   Insert: {
     created_at?: string;
@@ -31,6 +34,7 @@ export type Sites = {
     subdomain?: string | null;
     updated_at?: string | null;
     workspace_id: string;
+    status?: Enums["site_status"]; // <-- PROPIEDAD RESTAURADA
   };
   Update: {
     created_at?: string;
@@ -43,6 +47,7 @@ export type Sites = {
     subdomain?: string | null;
     updated_at?: string | null;
     workspace_id?: string;
+    status?: Enums["site_status"]; // <-- PROPIEDAD RESTAURADA
   };
   Relationships: [
     {
@@ -68,10 +73,10 @@ export type Sites = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato de Entidade Site**: ((Implementada)) Este tipo de dados define a estrutura da entidade `site`, que atua como um contêiner para campanhas.
+ * 1. **Sincronización de Esquema**: ((Implementada)) Se ha añadido la propiedad `status` al contrato de tipo, resolviendo la desincronización con el `schema.sql` y corrigiendo la causa raíz del error TS2352.
  *
  * @subsection Melhorias Futuras
- * 1. **Estado de Domínio Personalizado**: ((Vigente)) Adicionar um campo `custom_domain_status` de tipo ENUM para gerenciar o processo de verificação de domínios.
+ * 1. **Estado de Dominio Personalizado**: ((Vigente)) Adicionar un campo `custom_domain_status` de tipo ENUM para gerenciar el proceso de verificação de domínios.
  *
  * =====================================================================
  */

@@ -6,8 +6,9 @@
  *              al contenido, recibiendo todos sus textos y datos de enlace a través
  *              de su contrato de props. Compone otros aparatos atómicos como `SmartLink`
  *              y `ThemeSwitcher`.
+ *              ¡IMPORTANTE!: Refactorizado para Rebranding Completo.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
@@ -61,7 +62,9 @@ export function LandingHeader({
         <Link href={rootPath} className="flex items-center gap-3">
           <Image
             src="/images/logo.png"
-            alt="Logo de MetaShark"
+            // --- INICIO DE REFACTORIZACIÓN: Rebranding ---
+            alt="Logo de ConvertiKit" // Rebranding
+            // --- FIN DE REFACTORIZACIÓN ---
             width={40}
             height={40}
             priority
@@ -152,12 +155,10 @@ export function LandingHeader({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Composición Atómica**: ((Implementada)) El componente demuestra excelentemente la "Filosofía LEGO", ensamblando `SmartLink`, `LanguageSwitcher`, y el nuevo `ThemeSwitcher`.
- * 2. **Componente Puro e Internacionalizable**: ((Implementada)) El componente es 100% agnóstico al contenido, permitiendo que la `HomePage` construya sus props con textos internacionalizados.
+ * 1. **Rebranding Completo**: ((Implementada)) El `alt` del logo de la imagen ha sido actualizado a "Logo de ConvertiKit", asegurando la coherencia de marca con el `REBRANDING_MANIFESTO.md`.
  *
  * @subsection Melhorias Futuras
  * 1. **Menú Móvil Atómico**: ((Vigente)) La lógica y el JSX para el menú móvil (`<Sheet>`) podrían ser extraídos a su propio componente (`MobileMenu.tsx`) para una mayor atomicidad y simplificación del `LandingHeader`.
  *
  * =====================================================================
  */
-// src/components/layout/LandingHeader.tsx

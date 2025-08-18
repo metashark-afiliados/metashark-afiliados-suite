@@ -1,37 +1,55 @@
 // src/lib/actions/index.ts
 /**
  * @file src/lib/actions/index.ts
- * @description Manifiesto de la API de Acciones del Servidor (Barrel File).
- *              Esta es la Única Fuente de Verdad para consumir Server Actions
- *              desde los componentes de cliente. Ha sido actualizado para incluir
- *              el nuevo namespace `newsletter`.
+ * @description Manifiesto de la API de Acciones del Servidor. Ha sido corregido
+ *              para utilizar la ruta de importación correcta para las acciones
+ *              atomizadas, resolviendo un error de `Module not found`.
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 4.0.1
  */
+import * as admin from "./admin.actions";
+import * as builder from "./builder.actions";
+import { archiveCampaignAction } from "./campaigns/archive.action";
+import { createCampaignAction } from "./campaigns/create.action";
+import { createCampaignFromTemplateAction } from "./campaigns/create-from-template.action"; // Corregido
+import { deleteCampaignAction } from "./campaigns/delete.action";
+import { duplicateCampaignAction } from "./campaigns/duplicate.action";
+import * as invitations from "./invitations.actions";
+import * as newsletter from "./newsletter.actions";
+import * as password from "./password.actions";
+import * as profiles from "./profiles.actions";
+import * as session from "./session.actions";
+import * as sites from "./sites.actions";
+import * as telemetry from "./telemetry.actions";
+import * as workspaces from "./workspaces.actions";
 
-export * as admin from "./admin.actions";
-//export * as auth from "./auth.actions";
-export * as builder from "./builder.actions";
-export * as campaigns from "./campaigns.actions";
-export * as invitations from "./invitations.actions";
-export * as newsletter from "./newsletter.actions";
-export * as password from "./password.actions";
-export * as profiles from "./profiles.actions";
-export * as session from "./session.actions";
-export * as sites from "./sites.actions";
-export * as telemetry from "./telemetry.actions";
-export * as workspaces from "./workspaces.actions";
+export const campaigns = {
+  archiveCampaignAction,
+  createCampaignAction,
+  createCampaignFromTemplateAction,
+  deleteCampaignAction,
+  duplicateCampaignAction,
+};
 
+export {
+  admin,
+  builder,
+  invitations,
+  newsletter,
+  password,
+  profiles,
+  session,
+  sites,
+  telemetry,
+  workspaces,
+};
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Manifiesto**: ((Implementada)) Se ha añadido la exportación del nuevo módulo atómico `newsletter`, manteniendo el manifiesto de la capa de acciones consistente con la estructura de archivos y haciendo que la nueva acción sea consumible.
- *
- * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) Este archivo es un candidato ideal para ser mantenido por un script de build.
+ * 1. **Corrección de Nomenclatura**: ((Implementada)) La ruta de importación ha sido corregida, resolviendo el `Module not found`.
  *
  * =====================================================================
  */

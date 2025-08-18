@@ -1,0 +1,37 @@
+
+{
+  "en-US": {
+    "loading_context": "Loading workspace context...",
+    "section_title": "Publish Campaign",
+    "description": "This campaign is not assigned to any site. Select a site to publish it.",
+    "select_placeholder": "Select a site...",
+    "assign_button": "Assign & Save",
+    "toast_select_site_error": "Please select a site.",
+    "toast_load_sites_error": "Could not load the list of sites.",
+    "toast_assign_success": "Campaign assigned successfully!",
+    "toast_assign_error": "Error assigning campaign: {error}"
+  },
+  "es-ES": {
+    "loading_context": "Cargando contexto del workspace...",
+    "section_title": "Publicar Campaña",
+    "description": "Esta campaña no está asignada a ningún sitio. Selecciona un sitio para publicarla.",
+    "select_placeholder": "Selecciona un sitio...",
+    "assign_button": "Asignar y Guardar",
+    "toast_select_site_error": "Por favor, selecciona un sitio.",
+    "toast_load_sites_error": "No se pudo cargar la lista de sitios.",
+    "toast_assign_success": "¡Campaña asignada con éxito!",
+    "toast_assign_error": "Error al asignar la campaña: {error}"
+  },
+  "pt-BR": {
+    "loading_context": "Carregando contexto do workspace...",
+    "section_title": "Publicar Campanha",
+    "description": "Esta campanha não está atribuída a nenhum site. Selecione um site para publicá-la.",
+    "select_placeholder": "Selecione um site...",
+    "assign_button": "Atribuir e Salvar",
+    "toast_select_site_error": "Por favor, selecione um site.",
+    "toast_load_sites_error": "Não foi possível carregar a lista de sites.",
+    "toast_assign_success": "Campanha atribuída com sucesso!",
+    "toast_assign_error": "Erro ao atribuir a campanha: {error}"
+  }
+}
+

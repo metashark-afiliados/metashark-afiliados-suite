@@ -1,59 +1,62 @@
 {
   "en-US": {
-    "error_title": "Error Loading Dashboard",
-    "error_description": "We couldn't get the latest data. Please try again.",
-    "tooltip": "This is your Command Center. Drag and drop the cards to customize your layout.",
-    "welcomeMessage": "Welcome, {username}",
-    "subtitle": "Which high-performance campaign are we launching today?",
-    "layoutSaveError": "Could not save the dashboard layout.",
-    "RecentCampaigns": {
-      "title": "Continue working on...",
-      "emptyState": {
-        "title": "Let's start your first campaign!",
-        "ctaTitle": "Guided Campaign",
-        "ctaDescription": "I'll guide you step-by-step to create a high-converting landing page.",
-        "ctaButton": "Create my First Campaign"
-      },
+    "breadcrumbs": {
+      "dashboard": "Home"
+    },
+    "welcomeHero": {
+      "title": "What will we design today, {username}?",
+      "searchPlaceholder": "Customize your campaigns however you want",
+      "tabs": {
+        "myDesigns": "My Designs",
+        "templates": "Templates",
+        "aiTools": "AI Tools"
+      }
+    },
+    "RecentActivity": {
+      "title": "Recent Designs",
+      "cardAriaLabel": "Continue working on {campaignName}",
       "lastEdited": "Last edited",
-      "preview": "Preview"
+      "no_recent_activity": "No recent activity to show."
     }
   },
   "es-ES": {
-    "error_title": "Error al Cargar el Dashboard",
-    "error_description": "No pudimos obtener los últimos datos. Por favor, inténtalo de nuevo.",
-    "tooltip": "Este es tu Centro de Comando. Arrastra y suelta las tarjetas para personalizar tu diseño.",
-    "welcomeMessage": "Bienvenido, {username}",
-    "subtitle": "¿Qué campaña de alto rendimiento vamos a lanzar hoy?",
-    "layoutSaveError": "No se pudo guardar el diseño del dashboard.",
-    "RecentCampaigns": {
-      "title": "Continuar trabajando en...",
-      "emptyState": {
-        "title": "¡Vamos a empezar tu primera campaña!",
-        "ctaTitle": "Campaña Guiada",
-        "ctaDescription": "Te guiaré paso a paso para crear una landing page de alta conversión.",
-        "ctaButton": "Crear mi Primera Campaña"
-      },
+    "breadcrumbs": {
+      "dashboard": "Inicio"
+    },
+    "welcomeHero": {
+      "title": "¿Qué vamos a diseñar hoy, {username}?",
+      "searchPlaceholder": "Personaliza tus campañas como quieras",
+      "tabs": {
+        "myDesigns": "Mis Diseños",
+        "templates": "Plantillas",
+        "aiTools": "Herramientas IA"
+      }
+    },
+    "RecentActivity": {
+      "title": "Diseños Recientes",
+      "cardAriaLabel": "Continuar trabajando en {campaignName}",
       "lastEdited": "Última edición",
-      "preview": "Previsualización"
+      "no_recent_activity": "No hay actividad reciente para mostrar."
     }
   },
   "pt-BR": {
-    "error_title": "Erro ao Carregar o Painel",
-    "error_description": "Não foi possível obter os dados mais recentes. Por favor, tente novamente.",
-    "tooltip": "Este é o seu Centro de Comando. Arraste e solte os cartões para personalizar seu layout.",
-    "welcomeMessage": "Bem-vindo, {username}",
-    "subtitle": "Qual campanha de alta performance vamos lançar hoje?",
-    "layoutSaveError": "Não foi possível salvar o layout do painel.",
-    "RecentCampaigns": {
-      "title": "Continuar trabalhando em...",
-      "emptyState": {
-        "title": "Vamos começar sua primeira campanha!",
-        "ctaTitle": "Campanha Guiada",
-        "ctaDescription": "Vou te guiar passo a passo para criar uma landing page de alta conversão.",
-        "ctaButton": "Criar minha Primeira Campanha"
-      },
+    "breadcrumbs": {
+      "dashboard": "Início"
+    },
+    "welcomeHero": {
+      "title": "O que vamos criar hoje, {username}?",
+      "searchPlaceholder": "Personalize suas campanhas como quiser",
+      "tabs": {
+        "myDesigns": "Meus Designs",
+        "templates": "Modelos",
+        "aiTools": "Ferramentas de IA"
+      }
+    },
+    "RecentActivity": {
+      "title": "Designs Recentes",
+      "cardAriaLabel": "Continuar trabalhando em {campaignName}",
       "lastEdited": "Última edição",
-      "preview": "Pré-visualização"
+      "no_recent_activity": "Nenhuma atividade recente para mostrar."
     }
   }
 }

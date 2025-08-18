@@ -1,3 +1,4 @@
+
 {
   "en-US": {
     "entityName": "Campaign",
@@ -81,7 +82,10 @@
       "campaign_not_found": "The requested campaign could not be found.",
       "invalid_data": "Invalid data provided.",
       "invalid_id": "Invalid ID provided.",
-      "unexpected": "An unexpected error occurred."
+      "unexpected": "An unexpected error occurred.",
+      "permission_denied_site": "You do not have permission to modify the selected site.",
+      "assignment_not_allowed": "This campaign cannot be assigned. It may already belong to a site, or you are not the original creator.",
+      "update_failed": "Failed to update the campaign. Please try again."
     }
   },
   "es-ES": {
@@ -166,7 +170,10 @@
       "campaign_not_found": "No se pudo encontrar la campaña solicitada.",
       "invalid_data": "Los datos proporcionados son inválidos.",
       "invalid_id": "El ID proporcionado es inválido.",
-      "unexpected": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo."
+      "unexpected": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo.",
+      "permission_denied_site": "No tienes permiso para modificar el sitio seleccionado.",
+      "assignment_not_allowed": "Esta campaña no puede ser asignada. Puede que ya pertenezca a un sitio, o que no seas el creador original.",
+      "update_failed": "No se pudo actualizar la campaña. Por favor, inténtalo de nuevo."
     }
   },
   "pt-BR": {
@@ -251,7 +258,10 @@
       "campaign_not_found": "A campanha solicitada não pôde ser encontrada.",
       "invalid_data": "Dados fornecidos inválidos.",
       "invalid_id": "ID fornecido inválido.",
-      "unexpected": "Ocorreu um erro inesperado. Por favor, tente novamente."
+      "unexpected": "Ocorreu um erro inesperado. Por favor, tente novamente.",
+      "permission_denied_site": "Você não tem permissão para modificar o site selecionado.",
+      "assignment_not_allowed": "Esta campanha não pode ser atribuída. Ela já pode pertencer a um site, ou você não é o criador original.",
+      "update_failed": "Não foi possível atualizar a campanha. Por favor, tente novamente."
     }
   }
 }

@@ -2,19 +2,18 @@
 /**
  * @file src/app/[locale]/auth/login/page.tsx
  * @description Contenedor de Servidor para la página de inicio de sesión.
- *              Ha sido nivelado para componer la arquitectura de autenticación
- *              delegada a Supabase, ensamblando los aparatos `LoginForm` y `AuthFooter`
- *              y proveyéndoles las traducciones necesarias. Se eliminó la llamada
- *              ilegal a `useAuthModalStore.getState()` para cumplir con los límites de RSC.
+ *              Ha sido refactorizado a un estándar de élite para alinearse con
+ *              la arquitectura de "Formulario Soberano". Su única responsabilidad
+ *              es ensamblar el layout y el componente `LoginForm`, eliminando
+ *              toda la lógica de configuración de UI obsoleta.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.0.0
  */
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import React from "react";
 
-import { AuthFooter } from "@/components/auth/AuthFooter";
 import { LoginForm } from "@/components/auth/LoginForm";
 import {
   Card,
@@ -53,38 +52,6 @@ export default async function LoginPage({
   }
 
   const tLogin = await getTranslations("LoginPage");
-  const tSignUp = await getTranslations("SignUpPage");
-  const tSupabase = await getTranslations("SupabaseAuthUI");
-  const tAuthFooter = await getTranslations("AuthFooter");
-
-  const supabaseLocalization = {
-    sign_in: {
-      email_label: tSupabase("email_label"),
-      password_label: tSupabase("password_label"),
-      button_label: tLogin("signInButton"),
-    },
-    sign_up: {
-      email_label: tSupabase("email_label"),
-      password_label: tSupabase("password_label"),
-      button_label: tSignUp("signUpButton"),
-    },
-    forgotten_password: {
-      link_text: tSupabase("forgotten_password.link_text"),
-    },
-    common: {
-      loading_button_label: tSupabase("common.loading_button_label"),
-    },
-  };
-
-  const authFooterTexts = {
-    login: {
-      switchView: tAuthFooter("dontHaveAccount"),
-    },
-    signup: {
-      switchView: tAuthFooter("alreadyHaveAccount"),
-      legalNotice: tSignUp("legalNotice"),
-    },
-  };
 
   return (
     <Card className="w-full max-w-md border-border/60 bg-card/50 backdrop-blur-lg">
@@ -93,25 +60,23 @@ export default async function LoginPage({
         <CardDescription>{tLogin("subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <LoginForm view="sign_in" localization={supabaseLocalization} />
+        <LoginForm />
       </CardContent>
-      {/* AuthFooter ahora es un Client Component puro que no necesita `onSwitchView` aquí */}
-      {/* La lógica modal se manejará en un componente de layout superior o un dialog global */}
     </Card>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Cumplimiento de Arquitectura RSC**: ((Implementada)) Se eliminó la llamada a `useAuthModalStore.getState()`, resolviendo el error `Attempted to call getState() from the server`. El componente ahora es un Server Component puro, como dicta la arquitectura.
- * 2. **Cero Regresiones Funcionales**: ((Implementada)) El componente sigue obteniendo las traducciones en el servidor y configurando `LoginForm`, preservando su funcionalidad principal.
+ * 1. **Alineación Arquitectónica**: ((Implementada)) Se ha eliminado el paso de props (`view`, `localization`) y el código muerto asociado, alineando este Server Component con la arquitectura de Formulario Soberano del `LoginForm`.
+ * 2. **Resolución de Error Crítico (TS2322)**: ((Implementada)) La corrección del contrato de props resuelve el error de compilación que impedía el funcionamiento del sistema.
+ * 3. **Simplificación y Cohesión**: ((Implementada)) El componente ahora sigue estrictamente el Principio de Responsabilidad Única, actuando solo como un contenedor de layout.
  *
  * @subsection Melhorias Futuras
- * 1. **Abstracción de Lógica de Traducción**: ((Vigente)) La construcción del objeto `supabaseLocalization` se repite en `signup/page.tsx`. Esta lógica podría abstraerse a un helper de servidor `getSupabaseLocalization(t)` para cumplir el principio DRY.
+ * 1. **Enlace a Registro**: ((Vigente)) Añadir un `CardFooter` con un `SmartLink` a la página de registro (`/auth/signup`) para completar la UX de navegación entre los flujos de autenticación.
  *
  * =====================================================================
  */

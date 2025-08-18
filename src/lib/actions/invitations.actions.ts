@@ -5,8 +5,8 @@
  *              invitaciones. Contiene la lógica de negocio para enviar y aceptar
  *              invitaciones de workspace, validando permisos y datos, y auditando
  *              cada operación.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @author Raz Podestá
+ * @version 1.1.0
  */
 "use server";
 import "server-only";
@@ -15,23 +15,13 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { ZodError } from "zod";
 
 import { requireWorkspacePermission } from "@/lib/auth/user-permissions";
-import { invitations as invitationsData } from "@/lib/data";
+import * as invitationsData from "@/lib/data/invitations";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 import { type ActionResult, InvitationServerSchema } from "@/lib/validators";
 
 import { createAuditLog } from "./_helpers";
 
-/**
- * @public
- * @async
- * @function sendWorkspaceInvitationAction
- * @description Envía una invitación a un nuevo miembro para unirse a un workspace.
- *              Valida que el actor tenga permisos de 'owner' o 'admin', que el
- *              destinatario no sea él mismo, y que no exista ya una invitación o membresía.
- * @param {FormData} formData - Los datos del formulario de invitación.
- * @returns {Promise<ActionResult<{ message: string }>>} El resultado de la operación.
- */
 export async function sendWorkspaceInvitationAction(
   formData: FormData
 ): Promise<ActionResult<{ message: string }>> {
@@ -71,7 +61,6 @@ export async function sendWorkspaceInvitationAction(
     });
 
     if (!result.success) {
-      // Manejar error de violación de unicidad de la base de datos de forma amigable.
       if (result.error?.code === "23505") {
         return {
           success: false,
@@ -88,7 +77,6 @@ export async function sendWorkspaceInvitationAction(
       metadata: { invitedEmail: invitee_email, role },
     });
 
-    // Revalida la caché de invitaciones para el destinatario.
     revalidateTag(`invitations:${invitee_email}`);
     logger.info("[InvitationsAction] Invitación enviada con éxito.", {
       inviterId: user.id,
@@ -110,16 +98,6 @@ export async function sendWorkspaceInvitationAction(
   }
 }
 
-/**
- * @public
- * @async
- * @function acceptInvitationAction
- * @description Permite a un usuario autenticado aceptar una invitación pendiente.
- *              Delega la lógica transaccional a la RPC `accept_workspace_invitation`.
- *              Revalida todas las cachés relevantes tras el éxito.
- * @param {string} invitationId - El ID de la invitación a aceptar.
- * @returns {Promise<ActionResult<{ message: string }>>} El resultado de la operación.
- */
 export async function acceptInvitationAction(
   invitationId: string
 ): Promise<ActionResult<{ message: string }>> {
@@ -174,14 +152,16 @@ export async function acceptInvitationAction(
  *                           MEJORA CONTINUA
  * =====================================================================
  *
+ * @subsection Melhorias Adicionadas
+ * 1. **Corrección de Dependencia de Datos**: ((Implementada)) La action ahora importa el módulo `invitations.ts` directamente, resolviendo el error de compilación y alineándose con la arquitectura de datos atómica.
+ * 2. **Fluxo de Colaboração Completo**: ((Implementada)) Este aparato fornece a lógica de backend para o ciclo de vida completo de convites.
+ * 3. **Segurança e Validação em Camadas**: ((Implementada)) A ação de envio valida permissões, dados de entrada e regras de negócio.
+ * 4. **Revalidação de Cache Precisa**: ((Implementada)) As ações invalidam as tags de cache relevantes para uma UI consistente.
+ *
  * @subsection Melhorias Futuras
  * 1. **Revocar Invitación**: ((Vigente)) Crear una `revokeInvitationAction(invitationId)` que permita a los administradores cancelar una invitación pendiente.
  * 2. **Reenviar Invitación**: ((Vigente)) Añadir una `resendInvitationAction(invitationId)` que vuelva a enviar el correo de invitación, con limitación de tasa.
- *
- * @subsection Melhorias Adicionadas
- * 1. **Fluxo de Colaboração Completo**: ((Implementada)) Este aparato fornece a lógica de backend para o ciclo de vida completo de convites, uma funcionalidade essencial para equipes e agências.
- * 2. **Segurança e Validação em Camadas**: ((Implementada)) A ação de envio valida permissões (`requireWorkspacePermission`), dados de entrada (`InvitationServerSchema`) e regras de negócio (não se auto-convidar), garantindo uma operação robusta.
- * 3. **Revalidação de Cache Precisa**: ((Implementada)) As ações invalidam as tags de cache relevantes (`invitations`, `workspaces`) e o caminho do layout, garantindo que a UI de todos os usuários afetados se atualize de forma consistente.
+ * 3. **Error I18n Keys**: ((Vigente)) En lugar de devolver strings de error codificados (ej. "No puedes invitarte a ti mismo."), devolver claves de internacionalización para que la UI pueda mostrar el mensaje traducido.
  *
  * =====================================================================
  */

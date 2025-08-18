@@ -1,25 +1,27 @@
 // src/app/[locale]/dashboard/layout.tsx
 /**
  * @file src/app/[locale]/dashboard/layout.tsx
- * @description Layout principal del dashboard. Ha sido refactorizado a un
- *              estándar de élite para eliminar la escritura ilegal de cookies,
- *              resolviendo un error crítico de runtime y alineándose con las
- *              mejores prácticas de los Server Components de Next.js.
+ * @description Layout principal del dashboard, refactorizado a la Arquitectura v10.2
+ *              ("Guardián de Contexto"). Implementa una lógica de selección de workspace
+ *              de élite, maneja todos los casos borde (usuario nuevo, solo invitaciones,
+ *              sin workspaces) y elimina la dependencia de la ruta obsoleta `/welcome`.
  * @author Raz Podestá
- * @version 5.1.0
+ * @version 10.2.0
  */
 import React from "react";
-import { unstable_cache as cache } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { type SupabaseClient, type User } from "@supabase/supabase-js";
 
+import { createPersistentErrorLog } from "@/lib/actions/_helpers";
 import { CommandPalette } from "@/components/feedback/CommandPalette";
 import { LiaChatWidget } from "@/components/feedback/LiaChatWidget";
-import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
-import { DashboardProvider } from "@/lib/context/DashboardContext";
+import {
+  DashboardProvider,
+  type DashboardContextProps,
+} from "@/lib/context/DashboardContext";
 import {
   campaignsData,
   modules as modulesData,
@@ -28,139 +30,146 @@ import {
 } from "@/lib/data";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
-import { type Database, type Tables } from "@/lib/types/database";
+import { type Enums } from "@/lib/types/database";
 
-type Workspace = Tables<"workspaces">;
-type Supabase = SupabaseClient<Database, "public">;
+async function getLayoutData(): Promise<DashboardContextProps | null> {
+  try {
+    const cookieStore = cookies();
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-const getCachedLayoutData = cache(
-  async (
-    supabase: Supabase,
-    user: User,
-    activeWorkspaceId: string | undefined
-  ) => {
-    logger.info(
-      `[Cache MISS] Obteniendo datos de layout para usuario ${user.id}.`
-    );
+    if (!user) return null;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile) {
+      logger.error(
+        `[DashboardLayout] INCONSISTENCIA: No se encontró perfil para ${user.id}.`
+      );
+      await supabase.auth.signOut();
+      return null;
+    }
+
     const [userWorkspaces, pendingInvitations, modules] = await Promise.all([
       workspaces.getWorkspacesByUserId(user.id, supabase),
       notifications.getPendingInvitationsByEmail(user.email!, supabase),
       modulesData.getFeatureModulesForUser(user, supabase),
     ]);
 
-    let activeWorkspace: Workspace | null = null;
-    if (
-      activeWorkspaceId &&
-      userWorkspaces.some((w) => w.id === activeWorkspaceId)
-    ) {
-      activeWorkspace =
-        userWorkspaces.find((w) => w.id === activeWorkspaceId) || null;
-    } else if (userWorkspaces.length > 0) {
+    // --- INICIO DE LÓGICA DE CONTEXTO DE ÉLITE ---
+    const activeWorkspaceId = cookieStore.get("active_workspace_id")?.value;
+    let activeWorkspace =
+      userWorkspaces.find((ws) => ws.id === activeWorkspaceId) || null;
+
+    if (!activeWorkspace && userWorkspaces.length > 0) {
       activeWorkspace = userWorkspaces[0];
+      logger.info(
+        `[DashboardLayout] No hay cookie de workspace activa. Estableciendo el primero por defecto para ${user.id}.`
+      );
     }
 
-    let recentCampaigns: Tables<"campaigns">[] = [];
-    if (activeWorkspace) {
-      recentCampaigns =
-        await campaignsData.management.getRecentCampaignsByWorkspaceId(
-          activeWorkspace.id,
-          4,
-          supabase
-        );
+    if (userWorkspaces.length === 0 && pendingInvitations.length === 0) {
+      logger.info(
+        `[DashboardLayout] Usuario ${user.id} sin workspaces ni invitaciones. Renderizando estado vacío.`
+      );
     }
+
+    if (!activeWorkspace) {
+      return {
+        user,
+        profile,
+        modules,
+        pendingInvitations,
+        workspaces: [],
+        activeWorkspace: null,
+        activeWorkspaceRole: null,
+        recentCampaigns: [],
+      };
+    }
+    // --- FIN DE LÓGICA DE CONTEXTO DE ÉLITE ---
+
+    const { data: memberRole } = await supabase
+      .from("workspace_members")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("workspace_id", activeWorkspace.id)
+      .single();
+
+    const activeWorkspaceRole =
+      (memberRole?.role as Enums<"workspace_role">) || null;
+
+    const recentCampaigns =
+      await campaignsData.management.getRecentCampaignsByWorkspaceId(
+        activeWorkspace.id,
+        4,
+        supabase
+      );
 
     return {
-      userWorkspaces,
+      user,
+      profile,
+      workspaces: userWorkspaces,
+      activeWorkspace,
+      activeWorkspaceRole,
       pendingInvitations,
       modules,
-      activeWorkspace,
       recentCampaigns,
     };
-  },
-  ["dashboard-layout-data"],
-  { revalidate: 60 }
-);
-
-async function getLayoutData() {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return redirect("/auth/login?next=/dashboard");
-  }
-
-  const activeWorkspaceId = cookieStore.get("active_workspace_id")?.value;
-
-  const {
-    userWorkspaces,
-    pendingInvitations,
-    modules,
-    activeWorkspace,
-    recentCampaigns,
-  } = await getCachedLayoutData(supabase, user, activeWorkspaceId);
-
-  if (userWorkspaces.length === 0 && pendingInvitations.length === 0) {
-    logger.info(
-      `[DashboardLayout] Usuario ${user.id} requiere onboarding. Redirigiendo a /welcome.`
+  } catch (error) {
+    logger.error(
+      "[DashboardLayout:getLayoutData] Fallo crítico.",
+      error
     );
-    return redirect("/welcome");
-  }
-
-  if (!activeWorkspace) {
-    logger.warn(
-      `[DashboardLayout] No se pudo determinar un workspace activo para ${user.id}. Redirigiendo a welcome.`
+    await createPersistentErrorLog(
+      "DashboardLayout:getLayoutData",
+      error as Error
     );
-    return redirect("/welcome");
+    return null;
   }
-
-  // La escritura de cookies ha sido eliminada de este componente.
-
-  return {
-    user,
-    workspaces: userWorkspaces,
-    activeWorkspace,
-    pendingInvitations,
-    modules,
-    recentCampaigns,
-  };
 }
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}): Promise<React.ReactElement> {
+  logger.trace("[DashboardLayout] Renderizando layout de servidor...");
   const layoutData = await getLayoutData();
-  if (!layoutData) return null;
+
+  if (!layoutData) {
+    return redirect("/auth/login?next=/dashboard");
+  }
 
   return (
     <DashboardProvider value={layoutData}>
-      <div className="flex min-h-screen w-full flex-col bg-muted/40">
+      <div className="flex min-h-screen w-full bg-muted/40">
         <DashboardSidebar />
-        <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-          <DashboardHeader />
+        <div className="flex flex-1 flex-col">
           <main className="flex-1 gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
         </div>
         <LiaChatWidget />
         <CommandPalette />
+        {!layoutData.profile.has_completed_onboarding && <WelcomeModal />}
       </div>
     </DashboardProvider>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error Crítico de Runtime**: ((Implementada)) Se ha eliminado la llamada ilegal a `cookieStore.set()`, resolviendo el error de runtime y alineando el componente con las reglas de los Server Components.
+ * 1. **Lógica de Contexto de Élite**: ((Implementada)) El layout ahora maneja correctamente todos los casos borde: selecciona el primer workspace por defecto para nuevos usuarios, y permite el renderizado del dashboard en un estado limitado para usuarios sin workspaces (con o sin invitaciones).
+ * 2. **Eliminación de Deuda Arquitectónica**: ((Implementada)) Se ha eliminado toda la lógica y redirecciones relacionadas con la ruta obsoleta `/welcome`.
  *
  * =====================================================================
  */

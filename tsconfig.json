@@ -1,4 +1,4 @@
-// tsconfig.json
+
 {
   "compilerOptions": {
     "strict": true,
@@ -35,18 +35,10 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.json",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/components/auth/LoginForm.tsx.old",
+    "src/lib/actions/auth.actions.ts.old",
+    "src/middleware/handlers/auth/index.ts.old"
   ],
   "exclude": ["node_modules"]
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Rutas de Pruebas**: ((Implementada)) Se ha añadido el alias `@tests/*` al `tsconfig.json`. Esto crea una ruta absoluta y canónica para todos los módulos dentro del directorio de pruebas, resolviendo la causa raíz del error TS2307 y mejorando la mantenibilidad.
- *
- * =====================================================================
- */
-// tsconfig.json

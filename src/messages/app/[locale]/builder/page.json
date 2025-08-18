@@ -1,0 +1,26 @@
+{
+  "en-US": {
+    "Header": {
+      "back_to_dashboard": "Back to Dashboard",
+      "back_to_dashboard_aria": "Navigate back to the main dashboard",
+      "preview_button": "Preview",
+      "preview_aria": "Open a live preview of the campaign"
+    }
+  },
+  "es-ES": {
+    "Header": {
+      "back_to_dashboard": "Volver al Dashboard",
+      "back_to_dashboard_aria": "Navegar de vuelta al dashboard principal",
+      "preview_button": "Previsualizar",
+      "preview_aria": "Abrir una previsualización en vivo de la campaña"
+    }
+  },
+  "pt-BR": {
+    "Header": {
+      "back_to_dashboard": "Voltar ao Painel",
+      "back_to_dashboard_aria": "Navegar de volta para o painel principal",
+      "preview_button": "Pré-visualizar",
+      "preview_aria": "Abrir uma pré-visualização ao vivo da campanha"
+    }
+  }
+}

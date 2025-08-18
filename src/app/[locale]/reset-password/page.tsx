@@ -2,11 +2,10 @@
 /**
  * @file page.tsx
  * @description Página y formulario para que los usuarios establezcan una nueva contraseña.
- *              Es un componente de cliente soberano para una UX de élite con
- *              feedback en tiempo real. Corregido para manejar correctamente
- *              los errores de tipo en el uso de `useFormState`.
+ *              Corregido para alinear el estado inicial de `useFormState` con el
+ *              contrato de tipo de unión discriminada `ActionResult`.
  * @author Raz Podestá
- * @version 2.0.1
+ * @version 2.1.0
  */
 "use client";
 
@@ -20,19 +19,12 @@ import { motion } from "framer-motion";
 
 import { updatePasswordAction } from "@/lib/actions/password.actions";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { type ActionResult } from "@/lib/validators"; // Ensure ActionResult is imported
+import { type ActionResult } from "@/lib/validators";
 
-// Define a local type alias for clarity, matching ActionResult<null>
 type UpdatePasswordFormState = ActionResult<null>;
 
 function SubmitButton() {
@@ -54,7 +46,6 @@ const PasswordStrengthMeter = ({ score }: { score: number }) => {
     { color: "bg-green-500" },
     { color: "bg-green-500" },
   ];
-
   return (
     <div className="flex gap-2 pt-1">
       {Array.from({ length: 4 }).map((_, i) => (
@@ -86,19 +77,16 @@ export default function ResetPasswordPage() {
   const [state, formAction] = useFormState<UpdatePasswordFormState, FormData>(
     updatePasswordAction,
     {
-      error: "", // CORRECCIÓN: Cambiado de null a "" para coincidir con el tipo ActionResult
       success: false,
-      data: null,
+      error: "",
     }
   );
 
   useEffect(() => {
-    // CORRECTION: Explicitly narrow the type to ensure 'error' property exists
     if (state && !state.success && state.error) {
       toast.error(state.error);
     }
     if (state && state.success) {
-      // Also check for success state
       toast.success(t("successToast"));
       setTimeout(() => router.push("/auth/login"), 3000);
     }
@@ -159,18 +147,13 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Corrección de Tipos y `useFormState`**: ((Implementada)) Se ha refinado la lógica del `useEffect` con una guarda de tipo explícita (`if (state && !state.success && state.error)`) para resolver los errores `TS2769` y `TS2339`, asegurando un manejo de errores tipo-seguro y robusto.
- * 2. **UX de Élite**: ((Implementada)) Incluye un medidor de fortaleza de contraseña visual y animado para guiar al usuario.
- * 3. **Feedback en Tiempo Real**: ((Implementada)) Usa `useFormState` y `toast` para un feedback inmediato.
- * 4. **Redirección Automática**: ((Implementada)) Redirige al usuario al login después de un cambio exitoso.
+ * 1. **Sincronización de Tipos**: ((Implementada)) Se ha eliminado la propiedad `data: null` del estado inicial del `useFormState` cuando `success` es `false`, resolviendo el error `TS2353` y alineando el estado con el contrato de tipo `ActionResult`.
  *
- * =====================================================================
  */
 // src/app/[locale]/reset-password/page.tsx

@@ -1,13 +1,11 @@
 // src/components/auth/AuthDialog.tsx
 /**
  * @file src/components/auth/AuthDialog.tsx
- * @description Orquestador de cliente para los modales de autenticación. Este
- *              aparato es la implementación central de la estrategia de UX modal.
- *              Consume el store `useAuthModalStore` para gestionar su estado y
- *              compone los aparatos `LoginForm` y `AuthFooter` para renderizar
- *              la UI de login y signup dentro de un diálogo.
+ * @description Orquestador de cliente para los modales de autenticación.
+ *              Ha sido refactorizado para renderizar el nuevo `LoginForm`
+ *              soberano sin pasarle props obsoletas.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
@@ -26,41 +24,14 @@ import {
 import { AuthFooter } from "./AuthFooter";
 import { LoginForm } from "./LoginForm";
 
-/**
- * @public
- * @component AuthDialog
- * @description Renderiza y controla los modales de inicio de sesión y registro.
- * @returns {React.ReactElement}
- */
 export function AuthDialog(): React.ReactElement {
   const { isOpen, view, closeModal, switchView } = useAuthModalStore();
   const tLogin = useTranslations("LoginPage");
   const tSignUp = useTranslations("SignUpPage");
-  const tSupabase = useTranslations("SupabaseAuthUI");
 
   const isLoginView = view === "login";
   const title = isLoginView ? tLogin("title") : tSignUp("title");
   const subtitle = isLoginView ? tLogin("subtitle") : tSignUp("subtitle");
-
-  // Ensambla el objeto de localización para la UI de Supabase.
-  const supabaseLocalization = {
-    sign_in: {
-      email_label: tSupabase("email_label"),
-      password_label: tSupabase("password_label"),
-      button_label: tLogin("signInButton"),
-    },
-    sign_up: {
-      email_label: tSupabase("email_label"),
-      password_label: tSupabase("password_label"),
-      button_label: tSignUp("signUpButton"),
-    },
-    forgotten_password: {
-      link_text: tSupabase("forgotten_password.link_text"),
-    },
-    common: {
-      loading_button_label: tSupabase("common.loading_button_label"),
-    },
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
@@ -70,10 +41,9 @@ export function AuthDialog(): React.ReactElement {
           <DialogDescription>{subtitle}</DialogDescription>
         </DialogHeader>
         <div className="px-6">
-          <LoginForm
-            view={isLoginView ? "sign_in" : "sign_up"}
-            localization={supabaseLocalization}
-          />
+          {/* --- INICIO DE CORRECCIÓN (RUPTURA DE CONTRATO) --- */}
+          <LoginForm />
+          {/* --- FIN DE CORRECCIÓN --- */}
         </div>
         <AuthFooter type={view} onSwitchView={switchView} />
       </DialogContent>
@@ -87,13 +57,10 @@ export function AuthDialog(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura Modal Funcional**: ((Implementada)) Este aparato completa la implementación de la UX de autenticación modal, unificando los flujos de login y signup en una experiencia de usuario fluida y moderna.
- * 2. **Composición de Aparatos (SRP)**: ((Implementada)) El `AuthDialog` demuestra perfectamente la "Filosofía LEGO", actuando como un orquestador que ensambla piezas atómicas (`LoginForm`, `AuthFooter`) y es controlado por un store de estado desacoplado (`useAuthModalStore`).
- * 3. **Internacionalización Completa**: ((Implementada)) El componente obtiene todas las traducciones necesarias y las inyecta en los componentes hijos, incluyendo el complejo objeto de localización para la UI de Supabase.
+ * 1. **Resolución de Ruptura de Contrato**: ((Implementada)) Se ha eliminado el paso de props obsoletas a `LoginForm`, resolviendo el error de tipo `TS2322`.
  *
  * @subsection Melhorias Futuras
- * 1. **Animaciones de Transición de Vista**: ((Vigente)) Al cambiar entre las vistas de login y signup, se podría usar `framer-motion` y `AnimatePresence` para aplicar una transición suave (ej. un fundido cruzado) entre los contenidos del modal.
- * 2. **Gestión de Foco**: ((Vigente)) Asegurar que, al abrir el modal, el foco se establezca automáticamente en el primer campo del formulario para una accesibilidad de élite. Radix UI maneja esto bien, pero requiere verificación.
+ * 1. **Formularios Modales Dinámicos**: ((Vigente)) Renderizar condicionalmente `<LoginForm />` o un futuro `<SignUpForm />` basado en `view`.
  *
  * =====================================================================
  */

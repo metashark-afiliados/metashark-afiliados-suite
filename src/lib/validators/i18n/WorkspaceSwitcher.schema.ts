@@ -2,67 +2,41 @@
 /**
  * @file WorkspaceSwitcher.schema.ts
  * @description Define el contrato de datos para el namespace 'WorkspaceSwitcher'.
- *              Ha sido nivelado para incluir las claves de validación y toda la
- *              estructura de texto requerida por el componente y sus hijos.
+ *              Ha sido nivelado para incluir el ciclo de vida de eliminación.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
 import { z } from "zod";
 
 export const WorkspaceSwitcherSchema = z.object({
-  // Textos del Popover Principal
-  selectWorkspace_label: z
-    .string()
-    .describe("Aria-label para el botón principal del switcher."),
-  search_placeholder: z
-    .string()
-    .describe("Placeholder para el campo de búsqueda de workspaces."),
-  empty_results: z
-    .string()
-    .describe("Texto a mostrar cuando la búsqueda no encuentra workspaces."),
-  changing_status: z
-    .string()
-    .describe(
-      "Texto que se muestra en el botón mientras se cambia de workspace."
-    ),
+  selectWorkspace_label: z.string(),
+  search_placeholder: z.string(),
+  empty_results: z.string(),
+  changing_status: z.string(),
 
-  // Acciones del Menú
-  createWorkspace_button: z
-    .string()
-    .describe("Texto para la opción de crear un nuevo workspace."),
-  inviteMember_button: z
-    .string()
-    .describe("Texto para la opción de invitar a un miembro."),
-  inviteMember_description: z
-    .string()
-    .describe("Descripción en el diálogo de invitación (soporta HTML)."),
-  workspaceSettings_button: z
-    .string()
-    .describe("Texto para la opción de ir a los ajustes del workspace."),
+  createWorkspace_button: z.string(),
+  inviteMember_button: z.string(),
+  inviteMember_description: z.string(),
+  workspaceSettings_button: z.string(),
+  deleteWorkspace_button: z.string(), // <-- NUEVO
 
-  // Flujo de Onboarding (Primer Uso)
-  onboarding_title: z
-    .string()
-    .describe("Título principal para la página o diálogo de onboarding."),
-  onboarding_welcome_title: z
-    .string()
-    .describe("Título de bienvenida en el diálogo de onboarding."),
-  onboarding_welcome_description: z
-    .string()
-    .describe("Descripción en el diálogo de onboarding."),
+  onboarding_welcome_title: z.string(),
+  onboarding_welcome_description: z.string(),
 
-  // Formulario de Creación de Workspace
   create_form: z.object({
     name_label: z.string(),
     name_placeholder: z.string(),
-    icon_label: z.string(),
-    icon_placeholder: z.string(),
     creating_button: z.string(),
     create_button: z.string(),
     success_toast: z.string(),
   }),
 
-  // Formulario de Invitación de Miembro
+  edit_form: z.object({
+    // <-- NUEVO
+    name_aria_label: z.string(),
+    success_toast: z.string(),
+  }),
+
   invite_form: z.object({
     email_label: z.string(),
     email_placeholder: z.string(),
@@ -74,19 +48,23 @@ export const WorkspaceSwitcherSchema = z.object({
     send_button: z.string(),
   }),
 
-  // Claves de Error de Validación (Zod)
-  error_icon_required: z
-    .string()
-    .describe("Error cuando el ícono del workspace es omitido."),
+  delete_dialog: z.object({
+    // <-- NUEVO
+    title: z.string(),
+    description: z.string(),
+    confirmation_label: z.string(),
+    confirm_button: z.string(),
+    success_toast: z.string(),
+  }),
 });
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
+ *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato Completo**: ((Implementada)) El schema ahora incluye todas las claves necesarias para el componente, sus formularios hijos y los errores de validación.
- * 2. **Documentación Embebida**: ((Implementada)) Se ha añadido `.describe()` a cada clave para documentar su propósito.
+ * 1. **Completitud de Ciclo de Vida**: ((Implementada)) Se han añadido las claves para la funcionalidad de edición y eliminación.
+ *
  * =====================================================================
  */
 // src/lib/validators/i18n/WorkspaceSwitcher.schema.ts

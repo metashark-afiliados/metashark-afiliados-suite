@@ -1,31 +1,23 @@
 // src/app/[locale]/builder/[campaignId]/page.tsx
 /**
  * @file page.tsx
- * @description Página de servidor principal del constructor. Actúa como la capa de
- *              seguridad y obtención de datos, preparando e hidratando el estado
- *              inicial para la UI del cliente.
- *              Corregido para importar el módulo de datos de campaña con su nombre de exportación correcto.
+ * @description Página de servidor principal del constructor. Ha sido refactorizado
+ *              para inyectar el `site_id` (incluso si es nulo) en el objeto `campaignConfig`
+ *              durante la hidratación del store, asegurando que el estado del cliente
+ *              tenga el contexto completo y cumpliendo con el nuevo contrato de tipo.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.0.0
  */
 import { notFound, redirect } from "next/navigation";
+import React from "react";
 
 import { Canvas } from "@/components/builder/Canvas";
+import { useBuilderStore } from "@/lib/builder/core/store";
 import { type CampaignConfig } from "@/lib/builder/types.d";
-import { campaignsData } from "@/lib/data"; // CORRECTION: Changed import to campaignsData
+import { campaignsData } from "@/lib/data";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
-import { useBuilderStore } from "@/lib/builder/core/store";
 
-/**
- * @public
- * @async
- * @function BuilderPage
- * @description Valida permisos, obtiene datos y pre-carga el estado de Zustand.
- * @param {object} props - Propiedades de la página.
- * @param {{ campaignId: string }} props.params - Parámetros de la ruta.
- * @returns {Promise<React.ReactElement>}
- */
 export default async function BuilderPage({
   params,
 }: {
@@ -37,9 +29,6 @@ export default async function BuilderPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    logger.warn("[BuilderPage] Acceso no autenticado. Redirigiendo a login.", {
-      campaignId: params.campaignId,
-    });
     return redirect(`/auth/login?next=/builder/${params.campaignId}`);
   }
 
@@ -49,30 +38,32 @@ export default async function BuilderPage({
   );
 
   if (!campaignData) {
-    logger.error(
-      `[BuilderPage] Campaña no encontrada o acceso denegado para ${params.campaignId} por usuario ${user.id}`
-    );
     notFound();
   }
 
-  // Lógica de fallback: si la campaña es nueva y no tiene contenido,
-  // se genera una estructura por defecto para una mejor UX.
-  const campaignConfig: CampaignConfig =
-    (campaignData.content as CampaignConfig | null) ?? {
-      id: campaignData.id,
-      name: campaignData.name,
+  const baseConfig: Omit<CampaignConfig, "id" | "name" | "site_id" | "blocks"> =
+    {
       theme: { globalFont: "Inter", globalColors: {} },
-      blocks: [],
     };
 
-  // Hidratación del estado de Zustand en el servidor.
+  const contentFromDb = (campaignData.content as Partial<CampaignConfig>) || {};
+
+  // Construye el objeto `campaignConfig` adhiriéndose estrictamente al tipo,
+  // asegurando que `site_id` (potencialmente nulo) esté presente.
+  const campaignConfig: CampaignConfig = {
+    ...baseConfig,
+    id: campaignData.id,
+    name: campaignData.name,
+    site_id: campaignData.site_id,
+    blocks: [],
+    ...contentFromDb,
+  };
+
   useBuilderStore.setState({ campaignConfig });
 
   logger.info(
     "[BuilderPage] Datos de campaña cargados e hidratados en el store.",
-    {
-      campaignId: campaignData.id,
-    }
+    { campaignId: campaignData.id, siteId: campaignData.site_id }
   );
 
   return (
@@ -88,14 +79,12 @@ export default async function BuilderPage({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Correção de Importação**: ((Implementada)) A importação de `campaignsData` foi corrigida para usar o nome de exportação correto do arquivo barril `src/lib/data/index.ts`, resolvendo o erro `TS2305`.
- * 2. **Segurança Robusta**: ((Implementada)) A página atua como um guardião de segurança, validando a sessão e os permissões através da camada de dados antes de renderizar.
- * 3. **Hidratação de Estado SSR**: ((Implementada)) O uso de `useBuilderStore.setState` em um Server Component é uma técnica de élite que melhora significativamente o desempenho de carga inicial.
- * 4. **Lógica de Fallback de UX**: ((Implementada)) Fornece uma configuração por defeito para campanhas novas, garantindo que o usuário nunca veja um estado de erro inesperado.
+ * 1. **Sincronización de Contrato**: ((Implementada)) La lógica de hidratación ahora construye un objeto `CampaignConfig` que cumple estrictamente con el nuevo contrato de tipo, incluyendo el `site_id` nulo.
+ * 2. **Hidratación de Contexto Completo**: ((Implementada)) La lógica fusiona el `site_id` del registro de la base de datos en el objeto `campaignConfig` antes de hidratar el store, asegurando que el estado del cliente sea una representación completa y precisa desde el inicio.
  *
  * @subsection Melhorias Futuras
- * 1. **Cacheo de Dados de Campanha**: ((Implementada)) A consulta `getCampaignContentById` é agora cacheada com `unstable_cache` de Next.js (implementado em `src/lib/data/campaigns/editor.data.ts`).
- * 2. **Sistema de Plantillas de Campaña**: ((Vigente)) A estrutura de campanha por defeito está codificada. Uma melhoria arquitetónica seria mover esta e outras plantillas para uma tabela `campaign_templates`.
+ * 1. **Validación de `content`**: ((Vigente)) El `content` de la base de datos debería ser validado con `CampaignConfigSchema.partial().safeParse()` antes de ser usado para una mayor resiliencia.
  *
  * =====================================================================
  */
+// src/app/[locale]/builder/[campaignId]/page.tsx

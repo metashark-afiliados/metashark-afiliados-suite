@@ -2,8 +2,9 @@
 /**
  * @file emoji-picker.tsx
  * @description Componente de seletor de emojis, baseado em `frimousse`.
+ *              ¡IMPORTANTE!: Refatorizado para uma Internacionalização Completa.
  * @author Metashark (adaptado de Shadcn/UI)
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
@@ -15,6 +16,7 @@ import {
   type EmojiPickerListRowProps,
 } from "frimousse";
 import { LoaderIcon, SearchIcon } from "lucide-react";
+import { useTranslations } from "next-intl"; // Importar useTranslations
 
 import { cn } from "@/lib/utils";
 
@@ -99,6 +101,9 @@ function EmojiPickerContent({
   className,
   ...props
 }: React.ComponentProps<typeof EmojiPickerPrimitive.Viewport>) {
+  // --- INICIO DE REFACTORIZACIÓN: Internacionalización ---
+  const t = useTranslations("components.ui.EmojiPicker");
+  // --- FIN DE REFACTORIZACIÓN ---
   return (
     <EmojiPickerPrimitive.Viewport
       className={cn("outline-hidden relative flex-1", className)}
@@ -115,7 +120,9 @@ function EmojiPickerContent({
         className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm"
         data-slot="emoji-picker-empty"
       >
-        No emoji found.
+        {/* --- INICIO DE REFACTORIZACIÓN --- */}
+        {t("no_emoji_found")}
+        {/* --- FIN DE REFACTORIZACIÓN --- */}
       </EmojiPickerPrimitive.Empty>
       <EmojiPickerPrimitive.List
         className="select-none pb-1"
@@ -134,6 +141,9 @@ function EmojiPickerFooter({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  // --- INICIO DE REFACTORIZACIÓN: Internacionalización ---
+  const t = useTranslations("components.ui.EmojiPicker");
+  // --- FIN DE REFACTORIZACIÓN ---
   return (
     <div
       className={cn(
@@ -156,7 +166,9 @@ function EmojiPickerFooter({
             </>
           ) : (
             <span className="text-muted-foreground ml-1.5 flex h-7 items-center truncate text-xs">
-              Select an emoji…
+              {/* --- INICIO DE REFACTORIZACIÓN --- */}
+              {t("select_an_emoji")}
+              {/* --- FIN DE REFACTORIZACIÓN --- */}
             </span>
           )
         }
@@ -178,11 +190,7 @@ export {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Personalização**: ((Implementada)) Este componente adiciona uma camada de personalização e apelo visual à aplicação, sendo um pré-requisito para o formulário de criação de workspaces.
- *
- * @subsection Melhorias Futuras
- * 1. **Internacionalização**: ((Vigente)) Os textos codificados em duro ("No emoji found.", "Select an emoji…") devem ser internacionalizados. O componente pai que o consome (como `CreateWorkspaceForm`) pode passar esses textos como props.
+ * 1. **Full Internacionalización**: ((Implementada)) Los textos codificados en duro ("No emoji found.", "Select an emoji…") han sido extraídos a un nuevo archivo de mensajes (`src/messages/components/ui/EmojiPicker.json`) y se consumen con `useTranslations`. Esto cumple una brecha crítica del protocolo.
  *
  * =====================================================================
  */
-// src/components/ui/emoji-picker.tsx

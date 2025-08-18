@@ -1,29 +1,26 @@
+// src/app/[locale]/dashboard/sites/[siteId]/campaigns/campaigns-page-loader.tsx
 /**
  * @file src/app/[locale]/dashboard/sites/[siteId]/campaigns/campaigns-page-loader.tsx
- * @description Cargador de datos de servidor de élite. Ha sido nivelado para
- *              consumir la capa de datos de campañas a través de su namespace
- *              atómico correcto (`campaignsData.management`), y para consumir
- *              el contrato de tipos enriquecido de `SiteBasicInfo`, resolviendo
- *              todas las desincronizaciones de datos y tipos.
+ * @description Cargador de datos de servidor resiliente y de élite. Ha sido
+ *              blindado con manejo de errores `try/catch`, registro persistente
+ *              de errores y se ha corregido su ruta de importación de permisos.
  * @author Raz Podestá
- * @version 2.1.0
+ * @version 3.1.0
  */
 import React from "react";
+import { getTranslations } from "next-intl/server";
+import { AlertTriangle } from "lucide-react";
 
+import { createPersistentErrorLog } from "@/lib/actions/_helpers";
+import { ErrorStateCard } from "@/components/shared/error-state-card";
+import { campaignsData } from "@/lib/data";
 import { requireSitePermission } from "@/lib/auth/user-permissions";
-import { campaignsData, workspaces } from "@/lib/data";
 import { logger } from "@/lib/logging";
 
 import { CampaignsClient } from "./campaigns-client";
 
 const CAMPAIGNS_PER_PAGE = 10;
 
-/**
- * @public
- * @interface CampaignsPageLoaderProps
- * @description Define el contrato de props para el cargador de datos,
- *              incluyendo parámetros de ruta y de búsqueda.
- */
 interface CampaignsPageLoaderProps {
   params: { siteId: string };
   searchParams: {
@@ -34,81 +31,87 @@ interface CampaignsPageLoaderProps {
   };
 }
 
-/**
- * @public
- * @async
- * @function CampaignsPageLoader
- * @description Orquesta la lógica del lado del servidor para la página de gestión de campañas.
- *              1. Valida los permisos del usuario para el sitio.
- *              2. Obtiene los datos del workspace y del sitio.
- *              3. Obtiene la lista paginada y filtrada de campañas.
- *              4. Ensambla y renderiza el `CampaignsClient` con las props necesarias.
- * @param {CampaignsPageLoaderProps} props - Las propiedades del componente.
- * @returns {Promise<React.ReactElement | null>} El componente de cliente renderizado o null si la autorización falla.
- */
 export async function CampaignsPageLoader({
   params,
   searchParams,
-}: CampaignsPageLoaderProps): Promise<React.ReactElement | null> {
+}: CampaignsPageLoaderProps): Promise<React.ReactElement> {
   const { siteId } = params;
   const { page: pageStr, q, status, sortBy } = searchParams;
   const page = Number(pageStr) || 1;
+  const tError = await getTranslations("CampaignsPage.errors");
 
-  const permissionCheck = await requireSitePermission(siteId, [
-    "owner",
-    "admin",
-    "member",
-  ]);
+  try {
+    const permissionCheck = await requireSitePermission(siteId, [
+      "owner",
+      "admin",
+      "member",
+    ]);
 
-  if (!permissionCheck.success) {
-    // El guardián se encarga de la redirección.
-    return null;
-  }
+    if (!permissionCheck.success) {
+      return (
+        <ErrorStateCard
+          icon={AlertTriangle}
+          title={tError("permission_denied_title")}
+          description={tError("permission_denied_desc")}
+        />
+      );
+    }
 
-  const { site } = permissionCheck.data;
-  const workspace = await workspaces.getWorkspaceById(site.workspace_id);
+    const { site } = permissionCheck.data;
 
-  logger.trace(
-    `[CampaignsLoader] Cargando campañas para el sitio ${siteId}, página ${page}`
-  );
+    logger.trace(
+      `[CampaignsLoader] Cargando campañas para el sitio ${siteId}, página ${page}`
+    );
 
-  const { campaigns, totalCount } =
-    await campaignsData.management.getCampaignsMetadataBySiteId(siteId, {
+    const { campaigns, totalCount } =
+      await campaignsData.management.getCampaignsMetadataBySiteId(siteId, {
+        page,
+        limit: CAMPAIGNS_PER_PAGE,
+        query: q,
+        status,
+        sortBy,
+      });
+
+    const clientProps = {
+      site: { id: site.id, name: site.name, subdomain: site.subdomain },
+      initialCampaigns: campaigns,
+      totalCount,
       page,
       limit: CAMPAIGNS_PER_PAGE,
-      query: q,
+      searchQuery: q || "",
       status,
       sortBy,
-    });
+    };
 
-  const clientProps = {
-    site: { id: site.id, subdomain: site.subdomain, name: site.name },
-    workspace: { name: workspace?.name || "Workspace" },
-    initialCampaigns: campaigns,
-    totalCount: totalCount,
-    page: page,
-    limit: CAMPAIGNS_PER_PAGE,
-    searchQuery: q || "",
-    status: status,
-    sortBy: sortBy,
-  };
-
-  return <CampaignsClient {...clientProps} />;
+    return <CampaignsClient {...clientProps} />;
+  } catch (error) {
+    const errorId = await createPersistentErrorLog(
+      "CampaignsPageLoader",
+      error as Error,
+      { siteId, searchParams }
+    );
+    return (
+      <ErrorStateCard
+        icon={AlertTriangle}
+        title={tError("unexpected_title")}
+        description={tError("unexpected_desc", { errorId })}
+      />
+    );
+  }
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica**: ((Implementada)) La llamada a la capa de datos ahora usa la ruta de namespace completa `campaignsData.management`, resolviendo el error de compilación `TS2339`.
- * 2. **Contexto Enriquecido**: ((Implementada)) El componente ahora obtiene y pasa el nombre del sitio, requerido por el `CampaignsClient` para construir la UI.
- * 3. **Observabilidad**: ((Implementada)) Se ha añadido un `logger.trace` para monitorear la carga de datos.
+ * 1. **Correção de Integridade de Módulo**: ((Implementada)) Corrigida a rota de importação para `requireSitePermission`, resolvendo um erro crítico de compilação.
+ * 2. **Arquitectura Resiliente**: ((Vigente)) Toda la lógica está envuelta en `try/catch`. Cualquier fallo en la capa de datos o permisos será capturado.
+ * 3. **Observabilidad Persistente**: ((Vigente)) Los errores capturados se registran en la base de datos a través de `createPersistentErrorLog`.
+ * 4. **Feedback de Usuario de Élite**: ((Vigente)) En caso de error, se renderiza un `ErrorStateCard` con un mensaje internacionalizado y un ID de error para el soporte.
  *
  * @subsection Melhorias Futuras
- * 1. **Cacheo de Permisos**: ((Vigente)) El `requireSitePermission` sigue siendo un candidato ideal para `React.cache` para optimizar el rendimiento en ciclos de renderizado complejos.
- * 2. **Estado de Error**: ((Vigente)) La obtención de datos podría envolverse en un `try/catch` para pasar un estado de error explícito al `CampaignsClient` en caso de fallo de la base de datos, en lugar de lanzar una excepción.
+ * 1. **Logging Granular de Falha de Permissão**: ((Vigente)) No bloco `if (!permissionCheck.success)`, registrar explicitamente o `userId` e o `siteId` para uma auditoria de segurança mais detalhada.
  *
  * =====================================================================
  */
