@@ -61,10 +61,15 @@ export function createEdgeClient(request: NextRequest, response: NextResponse) {
           response.cookies.set({ name, value: "", ...options });
         },
       },
+      // --- INICIO DE CORRECCIÓN CRÍTICA DE RUNTIME ---
+      // Se deshabilita explícitamente la persistencia de sesión y el auto-refresco.
+      // Esto instruye a la librería @supabase/ssr a no utilizar la lógica
+      // que depende de APIs de Node.js (como `process`), resolviendo el error de build.
       auth: {
         autoRefreshToken: false,
         persistSession: false,
       },
+      // --- FIN DE CORRECCIÓN CRÍTICA DE RUNTIME ---
     }
   );
 }

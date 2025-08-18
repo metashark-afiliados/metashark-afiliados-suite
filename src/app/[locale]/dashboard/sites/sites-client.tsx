@@ -1,9 +1,9 @@
 // src/app/[locale]/dashboard/sites/sites-client.tsx
 /**
  * @file src/app/[locale]/dashboard/sites/sites-client.tsx
- * @description Orquestador de UI de élite para la página "Mis Sitios". Ha sido
- *              sincronizado para proveer el `confirmationLabel` requerido por
- *              el `SiteCard`, resolviendo el error de tipo de build.
+ * @description Orquestador de UI de élite. Ha sido sincronizado para proveer
+ *              el `confirmationLabel` requerido por el `SiteCard`, resolviendo
+ *              el error de tipo de build final.
  * @author Raz Podestá
  * @version 4.1.0
  */
@@ -86,11 +86,35 @@ export function SitesClient({
       />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
-        {/* ... (Contenido del Dialog sin cambios) ... */}
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("header.createDialogTitle")}</DialogTitle>
+          </DialogHeader>
+          <CreateSiteForm
+            workspaceId={activeWorkspaceId}
+            onSuccess={handleCreate}
+            isPending={isPending}
+            texts={{
+              nameLabel: t("form.nameLabel"),
+              namePlaceholder: t("form.namePlaceholder"),
+              subdomainLabel: t("form.subdomainLabel"),
+              subdomainInUseError: t("form.subdomainInUseError"),
+              descriptionLabel: t("form.descriptionLabel"),
+              descriptionPlaceholder: t("form.descriptionPlaceholder"),
+              creatingButton: t("form.creatingButton"),
+              createButton: t("form.createButton"),
+            }}
+          />
+        </DialogContent>
       </Dialog>
 
       <div className="w-full md:w-1/3">
-        {/* ... (SearchInput sin cambios) ... */}
+        <SearchInput
+          placeholder={t("header.searchPlaceholder")}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          clearAriaLabel={t("header.clearSearchAria")}
+        />
       </div>
 
       <SitesGrid
@@ -120,11 +144,13 @@ export function SitesClient({
             }),
           confirmButton: t("deleteDialog.confirmButton"),
           cancelButton: tDialogs("generic_cancelButton"),
+          // --- INICIO DE CORRECCIÓN DE CONTRATO ---
           confirmationLabel: (subdomain: string) =>
             t.rich("deleteDialog.confirmation_label", {
               subdomain,
               strong: (chunks) => <strong>{chunks}</strong>,
             }),
+          // --- FIN DE CORRECCIÓN DE CONTRATO ---
         }}
       />
 
@@ -150,7 +176,7 @@ export function SitesClient({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de Props**: ((Implementada)) Se ha añadido la clave `confirmationLabel` al objeto `deleteDialogTexts`, alineando el componente con el contrato actualizado de `SiteCard` y `ConfirmationDialogContent` y resolviendo el error de tipo de build.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha añadido la clave `confirmationLabel` al objeto `deleteDialogTexts`, alineando el componente con el contrato actualizado de `SiteCard` y resolviendo el error de tipo de build.
  *
  * =====================================================================
  */

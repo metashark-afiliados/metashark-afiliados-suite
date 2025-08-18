@@ -3,7 +3,8 @@
  * @file ImpersonationDialog.tsx
  * @description Componente atómico para la funcionalidad de suplantación de usuario.
  *              Ha sido refactorizado para usar el componente genérico `ConfirmationDialogContent`,
- *              mejorando la reutilización y la consistencia de la UI.
+ *              mejorando la reutilización y la consistencia de la UI, y resolviendo
+ *              un error de importación de módulo.
  * @author Raz Podestá
  * @version 3.0.0
  */
@@ -18,7 +19,7 @@ import { admin as adminActions } from "@/lib/actions";
 import { type UserProfilesWithEmail } from "@/lib/types/database/views";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog"; // <-- CORRECCIÓN: Importación del nombre correcto
+import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
 
 type ProfileRow = UserProfilesWithEmail["Row"];
 
@@ -78,7 +79,7 @@ export function ImpersonationDialog({ profile }: { profile: ProfileRow }) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato**: ((Implementada)) Se ha actualizado la importación a `ConfirmationDialogContent`, resolviendo el error de build. El componente ahora gestiona su propio estado de diálogo.
+ * 1. **Sincronización de Contrato de Módulo**: ((Implementada)) Se ha actualizado la importación a `ConfirmationDialogContent`, resolviendo el error de build `Attempted import error`. El componente ahora gestiona su propio estado de diálogo, adhiriéndose al nuevo patrón de composición.
  *
  * =====================================================================
  */

@@ -3,8 +3,8 @@
  * @file src/components/campaigns/CampaignsTableColumns.tsx
  * @description Aparato atómico y puro. Genera la configuración de columnas
  *              (`ColumnDef[]`) para la tabla de campañas. Ha sido refactorizado
- *              a la v3.0.0 para consumir el componente `ConfirmationDialogContent`
- *              y gestionar su propio estado de diálogo, mejorando la composición.
+ *              para consumir el componente `ConfirmationDialogContent` y gestionar
+ *              su propio estado de diálogo.
  * @author Raz Podestá
  * @version 3.0.0
  */
@@ -38,6 +38,7 @@ import { type CampaignMetadata } from "@/lib/data/campaigns";
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
+// ... (types y map sin cambios) ...
 type TFunction = ReturnType<typeof useTranslations>;
 type TFormatter = ReturnType<typeof useFormatter>;
 type CampaignStatus = "draft" | "published" | "archived";
@@ -64,7 +65,7 @@ export interface GetCampaignsColumnsParams {
 }
 
 export const getCampaignsColumns = ({
-  t,
+  /* ... (props sin cambios) ... */ t,
   tDialogs,
   format,
   handleDelete,
@@ -74,6 +75,7 @@ export const getCampaignsColumns = ({
   mutatingId,
   toastTexts,
 }: GetCampaignsColumnsParams): ColumnDef<CampaignMetadata>[] => [
+  // ... (columnas 'name', 'status', 'updated_at' sin cambios)...
   {
     accessorKey: "name",
     header: t("table.header_name"),
@@ -209,11 +211,7 @@ export const getCampaignsColumns = ({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Composición Atómica**: ((Implementada)) El componente ahora consume `ConfirmationDialogContent` y gestiona su propio estado de diálogo, adhiriéndose al patrón de composición de élite y resolviendo el error de build `Attempted import error`.
- * 2. **Cero Regresiones**: ((Implementada)) Se ha verificado que toda la funcionalidad del menú de acciones, incluyendo la lógica de `handleDuplicate`, `handleArchive` y la navegación, se ha preservado intacta.
- *
- * @subsection Melhorias Futuras
- * 1. **Abstracción de `ActionsMenu`**: ((Vigente)) La lógica del `DropdownMenu` y el `Dialog` para las acciones de la fila podría ser extraída a un componente `RowActionsMenu` genérico para simplificar aún más la definición de la columna y ser reutilizado en otras tablas.
+ * 1. **Sincronización de Contrato de Módulo**: ((Implementada)) Se ha actualizado la importación a `ConfirmationDialogContent` y la celda de acciones ahora gestiona su propio estado de diálogo.
  *
  * =====================================================================
  */
