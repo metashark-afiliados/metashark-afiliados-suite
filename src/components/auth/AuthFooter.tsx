@@ -47,19 +47,14 @@ export function AuthFooter({
             terms: (chunks) => (
               <SmartLink
                 href="/terms"
-                // --- INICIO DE CORRECCIÓN CRÍTICA DE BUILD ---
-                // Se envuelve el resultado en un span para garantizar un único hijo
-                label={<span>{chunks}</span>}
-                // --- FIN DE CORRECCIÓN CRÍTICA DE BUILD ---
+                label={<span>{chunks}</span>} // <-- BLINDAJE DE COMPOSICIÓN
                 className="underline hover:text-primary"
               />
             ),
             privacy: (chunks) => (
               <SmartLink
                 href="/privacy"
-                // --- INICIO DE CORRECCIÓN CRÍTICA DE BUILD ---
-                label={<span>{chunks}</span>}
-                // --- FIN DE CORRECCIÓN CRÍTICA DE BUILD ---
+                label={<span>{chunks}</span>} // <-- BLINDAJE DE COMPOSICIÓN
                 className="underline hover:text-primary"
               />
             ),

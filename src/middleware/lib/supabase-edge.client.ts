@@ -3,8 +3,8 @@
  * @file src/middleware/lib/supabase-edge.client.ts
  * @description Aparato de utilidad para crear un cliente Supabase de servidor,
  *              optimizado para el Vercel Edge Runtime. Ha sido refactorizado para
- *              deshabilitar la persistencia de sesión y el auto-refresco, resolviendo
- *              una incompatibilidad crítica con el Edge Runtime.
+ *              deshabilitar la persistencia de sesión, resolviendo una
+ *              incompatibilidad crítica con el Edge Runtime.
  * @author Raz Podestá
  * @version 6.0.0
  */
@@ -61,15 +61,10 @@ export function createEdgeClient(request: NextRequest, response: NextResponse) {
           response.cookies.set({ name, value: "", ...options });
         },
       },
-      // --- INICIO DE CORRECCIÓN CRÍTICA DE RUNTIME ---
-      // Se deshabilita explícitamente la persistencia de sesión y el auto-refresco.
-      // Esto instruye a la librería @supabase/ssr a no utilizar la lógica
-      // que depende de APIs de Node.js (como `process`), resolviendo el error de build.
       auth: {
         autoRefreshToken: false,
         persistSession: false,
       },
-      // --- FIN DE CORRECCIÓN CRÍTICA DE RUNTIME ---
     }
   );
 }

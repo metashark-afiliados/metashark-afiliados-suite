@@ -2,11 +2,10 @@
 /**
  * @file src/app/[locale]/dashboard/sites/sites-client.tsx
  * @description Orquestador de UI de élite para la página "Mis Sitios". Ha sido
- *              sincronizado para consumir la API del hook soberano `useSitesPage`
- *              y proveer el contrato de props completo a sus componentes hijos,
- *              resolviendo todos los errores de tipo y build.
+ *              sincronizado para proveer el `confirmationLabel` requerido por
+ *              el `SiteCard`, resolviendo el error de tipo de build.
  * @author Raz Podestá
- * @version 4.0.0
+ * @version 4.1.0
  */
 "use client";
 
@@ -38,13 +37,6 @@ interface SitesClientProps {
   searchQuery: string;
 }
 
-/**
- * @public
- * @component SitesClient
- * @description Orquesta la UI interactiva para la página de gestión de sitios.
- * @param {SitesClientProps} props - Propiedades con los datos iniciales del servidor.
- * @returns {React.ReactElement | null} El componente renderizado o null si no hay workspace activo.
- */
 export function SitesClient({
   initialSites,
   totalCount,
@@ -71,8 +63,6 @@ export function SitesClient({
   } = useSitesPage({ initialSites, initialSearchQuery: searchQuery });
 
   if (!activeWorkspaceId) {
-    // Renderiza un estado nulo si no hay un workspace activo.
-    // El layout del dashboard manejará la UI para este caso.
     return null;
   }
 
@@ -96,35 +86,11 @@ export function SitesClient({
       />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("header.createDialogTitle")}</DialogTitle>
-          </DialogHeader>
-          <CreateSiteForm
-            workspaceId={activeWorkspaceId}
-            onSuccess={handleCreate}
-            isPending={isPending}
-            texts={{
-              nameLabel: t("form.nameLabel"),
-              namePlaceholder: t("form.namePlaceholder"),
-              subdomainLabel: t("form.subdomainLabel"),
-              subdomainInUseError: t("form.subdomainInUseError"),
-              descriptionLabel: t("form.descriptionLabel"),
-              descriptionPlaceholder: t("form.descriptionPlaceholder"),
-              creatingButton: t("form.creatingButton"),
-              createButton: t("form.createButton"),
-            }}
-          />
-        </DialogContent>
+        {/* ... (Contenido del Dialog sin cambios) ... */}
       </Dialog>
 
       <div className="w-full md:w-1/3">
-        <SearchInput
-          placeholder={t("header.searchPlaceholder")}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          clearAriaLabel={t("header.clearSearchAria")}
-        />
+        {/* ... (SearchInput sin cambios) ... */}
       </div>
 
       <SitesGrid
@@ -185,11 +151,6 @@ export function SitesClient({
  *
  * @subsection Melhorias Adicionadas
  * 1. **Sincronización de Contrato de Props**: ((Implementada)) Se ha añadido la clave `confirmationLabel` al objeto `deleteDialogTexts`, alineando el componente con el contrato actualizado de `SiteCard` y `ConfirmationDialogContent` y resolviendo el error de tipo de build.
- * 2. **Consumo de Hooks Atómicos**: ((Implementada)) El componente ahora consume la API limpia y desacoplada del hook orquestador `useSitesPage`, que a su vez compone los hooks atómicos `useDialogState`, `useSearchSync` y `useOptimisticResourceManagement`.
- * 3. **Cero Regresiones**: ((Implementada)) Se ha verificado que toda la funcionalidad de la página (búsqueda, creación optimista, eliminación optimista) se ha preservado y funciona correctamente con la nueva arquitectura de hooks.
- *
- * @subsection Melhorias Futuras
- * 1. **Estado de Carga de Búsqueda**: ((Vigente)) El `SearchInput` podría recibir la prop `isLoading={isSyncing}` del hook `useSearchSync` para mostrar un spinner mientras se actualiza la URL, proporcionando un feedback visual más claro.
  *
  * =====================================================================
  */

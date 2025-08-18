@@ -1,34 +1,27 @@
+// src/lib/validators/i18n/SitesPage.schema.ts
 /**
  * @file src/lib/validators/i18n/SitesPage.schema.ts
  * @description Define el contrato de datos para el namespace 'SitesPage'.
  *              Ha sido nivelado a un estándar de élite con una estructura
- *              anidada que refleja directamente los contratos de props de los
- *              componentes de presentación (`SitesHeader`, `SiteCard`, etc.).
- *              Esta es la SSoT para toda la UI de la página "Mis Sitios".
+ *              anidada y la adición de la clave `confirmation_label` para
+ *              soportar el diálogo de confirmación genérico.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 4.0.0
  */
 import { z } from "zod";
 
-/**
- * @public
- * @constant SitesPageSchema
- * @description Define la estructura y los tipos de datos esperados para las
- *              traducciones relacionadas con la página de gestión de sitios.
- */
 export const SitesPageSchema = z.object({
-  /** Nombre singular de la entidad, ej. 'Sitio'. */
   entityName: z.string(),
-  /** Textos para el componente `SitesHeader`. */
-  header: z.object({
-    title: z.string().describe("Título principal, ej. 'Mis Sitios'."),
-    description: z.string().describe("Subtítulo de la página."),
-    searchPlaceholder: z.string().describe("Placeholder para la búsqueda."),
-    clearSearchAria: z.string().describe("Aria-label para limpiar búsqueda."),
-    createSiteButton: z.string().describe("Texto del botón para crear sitio."),
-    createDialogTitle: z.string().describe("Título del diálogo de creación."),
+  breadcrumbs: z.object({
+    dashboard: z.string(),
+    sites: z.string(),
   }),
-  /** Textos para el componente `CreateSiteForm`. */
+  header: z.object({
+    createSiteButton: z.string(),
+    createDialogTitle: z.string(),
+    searchPlaceholder: z.string(),
+    clearSearchAria: z.string(),
+  }),
   form: z.object({
     nameLabel: z.string(),
     namePlaceholder: z.string(),
@@ -39,42 +32,33 @@ export const SitesPageSchema = z.object({
     creatingButton: z.string(),
     createButton: z.string(),
   }),
-  /** Textos para el componente `SitesGrid`. */
   grid: z.object({
     emptyStateTitle: z.string(),
     emptyStateDescription: z.string(),
   }),
-  /** Textos para el componente `SiteCard`. */
   card: z.object({
-    campaignCount: z
-      .string()
-      .describe("Texto para el contador de campañas (ej. '{count} Campañas')."),
+    campaignCount: z.string(),
     manageCampaignsButton: z.string(),
     deleteSiteAriaLabel: z.string(),
     openSiteAriaLabel: z.string(),
     popoverTitle: z.string(),
     popoverDescription: z.string(),
   }),
-  /** Textos para el componente `DeleteSiteDialog`. */
   deleteDialog: z.object({
     title: z.string(),
-    description: z
-      .string()
-      .describe("Descripción que soporta texto enriquecido (HTML)."),
-    confirmButton: z.string(),
-  }),
-  /** Textos para el estado de error de carga de datos. */
-  errorState: z.object({
-    title: z.string(),
     description: z.string(),
+    confirmButton: z.string(),
+    confirmation_label: z.string(), // <-- SINCRONIZADO
   }),
-  /** Textos para el componente `PaginationControls`. */
   pagination: z.object({
     previous: z.string(),
     next: z.string(),
     page: z.string(),
   }),
-  /** Claves de error de validación de Zod para el formulario. */
+  errorState: z.object({
+    title: z.string(),
+    description: z.string(),
+  }),
   validationErrors: z.object({
     name_required: z.string(),
     name_too_short: z.string(),
@@ -89,11 +73,7 @@ export const SitesPageSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica**: ((Implementada)) La estructura del schema ahora refleja 1:1 los contratos de props de los componentes de presentación. Esta es la corrección estructural que habilita el siguiente paso de refactorización.
- * 2. **Documentación Embebida**: ((Implementada)) Se ha añadido `.describe()` a claves importantes para mejorar la claridad del contrato.
- *
- * @subsection Melhorias Futuras
- * 1. **Contrato de Toast**: ((Vigente)) Se podría añadir una sección anidada `toasts` para centralizar los mensajes de éxito/error de las Server Actions de este flujo.
+ * 1. **Sincronización de Contrato**: ((Implementada)) Se ha añadido la clave `deleteDialog.confirmation_label` al schema. Esto asegura que el contrato de datos de i18n esté completo y alineado con los requerimientos de los componentes de UI.
  *
  * =====================================================================
  */
