@@ -1,11 +1,12 @@
+// src/components/campaigns/CampaignsTableColumns.tsx
 /**
  * @file src/components/campaigns/CampaignsTableColumns.tsx
- * @description Aparato atómico y puro de élite. Genera la configuración de columnas
- *              (`ColumnDef[]`) para la tabla de campañas. Ha sido nivelado para
- *              corregir una regresión de tipos y restaurar funcionalidad perdida,
- *              asegurando la compatibilidad completa con versiones anteriores.
+ * @description Aparato atómico y puro. Genera la configuración de columnas
+ *              (`ColumnDef[]`) para la tabla de campañas. Ha sido refactorizado
+ *              a la v3.0.0 para consumir el componente `ConfirmationDialogContent`
+ *              y gestionar su propio estado de diálogo, mejorando la composición.
  * @author Raz Podestá
- * @version 2.3.1
+ * @version 3.0.0
  */
 "use client";
 
@@ -20,10 +21,12 @@ import {
   ShieldAlert,
   Trash2,
 } from "lucide-react";
+import React, { useState } from "react";
 
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog";
+import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,12 +57,10 @@ export interface GetCampaignsColumnsParams {
   handleArchive: (campaignId: string) => void;
   isPending: boolean;
   mutatingId: string | null;
-  // --- INICIO DE CORRECCIÓN DE REGRESIÓN DE CONTRATO ---
   toastTexts: {
     duplicating: string;
     archiving: string;
   };
-  // --- FIN DE CORRECCIÓN DE REGRESIÓN DE CONTRATO ---
 }
 
 export const getCampaignsColumns = ({
@@ -71,6 +72,7 @@ export const getCampaignsColumns = ({
   handleArchive,
   isPending,
   mutatingId,
+  toastTexts,
 }: GetCampaignsColumnsParams): ColumnDef<CampaignMetadata>[] => [
   {
     accessorKey: "name",
@@ -116,52 +118,67 @@ export const getCampaignsColumns = ({
   },
   {
     id: "actions",
-    // --- INICIO DE CORRECCIÓN DE REGRESIÓN FUNCIONAL ---
     header: () => <div className="text-right">{t("table.header_actions")}</div>,
-    // --- FIN DE CORRECCIÓN DE REGRESIÓN FUNCIONAL ---
-    cell: ({ row }) => (
-      <div className="text-right">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <Link
-                href={{
-                  pathname: "/builder/[campaignId]",
-                  params: { campaignId: row.original.id },
-                }}
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                <span>{t("table.action_edit")}</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDuplicate(row.original.id)}>
-              <Copy className="mr-2 h-4 w-4" />
-              <span>{t("table.action_duplicate")}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleArchive(row.original.id)}>
-              <Archive className="mr-2 h-4 w-4" />
-              <span>{t("table.action_archive")}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem disabled>
-              <PieChart className="mr-2 h-4 w-4" />
-              <span>{t("table.action_analytics")}</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <ConfirmationDialog
-              triggerButton={
-                <DropdownMenuItem
-                  onSelect={(e) => e.preventDefault()}
-                  className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span>{t("table.action_delete")}</span>
+    cell: function Cell({ row }) {
+      const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+      const handleDeleteConfirm = (formData: FormData) => {
+        handleDelete(formData);
+      };
+
+      return (
+        <div className="text-right">
+          <Dialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+          >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link
+                    href={{
+                      pathname: "/builder/[campaignId]",
+                      params: { campaignId: row.original.id },
+                    }}
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    <span>{t("table.action_edit")}</span>
+                  </Link>
                 </DropdownMenuItem>
-              }
+                <DropdownMenuItem
+                  onClick={() => handleDuplicate(row.original.id)}
+                >
+                  <Copy className="mr-2 h-4 w-4" />
+                  <span>{t("table.action_duplicate")}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleArchive(row.original.id)}
+                >
+                  <Archive className="mr-2 h-4 w-4" />
+                  <span>{t("table.action_archive")}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>
+                  <PieChart className="mr-2 h-4 w-4" />
+                  <span>{t("table.action_analytics")}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DialogTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    <span>{t("table.action_delete")}</span>
+                  </DropdownMenuItem>
+                </DialogTrigger>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ConfirmationDialogContent
               icon={ShieldAlert}
               title={t("deleteDialog.title")}
               description={t.rich("deleteDialog.description", {
@@ -170,7 +187,8 @@ export const getCampaignsColumns = ({
               })}
               confirmButtonText={t("deleteDialog.confirmButton")}
               cancelButtonText={tDialogs("generic_cancelButton")}
-              onConfirm={handleDelete}
+              onConfirm={handleDeleteConfirm}
+              onClose={() => setIsDeleteDialogOpen(false)}
               isPending={isPending && mutatingId === row.original.id}
               hiddenInputs={{ campaignId: row.original.id }}
               confirmationText={row.original.name}
@@ -179,9 +197,24 @@ export const getCampaignsColumns = ({
                 strong: (chunks) => <strong>{chunks}</strong>,
               })}
             />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    ),
+          </Dialog>
+        </div>
+      );
+    },
   },
 ];
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Composición Atómica**: ((Implementada)) El componente ahora consume `ConfirmationDialogContent` y gestiona su propio estado de diálogo, adhiriéndose al patrón de composición de élite y resolviendo el error de build `Attempted import error`.
+ * 2. **Cero Regresiones**: ((Implementada)) Se ha verificado que toda la funcionalidad del menú de acciones, incluyendo la lógica de `handleDuplicate`, `handleArchive` y la navegación, se ha preservado intacta.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Abstracción de `ActionsMenu`**: ((Vigente)) La lógica del `DropdownMenu` y el `Dialog` para las acciones de la fila podría ser extraída a un componente `RowActionsMenu` genérico para simplificar aún más la definición de la columna y ser reutilizado en otras tablas.
+ *
+ * =====================================================================
+ */
+// src/components/campaigns/CampaignsTableColumns.tsx

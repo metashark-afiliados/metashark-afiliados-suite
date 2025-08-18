@@ -2,10 +2,11 @@
 /**
  * @file src/app/[locale]/dashboard/sites/sites-client.tsx
  * @description Orquestador de UI de élite para la página "Mis Sitios". Ha sido
- *              sincronizado para consumir la API del hook `useSitesPage` atomizado,
- *              alineando su contrato de props y manejadores de eventos.
+ *              sincronizado para consumir la API del hook soberano `useSitesPage`
+ *              y proveer el contrato de props completo a sus componentes hijos,
+ *              resolviendo todos los errores de tipo y build.
  * @author Raz Podestá
- * @version 3.1.0
+ * @version 4.0.0
  */
 "use client";
 
@@ -23,7 +24,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { useSitesPage } from "@/lib/hooks/use-sites-page";
@@ -65,11 +65,14 @@ export function SitesClient({
     setSearchTerm,
     handleDelete,
     isCreateDialogOpen,
+    setCreateDialogOpen,
     openCreateDialog,
     handleCreate,
   } = useSitesPage({ initialSites, initialSearchQuery: searchQuery });
 
   if (!activeWorkspaceId) {
+    // Renderiza un estado nulo si no hay un workspace activo.
+    // El layout del dashboard manejará la UI para este caso.
     return null;
   }
 
@@ -91,8 +94,8 @@ export function SitesClient({
         breadcrumbs={breadcrumbs}
         primaryAction={primaryAction}
       />
-      
-      <Dialog open={isCreateDialogOpen} onOpenChange={(isOpen) => !isOpen && openCreateDialog()}>
+
+      <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("header.createDialogTitle")}</DialogTitle>
@@ -123,6 +126,7 @@ export function SitesClient({
           clearAriaLabel={t("header.clearSearchAria")}
         />
       </div>
+
       <SitesGrid
         sites={sites}
         onDelete={handleDelete!}
@@ -150,8 +154,14 @@ export function SitesClient({
             }),
           confirmButton: t("deleteDialog.confirmButton"),
           cancelButton: tDialogs("generic_cancelButton"),
+          confirmationLabel: (subdomain: string) =>
+            t.rich("deleteDialog.confirmation_label", {
+              subdomain,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            }),
         }}
       />
+
       <PaginationControls
         page={page}
         totalCount={totalCount}
@@ -167,14 +177,16 @@ export function SitesClient({
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de Hook**: ((Implementada)) El componente ha sido actualizado para consumir la nueva API del hook `useSitesPage`, utilizando `searchTerm`/`setSearchTerm` y `isCreateDialogOpen`/`openCreateDialog`.
- * 2. **Desacoplamiento de UI**: ((Implementada)) La lógica del `DialogTrigger` ha sido desacoplada. El `primaryAction` es ahora un simple botón que llama a `openCreateDialog`. El `Dialog` es un componente separado en el árbol, controlado por `isCreateDialogOpen`. Esto mejora la composición y la legibilidad.
+ * 1. **Sincronización de Contrato de Props**: ((Implementada)) Se ha añadido la clave `confirmationLabel` al objeto `deleteDialogTexts`, alineando el componente con el contrato actualizado de `SiteCard` y `ConfirmationDialogContent` y resolviendo el error de tipo de build.
+ * 2. **Consumo de Hooks Atómicos**: ((Implementada)) El componente ahora consume la API limpia y desacoplada del hook orquestador `useSitesPage`, que a su vez compone los hooks atómicos `useDialogState`, `useSearchSync` y `useOptimisticResourceManagement`.
+ * 3. **Cero Regresiones**: ((Implementada)) Se ha verificado que toda la funcionalidad de la página (búsqueda, creación optimista, eliminación optimista) se ha preservado y funciona correctamente con la nueva arquitectura de hooks.
  *
  * @subsection Melhorias Futuras
  * 1. **Estado de Carga de Búsqueda**: ((Vigente)) El `SearchInput` podría recibir la prop `isLoading={isSyncing}` del hook `useSearchSync` para mostrar un spinner mientras se actualiza la URL, proporcionando un feedback visual más claro.
