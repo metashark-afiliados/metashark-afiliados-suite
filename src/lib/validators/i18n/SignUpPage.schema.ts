@@ -2,10 +2,9 @@
 /**
  * @file src/lib/validators/i18n/SignUpPage.schema.ts
  * @description Define el contrato de datos para el namespace 'SignUpPage'.
- *              Ha sido sincronizado para incluir las claves utilizadas por
- *              el `AuthFooter`.
+ *              Ha sido sincronizado para incluir la clave `legalNotice`.
  * @author Raz Podestá
- * @version 3.1.0
+ * @version 3.0.0
  */
 import { z } from "zod";
 
@@ -14,10 +13,12 @@ export const SignUpPageSchema = z.object({
   title: z.string(),
   subtitle: z.string(),
   signUpButton: z.string(),
-  // --- INICIO DE CORRECCIÓN (SINCRONIZACIÓN DE CONTRATO) ---
   alreadyHaveAccount: z.string(),
-  legalNotice: z.string(),
-  // --- FIN DE CORRECCIÓN ---
+  legalNotice: z
+    .string()
+    .describe(
+      "Aviso legal que contiene placeholders <terms> y <privacy> para enlaces."
+    ),
 });
 
 /**
@@ -26,7 +27,7 @@ export const SignUpPageSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato**: ((Implementada)) Se han añadido las claves `alreadyHaveAccount` y `legalNotice`, resolviendo `IntlError: MISSING_MESSAGE` y sincronizando el schema con el uso real del `AuthFooter`.
+ * 1. **Sincronización de Contrato**: ((Implementada)) Se ha añadido la clave `legalNotice` al schema, resolviendo `IntlError: MISSING_MESSAGE` y sincronizando el schema con el uso real del componente `AuthFooter`.
  *
  * @subsection Melhorias Futuras
  * 1. **Contrato de Errores**: ((Vigente)) Añadir claves para mensajes de error específicos del flujo de registro.

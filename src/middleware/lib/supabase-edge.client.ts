@@ -2,12 +2,14 @@
 /**
  * @file src/middleware/lib/supabase-edge.client.ts
  * @description Aparato de utilidad para crear un cliente Supabase de servidor,
- *              optimizado para el Edge Runtime. Ha sido refactorizado para
- *              deshabilitar la persistencia de sesión, resolviendo una
- *              incompatibilidad crítica con el Edge Runtime.
+ *              optimizado para el Vercel Edge Runtime. Ha sido refactorizado para
+ *              deshabilitar la persistencia de sesión y el auto-refresco, resolviendo
+ *              una incompatibilidad crítica con el Edge Runtime.
  * @author Raz Podestá
- * @version 5.0.0
+ * @version 6.0.0
  */
+import "server-only";
+
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
@@ -77,11 +79,11 @@ export function createEdgeClient(request: NextRequest, response: NextResponse) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Compatibilidad con Edge Runtime**: ((Implementada)) Se han añadido las opciones `autoRefreshToken: false` y `persistSession: false` a la configuración del cliente. Esto previene que `@supabase/ssr` intente acceder a APIs de Node.js, resolviendo el error crítico de build.
- * 2. **Sincronización con `@supabase/ssr`**: ((Implementada)) La refactorización ha sido actualizada para utilizar el `createServerClient` de `@supabase/ssr`, que es la librería canónica actual, en lugar del obsoleto `createClient` de `@supabase/supabase-js` para este contexto.
+ * 1. **Compatibilidad con Vercel Edge**: ((Implementada)) Se han añadido las opciones `autoRefreshToken: false` y `persistSession: false`. Esta es la solución canónica recomendada por Supabase para ejecutar el cliente en entornos restringidos como el Edge Runtime, eliminando la dependencia de APIs de Node.js y resolviendo el error crítico de build.
+ * 2. **Cero Regresiones**: ((Implementada)) La lógica de manejo de cookies y la integración con el modo de desarrollo simulado se han preservado intactas.
  *
  * @subsection Melhorias Futuras
- * 1. **Sincronización de Versiones**: ((Vigente)) Monitorear futuras versiones de `@supabase/ssr` que puedan ofrecer una exportación explícita para el Edge Runtime y adoptar esa solución canónica cuando esté disponible.
+ * 1. **Sincronización de Versiones**: ((Vigente)) Monitorear futuras versiones de `@supabase/ssr` que puedan ofrecer una exportación explícita para el Edge Runtime (ej. `createEdgeServerClient`) y adoptar esa solución canónica cuando esté disponible para una mayor claridad semántica.
  *
  * =====================================================================
  */

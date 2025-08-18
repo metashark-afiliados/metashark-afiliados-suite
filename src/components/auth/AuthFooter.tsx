@@ -1,11 +1,12 @@
 // src/components/auth/AuthFooter.tsx
 /**
  * @file src/components/auth/AuthFooter.tsx
- * @description Aparato de UI atómico y de presentación puro. Renderiza el
- *              pie de página para los formularios de autenticación, mostrando
- *              enlaces contextuales para cambiar entre login/signup y avisos legales.
+ * @description Aparato de UI atómico y de presentación puro. Ha sido refactorizado
+ *              para envolver la salida de `t.rich` en un `<span>`, garantizando
+ *              que el componente `SmartLink` reciba un único hijo y resolviendo
+ *              el error de build `React.Children.only`.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
@@ -15,23 +16,11 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { SmartLink } from "@/components/ui/SmartLink";
 
-/**
- * @public
- * @interface AuthFooterProps
- * @description Define el contrato de props para el `AuthFooter`.
- */
 interface AuthFooterProps {
   type: "login" | "signup";
   onSwitchView: (view: "login" | "signup") => void;
 }
 
-/**
- * @public
- * @component AuthFooter
- * @description Renderiza un pie de página contextual para los flujos de autenticación.
- * @param {AuthFooterProps} props - Propiedades del componente.
- * @returns {React.ReactElement}
- */
 export function AuthFooter({
   type,
   onSwitchView,
@@ -58,14 +47,19 @@ export function AuthFooter({
             terms: (chunks) => (
               <SmartLink
                 href="/terms"
-                label={chunks}
+                // --- INICIO DE CORRECCIÓN CRÍTICA DE BUILD ---
+                // Se envuelve el resultado en un span para garantizar un único hijo
+                label={<span>{chunks}</span>}
+                // --- FIN DE CORRECCIÓN CRÍTICA DE BUILD ---
                 className="underline hover:text-primary"
               />
             ),
             privacy: (chunks) => (
               <SmartLink
                 href="/privacy"
-                label={chunks}
+                // --- INICIO DE CORRECCIÓN CRÍTICA DE BUILD ---
+                label={<span>{chunks}</span>}
+                // --- FIN DE CORRECCIÓN CRÍTICA DE BUILD ---
                 className="underline hover:text-primary"
               />
             ),
@@ -78,29 +72,14 @@ export function AuthFooter({
 
 /**
  * =====================================================================
- *                           REPORTE POST-CÓDIGO
- * =====================================================================
- * @analisis_de_impacto
- * Este aparato es una dependencia de `login/page.tsx` y `signup/page.tsx`.
- * Su reconstrucción es un paso necesario para implementar la nueva arquitectura
- * de autenticación modal y unificar la UX, como se describe en el manifiesto.
- *
- * @protocolo_de_transparencia
- * LOC Anterior: 0 (Inexistente) | LOC Atual: 80
- * Justificación: Creación de un nuevo componente atómico de UI. El LOC
- * incluye lógica condicional, uso de `t.rich` para i18n, y documentación TSDoc completa.
- *
- * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura Modal**: ((Implementada)) El callback `onSwitchView` permite al `AuthDialog` padre gestionar el cambio de vistas sin recargar la página.
- * 2. **Cumplimiento Legal**: ((Implementada)) Muestra condicionalmente enlaces a los documentos legales en el flujo de registro.
- * 3. **Uso de Texto Enriquecido (i18n)**: ((Implementada)) Utiliza `t.rich` para renderizar un texto que contiene múltiples enlaces.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha envuelto la salida de `t.rich` (`chunks`) en un `<span>`. Esto asegura que el componente `SmartLink`, y por ende el `<Link>` interno, siempre reciba un único elemento React como hijo, resolviendo el error `React.Children.only`.
  *
  * @subsection Melhorias Futuras
- * 1. **Soporte para "Social Proof"**: ((Vigente)) Se podría añadir una prop opcional para mostrar un pequeño texto de prueba social, como "Únete a más de 10,000 marketers".
+ * 1. **Componente `RichSmartLink`**: ((Vigente)) Se podría crear un nuevo componente `RichSmartLink` que acepte `chunks` directamente y realice el envolvimiento en `<span>` internamente, para una mayor abstracción y limpieza del código en los componentes consumidores.
  *
  * =====================================================================
  */
