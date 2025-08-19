@@ -2,9 +2,9 @@
 /**
  * @file src/messages/manifest.ts
  * @description Manifiesto de Importación Dinámica. Ha sido actualizado para
- *              registrar la entrada del nuevo namespace `SiteAssignmentControl`.
- * @author Raz Podestá
- * @version 9.0.0
+ *              registrar la entrada del nuevo namespace `pages.NotFoundPage`.
+ * @author L.I.A. Legacy
+ * @version 10.0.0
  */
 import { type ManifestModule } from "./types";
 
@@ -23,6 +23,7 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "pages.DisclaimerPage": () => import("./pages/DisclaimerPage.json"),
   "pages.ForgotPasswordPage": () => import("./pages/ForgotPasswordPage.json"),
   "pages.LegalNoticePage": () => import("./pages/LegalNoticePage.json"),
+  "pages.NotFoundPage": () => import("./pages/NotFoundPage.json"), // <-- NUEVO REGISTRO
   "pages.PrivacyPolicyPage": () => import("./pages/PrivacyPolicyPage.json"),
   "pages.ResetPasswordPage": () => import("./pages/ResetPasswordPage.json"),
   "pages.TermsOfServicePage": () => import("./pages/TermsOfServicePage.json"),
@@ -55,7 +56,6 @@ export const messagesManifest: Record<string, ManifestModule> = {
   LoginPage: () => import("./app/[locale]/auth/login/page.json"),
   SignUpPage: () => import("./app/[locale]/auth/signup/page.json"),
   SiteAssignmentControl: () =>
-    // <-- NUEVO REGISTRO
     import("./components/builder/SiteAssignmentControl.json"),
   SitesPage: () => import("./app/[locale]/dashboard/sites/page.json"),
   SupabaseAuthUI: () => import("./components/auth/SupabaseAuthUI.json"),
@@ -78,13 +78,14 @@ export const messagesManifest: Record<string, ManifestModule> = {
   SupportCTA: () => import("./components/landing/SupportCTA.json"),
   Testimonials: () => import("./components/landing/Testimonials.json"),
 };
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Registro de Namespace**: ((Implementada)) El manifiesto ahora registra la importación dinámica para el nuevo archivo de mensajes, permitiendo que el orquestador `i18n.ts` lo cargue.
+ * 1. **Registro de Namespace**: ((Implementada)) El manifiesto ahora registra la importación dinámica para `NotFoundPage.json`, permitiendo que `i18n.ts` lo cargue.
  *
  * =====================================================================
  */

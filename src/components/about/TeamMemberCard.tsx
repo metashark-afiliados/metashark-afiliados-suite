@@ -1,12 +1,6 @@
 // src/components/about/TeamMemberCard.tsx
-/**
- * @file TeamMemberCard.tsx
- * @description Componente de presentación atómico para un miembro del equipo.
- *              Simplificado bajo la directiva "Build Limpio" para eliminar
- *              `framer-motion` y ser un componente estático.
- * @author Raz Podestá
- * @version 2.0.0
- */
+"use client";
+
 import Image from "next/image";
 import { Linkedin, Twitter } from "lucide-react";
 
@@ -38,7 +32,9 @@ interface TeamMemberCardProps {
 /**
  * @public
  * @component TeamMemberCard
- * @description Renderiza una tarjeta visualmente atractiva para un miembro del equipo.
+ * @description Renderiza una tarjeta para un miembro del equipo. Ha sido refactorizado
+ *              para ser un Client Component explícito, resolviendo una violación
+ *              de reglas de React Server Components que impedía el build.
  * @param {TeamMemberCardProps} props - Propiedades para configurar la tarjeta.
  * @returns {React.ReactElement}
  */
@@ -92,16 +88,17 @@ export function TeamMemberCard({
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Eliminación de Dependencias de Cliente**: ((Implementada)) Se ha eliminado `framer-motion` y la directiva `"use client"`.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha añadido la directiva `"use client"`. Esto lo declara como un Client Component, permitiendo que `TeamSection.tsx` (que también será un Client Component) lo importe y renderice correctamente, resolviendo la cascada de violaciones de RSC.
  *
  * @subsection Melhorias Futuras
- * 1. **Reintroducción Controlada de Animaciones**: ((Vigente)) Reintroducir `"use client"` y `framer-motion` post-despliegue.
+ * 1. **Animación de Entrada**: ((Vigente)) Reintroducir `framer-motion` para animar la entrada de la tarjeta, mejorando el dinamismo de la página.
  *
  * =====================================================================
  */

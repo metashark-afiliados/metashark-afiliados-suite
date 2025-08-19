@@ -1,0 +1,22 @@
+
+{
+  "en-US": {
+    "title": "Error 404: Page Not Found",
+    "description": "The page you are looking for does not exist or has been moved. Let's get you back on track.",
+    "backToHome": "Back to Home",
+    "goToDashboard": "Go to Dashboard"
+  },
+  "es-ES": {
+    "title": "Error 404: Página No Encontrada",
+    "description": "La página que buscas no existe o ha sido movida. Volvamos al camino correcto.",
+    "backToHome": "Volver al Inicio",
+    "goToDashboard": "Ir al Dashboard"
+  },
+  "pt-BR": {
+    "title": "Erro 404: Página Não Encontrada",
+    "description": "A página que você está procurando não existe ou foi movida. Vamos te colocar de volta nos trilhos.",
+    "backToHome": "Voltar para o Início",
+    "goToDashboard": "Ir para o Painel"
+  }
+}
+

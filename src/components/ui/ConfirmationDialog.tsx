@@ -1,12 +1,12 @@
 // src/components/ui/ConfirmationDialog.tsx
 /**
- * @file src/components/ui/ConfirmationDialog.tsx
- * @description Componente de UI genérico de élite para el contenido de un
- *              diálogo de confirmación. Ha sido refactorizado a la v3.2.0
- *              para corregir un error de lógica en su `useEffect` y mejorar
- *              el reseteo de estado.
- * @author Raz Podestá
- * @version 3.2.0
+ * @file ConfirmationDialog.tsx
+ * @description Componente de UI genérico y de élite para diálogos de confirmación.
+ *              Ha sido refactorizado a la v4.0.0, siguiendo la "Filosofía LEGO",
+ *              para actuar como un orquestador de layout puro que compone el
+ *              nuevo átomo `ConfirmationInput`.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
  */
 "use client";
 
@@ -16,16 +16,16 @@ import { Loader2 } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { RichText } from "@/components/ui/RichText";
+import { logger } from "@/lib/logging";
+
+import { ConfirmationInput } from "./ConfirmationInput"; // <-- IMPORTACIÓN ATÓMICA
 
 interface ConfirmationDialogContentProps {
   icon?: React.ElementType;
@@ -56,31 +56,34 @@ export function ConfirmationDialogContent({
   confirmationLabel,
   onClose,
 }: ConfirmationDialogContentProps) {
-  const [inputValue, setInputValue] = React.useState("");
+  const [isConfirmed, setIsConfirmed] = React.useState(false);
+  const formRef = React.useRef<HTMLFormElement>(null);
 
   const isConfirmationRequired = !!confirmationText;
-  const isConfirmationMatch = inputValue === confirmationText;
   const isConfirmButtonDisabled =
-    isPending || (isConfirmationRequired && !isConfirmationMatch);
+    isPending || (isConfirmationRequired && !isConfirmed);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isConfirmButtonDisabled) return;
+
+    logger.trace("[ConfirmationDialog] Formulario de confirmación enviado.");
     const formData = new FormData(event.currentTarget);
     onConfirm(formData);
   };
 
-  const handleClose = () => {
-    setInputValue("");
+  const handleClose = React.useCallback(() => {
+    logger.trace("[ConfirmationDialog] Lógica de cierre ejecutada.");
+    setIsConfirmed(false); // Resetea el estado de confirmación
     onClose();
-  };
+  }, [onClose]);
 
   return (
     <DialogContent
       onEscapeKeyDown={handleClose}
       onPointerDownOutside={handleClose}
     >
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {Icon && <Icon className="h-6 w-6 text-destructive" />}
@@ -91,19 +94,13 @@ export function ConfirmationDialogContent({
           </DialogDescription>
         </DialogHeader>
 
-        {isConfirmationRequired && (
-          <div className="mt-4 space-y-2">
-            <Label htmlFor="confirmation-input">
-              <RichText>{confirmationLabel}</RichText>
-            </Label>
-            <Input
-              id="confirmation-input"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              autoComplete="off"
-              disabled={isPending}
-            />
-          </div>
+        {isConfirmationRequired && confirmationLabel && (
+          <ConfirmationInput
+            label={confirmationLabel}
+            confirmationText={confirmationText}
+            onConfirmationChange={setIsConfirmed}
+            isPending={isPending}
+          />
         )}
 
         <DialogFooter className="mt-4">
@@ -139,11 +136,8 @@ export function ConfirmationDialogContent({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error Lógico (TS2774)**: ((Implementada)) Se ha eliminado el `useEffect` defectuoso. La lógica de reseteo del `inputValue` se ha movido a un nuevo `handleClose` que es invocado por los eventos de cierre del diálogo (`onEscapeKeyDown`, `onPointerDownOutside`) y el botón de cancelar. Esto garantiza un comportamiento predecible y correcto.
- * 2. **Composición Segura**: ((Implementada)) El uso de `RichText` se mantiene, asegurando que el componente siga siendo robusto contra errores de composición.
- *
- * @subsection Melhorias Futuras
- * 1. **Manejo de Foco**: ((Vigente)) Se podría añadir lógica para enfocar automáticamente el campo de entrada de confirmación cuando el diálogo se abre, mejorando la accesibilidad y la UX.
+ * 1. **Composición Atómica (LEGO)**: ((Implementada)) El componente ahora delega toda la lógica del input de confirmación al nuevo átomo `ConfirmationInput`, actuando como un orquestador de layout puro y cumpliendo con la "Filosofía LEGO".
+ * 2. **Lógica de Estado Simplificada**: ((Implementada)) El estado interno se ha simplificado a un único booleano `isConfirmed`, lo que hace que la lógica para deshabilitar el botón de confirmación sea más limpia y directa.
  *
  * =====================================================================
  */

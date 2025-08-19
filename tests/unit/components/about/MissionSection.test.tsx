@@ -1,19 +1,10 @@
 // tests/unit/components/about/MissionSection.test.tsx
-/**
- * @file MissionSection.test.tsx
- * @description Arnés de pruebas unitarias para el componente `MissionSection`.
- *              Valida que el componente renderice correctamente todo el
- *              contenido pasado a través de sus props.
- * @author Raz Podestá
- * @version 1.0.0
- */
 import { screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { MissionSection } from "@/components/about/MissionSection";
 import { render } from "@tests/utils/render";
 
-// Mock de `framer-motion` para evitar errores de animación en un entorno de prueba sin DOM completo.
 vi.mock("framer-motion", () => ({
   motion: {
     section: "section",
@@ -31,7 +22,6 @@ describe("Componente Atómico: MissionSection", () => {
     await render(<MissionSection {...mockProps} />);
 
     // Assert
-    // Verifica que el título se renderice dentro de un encabezado de nivel 2.
     expect(
       screen.getByRole("heading", {
         name: "Nuestra Misión de Prueba",
@@ -39,7 +29,6 @@ describe("Componente Atómico: MissionSection", () => {
       })
     ).toBeInTheDocument();
 
-    // Verifica que ambos párrafos de contenido estén presentes en el documento.
     expect(
       screen.getByText("Primer párrafo de contenido.")
     ).toBeInTheDocument();
@@ -48,14 +37,17 @@ describe("Componente Atómico: MissionSection", () => {
     ).toBeInTheDocument();
   });
 });
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Garantía de Calidad**: ((Implementada)) Se ha creado una suite de pruebas unitarias para este componente, asegurando que su contrato de props se respete y previniendo regresiones visuales.
- * 2. **Mock de Animaciones**: ((Implementada)) Se ha simulado `framer-motion` para que las pruebas se centren en la lógica de renderizado del componente y no en la implementación de la animación.
+ * 1. **Garantía de Calidad**: ((Implementada)) La suite de pruebas existente valida que el contrato de props y la lógica de renderizado del componente se mantienen intactos tras la refactorización a Client Component.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Pruebas de Accesibilidad (a11y)**: ((Vigente)) La utilidad `render` ya integra `jest-axe`. Se pueden añadir aserciones explícitas para validar la conformidad con WCAG.
  *
  * =====================================================================
  */

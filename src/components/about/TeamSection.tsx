@@ -1,12 +1,6 @@
 // src/components/about/TeamSection.tsx
-/**
- * @file TeamSection.tsx
- * @description Orquestador de UI que ensambla las tarjetas de miembros del equipo.
- *              Simplificado bajo la directiva "Build Limpio" para eliminar
- *              `framer-motion` y ser un componente estático.
- * @author Raz Podestá
- * @version 2.0.0
- */
+"use client";
+
 import { Users } from "lucide-react";
 
 import { TeamMemberCard, type TeamMember } from "./TeamMemberCard";
@@ -20,7 +14,9 @@ interface TeamSectionProps {
 /**
  * @public
  * @component TeamSection
- * @description Renderiza la sección del equipo.
+ * @description Orquestador de UI que ensambla las tarjetas de miembros del equipo.
+ *              Ha sido refactorizado para ser un Client Component explícito,
+ *              resolviendo una violación de reglas de React Server Components.
  * @param {TeamSectionProps} props - Propiedades para configurar la sección.
  * @returns {React.ReactElement}
  */
@@ -50,16 +46,17 @@ export function TeamSection({
     </section>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Eliminación de Dependencias de Cliente**: ((Implementada)) Se ha eliminado `framer-motion` y la directiva `"use client"`.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) La adición de `"use client"` completa la cadena de Client Components (`about-page-client` -> `TeamSection` -> `TeamMemberCard`), resolviendo de forma definitiva el blocker de despliegue relacionado con la página "About".
  *
  * @subsection Melhorias Futuras
- * 1. **Reintroducción Controlada de Animaciones**: ((Vigente)) Reintroducir `"use client"` y `framer-motion` post-despliegue.
+ * 1. **Animación de Entrada Escalonada**: ((Vigente)) Reintroducir `framer-motion` para aplicar una animación de entrada escalonada (`staggerChildren`) a las tarjetas de los miembros del equipo.
  *
  * =====================================================================
  */

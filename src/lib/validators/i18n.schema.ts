@@ -2,9 +2,9 @@
 /**
  * @file src/lib/validators/i18n.schema.ts
  * @description Manifiesto de Tipos y SSoT para el contrato de i18n. Ha sido
- *              actualizado para integrar el nuevo schema de `SiteAssignmentControl`.
- * @author Raz Podestá
- * @version 16.0.0
+ *              actualizado para integrar el nuevo schema de `NotFoundPage`.
+ * @author L.I.A. Legacy
+ * @version 17.0.0
  */
 import { z } from "zod";
 
@@ -46,12 +46,13 @@ import { LiaChatWidgetSchema } from "./i18n/LiaChatWidget.schema";
 import { LoginPageSchema } from "./i18n/LoginPage.schema";
 import { MetricsSchema } from "./i18n/Metrics.schema";
 import { NewsletterSchema } from "./i18n/Newsletter.schema";
+import { NotFoundPageSchema } from "./i18n/NotFoundPage.schema"; // <-- NUEVA IMPORTACIÓN
 import { PrivacyPolicyPageSchema } from "./i18n/PrivacyPolicyPage.schema";
 import { ProcessStepsSchema } from "./i18n/ProcessSteps.schema";
 import { PublicSitePageSchema } from "./i18n/PublicSitePage.schema";
 import { ResetPasswordPageSchema } from "./i18n/ResetPasswordPage.schema";
 import { SignUpPageSchema } from "./i18n/SignUpPage.schema";
-import { SiteAssignmentControlSchema } from "./i18n/SiteAssignmentControl.schema"; // <-- NUEVA IMPORTACIÓN
+import { SiteAssignmentControlSchema } from "./i18n/SiteAssignmentControl.schema";
 import { SitesPageSchema } from "./i18n/SitesPage.schema";
 import { SmartLinkSchema } from "./i18n/SmartLink.schema";
 import { SocialProofSchema } from "./i18n/SocialProof.schema";
@@ -105,12 +106,13 @@ export const i18nSchema = z.object({
   LoginPage: LoginPageSchema,
   Metrics: MetricsSchema,
   Newsletter: NewsletterSchema,
+  "pages.NotFoundPage": NotFoundPageSchema, // <-- NUEVO NAMESPACE
   PrivacyPolicyPage: PrivacyPolicyPageSchema,
   ProcessSteps: ProcessStepsSchema,
   PublicSitePage: PublicSitePageSchema,
   ResetPasswordPage: ResetPasswordPageSchema,
   SignUpPage: SignUpPageSchema,
-  SiteAssignmentControl: SiteAssignmentControlSchema, // <-- NUEVO NAMESPACE
+  SiteAssignmentControl: SiteAssignmentControlSchema,
   SitesPage: SitesPageSchema,
   SmartLink: SmartLinkSchema,
   SocialProof: SocialProofSchema,
@@ -128,13 +130,14 @@ export const i18nSchema = z.object({
 });
 
 export type MessagesType = z.infer<typeof i18nSchema>;
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Integración de Contrato**: ((Implementada)) El schema principal de i18n ahora importa e integra el nuevo `SiteAssignmentControlSchema`, haciendo que el sistema de tipos sea consciente del nuevo namespace.
+ * 1. **Integración de Contrato**: ((Implementada)) El schema principal de i18n ahora integra `NotFoundPageSchema`, completando la definición de tipos para la página 404.
  *
  * =====================================================================
  */
