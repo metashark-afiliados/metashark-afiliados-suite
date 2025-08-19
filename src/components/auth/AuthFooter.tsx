@@ -2,9 +2,9 @@
 /**
  * @file src/components/auth/AuthFooter.tsx
  * @description Aparato de UI atómico y de presentación puro. Ha sido refactorizado
- *              para envolver la salida de `t.rich` en un `<span>`, garantizando
- *              que el componente `SmartLink` reciba un único hijo y resolviendo
- *              el error de build `React.Children.only`.
+ *              a un estándar de élite para envolver la salida de `t.rich` en un
+ *              `<span>`, garantizando que el componente `SmartLink` reciba un
+ *              único hijo y resolviendo el error de build `React.Children.only`.
  * @author Raz Podestá
  * @version 2.0.0
  */
@@ -21,6 +21,15 @@ interface AuthFooterProps {
   onSwitchView: (view: "login" | "signup") => void;
 }
 
+/**
+ * @public
+ * @component AuthFooter
+ * @description Renderiza el pie de página para los modales de autenticación,
+ *              permitiendo al usuario cambiar entre las vistas de login y signup,
+ *              y mostrando los avisos legales.
+ * @param {AuthFooterProps} props - Propiedades para configurar el pie de página.
+ * @returns {React.ReactElement} El componente de pie de página renderizado.
+ */
 export function AuthFooter({
   type,
   onSwitchView,
@@ -64,14 +73,16 @@ export function AuthFooter({
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build**: ((Implementada)) Se ha envuelto la salida de `t.rich` (`chunks`) en un `<span>`. Esto asegura que el componente `SmartLink` siempre reciba un único elemento React como hijo, resolviendo el error `React.Children.only`.
+ * 1. **Blindaje de Composición**: ((Implementada)) Se ha envuelto la salida de `t.rich` (`chunks`) en un `<span>`. Esto asegura que el componente `SmartLink` siempre reciba un único elemento React como hijo, resolviendo el error crítico de build `React.Children.only`.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Contenido Dinámico de Aviso Legal**: ((Vigente)) El texto del aviso legal está codificado en el componente. Podría ser pasado como una prop para una mayor flexibilidad y reutilización del `AuthFooter` en contextos que no requieran este aviso específico.
  *
  * =====================================================================
  */
