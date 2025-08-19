@@ -2,11 +2,11 @@
 /**
  * @file dashboard-client.test.tsx
  * @description Arnés de pruebas unitarias para el ensamblador `DashboardClient`.
+ *              Refactorizado para depender únicamente del setup de mocks global.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 1.0.1
  */
 import { render } from "@testing-library/react";
-import { mockNextIntl } from "tests/mocks";
 import { describe, expect, it, vi } from "vitest";
 
 import { ActionDock } from "@/components/dashboard/ActionDock";
@@ -17,7 +17,8 @@ import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { useDashboard } from "@/lib/context/DashboardContext";
 
 // --- Mocks ---
-mockNextIntl();
+// Eliminada la importación explícita de mockNextIntl.
+// Ahora se confía en el setup global definido en tests/setup.ts
 vi.mock("@/lib/context/DashboardContext");
 vi.mock("@/components/dashboard/ActionDock");
 vi.mock("@/components/dashboard/RecentActivity");
@@ -49,11 +50,10 @@ describe("Aparato Ensamblador: DashboardClient", () => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Prueba de Composición**: ((Implementada)) La prueba valida que el `DashboardClient` cumple su única responsabilidad: ensamblar sus componentes hijos.
+ * 1. **Coherencia de Mocks**: ((Implementada)) Se ha eliminado la importación directa de `mockNextIntl`, asegurando que el test depende únicamente del setup global de mocks, lo que mejora la consistencia y el Principio DRY de la infraestructura de pruebas.
  *
  * @subsection Melhorias Futuras
  * 1. **Pruebas de Contrato de Contexto**: ((Vigente)) Se podría expandir la prueba para verificar que los datos correctos del `useDashboard` mock (username, recentCampaigns) se pasen como props a los componentes hijos.
  *
  * =====================================================================
  */
-// tests/unit/components/dashboard/dashboard-client.test.tsx

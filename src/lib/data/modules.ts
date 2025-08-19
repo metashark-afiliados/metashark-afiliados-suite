@@ -3,9 +3,10 @@
  * @file src/lib/data/modules.ts
  * @description Aparato de datos para la entidad 'feature_modules'. Ha sido nivelado
  *              para soportar Inyección de Dependencias, permitiendo su uso seguro
- *              dentro de funciones cacheadas.
+ *              dentro de funciones cacheadas. Sincronizado para incluir
+ *              `required_plan` y `display_order` en la interfaz `FeatureModule` con tipado correcto.
  * @author L.I.A. Legacy
- * @version 2.0.0
+ * @version 2.1.2
  */
 "use server";
 
@@ -14,15 +15,18 @@ import { type User, type SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
 import { createClient as createServerClient } from "@/lib/supabase/server";
+import { type Enums } from "@/lib/types/database"; // Import Enums type
 
 export type FeatureModule = {
   id: string;
   title: string;
   description: string;
-  tooltip: string;
+  tooltip: string | null;
   icon: string;
   href: string;
   status: "active" | "soon" | "locked";
+  required_plan: Enums<"plan_type">;
+  display_order: number; // <-- CORRECCIÓN: Propiedad 'display_order' añadida
 };
 
 type PlanHierarchy = "free" | "pro" | "enterprise";
@@ -91,7 +95,7 @@ export async function getFeatureModulesForUser(
       planHierarchy[mod.required_plan as PlanHierarchy] || 1;
     const isUnlocked = userLevel >= requiredLevel;
 
-    let status: FeatureModule["status"] = "locked";
+    let status: FeatureModule["status"] = "locked"; // Default to locked
     if (isUnlocked) {
       status = mod.status === "active" ? "active" : "soon";
     }
@@ -101,9 +105,11 @@ export async function getFeatureModulesForUser(
       title: mod.title,
       description: mod.description,
       tooltip: mod.tooltip ?? "",
-      icon: mod.icon_name,
+      icon: mod.icon_name, // Map icon_name from DB to 'icon' property for FeatureModule
       href: mod.href,
       status,
+      required_plan: mod.required_plan,
+      display_order: mod.display_order, // Incluida para coincidir con la interfaz
     };
   });
 
@@ -132,8 +138,7 @@ export async function getFeatureModulesForUser(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Inyección de Dependencias**: ((Implementada)) La función ahora acepta un `supabaseClient` opcional, permitiendo su uso seguro en contextos cacheados.
+ * 1. **Resolución de Error de Tipos (TS2352)**: ((Implementada)) Se ha añadido la propiedad `display_order: number` a la interfaz `FeatureModule`, resolviendo la incompatibilidad de tipos con los datos de mock y asegurando la coherencia entre las interfaces y la estructura de la base de datos.
  *
  * =====================================================================
  */
-// src/lib/data/modules.ts

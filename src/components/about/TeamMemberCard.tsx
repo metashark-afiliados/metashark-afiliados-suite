@@ -95,10 +95,10 @@ export function TeamMemberCard({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha añadido la directiva `"use client"`. Esto lo declara como un Client Component, permitiendo que `TeamSection.tsx` (que también será un Client Component) lo importe y renderice correctamente, resolviendo la cascada de violaciones de RSC.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha añadido la directiva `"use client"`. Esto lo declara como un Client Component, permitiendo que `TeamSection.tsx` (que también será un Client Component) lo importe y renderice correctamente.
  *
  * @subsection Melhorias Futuras
- * 1. **Animación de Entrada**: ((Vigente)) Reintroducir `framer-motion` para animar la entrada de la tarjeta, mejorando el dinamismo de la página.
+ * 1. **Animación de Entrada**: ((Vigente)) Reintroducir `framer-motion` para animar la entrada de la tarjeta.
  *
  * =====================================================================
  */

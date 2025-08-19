@@ -1,11 +1,11 @@
 // src/lib/validators/schemas.ts
 /**
  * @file validators/schemas.ts
- * @description Biblioteca de Schemas de Zod y SSoT. Ha sido refactorizado
- *              para consolidar todos los schemas de telemetría, eliminando
- *              la ambigüedad de módulos y resolviendo el error de build TS2308.
+ * @description Biblioteca de Schemas de Zod y SSoT. Refactorizado a un
+ *              estándar de élite eliminando los namespaces de los mensajes
+ *              de error para una arquitectura de i18n desacoplada.
  * @author Raz Podestá
- * @version 2.4.0
+ * @version 2.5.0
  */
 import { z } from "zod";
 
@@ -13,29 +13,27 @@ import { keysToSnakeCase } from "@/lib/helpers/object-case-converter";
 import { slugify } from "@/lib/utils/text";
 
 // --- ESQUEMAS BASE ATÓMICOS ---
-const UuidSchema = z
-  .string()
-  .uuid({ message: "ValidationErrors.invalid_uuid" });
+const UuidSchema = z.string().uuid({ message: "invalid_uuid" });
 const NameSchema = z
-  .string({ required_error: "ValidationErrors.name_required" })
+  .string({ required_error: "name_required" })
   .trim()
-  .min(3, { message: "ValidationErrors.name_too_short" })
-  .max(40, { message: "ValidationErrors.name_too_long" });
+  .min(3, { message: "name_too_short" })
+  .max(40, { message: "name_too_long" });
 const SubdomainSchema = z
   .string()
   .trim()
-  .min(3, { message: "ValidationErrors.subdomain_too_short" })
+  .min(3, { message: "subdomain_too_short" })
   .regex(/^[a-z0-9-]+$/, {
-    message: "ValidationErrors.subdomain_invalid_chars",
+    message: "subdomain_invalid_chars",
   })
   .transform((subdomain) => subdomain.toLowerCase());
 export const EmailSchema = z
   .string()
   .trim()
-  .email({ message: "ValidationErrors.invalid_email" });
+  .email({ message: "invalid_email" });
 export const PasswordSchema = z
   .string()
-  .min(8, { message: "ValidationErrors.password_too_short" });
+  .min(8, { message: "password_too_short" });
 
 // --- ESQUEMAS DE ENTIDADES ---
 export const CreateSiteClientSchema = z.object({
@@ -96,9 +94,9 @@ export const CreateCampaignSchema = z
     slug: z
       .string()
       .trim()
-      .min(3, { message: "ValidationErrors.slug_too_short" })
+      .min(3, { message: "slug_too_short" })
       .regex(/^[a-z0-9-]+$/, {
-        message: "ValidationErrors.slug_invalid_chars",
+        message: "slug_invalid_chars",
       })
       .optional(),
     siteId: UuidSchema,
@@ -111,10 +109,8 @@ export const DeleteCampaignSchema = z.object({ campaignId: UuidSchema });
 // --- ESQUEMAS DE TELEMETRÍA ---
 export const VisitorLogSchema = z.object({
   session_id: UuidSchema,
-  fingerprint: z
-    .string()
-    .min(1, { message: "ValidationErrors.fingerprint_required" }),
-  ip_address: z.string().ip({ message: "ValidationErrors.invalid_ip" }),
+  fingerprint: z.string().min(1, { message: "fingerprint_required" }),
+  ip_address: z.string().ip({ message: "invalid_ip" }),
   geo_data: z.record(z.any()).nullable().optional(),
   user_agent: z.string().nullable().optional(),
   utm_params: z.record(z.any()).nullable().optional(),
@@ -127,9 +123,7 @@ export const VisitorLogSchema = z.object({
 
 export const ClientEnrichmentSchema = z.object({
   sessionId: UuidSchema,
-  fingerprint: z
-    .string()
-    .min(1, { message: "ValidationErrors.fingerprint_required" }),
+  fingerprint: z.string().min(1, { message: "fingerprint_required" }),
   browser_context: z.record(z.any()).nullable().optional(),
 });
 /**
@@ -138,7 +132,7 @@ export const ClientEnrichmentSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Consolidación de SSoT**: ((Implementada)) Todos los schemas de validación de entidades, incluyendo los de telemetría, ahora residen en este único archivo, eliminando la duplicación y resolviendo el error de build.
+ * 1. **Arquitectura I18n Desacoplada**: ((Implementada)) Se han eliminado los prefijos de namespace de los mensajes de error de Zod. Esto resuelve el error de `MISSING_MESSAGE` y establece un patrón arquitectónico correcto.
  *
  * =====================================================================
  */

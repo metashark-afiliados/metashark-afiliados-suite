@@ -4,8 +4,9 @@
  * @description Configuración canónica para la suite de pruebas E2E con Playwright.
  *              Alineada con la estrategia de entorno único, utiliza `.env.local`
  *              como la SSoT para las pruebas locales y el comando `pnpm dev`.
+ *              Ahora incluye el `globalSetup` para limpieza de base de datos.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 1.1.0
  */
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
@@ -25,6 +26,9 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
+  // --- INICIO DE CORRECCIÓN: GLOBAL SETUP ---
+  globalSetup: "./tests/e2e/global-setup.ts", // Ruta al script de setup global
+  // --- FIN DE CORRECCIÓN ---
   use: {
     baseURL: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     trace: "on-first-retry",
@@ -50,12 +54,10 @@ export default defineConfig({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Estrategia de Entorno Único**: ((Implementada)) La configuración carga `.env.local` y utiliza `pnpm dev`, simplificando la configuración y eliminando dependencias de scripts obsoletos.
- * 2. **Rutas Robustas**: ((Implementada)) Utiliza `path.resolve` para una resolución de ruta de archivo de entorno a prueba de fallos.
+ * 1. **Activación de Limpieza E2E**: ((Implementada)) Se ha añadido la propiedad `globalSetup` en la configuración, vinculando el script de limpieza de la base de datos a la ejecución de las pruebas E2E.
  *
  * @subsection Melhorias Futuras
- * 1. **Setup Global de Pruebas E2E**: ((Vigente)) Se puede configurar un `globalSetup` que ejecute una RPC para resetear la base de datos de pruebas antes de iniciar la suite, garantizando un estado limpio para cada ejecución.
+ * 1. **Setup por Proyecto**: ((Vigente)) Si se introducen múltiples "proyectos" de Playwright (ej. `api-tests`), cada uno podría tener su propio `globalSetup` para una limpieza más granular.
  *
  * =====================================================================
  */
-// playwright.config.ts
