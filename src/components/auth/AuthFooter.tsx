@@ -71,10 +71,7 @@ export function AuthFooter({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build**: ((Implementada)) Se ha envuelto la salida de `t.rich` (`chunks`) en un `<span>`. Esto asegura que el componente `SmartLink`, y por ende el `<Link>` interno, siempre reciba un único elemento React como hijo, resolviendo el error `React.Children.only`.
- *
- * @subsection Melhorias Futuras
- * 1. **Componente `RichSmartLink`**: ((Vigente)) Se podría crear un nuevo componente `RichSmartLink` que acepte `chunks` directamente y realice el envolvimiento en `<span>` internamente, para una mayor abstracción y limpieza del código en los componentes consumidores.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha envuelto la salida de `t.rich` (`chunks`) en un `<span>`. Esto asegura que el componente `SmartLink` siempre reciba un único elemento React como hijo, resolviendo el error `React.Children.only`.
  *
  * =====================================================================
  */
