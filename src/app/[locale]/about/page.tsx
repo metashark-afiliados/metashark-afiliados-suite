@@ -1,37 +1,22 @@
 // src/app/[locale]/about/page.tsx
 /**
  * @file page.tsx
- * @description Orquestador de servidor y ensamblador de UI para la página
- *              "Sobre Nosotros". Ha sido refactorizado a un estándar de élite
- *              para eliminar el wrapper de cliente intermedio, mejorando el
- *              rendimiento y simplificando la arquitectura.
+ * @description Orquestador de servidor para la página "Sobre Nosotros".
+ *              Ha sido refactorizado a su arquitectura canónica, donde su única
+ *              responsabilidad es obtener los datos de i18n y pasarlos como
+ *              props al componente de cliente (`AboutPageClient`), que manejará
+ *              el renderizado y las animaciones.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 4.0.0
  */
 import React from "react";
 import type { Metadata } from "next";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
-import { motion } from "framer-motion";
 
-import { MissionSection } from "@/components/about/MissionSection";
-import { TeamSection } from "@/components/about/TeamSection";
 import { type TeamMember } from "@/components/about/TeamMemberCard";
 import { logger } from "@/lib/logging";
 
-interface AboutPageData {
-  hero: {
-    title: string;
-  };
-  mission: {
-    title: string;
-    content: string[];
-  };
-  team: {
-    title: string;
-    subtitle: string;
-    members: TeamMember[];
-  };
-}
+import { AboutPageClient, type AboutPageData } from "./about-page-client";
 
 export async function generateMetadata({
   params: { locale },
@@ -48,7 +33,7 @@ export default async function AboutPage({
   params: { locale: string };
 }) {
   unstable_setRequestLocale(locale);
-  logger.trace(`[AboutPage] Renderizando página para el locale: ${locale}`);
+  logger.trace(`[AboutPage] Obteniendo datos para el locale: ${locale}`);
   const t = await getTranslations("pages.AboutPage");
 
   const pageData: AboutPageData = {
@@ -66,22 +51,7 @@ export default async function AboutPage({
     },
   };
 
-  return (
-    <main className="container mx-auto max-w-5xl py-12 px-4 space-y-16">
-      <header className="text-center py-16">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-5xl font-extrabold tracking-tighter text-primary"
-        >
-          {pageData.hero.title}
-        </motion.h1>
-      </header>
-      <MissionSection {...pageData.mission} />
-      <TeamSection {...pageData.team} />
-    </main>
-  );
+  return <AboutPageClient data={pageData} />;
 }
 /**
  * =====================================================================
@@ -89,12 +59,10 @@ export default async function AboutPage({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Eliminación de Wrapper de Cliente**: ((Implementada)) Se ha eliminado el componente `about-page-client.tsx`, y este Server Component ahora ensambla directamente los componentes de presentación. Esto reduce el client bundle size y simplifica el árbol de componentes.
- * 2. **Full Observabilidad**: ((Implementada)) Se ha añadido `logger.trace` para monitorear el renderizado de la página en el servidor.
- * 3. **Rendimiento Mejorado**: ((Implementada)) Al renderizar la estructura principal (`<main>`, `<header>`) en el servidor, se envía un HTML más completo al cliente, mejorando el First Contentful Paint (FCP).
+ * 1. **Restauración de Arquitectura RSC**: ((Implementada)) El componente vuelve a ser un orquestador de datos puro, cumpliendo con las reglas de los Server Components y resolviendo la causa raíz del fallo de build.
  *
  * @subsection Melhorias Futuras
- * 1. **Contenido Dinámico del Equipo**: ((Vigente)) El array `team.members` se obtiene de los archivos i18n. Una mejora de élite sería obtener estos datos de la tabla `profiles` de la base de datos, permitiendo gestionar el equipo sin necesidad de un despliegue de código.
+ * 1. **Contenido Dinámico del Equipo**: ((Vigente)) Obtener los `team.members` desde la base de datos sigue siendo la mejora de élite para este aparato.
  *
  * =====================================================================
  */
