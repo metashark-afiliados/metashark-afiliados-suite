@@ -10,13 +10,14 @@
  */
 "use client";
 
-import { AlertTriangle, ArrowLeft, Home } from "lucide-react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect } from "react";
+import { AlertTriangle, ArrowLeft, Home } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { clientLogger } from "@/lib/logging";
+import { locales } from "@/lib/navigation";
 
 const supportedLocales = ["en-US", "es-ES", "pt-BR"] as const;
 
@@ -54,8 +55,8 @@ export default function NotFound(): React.ReactElement {
           <Button variant="outline" asChild>
             <Link href={`/${locale}`}>
               {/* --- INICIO DE CORRECCIÓN DE BLINDAJE --- */}
-              <span>
-                <ArrowLeft className="mr-2 h-4 w-4 inline" />
+              <span className="inline-flex items-center justify-center">
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 {messages.backToHome}
               </span>
               {/* --- FIN DE CORRECCIÓN DE BLINDAJE --- */}
@@ -64,8 +65,8 @@ export default function NotFound(): React.ReactElement {
           <Button asChild>
             <Link href={`/${locale}/dashboard`}>
               {/* --- INICIO DE CORRECCIÓN DE BLINDAJE --- */}
-              <span>
-                <Home className="mr-2 h-4 w-4 inline" />
+              <span className="inline-flex items-center justify-center">
+                <Home className="mr-2 h-4 w-4" />
                 {messages.goToDashboard}
               </span>
               {/* --- FIN DE CORRECCIÓN DE BLINDAJE --- */}
@@ -90,3 +91,4 @@ export default function NotFound(): React.ReactElement {
  *
  * =====================================================================
  */
+// src/app/not-found.tsx
