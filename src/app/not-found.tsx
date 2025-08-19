@@ -10,14 +10,13 @@
  */
 "use client";
 
-import React, { useEffect } from "react";
+import { AlertTriangle, ArrowLeft, Home } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AlertTriangle, ArrowLeft, Home } from "lucide-react";
+import React, { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { clientLogger } from "@/lib/logging";
-import { locales } from "@/lib/navigation";
 
 const supportedLocales = ["en-US", "es-ES", "pt-BR"] as const;
 
@@ -91,4 +90,3 @@ export default function NotFound(): React.ReactElement {
  *
  * =====================================================================
  */
-// src/app/not-found.tsx
