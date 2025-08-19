@@ -1,96 +1,98 @@
 // src/middleware/handlers/telemetry/index.ts
 /**
  * @file src/middleware/handlers/telemetry/index.ts
- * @description Manejador de telemetría, refactorizado para consumir el cliente
- *              Supabase específico del Edge, garantizando su compatibilidad
- *              y aislamiento de runtime.
- * @author L.I.A. Legacy
- * @version 2.0.0
+ * @description Manejador de telemetría para el middleware. Ha sido refactorizado
+ *              a un estándar de élite para desacoplarse completamente de Supabase
+ *              en el Edge. Ahora envía los datos de telemetría a un endpoint de
+ *              API interno (`/api/telemetry-edge`) de forma asíncrona y
+ *              no bloqueante ("fire-and-forget").
+ * @author Raz Podestá
+ * @version 3.0.0
  */
 import { type NextRequest, type NextResponse } from "next/server";
-import { ZodError } from "zod";
 
 import { logger } from "@/lib/logging";
 import { lookupIpAddress } from "@/lib/services/geoip.service";
-import { VisitorLogSchema } from "@/lib/validators";
-import { createEdgeClient } from "@/middleware/lib/supabase-edge.client";
+
+/**
+ * @private
+ * @async
+ * @function logVisitToServer
+ * @description Función "fire-and-forget" que envía el payload de telemetría
+ *              al endpoint de la API sin esperar una respuesta.
+ * @param {object} payload - Los datos del log de visitante a enviar.
+ * @param {string} origin - El origen de la petición para construir la URL de la API.
+ */
+async function logVisitToServer(
+  payload: object,
+  origin: string
+): Promise<void> {
+  try {
+    // No usamos 'await' aquí. Esta es una operación "fire-and-forget".
+    // El middleware no debe esperar a que la telemetría se complete.
+    fetch(`${origin}/api/telemetry-edge`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    logger.trace(
+      "[TelemetryHandler] Payload de telemetría enviado al endpoint de API."
+    );
+  } catch (error) {
+    logger.error(
+      "[TelemetryHandler] Fallo al enviar la petición fetch al endpoint de telemetría.",
+      error
+    );
+  }
+}
 
 /**
  * @public
  * @async
  * @function handleTelemetry
- * @description Si no existe una cookie de sesión, crea un nuevo registro de `visitor_logs`.
+ * @description Orquesta la recolección de datos en el middleware y dispara el
+ *              envío asíncrono al endpoint de la API.
  * @param {NextRequest} request - El objeto de la petición entrante.
- * @param {NextResponse} response - La respuesta a modificar.
+ * @param {NextResponse} response - La respuesta a modificar con la cookie de sesión.
  */
 export async function handleTelemetry(
   request: NextRequest,
   response: NextResponse
 ): Promise<void> {
   if (request.cookies.has("metashark_session_id")) {
-    logger.trace(
-      "[TelemetryHandler] Omitiendo log, la cookie de sesión ya existe."
-    );
     return;
   }
   logger.info("[TelemetryHandler] Nuevo visitante detectado, iniciando log.");
 
-  try {
-    const sessionId = self.crypto.randomUUID();
-    const ip = request.ip ?? "127.0.0.1";
-    const enrichedGeoData = await lookupIpAddress(ip);
+  const sessionId = self.crypto.randomUUID();
+  const ip = request.ip ?? "127.0.0.1";
+  const userAgent = request.headers.get("user-agent") || "";
+  const enrichedGeoData = await lookupIpAddress(ip);
 
-    const logPayload = {
-      session_id: sessionId,
-      fingerprint: "server_placeholder",
-      ip_address: ip,
-      geo_data: enrichedGeoData
-        ? { ...request.geo, ...enrichedGeoData }
-        : request.geo,
-      user_agent: request.headers.get("user-agent") || null,
-      utm_params: Object.fromEntries(request.nextUrl.searchParams.entries()),
-      referrer: request.headers.get("referer") || null,
-      landing_page: request.nextUrl.pathname,
-      is_bot: /bot|crawl|slurp|spider|mediapartners/i.test(
-        request.headers.get("user-agent") || ""
-      ),
-      is_known_abuser: false,
-    };
+  const logPayload = {
+    session_id: sessionId,
+    fingerprint: "server_placeholder", // Será enriquecido por el cliente
+    ip_address: ip,
+    geo_data: enrichedGeoData
+      ? { ...request.geo, ...enrichedGeoData }
+      : request.geo,
+    user_agent: userAgent,
+    utm_params: Object.fromEntries(request.nextUrl.searchParams.entries()),
+    referrer: request.headers.get("referer") || null,
+    landing_page: request.nextUrl.pathname,
+    is_bot: /bot|crawl|slurp|spider|mediapartners/i.test(userAgent),
+  };
 
-    const validatedPayload = VisitorLogSchema.parse(logPayload);
-    const supabase = createEdgeClient(request, response);
-    const { error } = await supabase
-      .from("visitor_logs")
-      .insert(validatedPayload);
+  // Dispara la llamada a la API pero no la espera.
+  logVisitToServer(logPayload, request.nextUrl.origin);
 
-    if (error) {
-      logger.error("[TelemetryHandler] Fallo al registrar la sesión.", {
-        error: error.message,
-      });
-    } else {
-      logger.info(
-        "[TelemetryHandler] Sesión de visitante registrada con éxito.",
-        { sessionId }
-      );
-      response.cookies.set("metashark_session_id", sessionId, {
-        path: "/",
-        httpOnly: true,
-        sameSite: "lax",
-        maxAge: 31536000, // 1 año
-      });
-    }
-  } catch (error) {
-    if (error instanceof ZodError) {
-      logger.warn("[TelemetryHandler] Payload de log de visitante inválido.", {
-        errors: error.flatten(),
-      });
-    } else {
-      logger.error(
-        "[TelemetryHandler] Fallo crítico en el manejador de telemetría.",
-        { error: error instanceof Error ? error.message : String(error) }
-      );
-    }
-  }
+  // Establece la cookie para prevenir logs duplicados en la misma sesión.
+  response.cookies.set("metashark_session_id", sessionId, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 31536000, // 1 año
+  });
 }
 /**
  * =====================================================================
@@ -98,7 +100,12 @@ export async function handleTelemetry(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Aislamiento de Runtime Completo**: ((Implementada)) Al actualizar la importación para usar `createEdgeClient`, este manejador queda completamente aislado y es seguro para el Edge.
+ * 1. **Aislamiento Completo del Edge Runtime**: ((Implementada)) El manejador ya no importa ni utiliza ninguna dependencia de Supabase. Ahora delega la escritura en la base de datos a un endpoint de API que se ejecuta en el runtime de Node.js. Esto elimina por completo la advertencia de build del Edge Runtime.
+ * 2. **Rendimiento Mejorado ("Fire-and-Forget")**: ((Implementada)) La llamada `fetch` al endpoint de API no es esperada (`await`). Esto significa que el middleware puede continuar y devolver la respuesta al usuario sin ser bloqueado por la operación de telemetría, reduciendo la latencia.
  *
+ * @subsection Melhorias Futuras
+ * 1. **Manejo de Fallos de `fetch`**: ((Vigente)) En un escenario de producción de misión crítica, se podría implementar una estrategia de reintentos con "exponential backoff" si la petición `fetch` inicial al endpoint de API falla.
+ *
+ * =====================================================================
  */
 // src/middleware/handlers/telemetry/index.ts
