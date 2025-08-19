@@ -1,14 +1,14 @@
 // src/app/[locale]/disclaimer/page.tsx
 /**
  * @file page.tsx
- * @description Página de Descargo de Responsabilidad. Ha sido corregida para
- *              pasar el nombre de ícono correcto (`AlertOctagon`) al
- *              `LegalPageLayout`, eliminando la advertencia de build.
+ * @description Página de Descargo de Responsabilidad. Ha sido validada para
+ *              confirmar que pasa el nombre de ícono correcto (`AlertOctagon`)
+ *              al `LegalPageLayout`, eliminando la advertencia de build.
  * @author L.I.A. Legacy
  * @version 1.1.0
  */
-import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
+import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 
 import { LegalPageLayout } from "@/components/legal/LegalPageLayout";
 
@@ -33,7 +33,7 @@ export default async function DisclaimerPage({
   const t = await getTranslations("pages.DisclaimerPage");
   return (
     <LegalPageLayout
-      icon="AlertOctagon" // <-- VERIFICADO Y CORRECTO: El nombre del ícono debe ser PascalCase.
+      icon="AlertOctagon"
       title={t("title")}
       content={t.raw("content")}
     />
@@ -45,10 +45,10 @@ export default async function DisclaimerPage({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Datos y Contrato**: ((Implementada)) Se ha verificado que el nombre del icono `AlertOctagon` coincide con el nombre de exportación correcto de `lucide-react` y el contrato esperado por `DynamicIcon`. Esto elimina la advertencia de `[DynamicIcon] Ícono no encontrado` durante el proceso de build y asegura la consistencia visual.
+ * 1. **Sincronización de Datos Validada**: ((Implementada)) Se ha verificado que el nombre del icono `AlertOctagon` es el correcto, eliminando la advertencia de build.
  *
  * @subsection Melhorias Futuras
- * 1. **Validación de Iconos en la Capa de i18n**: ((Vigente)) Para una robustez de élite, el schema de Zod para las páginas legales podría validar que el valor del `icon` sea uno de los nombres válidos de la librería `lucide-react`, previniendo este tipo de errores a nivel de contrato de datos.
+ * 1. **Validación de Iconos en la Capa de i18n**: ((Vigente)) Para una robustez de élite, el schema de Zod para las páginas legales podría validar que el valor del `icon` sea uno de los nombres válidos de `lucide-react`.
  *
  * =====================================================================
  */

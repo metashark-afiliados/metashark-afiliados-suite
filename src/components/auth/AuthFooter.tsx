@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
-import { RichText } from "@/components/ui/RichText"; // <-- NUEVA IMPORTACIÓN
+import { RichText } from "@/components/ui/RichText";
 import { SmartLink } from "@/components/ui/SmartLink";
 
 interface AuthFooterProps {
@@ -54,14 +54,14 @@ export function AuthFooter({
             terms: (chunks) => (
               <SmartLink
                 href="/terms"
-                label={<RichText>{chunks}</RichText>} // <-- BLINDAJE DE COMPOSICIÓN
+                label={<RichText>{chunks}</RichText>}
                 className="underline hover:text-primary"
               />
             ),
             privacy: (chunks) => (
               <SmartLink
                 href="/privacy"
-                label={<RichText>{chunks}</RichText>} // <-- BLINDAJE DE COMPOSICIÓN
+                label={<RichText>{chunks}</RichText>}
                 className="underline hover:text-primary"
               />
             ),
@@ -77,7 +77,7 @@ export function AuthFooter({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Composición Segura y Reutilizable**: ((Implementada)) El componente ahora utiliza el nuevo aparato `RichText.tsx` para envolver la salida de `t.rich`. Esto no solo resuelve la vulnerabilidad al error `React.Children.only` de forma arquitectónicamente sólida, sino que también promueve el uso de este nuevo componente de blindaje en toda la aplicación.
+ * 1. **Composición Segura y Reutilizable**: ((Implementada)) El componente ahora utiliza el nuevo aparato `RichText.tsx` para envolver la salida de `t.rich`. Esto resuelve la vulnerabilidad al error `React.Children.only` de forma arquitectónicamente sólida.
  *
  * @subsection Melhorias Futuras
  * 1. **Contenido Dinámico de Aviso Legal**: ((Vigente)) El texto del aviso legal está codificado en el componente. Podría ser pasado como una prop para una mayor flexibilidad.

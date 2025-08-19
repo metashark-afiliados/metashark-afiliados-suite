@@ -11,14 +11,12 @@
 "use client";
 
 import { AlertTriangle, ArrowLeft, Home } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { clientLogger } from "@/lib/logging";
-
-const supportedLocales = ["en-US", "es-ES", "pt-BR"] as const;
+import { Link } from "@/lib/navigation";
 
 export default function NotFound(): React.ReactElement {
   const pathname = usePathname();
@@ -26,12 +24,6 @@ export default function NotFound(): React.ReactElement {
   useEffect(() => {
     clientLogger.warn(`[404 Handler] Ruta no encontrada: ${pathname}`);
   }, [pathname]);
-
-  const segments = pathname.split("/");
-  const potentialLocale = segments[1];
-  const locale = supportedLocales.includes(potentialLocale as any)
-    ? potentialLocale
-    : "es-ES";
 
   const messages = {
     title: "Error 404",
@@ -52,23 +44,19 @@ export default function NotFound(): React.ReactElement {
         </p>
         <div className="mt-10 flex gap-4">
           <Button variant="outline" asChild>
-            <Link href={`/${locale}`}>
-              {/* --- INICIO DE BLINDAJE DE COMPOSICIÓN --- */}
+            <Link href="/">
               <span className="inline-flex items-center justify-center">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {messages.backToHome}
               </span>
-              {/* --- FIN DE BLINDAJE DE COMPOSICIÓN --- */}
             </Link>
           </Button>
           <Button asChild>
-            <Link href={`/${locale}/dashboard`}>
-              {/* --- INICIO DE BLINDAJE DE COMPOSICIÓN --- */}
+            <Link href="/dashboard">
               <span className="inline-flex items-center justify-center">
                 <Home className="mr-2 h-4 w-4" />
                 {messages.goToDashboard}
               </span>
-              {/* --- FIN DE BLINDAJE DE COMPOSICIÓN --- */}
             </Link>
           </Button>
         </div>
@@ -82,10 +70,10 @@ export default function NotFound(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha envuelto el contenido de los componentes `Link` (icono + texto) en un `<span>`. Esto proporciona un único hijo React al `Link`, que a su vez satisface el contrato `asChild` del `Button`, resolviendo el error `React.Children.only` que impedía el despliegue.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha envuelto el contenido de los `Link` (icono + texto) en un `<span>`. Esto proporciona un único hijo, resolviendo el error `React.Children.only` y completando la erradicación del Blocker #1.
  *
  * @subsection Melhorias Futuras
- * 1. **Internacionalización Completa**: ((Vigente)) El contenido de esta página sigue codificado en duro. La refactorización anterior para internacionalizar este componente debe ser reaplicada para cumplir el protocolo al 100%.
+ * 1. **Internacionalización Completa**: ((Pendiente)) El contenido sigue codificado. Reaplicar la refactorización a `useTranslations` es el siguiente paso de élite.
  *
  * =====================================================================
  */

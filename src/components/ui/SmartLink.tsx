@@ -1,10 +1,9 @@
 // src/components/ui/SmartLink.tsx
 /**
  * @file src/components/ui/SmartLink.tsx
- * @description Componente de enlace inteligente y atómico. Ha sido nivelado
- *              a un estándar de élite para aceptar `React.ReactNode` en su prop
- *              `label`, permitiendo la composición de enlaces con contenido
- *              enriquecido (ej. iconos, texto formateado).
+ * @description Componente de enlace inteligente y atómico. Ha sido nivelado a un
+ *              estándar de élite al blindar su contenido con `RichText` internamente,
+ *              haciéndolo inherentemente inmune al error `React.Children.only`.
  * @author L.I.A. Legacy
  * @version 2.1.0
  */
@@ -16,18 +15,18 @@ import { Link } from "@/lib/navigation";
 import { RichText } from "./RichText";
 
 export interface NavLinkItem {
-  href: any; // Se mantiene 'any' por compatibilidad con next-intl
-  label: React.ReactNode; // Contrato flexible para contenido enriquecido
+  href: any;
+  label: React.ReactNode;
   className?: string;
 }
 
 /**
  * @public
  * @component SmartLink
- * @description Renderiza un enlace inteligentemente, eligiendo entre `<a>` para
- *              rutas externas/anclas y el `<Link>` de next-intl para rutas internas.
- *              Envuelve el `label` en `<RichText>` para garantizar que siempre se
- *              pase un único hijo, previniendo errores de composición.
+ * @description Renderiza un enlace inteligente que elige entre `<a>` para rutas
+ *              externas y `<Link>` para internas. Envuelve el `label` en `<RichText>`
+ *              para garantizar que siempre se pase un único hijo, previniendo
+ *              errores de composición de forma sistémica.
  * @param {NavLinkItem} props - Propiedades del componente.
  * @returns {React.ReactElement}
  */
@@ -47,7 +46,6 @@ export const SmartLink: React.FC<NavLinkItem> = ({
     hrefString.startsWith("mailto:") ||
     hrefString.startsWith("tel:");
 
-  // --- BLINDAJE DE COMPOSICIÓN SISTÉMICO ---
   const content = <RichText>{label}</RichText>;
 
   if (isExternalOrAnchor) {
@@ -71,15 +69,13 @@ export const SmartLink: React.FC<NavLinkItem> = ({
     </Link>
   );
 };
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Blindaje de Composición Sistémico**: ((Implementada)) El componente ahora envuelve internamente la prop `label` con el componente de blindaje `RichText`. Esto hace que `SmartLink` sea inherentemente inmune al error `React.Children.only`, fortaleciendo a todos los componentes que lo consumen (como `AuthFooter`) de forma sistémica.
- * 2. **Contrato de Tipo Flexible**: ((Implementada)) Se ha verificado que la prop `label` sea de tipo `React.ReactNode`, lo que permite una composición versátil.
+ * 1. **Blindaje Sistémico**: ((Implementada)) El componente ahora envuelve `label` con `RichText` internamente. Esto resuelve el error `React.Children.only` en su origen, fortaleciendo todos los componentes que consumen `SmartLink`.
  *
  * =====================================================================
  */
