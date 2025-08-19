@@ -2,10 +2,10 @@
 /**
  * @file TelemetryClientLogger.tsx
  * @description Componente de cliente "fire-and-forget" que enriquece el log de
- *              sesión del servidor con datos del navegador (fingerprint, resolución, etc.).
- *              Se ejecuta de forma diferida para no impactar las métricas de rendimiento.
+ *              sesión del servidor. Ha sido refactorizado para invocar la nueva
+ *              acción `enrichVisitorLogAction`, resolviendo el error de build TS2551.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
@@ -18,17 +18,18 @@ import { logger } from "@/lib/logging";
 /**
  * @public
  * @component TelemetryClientLogger
- * @description Orquesta la recolección de datos del cliente y los envía a la
- *              Server Action `logClientVisitAction`.
+ * @description Orquesta la recolección de datos del cliente (fingerprint, resolución)
+ *              y los envía a la Server Action `enrichVisitorLogAction` para
+ *              enriquecer el log de sesión creado en el middleware. Se ejecuta
+ *              de forma diferida para no impactar las métricas de rendimiento.
  * @returns {null} Este componente no renderiza nada en el DOM.
  */
 export function TelemetryClientLogger(): null {
   React.useEffect(() => {
-    const logVisit = async () => {
-      // Previene doble logueo en la misma sesión de navegador
+    const enrichVisit = async () => {
       if (sessionStorage.getItem("telemetry_client_logged")) {
         logger.trace(
-          "[TelemetryClient] Log de cliente ya enviado para esta sesión."
+          "[TelemetryClient] Log de enriquecimiento ya enviado para esta sesión."
         );
         return;
       }
@@ -38,7 +39,7 @@ export function TelemetryClientLogger(): null {
 
       if (!sessionIdFromCookie) {
         logger.warn(
-          "[TelemetryClient] No se encontró cookie de sesión. Abortando log de cliente."
+          "[TelemetryClient] No se encontró cookie de sesión. Abortando enriquecimiento."
         );
         return;
       }
@@ -52,47 +53,43 @@ export function TelemetryClientLogger(): null {
       }
 
       try {
-        await telemetry.logClientVisitAction({
+        await telemetry.enrichVisitorLogAction({
           sessionId: sessionIdFromCookie,
           fingerprint,
-          screenWidth: window.innerWidth,
-          screenHeight: window.innerHeight,
-          userAgentClientHint: (navigator as any).userAgentData?.brands || null,
+          browser_context: {
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
+            userAgentClientHint:
+              (navigator as any).userAgentData?.brands || null,
+          },
         });
         sessionStorage.setItem("telemetry_client_logged", "true");
         logger.info(
-          "[TelemetryClient] Log de cliente enriquecido enviado con éxito.",
+          "[TelemetryClient] Log de visitante enriquecido con éxito.",
           { sessionId: sessionIdFromCookie }
         );
       } catch (error) {
         logger.error(
-          "[TelemetryClient] Fallo al enviar log de cliente a la Server Action.",
+          "[TelemetryClient] Fallo al invocar enrichVisitorLogAction.",
           error
         );
       }
     };
 
-    // Retrasa la ejecución para no impactar métricas como LCP
-    const timerId = setTimeout(logVisit, 500);
+    const timerId = setTimeout(enrichVisit, 500);
     return () => clearTimeout(timerId);
   }, []);
 
   return null;
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura Robusta**: ((Implementada)) El componente lee el `sessionId` de la cookie y lo envía para enriquecer el log, en lugar de generarlo, asegurando la consistencia.
- * 2. **Optimización de Rendimiento**: ((Implementada)) La ejecución se retrasa 500ms para no interferir con las métricas de Web Vitals.
- * 3. **Prevención de Duplicados**: ((Implementada)) Utiliza `sessionStorage` para asegurar que el log de enriquecimiento se envíe solo una vez por sesión de navegador.
- * 4. **Full Observabilidad**: ((Implementada)) Se han añadido logs de `trace`, `info`, `warn` y `error` para una visibilidad completa del proceso.
- *
- * @subsection Melhorias Futuras
- * 1. **Manejo de Permisos de Privacidad**: ((Vigente)) El componente podría integrarse con un futuro banner de consentimiento de cookies. Si el usuario no acepta las cookies de seguimiento/analíticas, la función `logVisit` no se ejecutaría.
+ * 1. **Resolución de Error de Build (TS2551)**: ((Implementada)) El componente ahora invoca a la nueva y correcta Server Action `enrichVisitorLogAction`, resolviendo el error de compilación.
+ * 2. **Sincronización de Contrato de Datos**: ((Implementada)) El payload enviado ahora coincide con el `ClientEnrichmentSchema`, asegurando que la validación en el servidor tendrá éxito.
  *
  * =====================================================================
  */
