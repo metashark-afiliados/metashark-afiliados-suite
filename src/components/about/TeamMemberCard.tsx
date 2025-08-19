@@ -1,16 +1,13 @@
 // src/components/about/TeamMemberCard.tsx
 /**
  * @file TeamMemberCard.tsx
- * @description Componente de presentación atómico y puro para mostrar la
- *              información de un miembro del equipo. Es un Client Component
- *              que utiliza `framer-motion` para microinteracciones.
+ * @description Componente de presentación atómico para un miembro del equipo.
+ *              Simplificado bajo la directiva "Build Limpio" para eliminar
+ *              `framer-motion` y ser un componente estático.
  * @author Raz Podestá
- * @version 1.1.0
+ * @version 2.0.0
  */
-"use client";
-
 import Image from "next/image";
-import { motion, type Variants } from "framer-motion";
 import { Linkedin, Twitter } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -35,7 +32,6 @@ export interface TeamMember {
 
 interface TeamMemberCardProps {
   member: TeamMember;
-  animationVariants?: Variants;
   className?: string;
 }
 
@@ -48,14 +44,10 @@ interface TeamMemberCardProps {
  */
 export function TeamMemberCard({
   member,
-  animationVariants,
   className,
 }: TeamMemberCardProps): React.ReactElement {
   return (
-    <motion.div
-      variants={animationVariants}
-      className={cn("h-full", className)}
-    >
+    <div className={cn("h-full", className)}>
       <Card className="h-full text-center transition-all duration-300 hover:shadow-primary/20 hover:border-primary/50 hover:-translate-y-1">
         <CardHeader className="items-center pt-8">
           <Image
@@ -97,7 +89,7 @@ export function TeamMemberCard({
           )}
         </CardFooter>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 /**
@@ -106,11 +98,10 @@ export function TeamMemberCard({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Microinteracciones de Élite**: ((Implementada)) Se ha añadido un efecto `hover:-translate-y-1` para dar una sensación de "elevación" a la tarjeta, mejorando el feedback visual de la interacción.
- * 2. **Accesibilidad (a11y)**: ((Implementada)) Se han añadido `aria-label` descriptivos a los enlaces de redes sociales.
+ * 1. **Eliminación de Dependencias de Cliente**: ((Implementada)) Se ha eliminado `framer-motion` y la directiva `"use client"`.
  *
  * @subsection Melhorias Futuras
- * 1. **Bio en Popover**: ((Vigente)) Añadir un `<Popover>` que muestre una breve biografía del miembro al hacer clic en la tarjeta, proporcionando más información sin saturar la UI inicial.
+ * 1. **Reintroducción Controlada de Animaciones**: ((Vigente)) Reintroducir `"use client"` y `framer-motion` post-despliegue.
  *
  * =====================================================================
  */

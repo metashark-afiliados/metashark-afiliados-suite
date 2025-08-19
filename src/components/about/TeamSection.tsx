@@ -1,15 +1,12 @@
 // src/components/about/TeamSection.tsx
 /**
  * @file TeamSection.tsx
- * @description Orquestador de UI que ensambla las tarjetas de miembros del equipo
- *              con una animación de entrada escalonada. Es un Client Component
- *              que consume el componente atómico `TeamMemberCard`.
+ * @description Orquestador de UI que ensambla las tarjetas de miembros del equipo.
+ *              Simplificado bajo la directiva "Build Limpio" para eliminar
+ *              `framer-motion` y ser un componente estático.
  * @author Raz Podestá
- * @version 1.1.0
+ * @version 2.0.0
  */
-"use client";
-
-import { motion } from "framer-motion";
 import { Users } from "lucide-react";
 
 import { TeamMemberCard, type TeamMember } from "./TeamMemberCard";
@@ -23,8 +20,7 @@ interface TeamSectionProps {
 /**
  * @public
  * @component TeamSection
- * @description Renderiza la sección del equipo, orquestando la animación
- *              escalonada de las tarjetas de los miembros.
+ * @description Renderiza la sección del equipo.
  * @param {TeamSectionProps} props - Propiedades para configurar la sección.
  * @returns {React.ReactElement}
  */
@@ -33,30 +29,8 @@ export function TeamSection({
   subtitle,
   members,
 }: TeamSectionProps): React.ReactElement {
-  const FADE_UP = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  };
-
-  const STAGGER_CONTAINER = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-      },
-    },
-  };
-
   return (
-    <motion.section
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.3 }}
-      variants={FADE_UP}
-      className="py-16 bg-muted rounded-lg"
-      aria-labelledby="team-title"
-    >
+    <section className="py-16 bg-muted rounded-lg" aria-labelledby="team-title">
       <div className="container mx-auto text-center">
         <div className="inline-flex items-center gap-3 bg-card px-4 py-2 rounded-full mb-4">
           <Users className="h-5 w-5 text-primary" />
@@ -67,20 +41,13 @@ export function TeamSection({
         <p className="max-w-2xl mx-auto text-muted-foreground mb-12">
           {subtitle}
         </p>
-        <motion.div
-          variants={STAGGER_CONTAINER}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {members.map((member) => (
-            <TeamMemberCard
-              key={member.name}
-              member={member}
-              animationVariants={FADE_UP}
-            />
+            <TeamMemberCard key={member.name} member={member} />
           ))}
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 /**
@@ -89,11 +56,10 @@ export function TeamSection({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Accesibilidad (a11y)**: ((Implementada)) Se ha añadido `aria-labelledby` y un `id` al título (`<h2>`), mejorando la estructura semántica.
- * 2. **Animación Escalonada**: ((Implementada)) El componente utiliza `staggerChildren` para un efecto visual de élite, mejorando la experiencia de usuario.
+ * 1. **Eliminación de Dependencias de Cliente**: ((Implementada)) Se ha eliminado `framer-motion` y la directiva `"use client"`.
  *
  * @subsection Melhorias Futuras
- * 1. **Ordenamiento Dinámico**: ((Vigente)) Añadir controles (ej. botones) que permitan al usuario ordenar la lista de miembros del equipo por nombre o rol, manipulando el array `members` antes de pasarlo al `.map()`.
+ * 1. **Reintroducción Controlada de Animaciones**: ((Vigente)) Reintroducir `"use client"` y `framer-motion` post-despliegue.
  *
  * =====================================================================
  */

@@ -1,22 +1,36 @@
 // src/app/[locale]/about/page.tsx
 /**
  * @file page.tsx
- * @description Orquestador de servidor para la página "Sobre Nosotros".
- *              Ha sido refactorizado a su arquitectura canónica, donde su única
- *              responsabilidad es obtener los datos de i18n y pasarlos como
- *              props al componente de cliente (`AboutPageClient`), que manejará
- *              el renderizado y las animaciones.
+ * @description Orquestador y ensamblador de la página "Sobre Nosotros".
+ *              Ha sido refactorizado bajo la directiva "Build Limpio" para
+ *              eliminar todas las dependencias de `framer-motion` y el wrapper
+ *              de cliente, con el objetivo de resolver el blocker de despliegue.
  * @author Raz Podestá
- * @version 4.0.0
+ * @version 5.0.0
  */
 import React from "react";
 import type { Metadata } from "next";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 
+import { MissionSection } from "@/components/about/MissionSection";
+import { TeamSection } from "@/components/about/TeamSection";
 import { type TeamMember } from "@/components/about/TeamMemberCard";
 import { logger } from "@/lib/logging";
 
-import { AboutPageClient, type AboutPageData } from "./about-page-client";
+interface AboutPageData {
+  hero: {
+    title: string;
+  };
+  mission: {
+    title: string;
+    content: string[];
+  };
+  team: {
+    title: string;
+    subtitle: string;
+    members: TeamMember[];
+  };
+}
 
 export async function generateMetadata({
   params: { locale },
@@ -33,7 +47,7 @@ export default async function AboutPage({
   params: { locale: string };
 }) {
   unstable_setRequestLocale(locale);
-  logger.trace(`[AboutPage] Obteniendo datos para el locale: ${locale}`);
+  logger.trace(`[AboutPage] Renderizando página para el locale: ${locale}`);
   const t = await getTranslations("pages.AboutPage");
 
   const pageData: AboutPageData = {
@@ -51,7 +65,17 @@ export default async function AboutPage({
     },
   };
 
-  return <AboutPageClient data={pageData} />;
+  return (
+    <main className="container mx-auto max-w-5xl py-12 px-4 space-y-16">
+      <header className="text-center py-16">
+        <h1 className="text-5xl font-extrabold tracking-tighter text-primary">
+          {pageData.hero.title}
+        </h1>
+      </header>
+      <MissionSection {...pageData.mission} />
+      <TeamSection {...pageData.team} />
+    </main>
+  );
 }
 /**
  * =====================================================================
@@ -59,10 +83,10 @@ export default async function AboutPage({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Restauración de Arquitectura RSC**: ((Implementada)) El componente vuelve a ser un orquestador de datos puro, cumpliendo con las reglas de los Server Components y resolviendo la causa raíz del fallo de build.
+ * 1. **Simplificación Radical**: ((Implementada)) Se ha eliminado la dependencia de `framer-motion` y el wrapper de cliente. El componente es ahora un Server Component puro que ensambla otros componentes puros, eliminando la causa sospechosa del fallo de build.
  *
  * @subsection Melhorias Futuras
- * 1. **Contenido Dinámico del Equipo**: ((Vigente)) Obtener los `team.members` desde la base de datos sigue siendo la mejora de élite para este aparato.
+ * 1. **Reintroducción Controlada de Animaciones**: ((Vigente)) Una vez que el despliegue sea estable, se podrá reintroducir `framer-motion` de forma controlada, asegurando que todos los componentes animados estén correctamente encapsulados en un Client Component.
  *
  * =====================================================================
  */
