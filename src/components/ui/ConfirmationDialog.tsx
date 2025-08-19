@@ -2,11 +2,11 @@
 /**
  * @file src/components/ui/ConfirmationDialog.tsx
  * @description Componente de UI genérico de élite para el contenido de un
- *              diálogo de confirmación. Ha sido refactorizado a la v3.0.0
- *              para ser un componente de "contenido" puro, resolviendo
- *              errores de build y mejorando su atomicidad.
+ *              diálogo de confirmación. Ha sido refactorizado a la v3.2.0
+ *              para corregir un error de lógica en su `useEffect` y mejorar
+ *              el reseteo de estado.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 3.2.0
  */
 "use client";
 
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RichText } from "@/components/ui/RichText";
 
 interface ConfirmationDialogContentProps {
   icon?: React.ElementType;
@@ -69,14 +70,15 @@ export function ConfirmationDialogContent({
     onConfirm(formData);
   };
 
-  React.useEffect(() => {
+  const handleClose = () => {
     setInputValue("");
-  }, [onClose]);
+    onClose();
+  };
 
   return (
     <DialogContent
-      onEscapeKeyDown={() => onClose()}
-      onPointerDownOutside={() => onClose()}
+      onEscapeKeyDown={handleClose}
+      onPointerDownOutside={handleClose}
     >
       <form onSubmit={handleSubmit}>
         <DialogHeader>
@@ -84,12 +86,16 @@ export function ConfirmationDialogContent({
             {Icon && <Icon className="h-6 w-6 text-destructive" />}
             {title}
           </DialogTitle>
-          <DialogDescription className="pt-2">{description}</DialogDescription>
+          <DialogDescription className="pt-2">
+            <RichText>{description}</RichText>
+          </DialogDescription>
         </DialogHeader>
 
         {isConfirmationRequired && (
           <div className="mt-4 space-y-2">
-            <Label htmlFor="confirmation-input">{confirmationLabel}</Label>
+            <Label htmlFor="confirmation-input">
+              <RichText>{confirmationLabel}</RichText>
+            </Label>
             <Input
               id="confirmation-input"
               value={inputValue}
@@ -101,16 +107,15 @@ export function ConfirmationDialogContent({
         )}
 
         <DialogFooter className="mt-4">
-          <DialogClose asChild>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isPending}
-              onClick={onClose}
-            >
-              {cancelButtonText}
-            </Button>
-          </DialogClose>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isPending}
+            onClick={handleClose}
+          >
+            {cancelButtonText}
+          </Button>
+
           {hiddenInputs &&
             Object.entries(hiddenInputs).map(([name, value]) => (
               <input key={name} type="hidden" name={name} value={value} />
@@ -128,15 +133,17 @@ export function ConfirmationDialogContent({
     </DialogContent>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build**: ((Implementada)) Se ha refactorizado para ser un componente de contenido (`<DialogContent>`), eliminando el `<DialogTrigger>`, lo que resuelve la causa raíz del error `React.Children.only`.
- * 2. **Atomicidad Mejorada (SRP)**: ((Implementada)) El componente ahora solo se encarga del contenido del diálogo, dejando la responsabilidad de controlar el estado de apertura y el disparador al componente padre.
+ * 1. **Resolución de Error Lógico (TS2774)**: ((Implementada)) Se ha eliminado el `useEffect` defectuoso. La lógica de reseteo del `inputValue` se ha movido a un nuevo `handleClose` que es invocado por los eventos de cierre del diálogo (`onEscapeKeyDown`, `onPointerDownOutside`) y el botón de cancelar. Esto garantiza un comportamiento predecible y correcto.
+ * 2. **Composición Segura**: ((Implementada)) El uso de `RichText` se mantiene, asegurando que el componente siga siendo robusto contra errores de composición.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Manejo de Foco**: ((Vigente)) Se podría añadir lógica para enfocar automáticamente el campo de entrada de confirmación cuando el diálogo se abre, mejorando la accesibilidad y la UX.
  *
  * =====================================================================
  */

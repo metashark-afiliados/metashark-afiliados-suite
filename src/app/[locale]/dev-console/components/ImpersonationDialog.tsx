@@ -1,10 +1,10 @@
-// src/app/[locale]/dev-console/components/ImpersonationDialog.tsx
+// src/components/dev-console/components/ImpersonationDialog.tsx
 /**
  * @file ImpersonationDialog.tsx
  * @description Componente atómico para la funcionalidad de suplantación de usuario.
  *              Ha sido refactorizado para usar el componente genérico `ConfirmationDialogContent`,
- *              mejorando la reutilización y la consistencia de la UI, y resolviendo
- *              un error de importación de módulo.
+ *              que internamente blinda el contenido enriquecido con `RichText`,
+ *              erradicando el error de build `React.Children.only` de forma sistémica.
  * @author Raz Podestá
  * @version 3.0.0
  */
@@ -18,7 +18,13 @@ import React, { useState } from "react";
 import { admin as adminActions } from "@/lib/actions";
 import { type UserProfilesWithEmail } from "@/lib/types/database/views";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
 
 type ProfileRow = UserProfilesWithEmail["Row"];
@@ -72,15 +78,18 @@ export function ImpersonationDialog({ profile }: { profile: ProfileRow }) {
     </Dialog>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de Módulo**: ((Implementada)) Se ha actualizado la importación a `ConfirmationDialogContent`, resolviendo el error de build `Attempted import error`. El componente ahora gestiona su propio estado de diálogo, adhiriéndose al nuevo patrón de composición.
+ * 1. **Composición Segura**: ((Implementada)) Este componente ahora consume la versión refactorizada de `ConfirmationDialogContent`, la cual utiliza internamente el blindaje `RichText`. Esto resuelve la vulnerabilidad al error `React.Children.only` de forma indirecta y arquitectónicamente sólida.
+ * 2. **Gestión de Estado Atómica**: ((Implementada)) La lógica de estado del diálogo (`isOpen`, `setIsOpen`) está encapsulada dentro de este componente, manteniéndolo autocontenido.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Abstracción de Lógica de UI**: ((Vigente)) La lógica de estado del diálogo podría ser abstraída al hook `useDialogState` para una mayor reutilización y consistencia.
  *
  * =====================================================================
  */
-// src/app/[locale]/dev-console/components/ImpersonationDialog.tsx
+// src/components/dev-console/components/ImpersonationDialog.tsx
