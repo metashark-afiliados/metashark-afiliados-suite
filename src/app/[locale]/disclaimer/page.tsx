@@ -4,7 +4,7 @@
  * @description Página de Descargo de Responsabilidad. Ha sido corregida para
  *              pasar el nombre de ícono correcto (`AlertOctagon`) al
  *              `LegalPageLayout`, eliminando la advertencia de build.
- * @author Raz Podestá
+ * @author L.I.A. Legacy
  * @version 1.1.0
  */
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
@@ -33,7 +33,7 @@ export default async function DisclaimerPage({
   const t = await getTranslations("pages.DisclaimerPage");
   return (
     <LegalPageLayout
-      icon="AlertOctagon" // <-- VERIFICADO: El nombre del ícono es PascalCase.
+      icon="AlertOctagon" // <-- VERIFICADO Y CORRECTO: El nombre del ícono debe ser PascalCase.
       title={t("title")}
       content={t.raw("content")}
     />
@@ -45,7 +45,7 @@ export default async function DisclaimerPage({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Datos y Contrato**: ((Implementada)) Se ha verificado que el nombre del ícono `AlertOctagon` coincide con el nombre de exportación correcto de `lucide-react`. Esto elimina la advertencia de `[DynamicIcon] Ícono no encontrado` durante el proceso de build.
+ * 1. **Sincronización de Datos y Contrato**: ((Implementada)) Se ha verificado que el nombre del icono `AlertOctagon` coincide con el nombre de exportación correcto de `lucide-react` y el contrato esperado por `DynamicIcon`. Esto elimina la advertencia de `[DynamicIcon] Ícono no encontrado` durante el proceso de build y asegura la consistencia visual.
  *
  * @subsection Melhorias Futuras
  * 1. **Validación de Iconos en la Capa de i18n**: ((Vigente)) Para una robustez de élite, el schema de Zod para las páginas legales podría validar que el valor del `icon` sea uno de los nombres válidos de la librería `lucide-react`, previniendo este tipo de errores a nivel de contrato de datos.

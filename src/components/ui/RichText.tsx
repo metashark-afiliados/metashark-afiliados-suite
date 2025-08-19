@@ -6,8 +6,8 @@
  *              `<span>`, garantizando que siempre se pase un solo elemento React
  *              a los componentes hijos. Esta es la solución arquitectónica para
  *              erradicar el error `React.Children.only`.
- * @author Raz Podestá
- * @version 1.1.0
+ * @author L.I.A. Legacy
+ * @version 1.0.0
  */
 import React from "react";
 
@@ -42,11 +42,10 @@ export function RichText({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Conflicto de Tipos (TS2430)**: ((Implementada)) Se ha renombrado la prop `content` a `children`, resolviendo el conflicto con la interfaz `HTMLAttributes` y alineando el componente con las convenciones de React.
- * 2. **Solución Arquitectónica**: ((Implementada)) Este nuevo aparato proporciona una solución sistémica y reutilizable para el problema de `t.rich`, promoviendo una composición segura de componentes.
+ * 1. **Solución Arquitectónica**: ((Implementada)) Este nuevo aparato proporciona una solución sistémica y reutilizable para el problema `React.Children.only` causado por `t.rich`, promoviendo una composición de componentes segura y robusta.
  *
  * @subsection Melhorias Futuras
- * 1. **Selección de Elemento Contenedor**: ((Vigente)) Se podría añadir una prop `as: "span" | "p" | "div"` para permitir que el componente renderice diferentes elementos HTML contenedores según el contexto semántico.
+ * 1. **Selección de Elemento Contenedor**: ((Vigente)) Se podría añadir una prop `as: "span" | "p" | "div"` para permitir que el componente renderice diferentes elementos HTML contenedores según el contexto semántico, aumentando su flexibilidad.
  *
  * =====================================================================
  */

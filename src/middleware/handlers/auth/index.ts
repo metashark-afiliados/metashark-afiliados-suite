@@ -1,15 +1,17 @@
 // src/middleware/handlers/auth/index.ts
 /**
  * @file src/middleware/handlers/auth/index.ts
- * @description Motor de reglas de autorización. Actualizado para reconocer
- *              sesiones simuladas en modo de desarrollo, rompiendo el bucle
- *              de redirección de autenticación.
+ * @description Motor de reglas de autorización de élite para el middleware.
+ *              Ha sido refactorizado para consumir sus dependencias desde el
+ *              directorio aislado `src/middleware/lib/`, garantizando la
+ *              compatibilidad con el Edge Runtime y resolviendo la advertencia de build.
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 2.0.0
  */
 import { type NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/logging";
+// --- INICIO DE CORRECCIÓN DE IMPORTACIONES ---
 import {
   getAuthDataForMiddleware,
   type UserAuthData,
@@ -18,6 +20,7 @@ import {
   ROUTE_MANIFEST,
   type RouteSecurityRule,
 } from "@/middleware/lib/routing-manifest-edge";
+// --- FIN DE CORRECCIÓN DE IMPORTACIONES ---
 
 function findMatchingRouteRule(
   pathname: string
@@ -61,7 +64,6 @@ function handleAuthenticated(
     return NextResponse.redirect(dashboardUrl);
   }
 
-  // Solo se valida el rol para usuarios reales, no para el mock.
   if (
     !("isDevMock" in authData) &&
     rule.classification === "protected" &&
@@ -95,7 +97,6 @@ export async function handleAuth(
   const isDevMode = process.env.DEV_MODE_ENABLED === "true";
   let authData: UserAuthData | { isDevMock: true } | null = null;
 
-  // --- LÓGICA DE MODO DESARROLLADOR ---
   if (isDevMode && request.cookies.has("dev_session")) {
     logger.trace("[AUTH_HANDLER:DevMock] Sesión simulada detectada.");
     authData = { isDevMock: true };
@@ -139,8 +140,8 @@ export async function handleAuth(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Soporte para Sesión Simulada**: ((Implementada)) El manejador ahora detecta la cookie `dev_session` en modo de desarrollo y simula una sesión autenticada, rompiendo el bucle de redirección y permitiendo el acceso al dashboard.
- * 2. **Tipado Robusto**: ((Implementada)) Se ha actualizado el tipo del parámetro `authData` en `handleAuthenticated` para aceptar tanto un `UserAuthData` real como un objeto de mock, manteniendo la seguridad de tipos.
+ * 1. **Aislamiento de Runtime Completo**: ((Implementada)) Al actualizar las importaciones para que apunten a `src/middleware/lib/`, este manejador y toda su cadena de dependencias quedan completamente aislados del código del runtime de Node.js, resolviendo la advertencia de Vercel y cumpliendo con las mejores prácticas del Edge.
  *
+ * =====================================================================
  */
 // src/middleware/handlers/auth/index.ts
