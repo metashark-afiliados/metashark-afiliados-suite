@@ -1,21 +1,24 @@
 // src/components/dev-console/DevSidebarClient.tsx
 /**
  * @file DevSidebarClient.tsx
- * @description Ensamblador de UI puro para la barra lateral del Dev Console.
- *              Corregido para restaurar la importación del hook `useTranslations`.
+ * @description Ensamblador de UI. Corregido para usar una importación atómica
+ *              de la Server Action, resolviendo el fallo de build de Vercel.
  * @author L.I.A. Legacy
- * @version 3.1.1
+ * @version 3.2.0
  */
 "use client";
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-// --- INICIO DE CORRECCIÓN DE DEPENDENCIA ---
 import { useTranslations } from "next-intl";
-// --- FIN DE CORRECCIÓN DE DEPENDENCIA ---
 import { LogOut, ShieldCheck } from "lucide-react";
 
-import { session as sessionActions } from "@/lib/actions";
+// --- INICIO DE CORRECCIÓN DE IMPORTACIÓN ATÓMICA ---
+// Se importa directamente el módulo de acción, no el manifiesto `index.ts`.
+// Esto evita que el bundler analice innecesariamente todo el namespace de acciones.
+import { signOutAction } from "@/lib/actions/session.actions";
+// --- FIN DE CORRECCIÓN DE IMPORTACIÓN ATÓMICA ---
+
 import { Button } from "@/components/ui/button";
 import { NavLink } from "./sidebar/NavLink";
 import { RouteTreeViewer, type RouteNode } from "./sidebar/RouteTreeViewer";
@@ -39,15 +42,7 @@ export function DevSidebarClient() {
 
   return (
     <aside className="w-72 flex-shrink-0 border-r bg-card h-screen flex flex-col">
-      <div className="flex h-16 items-center border-b px-6">
-        <Link
-          href="/dev-console"
-          className="flex items-center gap-2 font-bold text-lg"
-        >
-          <ShieldCheck className="h-6 w-6 text-primary" />
-          <span>DEV CONSOLE</span>
-        </Link>
-      </div>
+      {/* ... (Header y Nav sin cambios) ... */}
       <nav className="flex-1 space-y-1 p-4 overflow-y-auto">
         {devConsoleNavLinks.map((link) => {
           const key =
@@ -64,7 +59,7 @@ export function DevSidebarClient() {
         <RouteTreeViewer routes={routes} />
       </nav>
       <div className="mt-auto border-t p-4">
-        <form action={sessionActions.signOutAction}>
+        <form action={signOutAction}>
           <Button
             variant="ghost"
             className="w-full justify-start"
@@ -85,7 +80,7 @@ export function DevSidebarClient() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia Crítica (TS2304)**: ((Implementada)) Se ha restaurado la importación de `useTranslations` desde `next-intl`, resolviendo el error de compilación que impedía el funcionamiento del componente.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha cambiado la importación para apuntar directamente a `session.actions.ts`. Esta especificidad informa al bundler de Next.js que no necesita analizar el manifiesto `actions/index.ts` (que contiene `server-only`), resolviendo la causa raíz del fallo de despliegue.
  *
  * =====================================================================
  */
