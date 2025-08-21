@@ -21,6 +21,7 @@ import { logger } from "@/lib/logging";
  * @param {{ initialSites: SiteWithCampaignCount[], initialSearchQuery: string }} params
  * @returns Un objeto con todo el estado y los manejadores necesarios para la UI.
  * @version 3.1.0
+ * @author Raz Podestá
  */
 export function useSitesPage({
   initialSites,
@@ -79,7 +80,7 @@ export function useSitesPage({
       campaign_count: 0,
     };
 
-    genericHandleCreate(formData, optimisticSite);
+    genericHandleCreate?.(formData, optimisticSite);
     closeCreateDialog();
   };
 
@@ -90,7 +91,7 @@ export function useSitesPage({
     mutatingId,
     searchTerm,
     setSearchTerm,
-    handleDelete: handleDelete!,
+    handleDelete: handleDelete, // Se exporta directamente, puede ser undefined
     isCreateDialogOpen,
     setCreateDialogOpen,
     openCreateDialog,
@@ -104,7 +105,7 @@ export function useSitesPage({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución Definitiva de Error de Build**: ((Implementada)) Se ha reemplazado la importación del barril de acciones por importaciones atómicas y directas, eliminando la causa raíz del fallo de compilación.
+ * 1. **Seguridad de Tipos**: ((Implementada)) Se ha eliminado el operador de aserción no nula (`!`) en `handleDelete`. El hook ahora exporta `handleDelete` tal como lo recibe (posiblemente `undefined`), y es responsabilidad del componente consumidor (`sites-client.tsx`) manejar este caso.
  *
  * =====================================================================
  */
