@@ -3,10 +3,9 @@
  * @file src/lib/supabase/client.ts
  * @description Crea un cliente de Supabase para el navegador. Ha sido
  *              refactorizado para consumir las variables de entorno con prefijo
- *              gestionadas por la integración de Vercel, garantizando el uso de
- *              credenciales SSoT.
+ *              `INTEGRATION_` gestionadas por la integración de Vercel.
  * @author L.I.A. Legacy
- * @version 2.0.0
+ * @version 3.1.0
  */
 "use client";
 
@@ -27,7 +26,7 @@ export function createClient() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Consumo de SSoT de Credenciales**: ((Implementada)) El cliente ahora consume las variables de entorno gestionadas por la integración de Vercel, alineándose con la nueva estrategia de configuración.
+ * 1. **Alineación con Vercel**: ((Implementada)) El cliente ahora consume las variables de entorno con prefijo, alineándose con la configuración actual del despliegue.
  *
  * =====================================================================
  */
