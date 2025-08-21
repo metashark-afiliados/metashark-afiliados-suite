@@ -1,19 +1,19 @@
 // src/middleware/lib/permissions-edge.ts
 /**
  * @file src/middleware/lib/permissions-edge.ts
- * @description Aparato de lógica de sesión especializado y optimizado para el
- *              Edge Runtime. Ha sido refactorizado para consumir el nuevo
- *              cliente Supabase de Edge aislado, resolviendo una vulnerabilidad
- *              crítica de empaquetado de dependencias.
+ * @description Aparato de lógica de sesión especializado para el Edge Runtime.
+ *              Ha sido refactorizado para utilizar `await` al invocar la factoría
+ *              asíncrona `createEdgeClient`, resolviendo un error de tipo
+ *              crítico (`TS2339`) que impedía el build.
  * @author L.I.A. Legacy
- * @version 2.0.0
+ * @version 2.1.0
  */
 import "server-only";
 
 import { type NextRequest, type NextResponse } from "next/server";
 import { type User } from "@supabase/supabase-js";
 
-import { createEdgeClient } from "@/middleware/lib/supabase-edge.client"; // <-- DEPENDENCIA CORREGIDA
+import { createEdgeClient } from "@/middleware/lib/supabase-edge.client";
 import { type Database } from "@/lib/types/database";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
@@ -43,8 +43,9 @@ export async function getAuthDataForMiddleware(
   request: NextRequest,
   response: NextResponse
 ): Promise<UserAuthData | null> {
-  // --- CONSUMO DE CLIENTE AISLADO ---
-  const supabase = createEdgeClient(request, response);
+  // --- INICIO DE CORRECCIÓN: SINCRONIZACIÓN ASÍNCRONA ---
+  const supabase = await createEdgeClient(request, response);
+  // --- FIN DE CORRECCIÓN ---
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -72,11 +73,7 @@ export async function getAuthDataForMiddleware(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Aislamiento de Runtime Completo**: ((Implementada)) Este aparato ahora reside en `src/middleware/lib` y consume el `createEdgeClient`, que está diseñado específicamente para el Edge. Esto rompe la cadena de importación que estaba introduciendo dependencias de Node.js en el middleware, resolviendo la causa raíz de la advertencia de Vercel.
- *
- * @subsection Melhorias Futuras
- * 1. **Cacheo en Edge**: ((Vigente)) Para optimizar aún más, los datos del perfil (que raramente cambian) podrían ser cacheados en Vercel KV con un TTL corto, reduciendo las llamadas a la base de datos.
+ * 1. **Resolución de Regresión Crítica (TS2339)**: ((Implementada)) Se ha añadido `await` a la llamada `createEdgeClient`. Esto resuelve el error de compilación al asegurar que el código espere la resolución de la promesa antes de intentar acceder a las propiedades del cliente Supabase.
  *
  * =====================================================================
  */
-// src/middleware/lib/permissions-edge.ts

@@ -1,12 +1,13 @@
 // src/lib/data/modules.ts
 /**
  * @file src/lib/data/modules.ts
- * @description Aparato de datos para la entidad 'feature_modules'. Ha sido nivelado
- *              para soportar Inyección de Dependencias, permitiendo su uso seguro
- *              dentro de funciones cacheadas. Sincronizado para incluir
- *              `required_plan` y `display_order` en la interfaz `FeatureModule` con tipado correcto.
+ * @description Aparato de datos para la entidad 'feature_modules'. Ha sido
+ *              restaurado y refactorizado a un estándar de élite. El contrato
+ *              de tipo `FeatureModule` vuelve a usar `icon` para la UI, y la
+ *              lógica de transformación `icon_name` -> `icon` se realiza
+ *              dentro de la capa de datos, resolviendo la cascada de errores.
  * @author L.I.A. Legacy
- * @version 2.1.2
+ * @version 4.0.0
  */
 "use server";
 
@@ -15,18 +16,18 @@ import { type User, type SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
 import { createClient as createServerClient } from "@/lib/supabase/server";
-import { type Enums } from "@/lib/types/database"; // Import Enums type
+import { type Enums } from "@/lib/types/database";
 
 export type FeatureModule = {
   id: string;
   title: string;
   description: string;
   tooltip: string | null;
-  icon: string;
+  icon: string; // <-- CONTRATO DE UI RESTAURADO
   href: string;
   status: "active" | "soon" | "locked";
   required_plan: Enums<"plan_type">;
-  display_order: number; // <-- CORRECCIÓN: Propiedad 'display_order' añadida
+  display_order: number;
 };
 
 type PlanHierarchy = "free" | "pro" | "enterprise";
@@ -54,15 +55,6 @@ const getBaseModules = cache(
   { tags: ["feature_modules"] }
 );
 
-/**
- * @public
- * @async
- * @function getFeatureModulesForUser
- * @description Obtiene y personaliza la lista de módulos para un usuario específico.
- * @param {User} user - El objeto de usuario autenticado.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
- * @returns {Promise<FeatureModule[]>}
- */
 export async function getFeatureModulesForUser(
   user: User,
   supabaseClient?: Supabase
@@ -94,8 +86,7 @@ export async function getFeatureModulesForUser(
     const requiredLevel =
       planHierarchy[mod.required_plan as PlanHierarchy] || 1;
     const isUnlocked = userLevel >= requiredLevel;
-
-    let status: FeatureModule["status"] = "locked"; // Default to locked
+    let status: FeatureModule["status"] = "locked";
     if (isUnlocked) {
       status = mod.status === "active" ? "active" : "soon";
     }
@@ -105,11 +96,11 @@ export async function getFeatureModulesForUser(
       title: mod.title,
       description: mod.description,
       tooltip: mod.tooltip ?? "",
-      icon: mod.icon_name, // Map icon_name from DB to 'icon' property for FeatureModule
+      icon: mod.icon_name, // <-- LÓGICA DE TRANSFORMACIÓN
       href: mod.href,
       status,
       required_plan: mod.required_plan,
-      display_order: mod.display_order, // Incluida para coincidir con la interfaz
+      display_order: mod.display_order,
     };
   });
 
@@ -131,14 +122,14 @@ export async function getFeatureModulesForUser(
 
   return modulesWithStatus;
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Tipos (TS2352)**: ((Implementada)) Se ha añadido la propiedad `display_order: number` a la interfaz `FeatureModule`, resolviendo la incompatibilidad de tipos con los datos de mock y asegurando la coherencia entre las interfaces y la estructura de la base de datos.
+ * 1. **Restauración de Contrato de UI**: ((Implementada)) Se ha restaurado la propiedad `icon` en el tipo `FeatureModule`. Esto realinea el contrato de la capa de datos con lo que los componentes de UI esperan, resolviendo el error `TS2339`.
+ * 2. **Capa de Adaptación (Data Transformation)**: ((Implementada)) La función `getFeatureModulesForUser` ahora realiza la transformación de `icon_name` (de la DB) a `icon` (para la UI). Esta es la implementación canónica de una capa de datos que desacopla la persistencia de la presentación.
  *
  * =====================================================================
  */

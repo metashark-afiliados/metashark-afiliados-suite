@@ -2,12 +2,13 @@
 /**
  * @file tests/mocks/factories/supabase/auth.mock.ts
  * @description Factoría atómica para simular el cliente `auth` de Supabase.
+ *              Esta es la SSoT para el estado de autenticación en el entorno simulado.
  * @author Raz Podestá
  * @version 1.0.0
  */
 import { vi } from "vitest";
 
-import * as DUMMY_DATA from "@tests/mocks/data/database-state";
+import { MOCKED_USER } from "@tests/mocks/data/database-state";
 
 export type SpiedAuthMocks = {
   mockGetUser: ReturnType<typeof vi.fn>;
@@ -23,16 +24,27 @@ export type SpiedAuthMocks = {
  */
 export const createAuthMock = (spies: SpiedAuthMocks) => ({
   getUser: spies.mockGetUser.mockResolvedValue({
-    data: { user: DUMMY_DATA.MOCKED_USER },
+    data: { user: MOCKED_USER },
+    error: null,
   }),
   signOut: spies.mockSignOut.mockResolvedValue({ error: null }),
+  getSession: vi.fn().mockResolvedValue({
+    data: { session: { user: MOCKED_USER } },
+    error: null,
+  }),
+  // ...otros mocks de auth si son necesarios
 });
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
+ *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad**: ((Implementada)) Aísla la simulación de la API de autenticación.
+ * 1. **Atomicidad (SRP)**: ((Implementada)) Aísla la simulación de la API de autenticación. La lógica es simple, predecible y fácil de mantener.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Estado de Sesión Dinámico**: ((Vigente)) El mock podría ser mejorado para leer una cookie o un estado de KV para simular dinámicamente un usuario autenticado o no autenticado, en lugar de siempre devolver `MOCKED_USER`.
+ *
  * =====================================================================
  */
-// tests/mocks/factories/supabase/auth.mock.ts
