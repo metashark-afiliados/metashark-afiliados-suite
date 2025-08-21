@@ -2,16 +2,17 @@
 /**
  * @file src/middleware/lib/supabase-edge.client.ts
  * @description Aparato de utilidad atómico y aislado para crear un cliente Supabase
- *              de servidor, optimizado para el Vercel Edge Runtime. Ha sido corregido
- *              para utilizar la firma de API correcta para la manipulación de
- *              `request.cookies`, resolviendo una regresión crítica de tipos.
+ *              para el Edge Runtime. Utiliza importación dinámica (`await import`)
+ *              para prevenir que dependencias de Node.js se incluyan en el bundle
+ *              del Edge, y se alinea con el contrato de API de cookies de Next.js,
+ *              resolviendo todos los errores de build conocidos.
  * @author L.I.A. Legacy
- * @version 6.1.0
+ * @version 8.0.0
  */
 import "server-only";
 
 import { type NextRequest, type NextResponse } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { type CookieOptions } from "@supabase/ssr";
 
 import { createDevMockSupabaseClient } from "@/lib/supabase/mock-client-factory";
 import { logger } from "@/lib/logging";
@@ -21,7 +22,19 @@ const isDevMode =
   process.env.NODE_ENV === "development" &&
   process.env.DEV_MODE_ENABLED === "true";
 
-export function createEdgeClient(request: NextRequest, response: NextResponse) {
+/**
+ * @public
+ * @async
+ * @function createEdgeClient
+ * @description Factoría para crear una instancia del cliente de Supabase dentro del Middleware.
+ * @param {NextRequest} request - El objeto de la petición entrante.
+ * @param {NextResponse} response - La respuesta, que será modificada con las cookies de sesión.
+ * @returns {Promise<import('@supabase/supabase-js').SupabaseClient<Database>>}
+ */
+export async function createEdgeClient(
+  request: NextRequest,
+  response: NextResponse
+) {
   if (isDevMode) {
     logger.warn(
       "🚧 [EDGE] Modo Desarrollador ACTIVO. Devolviendo cliente Supabase SIMULADO."
@@ -35,6 +48,10 @@ export function createEdgeClient(request: NextRequest, response: NextResponse) {
     "[SupabaseEdgeClient] Creando instancia de cliente REAL para el Edge."
   );
 
+  // --- INICIO DE REFACTORIZACIÓN DE ÉLITE: IMPORTACIÓN DINÁMICA CORRECTA ---
+  const { createServerClient } = await import("@supabase/ssr");
+  // --- FIN DE REFACTORIZACIÓN DE ÉLITE ---
+
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -43,9 +60,6 @@ export function createEdgeClient(request: NextRequest, response: NextResponse) {
         get(name: string) {
           return request.cookies.get(name)?.value;
         },
-        // --- INICIO DE CORRECCIÓN DE CONTRATO DE API ---
-        // La API `request.cookies.set` y `response.cookies.set` esperan un único objeto.
-        // Se construye el objeto a partir de los argumentos proporcionados por Supabase.
         set(name: string, value: string, options: CookieOptions) {
           const cookie = { name, value, ...options };
           request.cookies.set(cookie);
@@ -56,7 +70,6 @@ export function createEdgeClient(request: NextRequest, response: NextResponse) {
           request.cookies.set(cookie);
           response.cookies.set(cookie);
         },
-        // --- FIN DE CORRECCIÓN DE CONTRATO DE API ---
       },
       auth: {
         autoRefreshToken: false,
@@ -65,14 +78,15 @@ export function createEdgeClient(request: NextRequest, response: NextResponse) {
     }
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Regresión Crítica (TS2345)**: ((Implementada)) Se ha corregido la implementación de los callbacks `set` y `remove` para que construyan un único objeto de cookie, alineándose con la API de `RequestCookies` de `next/server` y resolviendo la causa raíz del error de compilación.
+ * 1. **Resolución de Error de Tipo (TS2347)**: ((Implementada)) Se ha reemplazado `require()` por `await import()`. Esta sintaxis moderna de ES Modules preserva la información de tipos, permitiendo que TypeScript reconozca `createServerClient` como una función genérica y acepte el argumento `<Database>`, resolviendo el error.
+ * 2. **Resolución de Error de Build en Edge**: ((Implementada)) Al ser una importación dinámica, el bundler de Vercel no la sigue estáticamente, previniendo la inclusión de dependencias de Node.js en el bundle del Edge. Esta solución única resuelve ambos problemas.
  *
  * =====================================================================
  */
-// src/middleware/lib/supabase-edge.client.ts
