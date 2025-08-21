@@ -1,19 +1,10 @@
 // src/components/shared/pagination-controls.tsx
-/**
- * @file src/components/shared/pagination-controls.tsx
- * @description Componente de cliente atómico y reutilizable para la navegación
- *              paginada. Es un componente de presentación puro, completamente
- *              controlado por props, que construye dinámicamente los enlaces
- *              de paginación.
- * @author L.I.A. Legacy
- * @version 1.0.0
- */
 "use client";
 
-import { useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { usePagination, DOTS } from "@/lib/hooks/ui/use-pagination";
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
@@ -33,47 +24,15 @@ export interface PaginationControlsProps {
   texts: PaginationTexts;
 }
 
-const DOTS = "...";
-
-const usePaginationRange = (
-  totalPages: number,
-  currentPage: number,
-  siblingCount: number = 1
-): (string | number)[] => {
-  return useMemo(() => {
-    const totalPageNumbers = siblingCount + 5;
-    if (totalPageNumbers >= totalPages) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-    const leftSiblingIndex = Math.max(currentPage - siblingCount, 1);
-    const rightSiblingIndex = Math.min(currentPage + siblingCount, totalPages);
-    const shouldShowLeftDots = leftSiblingIndex > 2;
-    const shouldShowRightDots = rightSiblingIndex < totalPages - 2;
-
-    if (!shouldShowLeftDots && shouldShowRightDots) {
-      const leftItemCount = 3 + 2 * siblingCount;
-      const leftRange = Array.from({ length: leftItemCount }, (_, i) => i + 1);
-      return [...leftRange, DOTS, totalPages];
-    }
-    if (shouldShowLeftDots && !shouldShowRightDots) {
-      const rightItemCount = 3 + 2 * siblingCount;
-      const rightRange = Array.from(
-        { length: rightItemCount },
-        (_, i) => totalPages - rightItemCount + i + 1
-      );
-      return [1, DOTS, ...rightRange];
-    }
-    if (shouldShowLeftDots && shouldShowRightDots) {
-      const middleRange = Array.from(
-        { length: rightSiblingIndex - leftSiblingIndex + 1 },
-        (_, i) => leftSiblingIndex + i
-      );
-      return [1, DOTS, ...middleRange, DOTS, totalPages];
-    }
-    return []; // Should be unreachable
-  }, [totalPages, currentPage, siblingCount]);
-};
-
+/**
+ * @public
+ * @component PaginationControls
+ * @description Componente de cliente de presentación puro para la navegación paginada.
+ *              Consume el hook `usePagination` para la lógica y solo se encarga
+ *              de renderizar la UI.
+ * @author L.I.A. Legacy
+ * @version 3.0.0
+ */
 export function PaginationControls({
   page,
   totalCount,
@@ -83,15 +42,15 @@ export function PaginationControls({
   searchQuery,
   texts,
 }: PaginationControlsProps) {
-  const totalPages = Math.ceil(totalCount / limit);
-  const paginationRange = usePaginationRange(totalPages, page);
+  const { paginationRange, hasPreviousPage, hasNextPage } = usePagination({
+    currentPage: page,
+    totalCount,
+    pageSize: limit,
+  });
 
-  if (totalPages <= 1) {
+  if (page === 0 || paginationRange.length < 2) {
     return null;
   }
-
-  const hasPreviousPage = page > 1;
-  const hasNextPage = page < totalPages;
 
   const createPageLink = (pageNumber: number) => {
     const query: { page: string; q?: string } = {
@@ -165,14 +124,8 @@ export function PaginationControls({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Componente de Selección de Límite**: ((Vigente)) Añadir un `<Select>` que permita al usuario cambiar el número de ítems por página (`limit`), actualizando la URL y re-obteniendo los datos.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia**: ((Implementada)) La reconstrucción de este aparato resuelve el error `TS2307` en `sites-client.tsx`.
- * 2. **Componente de UI Reutilizable**: ((Implementada)) Proporciona una solución de paginación genérica y robusta para todas las tablas y cuadrículas de datos de la aplicación.
- * 3. **Lógica de Rango Inteligente**: ((Implementada)) El hook `usePaginationRange` implementa una lógica de élite para mostrar los números de página y los puntos suspensivos, asegurando una UX óptima incluso con un gran número de páginas.
+ * 1. **Hiper-Atomicidad (Presentación Pura)**: ((Implementada)) El componente ahora solo se encarga de la renderización, delegando toda la lógica de cálculo al hook `usePagination`.
  *
  * =====================================================================
  */
-// src/components/shared/pagination-controls.tsx

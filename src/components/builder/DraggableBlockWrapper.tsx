@@ -1,48 +1,28 @@
 // src/components/builder/DraggableBlockWrapper.tsx
-/**
- * @file DraggableBlockWrapper.tsx
- * @description Componente de Orden Superior (HOC) que envuelve cada bloque en el canvas,
- *              proporcionando interactividad (selección, D&D), aplicación de estilos
- *              dinámicos y un menú de acciones contextuales.
- * @author Raz Podestá
- * @version 1.0.0
- */
 "use client";
 
 import React from "react";
 import { useTranslations } from "next-intl";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  ArrowDown,
-  ArrowUp,
-  Copy,
-  GripVertical,
-  MoreVertical,
-  Trash2,
-} from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useBuilderStore } from "@/lib/builder/core/store";
 import { type PageBlock } from "@/lib/builder/types.d";
 import { logger } from "@/lib/logging";
 import { cn } from "@/lib/utils";
+import { BlockActionsMenu } from "./BlockActionsMenu";
+import { BlockDragHandle } from "./BlockDragHandle";
 
 /**
  * @public
  * @component DraggableBlockWrapper
- * @description Envuelve un componente de bloque para añadirle toda la funcionalidad del editor.
+ * @description Orquestador que envuelve cada bloque en el canvas, proveyendo
+ *              interactividad (selección, D&D) y ensamblando los átomos de UI
+ *              para la manija de arrastre y el menú de acciones.
  * @param {object} props - Propiedades del componente.
- * @param {PageBlock} props.block - El objeto de datos del bloque.
- * @param {React.ReactNode} props.children - El componente de bloque a renderizar.
  * @returns {React.ReactElement}
+ * @version 2.1.0
+ * @author Raz Podestá
  */
 export function DraggableBlockWrapper({
   block,
@@ -82,18 +62,7 @@ export function DraggableBlockWrapper({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const userDefinedStyles: React.CSSProperties = {
-    backgroundColor: block.styles.backgroundColor,
-    color: block.styles.textColor,
-    paddingTop: block.styles.paddingTop,
-    paddingBottom: block.styles.paddingBottom,
-    marginTop: block.styles.marginTop,
-    marginBottom: block.styles.marginBottom,
-  };
-
-  const stopPropagation = (e: React.MouseEvent | React.KeyboardEvent): void => {
-    e.stopPropagation();
-  };
+  const combinedStyles: React.CSSProperties = { ...dndStyles, ...block.styles };
 
   const handleAction = (action: () => void, actionName: string) => {
     logger.trace(`[BlockActions] Acción ejecutada: ${actionName}`, {
@@ -105,14 +74,8 @@ export function DraggableBlockWrapper({
   return (
     <div
       ref={setNodeRef}
-      style={{ ...dndStyles, ...userDefinedStyles }}
+      style={combinedStyles}
       onClick={() => handleAction(() => setSelectedBlockId(block.id), "select")}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          handleAction(() => setSelectedBlockId(block.id), "select_keypress");
-        }
-      }}
       role="button"
       tabIndex={0}
       aria-label={t("block_aria_label", { blockType: block.type })}
@@ -127,18 +90,7 @@ export function DraggableBlockWrapper({
           isSelected && "opacity-100"
         )}
       >
-        <div
-          {...attributes}
-          {...listeners}
-          onClick={stopPropagation}
-          onKeyDown={stopPropagation}
-          role="button"
-          tabIndex={0}
-          aria-label={t("drag_handle_aria")}
-          className="p-2 cursor-grab active:cursor-grabbing bg-card rounded-md border"
-        >
-          <GripVertical className="h-5 w-5 text-muted-foreground" />
-        </div>
+        <BlockDragHandle attributes={attributes} listeners={listeners} />
       </div>
 
       <div
@@ -147,64 +99,20 @@ export function DraggableBlockWrapper({
           isSelected && "opacity-100"
         )}
       >
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="secondary"
-              size="icon"
-              className="h-7 w-7"
-              aria-label={t("options_menu_aria")}
-              onClick={stopPropagation}
-            >
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            onClick={stopPropagation}
-            onKeyDown={stopPropagation}
-          >
-            <DropdownMenuItem
-              onSelect={() =>
-                handleAction(() => moveBlockByStep(block.id, "up"), "move_up")
-              }
-              disabled={blockIndex === 0}
-            >
-              <ArrowUp className="mr-2 h-4 w-4" />
-              <span>{t("move_up")}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() =>
-                handleAction(
-                  () => moveBlockByStep(block.id, "down"),
-                  "move_down"
-                )
-              }
-              disabled={blockIndex === totalBlocks - 1}
-            >
-              <ArrowDown className="mr-2 h-4 w-4" />
-              <span>{t("move_down")}</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onSelect={() =>
-                handleAction(() => duplicateBlock(block.id), "duplicate")
-              }
-            >
-              <Copy className="mr-2 h-4 w-4" />
-              <span>{t("duplicate")}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() =>
-                handleAction(() => deleteBlock(block.id), "delete")
-              }
-              className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              <span>{t("delete")}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <BlockActionsMenu
+          isFirst={blockIndex === 0}
+          isLast={blockIndex === totalBlocks - 1}
+          onMoveUp={() =>
+            handleAction(() => moveBlockByStep(block.id, "up"), "move_up")
+          }
+          onMoveDown={() =>
+            handleAction(() => moveBlockByStep(block.id, "down"), "move_down")
+          }
+          onDuplicate={() =>
+            handleAction(() => duplicateBlock(block.id), "duplicate")
+          }
+          onDelete={() => handleAction(() => deleteBlock(block.id), "delete")}
+        />
       </div>
 
       <div className={cn(isSelected && "pointer-events-none")}>{children}</div>
@@ -218,13 +126,7 @@ export function DraggableBlockWrapper({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Full Internacionalización y Observabilidad**: ((Implementada)) Todos los textos y acciones están ahora internacionalizados y registrados.
- * 2. **Lógica de Estado Robusta**: ((Implementada)) Los botones de acción (mover arriba/abajo) ahora se deshabilitan correctamente basándose en la posición del bloque.
- * 3. **Accesibilidad (a11y)**: ((Implementada)) Se han añadido roles y aria-labels a todos los elementos interactivos.
- *
- * @subsection Melhorias Futuras
- * 1. **Edición en Línea (Inline Editing)**: ((Vigente)) Implementar una lógica de doble clic en este wrapper que active un modo de "edición en línea" para los elementos de texto dentro del `children`, proporcionando una UX de edición aún más rápida.
+ * 1. **Alineación de Módulo**: ((Implementada)) Las importaciones han sido corregidas para consumir los átomos desde su manifiesto, completando la refactorización.
  *
  * =====================================================================
  */
-// src/components/builder/DraggableBlockWrapper.tsx

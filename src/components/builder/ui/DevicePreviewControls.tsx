@@ -1,10 +1,4 @@
 // src/components/builder/ui/DevicePreviewControls.tsx
-/**
- * @file DevicePreviewControls.tsx
- * @description Componente de UI atómico y puro para seleccionar la vista previa del dispositivo.
- * @author Raz Podestá
- * @version 1.0.0
- */
 "use client";
 
 import { useTranslations } from "next-intl";
@@ -18,8 +12,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { type DevicePreview } from "@/lib/builder/core/uiSlice";
-import { cn } from "@/lib/utils";
 
+/**
+ * @public
+ * @interface DevicePreviewControlsProps
+ * @description Contrato de props para el componente.
+ * @version 1.1.0
+ * @author Raz Podestá
+ */
 export interface DevicePreviewControlsProps {
   currentDevice: DevicePreview;
   setDevice: (device: DevicePreview) => void;
@@ -81,12 +81,10 @@ export function DevicePreviewControls({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Nuevo componente puro, controlado y reutilizable.
- * 2. **Full Internacionalización y Accesibilidad**: ((Implementada)) Todos los textos y `aria-labels` se consumen desde la capa de i18n. El estado `aria-pressed` mejora la accesibilidad.
+ * 1. **Alineación de API**: ((Implementada)) El componente ahora utiliza la variante `background` que fue añadida a la SSoT de estilos (`variants.ts`), resolviendo el error de tipo.
  *
  * @subsection Melhorias Futuras
- * 1. **Transiciones Animadas**: ((Vigente)) Usar `framer-motion` para animar el indicador de estado activo al cambiar de dispositivo, proporcionando una transición más fluida.
+ * 1. **Transiciones Animadas**: ((Vigente)) Usar `framer-motion` para animar el indicador de estado activo al cambiar de dispositivo.
  *
  * =====================================================================
  */
-// src/components/builder/ui/DevicePreviewControls.tsx

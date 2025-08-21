@@ -6,17 +6,16 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        solid: "text-white",
-        outline: "border-2 bg-transparent",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "underline-offset-4 hover:underline",
-      },
-      colorScheme: {
-        primary: "",
-        secondary: "",
-        destructive: "",
-        success: "",
-        warning: "",
+        link: "text-primary underline-offset-4 hover:underline",
+        background: "bg-background text-foreground hover:bg-muted",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -25,53 +24,22 @@ export const buttonVariants = cva(
         icon: "h-10 w-10",
       },
     },
-    compoundVariants: [
-      {
-        variant: "solid",
-        colorScheme: "primary",
-        className: "bg-primary text-primary-foreground hover:bg-primary/90",
-      },
-      {
-        variant: "solid",
-        colorScheme: "secondary",
-        className:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      },
-      {
-        variant: "solid",
-        colorScheme: "destructive",
-        className:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-      },
-      {
-        variant: "solid",
-        colorScheme: "success",
-        className: "bg-green-600 text-white hover:bg-green-600/90",
-      },
-      {
-        variant: "solid",
-        colorScheme: "warning",
-        className: "bg-yellow-500 text-black hover:bg-yellow-500/90",
-      },
-      {
-        variant: "outline",
-        colorScheme: "primary",
-        className: "border-primary text-primary hover:bg-primary/10",
-      },
-      {
-        variant: "outline",
-        colorScheme: "destructive",
-        className:
-          "border-destructive text-destructive hover:bg-destructive/10",
-      },
-      { variant: "link", colorScheme: "primary", className: "text-primary" },
-    ],
     defaultVariants: {
-      variant: "solid",
+      variant: "default",
       size: "default",
-      colorScheme: "primary",
     },
   }
 );
 
 export type ButtonVariantsProps = VariantProps<typeof buttonVariants>;
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **API de Variantes Unificada**: ((Implementada)) Se ha eliminado `colorScheme`. Todas las variaciones de estilo ahora se controlan a través de la única prop `variant`, simplificando la API y resolviendo la causa raíz de los errores de tipo.
+ *
+ * =====================================================================
+ */

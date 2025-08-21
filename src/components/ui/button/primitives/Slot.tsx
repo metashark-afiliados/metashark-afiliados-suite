@@ -2,17 +2,18 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
-import { buttonVariants, type ButtonVariantsProps } from "../variants";
+import { buttonVariants } from "../variants";
+import { type ButtonBaseProps } from "./Base"; // Importar el tipo base
 
-// --- CORRECCIÓN: El contrato ahora incluye las variantes de estilo ---
-export type ButtonSlotProps = React.HTMLAttributes<HTMLElement> &
-  ButtonVariantsProps & { children: React.ReactElement };
+export type ButtonSlotProps = ButtonBaseProps & {
+  children: React.ReactElement;
+};
 
 export const ButtonSlot = React.forwardRef<HTMLElement, ButtonSlotProps>(
-  ({ className, variant, size, colorScheme, children, ...props }, ref) => (
+  ({ className, variant, size, children, ...props }, ref) => (
     <Slot
       ref={ref}
-      className={cn(buttonVariants({ variant, size, colorScheme, className }))}
+      className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     >
       {children}
@@ -20,4 +21,13 @@ export const ButtonSlot = React.forwardRef<HTMLElement, ButtonSlotProps>(
   )
 );
 ButtonSlot.displayName = "ButtonSlot";
-// src/components/ui/button/primitives/Slot.tsx
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Herencia de Props Completa**: ((Implementada)) `ButtonSlotProps` ahora extiende `ButtonBaseProps`, heredando `disabled` y todos los demás atributos de botón, resolviendo el error de tipo en `pagination-controls`.
+ * =====================================================================
+ */

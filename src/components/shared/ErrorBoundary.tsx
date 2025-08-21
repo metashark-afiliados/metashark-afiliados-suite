@@ -1,13 +1,4 @@
 // src/components/shared/ErrorBoundary.tsx
-/**
- * @file src/components/shared/ErrorBoundary.tsx
- * @description Componente de UI atómico y de élite que implementa un Error Boundary
- *              de React. Este aparato captura errores de renderizado de JavaScript en
- *              sus componentes hijos, previene que toda la aplicación se rompa,
- *              y renderiza una UI de fallback.
- * @author Raz Podestá
- * @version 1.0.0
- */
 "use client";
 
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
@@ -42,6 +33,14 @@ const DefaultFallback = ({ reset }: { reset: () => void }) => (
   </Card>
 );
 
+/**
+ * @public
+ * @component ErrorBoundary
+ * @description Componente de UI atómico que captura errores de renderizado.
+ *              Alineado con la API de Button v12.0.
+ * @author Raz Podestá
+ * @version 1.1.0
+ */
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
@@ -56,8 +55,6 @@ export class ErrorBoundary extends Component<Props, State> {
       error,
       errorInfo,
     });
-    // Aquí se podría integrar un reporte a Sentry
-    // Sentry.captureException(error, { extra: errorInfo });
   }
 
   private handleReset = () => {
@@ -81,7 +78,6 @@ export class ErrorBoundary extends Component<Props, State> {
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Adicionadas
- * 1. **Resiliencia de UI**: ((Implementada)) Este componente previene que errores en un componente hijo rompan toda la aplicación, una práctica de élite para la robustez en producción.
+ * 1. **Alineación de API**: ((Implementada)) Se ha corregido el uso de la prop `variant` en el `Button`, resolviendo el error de tipo.
  * =====================================================================
  */
-// src/components/shared/ErrorBoundary.tsx

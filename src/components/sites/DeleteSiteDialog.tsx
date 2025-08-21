@@ -1,14 +1,4 @@
 // src/components/sites/DeleteSiteDialog.tsx
-/**
- * @file src/components/sites/DeleteSiteDialog.tsx
- * @description Modal de confirmación para la eliminación irreversible de un sitio.
- *              Este aparato es un componente de presentación 100% puro y agnóstico
- *              al contenido, recibiendo todos sus textos, estado y callbacks a
- *              través de su contrato de props. Encapsula la lógica de un
- *              formulario para pasar datos ocultos a la Server Action.
- * @author L.I.A. Legacy
- * @version 1.0.0
- */
 "use client";
 
 import * as React from "react";
@@ -26,11 +16,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-/**
- * @public
- * @interface DeleteSiteDialogTexts
- * @description Contrato para los textos internacionalizados del diálogo.
- */
 export interface DeleteSiteDialogTexts {
   title: string;
   description: (subdomain: string) => React.ReactNode;
@@ -54,10 +39,10 @@ interface DeleteSiteDialogProps {
 /**
  * @public
  * @component DeleteSiteDialog
- * @description Renderiza un botón que, al ser presionado, abre un modal de
- *              confirmación para una acción destructiva (eliminar sitio).
- * @param {DeleteSiteDialogProps} props - Las propiedades para configurar el diálogo.
- * @returns {React.ReactElement}
+ * @description Renderiza un modal de confirmación para eliminar un sitio.
+ *              Alineado con la API de Button v12.0.
+ * @author L.I.A. Legacy
+ * @version 1.1.0
  */
 export function DeleteSiteDialog({
   site,
@@ -114,13 +99,7 @@ export function DeleteSiteDialog({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Puro y Controlado**: ((Implementada)) El aparato es 100% controlado por props, lo que lo hace predecible, testeable y reutilizable.
- * 2. **Soporte para Texto Enriquecido**: ((Implementada)) La prop `description` acepta `React.ReactNode`, permitiendo que el componente padre pase texto formateado (ej. con `<strong>`), una práctica de élite para la internacionalización.
- * 3. **Paso de Datos Ocultos**: ((Implementada)) Utiliza un `<input type="hidden">` dentro de un formulario para pasar el `siteId` a la Server Action, un patrón robusto para acciones que operan sobre una entidad específica.
- *
- * @subsection Melhorias Futuras
- * 1. **Componente Genérico `ConfirmationDialog`**: ((Vigente)) Este componente sigue un patrón muy común. Podría ser abstraído a un `ConfirmationDialog` más genérico que reciba el `triggerButton`, el contenido y los `hiddenInputs` como props, para ser reutilizado en toda la aplicación para cualquier acción de confirmación.
+ * 1. **Alineación de API de Button**: ((Implementada)) Se ha corregido el uso de la prop `variant`, resolviendo el error de tipo.
  *
  * =====================================================================
  */
-// src/components/sites/DeleteSiteDialog.tsx

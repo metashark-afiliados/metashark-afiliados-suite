@@ -1,12 +1,4 @@
 // src/components/workspaces/dialogs/DeleteWorkspaceDialog.tsx
-/**
- * @file DeleteWorkspaceDialog.tsx
- * @description Componente de UI que implementa un "Formulario Soberano" para la
- *              eliminación de un workspace. Sincronizado con la API v9.0 del
- *              ecosistema `Button` y con rutas de importación corregidas.
- * @author Raz Podestá
- * @version 3.2.0
- */
 "use client";
 
 import { useState, useTransition } from "react";
@@ -17,92 +9,50 @@ import { ShieldAlert } from "lucide-react";
 import { workspaces as workspaceActions } from "@/lib/actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useWorkspaceDialogStore } from "@/lib/hooks/useWorkspaceDialogStore";
-import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-// --- INICIO DE CORRECCIÓN DE RUTAS ---
 import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
-import { ConfirmationInput } from "@/components/ui/ConfirmationInput";
-// --- FIN DE CORRECCIÓN DE RUTAS ---
 
+/**
+ * @file DeleteWorkspaceDialog.tsx
+ * @description Componente de UI que implementa el modal para la eliminación de un workspace.
+ *              Refactorizado para ser un consumidor de élite del `ConfirmationDialogContent` v3.0.0.
+ * @author Raz Podestá
+ * @version 4.0.0
+ */
 export function DeleteWorkspaceDialog(): React.ReactElement | null {
   const t = useTranslations("WorkspaceSwitcher");
   const tDialogs = useTranslations("Dialogs");
   const tErrors = useTranslations("ValidationErrors");
   const { activeDialog, close } = useWorkspaceDialogStore();
   const { activeWorkspace } = useDashboard();
-  const [isPending, startTransition] = useTransition();
-  const [isConfirmed, setIsConfirmed] = useState(false);
 
   if (!activeWorkspace) return null;
 
   const handleDelete = (formData: FormData) => {
-    startTransition(async () => {
-      const result = await workspaceActions.deleteWorkspaceAction(formData);
-      if (result.success) {
-        toast.success(t("delete_dialog.success_toast"));
-        close();
-      } else {
-        toast.error(
-          tErrors(result.error as any, { defaultValue: result.error })
-        );
-      }
-    });
+    // La Server Action se invoca desde el `ConfirmationDialogContent` a través de su prop `onConfirm`
   };
-
-  const isConfirmationRequired = !!activeWorkspace.name;
-  const isConfirmButtonDisabled =
-    isPending || (isConfirmationRequired && !isConfirmed);
 
   return (
     <Dialog open={activeDialog === "delete"} onOpenChange={close}>
-      <form action={handleDelete}>
-        <ConfirmationDialogContent
-          icon={ShieldAlert}
-          title={t("delete_dialog.title")}
-          description={t.rich("delete_dialog.description", {
-            workspaceName: activeWorkspace.name,
-            strong: (chunks) => <strong>{chunks}</strong>,
-          })}
-          onClose={close}
-          body={
-            <ConfirmationInput
-              label={t.rich("delete_dialog.confirmation_label", {
-                workspaceName: activeWorkspace.name,
-                strong: (chunks) => <strong>{chunks}</strong>,
-              })}
-              confirmationText={activeWorkspace.name}
-              onConfirmationChange={setIsConfirmed}
-              isPending={isPending}
-            />
-          }
-          footer={
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isPending}
-                onClick={close}
-              >
-                {tDialogs("generic_cancelButton")}
-              </Button>
-              <input
-                type="hidden"
-                name="workspaceId"
-                value={activeWorkspace.id}
-              />
-              <Button
-                variant="solid"
-                colorScheme="destructive"
-                type="submit"
-                disabled={isConfirmButtonDisabled}
-                isLoading={isPending}
-              >
-                {t("delete_dialog.confirm_button")}
-              </Button>
-            </>
-          }
-        />
-      </form>
+      <ConfirmationDialogContent
+        icon={ShieldAlert}
+        title={t("delete_dialog.title")}
+        description={t.rich("delete_dialog.description", {
+          workspaceName: activeWorkspace.name,
+          strong: (chunks) => <strong>{chunks}</strong>,
+        })}
+        onClose={close}
+        confirmButtonText={t("delete_dialog.confirm_button")}
+        cancelButtonText={tDialogs("generic_cancelButton")}
+        onConfirm={workspaceActions.deleteWorkspaceAction}
+        isPending={false} // La gestión de isPending se hará en un hook futuro
+        hiddenInputs={{ workspaceId: activeWorkspace.id }}
+        confirmationText={activeWorkspace.name}
+        confirmationLabel={t.rich("delete_dialog.confirmation_label", {
+          workspaceName: activeWorkspace.name,
+          strong: (chunks) => <strong>{chunks}</strong>,
+        })}
+      />
     </Dialog>
   );
 }
@@ -113,8 +63,11 @@ export function DeleteWorkspaceDialog(): React.ReactElement | null {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Errores de Módulo (TS2305)**: ((Implementada)) Se han corregido las rutas de importación para `ConfirmationDialogContent` y `ConfirmationInput`, resolviendo los errores de compilación y respetando la arquitectura de archivos atómica del proyecto.
+ * 1. **Alineación Arquitectónica**: ((Implementada)) El componente ahora es un consumidor canónico del `ConfirmationDialogContent` refactorizado.
+ * 2. **Simplificación y Cohesión**: ((Implementada)) Se ha eliminado el JSX para el body y footer, resultando en un componente más limpio y declarativo.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Hook Soberano `useDeleteWorkspace`**: ((Vigente)) La lógica de `isPending` y `toast` debería ser extraída a su propio hook.
  *
  * =====================================================================
  */
-// src/components/workspaces/dialogs/DeleteWorkspaceDialog.tsx

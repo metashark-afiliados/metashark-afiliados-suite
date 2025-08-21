@@ -1,38 +1,11 @@
 // src/components/sites/SiteCard.tsx
-/**
- * @file src/components/sites/SiteCard.tsx
- * @description Componente de presentación atómico para una tarjeta de sitio.
- *              Ha sido refactorizado para consumir el nuevo `ConfirmationDialogContent`
- *              y gestionar su propio estado de diálogo, siguiendo el patrón de
- *              composición de élite.
- * @author L.I.A. Legacy
- * @version 2.0.0
- */
-"use client";
+import React from "react";
 
-import React, { useState } from "react";
-import { ExternalLink, Info, ShieldAlert, Trash2 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
+import { Card as CardPrimitive } from "@/components/ui/card";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { Link } from "@/lib/navigation";
-import { protocol, rootDomain } from "@/lib/utils";
+import { SiteCardFooter } from "./SiteCardFooter";
+import { SiteCardHeader } from "./SiteCardHeader";
 
-// ... (Interfaces de props sin cambios) ...
 export interface SiteCardTexts {
   campaignCount: (count: number) => string;
   manageCampaignsButton: string;
@@ -59,6 +32,16 @@ interface SiteCardProps {
   deleteDialogTexts: DeleteSiteDialogTexts;
 }
 
+/**
+ * @public
+ * @component SiteCard
+ * @description Orquestador de UI puro que ensambla una tarjeta de sitio
+ *              a partir de los átomos `SiteCardHeader` y `SiteCardFooter`.
+ * @param {SiteCardProps} props - Propiedades para configurar la tarjeta.
+ * @returns {React.ReactElement}
+ * @version 3.0.0
+ * @author Raz Podestá
+ */
 export function SiteCard({
   site,
   onDelete,
@@ -67,64 +50,36 @@ export function SiteCard({
   texts,
   deleteDialogTexts,
 }: SiteCardProps): React.ReactElement {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const handleDeleteConfirm = (formData: FormData) => {
-    onDelete(formData);
-    // La UI optimista se encargará de remover la tarjeta,
-    // y la revalidación del servidor confirmará el estado.
-    // Podríamos cerrar el diálogo aquí, pero es mejor esperar
-    // la respuesta de la acción.
-  };
-
   return (
-    <Card className="flex flex-col justify-between h-full transition-all hover:border-primary/50 hover:shadow-lg">
-      <CardHeader>{/* ... (Contenido sin cambios) ... */}</CardHeader>
-      <CardFooter className="justify-between">
-        <Button variant="outline" asChild>
-          <Link
-            href={{
-              pathname: "/dashboard/sites/[siteId]/campaigns",
-              params: { siteId: site.id },
-            }}
-          >
-            {texts.manageCampaignsButton}
-          </Link>
-        </Button>
-        <div className="flex items-center gap-1">
-          {/* ... (Popover y ExternalLink sin cambios) ... */}
-
-          <Dialog
-            open={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-          >
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-destructive hover:bg-destructive/10 hover:text-destructive h-9 w-9"
-                aria-label={texts.deleteSiteAriaLabel(site.subdomain || "")}
-              />
-            </DialogTrigger>
-            <ConfirmationDialogContent
-              icon={ShieldAlert}
-              title={deleteDialogTexts.title}
-              description={deleteDialogTexts.description(site.subdomain || "")}
-              confirmButtonText={deleteDialogTexts.confirmButton}
-              cancelButtonText={deleteDialogTexts.cancelButton}
-              onConfirm={handleDeleteConfirm}
-              onClose={() => setIsDeleteDialogOpen(false)}
-              isPending={isPending && deletingSiteId === site.id}
-              hiddenInputs={{ siteId: site.id }}
-              confirmationText={site.subdomain || ""}
-              confirmationLabel={deleteDialogTexts.confirmationLabel(
-                site.subdomain || ""
-              )}
-            />
-          </Dialog>
-        </div>
-      </CardFooter>
-    </Card>
+    <CardPrimitive className="flex flex-col justify-between h-full transition-all hover:border-primary/50 hover:shadow-lg">
+      <SiteCardHeader
+        name={site.name}
+        campaignCountText={texts.campaignCount(site.campaign_count)}
+        popoverTitle={texts.popoverTitle}
+        popoverDescription={texts.popoverDescription}
+      />
+      <SiteCardFooter
+        site={site}
+        onDelete={onDelete}
+        isPending={isPending}
+        deletingSiteId={deletingSiteId}
+        texts={texts}
+        deleteDialogTexts={deleteDialogTexts}
+      />
+    </CardPrimitive>
   );
 }
-// src/components/sites/SiteCard.tsx
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Hiper-Atomicidad (Orquestador Puro)**: ((Implementada)) El componente ahora es un ensamblador puro que solo compone `SiteCardHeader` y `SiteCardFooter`.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Propagación de `children`**: ((Vigente)) El componente podría aceptar `children` para renderizar contenido personalizado en el cuerpo de la tarjeta.
+ *
+ * =====================================================================
+ */
