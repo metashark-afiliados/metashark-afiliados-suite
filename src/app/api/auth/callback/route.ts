@@ -1,21 +1,17 @@
 // src/app/api/auth/callback/route.ts
 /**
  * @file src/app/api/auth/callback/route.ts
- * @description Route Handler para el callback de autenticación. Nivelado a un
- *              estándar de élite con validación de seguridad para prevenir
- *              vulnerabilidades de "Open Redirect".
+ * @description Route Handler para el callback de autenticación. Ha sido
+ *              refactorizado para "Producción Total", eliminando la lógica de
+ *              simulación para interactuar siempre con la API real de Supabase
+ *              y manteniendo la validación de seguridad anti "Open Redirect".
  * @author Raz Podestá
- * @version 2.1.0
+ * @version 3.0.0
  */
-import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
-
-const isDevMode =
-  process.env.NODE_ENV === "development" &&
-  process.env.DEV_MODE_ENABLED === "true";
 
 /**
  * @private
@@ -28,12 +24,20 @@ const isValidRedirect = (path: string): boolean => {
   return path.startsWith("/") && !path.startsWith("//") && !path.includes(":");
 };
 
+/**
+ * @public
+ * @async
+ * @function GET
+ * @description Maneja el callback de autenticación de Supabase (OAuth y Magic Links).
+ *              Intercambia el código de autorización por una sesión de usuario.
+ * @param {NextRequest} request - El objeto de la petición entrante.
+ * @returns {Promise<NextResponse>} Una redirección al dashboard o a una página de error.
+ */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next"); // ej. "/dashboard/sites"
+  const next = searchParams.get("next");
 
-  // --- INICIO DE LÓGICA DE SEGURIDAD "OPEN REDIRECT" ---
   let redirectTo = `${origin}/dashboard`;
   if (next && isValidRedirect(next)) {
     redirectTo = `${origin}${next}`;
@@ -43,19 +47,6 @@ export async function GET(request: NextRequest) {
       nextParam: next,
       fallback: redirectTo,
     });
-  }
-  // --- FIN DE LÓGICA DE SEGURIDAD ---
-
-  if (isDevMode && code === "dev-mock-code") {
-    logger.info(
-      "[AuthCallback:DevMock] Código simulado recibido. Estableciendo sesión de desarrollo."
-    );
-    cookies().set("dev_session", "true", {
-      httpOnly: true,
-      path: "/",
-      sameSite: "lax",
-    });
-    return NextResponse.redirect(redirectTo);
   }
 
   if (code) {
@@ -88,12 +79,10 @@ export async function GET(request: NextRequest) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Prevención de Open Redirect**: ((Implementada)) Se ha añadido la función `isValidRedirect` y la lógica correspondiente para validar el parámetro `next`. Esto fortalece la seguridad del flujo de autenticación, una mejora crítica.
- * 2. **Observabilidad de Seguridad**: ((Implementada)) Se ha añadido un `logger.warn` específico para registrar intentos de redirección maliciosos, proporcionando una visibilidad clara sobre posibles ataques.
+ * 1. **Orientado a Producción**: ((Implementada)) Se ha eliminado el bloque condicional que manejaba el `dev-mock-code`. La ruta ahora solo procesa códigos de autorización reales, lo que la hace más segura y simple.
  *
  * @subsection Melhorias Futuras
- * 1. **Lista Blanca de Rutas**: ((Vigente)) Para una seguridad aún más estricta, la función `isValidRedirect` podría ser mejorada para validar la ruta contra el `ROUTE_MANIFEST`, asegurando que solo se pueda redirigir a rutas conocidas por la aplicación.
+ * 1. **Lista Blanca de Rutas de Redirección**: ((Vigente)) Para una seguridad de élite, la función `isValidRedirect` podría ser mejorada para validar la ruta `next` contra una lista blanca de rutas conocidas de la aplicación, en lugar de solo una validación de formato.
  *
  * =====================================================================
  */
-// src/app/api/auth/callback/route.ts
