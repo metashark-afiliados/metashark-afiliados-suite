@@ -1,22 +1,22 @@
 // src/components/feedback/CommandPalette.tsx
 "use client";
 
-import { workspaces as workspaceActions } from "@/lib/actions";
+import React from "react";
+import { setActiveWorkspaceAction } from "@/lib/actions/workspaces.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useCommandPaletteStore } from "@/lib/hooks/use-command-palette";
 import { logger } from "@/lib/logging";
 import { useRouter } from "@/lib/navigation";
-import React from "react";
 import { CommandPaletteContent } from "./CommandPaletteContent";
 
 /**
  * @public
  * @component CommandPalette
- * @description Orquestador de lógica para la paleta de comandos. Gestiona el estado
- *              global, consume el contexto del dashboard y define las acciones a
- *              ejecutar, pasando toda la información al componente de presentación puro.
+ * @description Orquestador de lógica para la paleta de comandos. Corregido para
+ *              utilizar importaciones de Server Action atómicas, resolviendo
+ *              el error de build "server-only".
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 3.1.0
  */
 export function CommandPalette() {
   const { user, workspaces, activeWorkspace, modules } = useDashboard();
@@ -59,7 +59,7 @@ export function CommandPalette() {
 
   const handleWorkspaceSelect = (workspaceId: string) => {
     runCommand(
-      () => workspaceActions.setActiveWorkspaceAction(workspaceId),
+      () => setActiveWorkspaceAction(workspaceId),
       `Switch to ${workspaceId}`
     );
   };
@@ -85,12 +85,11 @@ export function CommandPalette() {
 
 /**
  * =====================================================================
- *                           MEJORA CONTINUA
+ *                           MEJora Continua
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Orquestador Puro (LEGO)**: ((Implementada)) El componente ahora es un orquestador limpio que solo gestiona lógica, adhiriéndose al patrón de "componente contenedor/presentacional".
- * 2. **Error de Build Resuelto**: ((Implementada)) Al no importar ya el barril de acciones, este componente ya no contamina la cadena de dependencias del cliente.
+ * 1. **Resolución Definitiva de Error de Build**: ((Implementada)) Se ha reemplazado la importación del barril de acciones por una importación atómica y directa de `setActiveWorkspaceAction`, eliminando la causa raíz del fallo de compilación.
  *
  * =====================================================================
  */
