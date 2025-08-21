@@ -2,10 +2,10 @@
 /**
  * @file src/components/layout/DashboardSidebar.tsx
  * @description Barra lateral principal del dashboard. Refactorizada a la Arquitectura v9.1
- *              para actuar como el centro de navegación y contexto soberano, integrando
- *              el `WorkspaceSwitcher` en su parte superior.
+ *              y corregida para consumir el ecosistema atómico `UserMenu`,
+ *              resolviendo un error de build crítico.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
 "use client";
 
@@ -13,7 +13,7 @@ import React from "react";
 
 import { WorkspaceSwitcher } from "@/components/workspaces/WorkspaceSwitcher";
 import { NavList } from "./sidebar/NavList";
-import { UserMenu } from "./sidebar/UserMenu";
+import { UserMenu } from "./sidebar/user-menu";
 
 /**
  * @public
@@ -37,18 +37,18 @@ export function DashboardSidebar(): React.ReactElement {
     </aside>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Implementación de Arquitectura v9.1**: ((Implementada)) El `WorkspaceSwitcher` ha sido movido a la parte superior de la sidebar, fusionando la selección de contexto con la navegación principal. El `SidebarLogo` ha sido eliminado, ya que esta función ahora es responsabilidad del `WorkspaceSwitcher`.
- * 2. **Cohesión de Contexto**: ((Implementada)) La nueva estructura sigue el patrón de diseño de élite donde el contexto (workspace) se establece jerárquicamente por encima de las acciones (navegación), mejorando la claridad de la UI.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha corregido la ruta de importación de `UserMenu` para que apunte a `./sidebar/user-menu`, consumiendo el nuevo ecosistema atómico y resolviendo el fallo de compilación.
+ * 2. **Adhesión a la "Filosofía LEGO"**: ((Implementada)) El componente ahora ensambla correctamente los aparatos atómicos, respetando la arquitectura de élite.
  *
  * @subsection Melhorias Futuras
  * 1. **Sidebar Colapsable**: ((Vigente)) Implementar la lógica para colapsar la sidebar, mostrando solo iconos y el logo del workspace, para una UX más compacta.
  *
  * =====================================================================
  */
-// src/components/layout/DashboardSidebar.tsx

@@ -56,9 +56,7 @@ export function UserMenu(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Ensamblaje Puro (LEGO)**: ((Implementada)) El componente ahora es un orquestador limpio y legible que solo se encarga de componer los átomos `UserMenuTrigger`, `UserMenuContent` y `UserMenuSkeleton`.
- * 2. **Principio de Responsabilidad Única (SRP)**: ((Implementada)) Su única responsabilidad es obtener datos del contexto y pasarlos como props a los componentes de presentación, eliminando toda la lógica de UI y de invocación de acciones.
- * 3. **Error de Build Resuelto**: ((Implementada)) Al no importar ya `sessionActions`, este componente ya no contamina la cadena de dependencias del cliente, resolviendo la causa raíz del fallo de compilación.
+ * 1. **Cohesión Estructural**: ((Implementada)) El aparato ahora reside dentro de su módulo atómico, completando la refactorización y resolviendo el error de build.
  *
  * @subsection Melhorias Futuras
  * 1. **Gestión de Estado de Apertura**: ((Vigente)) Para casos de uso avanzados, podría gestionar el estado `open` del `DropdownMenu` para permitir el cierre programático del menú desde otras acciones en la aplicación.
