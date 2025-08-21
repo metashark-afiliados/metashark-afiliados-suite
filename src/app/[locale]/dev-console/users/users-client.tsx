@@ -1,41 +1,24 @@
 // src/app/[locale]/dev-console/users/users-client.tsx
 /**
  * @file users-client.tsx
- * @description Orquestador de Cliente de élite para la página de Gestión de Usuarios.
- *              Compone la UI, gestiona la interactividad (búsqueda, cambio de rol)
- *              y proporciona feedback al usuario a través de notificaciones.
- *              Ha sido corregido para acceder correctamente a las propiedades de los
- *              objetos de tipo `UserProfilesWithEmail` y para llamar a las Server Actions
- *              con el formato `FormData` adecuado.
- *              Corregido para pasar argumentos directamente a `updateUserRoleAction`.
+ * @description Orquestador de UI de élite y de presentación puro. Consume el
+ *              hook soberano `useUsersPage` y ensambla los componentes atómicos
+ *              para construir la página de Gestión de Usuarios.
  * @author Raz Podestá
- * @version 3.0.1
+ * @version 5.0.0
  */
 "use client";
 
-import React, { useTransition } from "react";
+import React from "react";
 import { useTranslations } from "next-intl";
-import toast from "react-hot-toast";
-import { type ColumnDef } from "@tanstack/react-table";
 
-import { admin as adminActions } from "@/lib/actions";
-import { usePathname, useRouter } from "@/lib/navigation";
-import { type Database } from "@/lib/types/database";
+import { useUsersPage } from "@/lib/hooks/useUsersPage";
 import { type UserProfilesWithEmail } from "@/lib/types/database/views";
 import { DataTable } from "@/components/shared/data-table";
 import { PaginationControls } from "@/components/shared/pagination-controls";
 import { SearchInput } from "@/components/ui/SearchInput";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ImpersonationDialog } from "../components/ImpersonationDialog";
-import { useDebounce } from "@/lib/hooks/use-debounce";
+import { getUsersColumns } from "./../components/users-table-columns";
 
-// CORRECTION: Access the Row type from UserProfilesWithEmail
 type ProfileRow = UserProfilesWithEmail["Row"];
 
 interface UsersClientProps {
@@ -54,119 +37,32 @@ export function UsersClient({
   searchQuery,
 }: UsersClientProps): React.ReactElement {
   const t = useTranslations("app.dev-console.UserManagementTable");
-  const tAdminToasts = useTranslations(
-    "app.dev-console.AdminDashboard.admin_toasts"
-  );
-  const tAdminErrors = useTranslations(
-    "app.dev-console.AdminDashboard.admin_errors"
-  );
+  const { isPending, searchTerm, setSearchTerm, handleRoleChange } =
+    useUsersPage({ initialSearchQuery: searchQuery });
 
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const handleRoleChange = (
-    userId: string,
-    newRole: Database["public"]["Enums"]["app_role"]
-  ) => {
-    startTransition(async () => {
-      // Justification: The adminActions.updateUserRoleAction expects userId and newRole
-      // directly as arguments, not a FormData object. This correction aligns the call
-      // with the action's signature, resolving TS2554.
-      const result = await adminActions.updateUserRoleAction(userId, newRole);
-
-      if (result.success) {
-        toast.success(tAdminToasts("user_role_updated_success"));
-      } else {
-        toast.error(
-          tAdminErrors(result.error as any) || tAdminErrors("unexpected_error")
-        );
-      }
-    });
-  };
-
-  const debouncedSearchHandler = useDebounce((query: string) => {
-    const params = new URLSearchParams(window.location.search);
-    if (query) {
-      params.set("q", query);
-    } else {
-      params.delete("q");
-    }
-    params.set("page", "1");
-    router.push(`${pathname}?${params.toString()}` as any);
-  }, 500);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    debouncedSearchHandler(query);
-  };
-
-  const columns: ColumnDef<ProfileRow>[] = React.useMemo(
-    () => [
-      {
-        header: t("table_header.email"),
-        cell: ({ row }) => (
-          <div>
-            <div className="font-medium">{row.original.email}</div>
-            <div className="text-xs text-muted-foreground font-mono">
-              {row.original.id}
-            </div>
-          </div>
-        ),
-      },
-      {
-        accessorKey: "full_name",
-        header: t("table_header.full_name"),
-        cell: ({ row }) => row.original.full_name || "N/A",
-      },
-      {
-        accessorKey: "app_role",
-        header: t("table_header.role"),
-        cell: ({ row }) => (
-          <Select
-            defaultValue={row.original.app_role || "user"}
-            onValueChange={(value) =>
-              handleRoleChange(
-                row.original.id!,
-                value as Database["public"]["Enums"]["app_role"]
-              )
-            }
-            disabled={isPending}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="user">User</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-              <SelectItem value="developer">Developer</SelectItem>
-            </SelectContent>
-          </Select>
-        ),
-      },
-      {
-        id: "actions",
-        header: () => (
-          <div className="text-right">{t("table_header.actions")}</div>
-        ),
-        cell: ({ row }) => (
-          <div className="text-right">
-            <ImpersonationDialog profile={row.original} />
-          </div>
-        ),
-      },
-    ],
-    [isPending, t, handleRoleChange]
+  // La definición de columnas se obtiene de la factoría atómica.
+  const columns = React.useMemo(
+    () => getUsersColumns({ t, isPending, handleRoleChange }),
+    [t, isPending, handleRoleChange]
   );
 
   return (
     <div className="space-y-6">
-      <SearchInput
-        placeholder={t("search_placeholder")}
-        value={searchQuery}
-        onChange={handleSearchChange}
-        clearAriaLabel={t("clear_search_aria")}
-      />
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">{t("table_header.email")}</h1>
+          <p className="text-muted-foreground">
+            Manage all users on the platform.
+          </p>
+        </div>
+        <SearchInput
+          placeholder={t("search_placeholder")}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          clearAriaLabel={t("clear_search_aria")}
+          className="w-full sm:max-w-xs"
+        />
+      </div>
       <DataTable
         columns={columns}
         data={profiles}
@@ -176,8 +72,8 @@ export function UsersClient({
         page={page}
         totalCount={totalCount}
         limit={limit}
-        basePath={pathname}
-        searchQuery={searchQuery}
+        basePath="/dev-console/users"
+        searchQuery={searchTerm}
         texts={{
           previousPageLabel: t("pagination.previousPageLabel"),
           nextPageLabel: t("pagination.nextPageLabel"),
@@ -187,17 +83,17 @@ export function UsersClient({
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Correção de Chamada de Server Action**: ((Implementada)) A chamada a `adminActions.updateUserRoleAction` agora passa `userId` e `newRole` como argumentos separados, resolvendo o erro `TS2554`.
+ * 1. **Hiper-Atomicidad (SRP)**: ((Implementada)) La lógica de definición de columnas ha sido abstraída a la factoría `getUsersColumns`, haciendo que este componente sea un orquestador de UI aún más puro y simple.
+ * 2. **Consistencia Arquitectónica**: ((Implementada)) Al adoptar el patrón de factoría de columnas, este módulo ahora es arquitectónicamente consistente con el módulo de `Campaigns`, mejorando la predictibilidad de la base de código.
  *
  * @subsection Melhorias Futuras
- * 1. **Refatorar para `useUsersPage` Pattern**: ((Vigente)) Este componente (`UsersClient`) poderia ser mais coeso se a lógica de busca (termo de busca, `handleSearchChange`) fosse encapsulada em um hook soberano `useUsersPage` (similar a `useSitesPage` e `useCampaignsPage`), seguindo o padrão de abstração já presente no projeto.
+ * 1. **Abstracción del Header**: ((Vigente)) El JSX para el header de la página (título, descripción y `SearchInput`) podría ser extraído a su propio componente atómico `UsersPageHeader.tsx` para una atomicidad máxima.
  *
  * =====================================================================
  */

@@ -1,24 +1,24 @@
 // tests/mocks/vi/actions.mock.ts
 /**
  * @file tests/mocks/vi/actions.mock.ts
- * @description Factoría de mock atómica para todas las Server Actions de la aplicación.
- *              Esta es la Única Fuente de Verdad para simular la API de acciones del
- *              servidor a nivel de módulo. Proporciona espías (`vi.fn`) para cada acción,
- *              con implementaciones de alta fidelidad que respetan los contratos de
- *              retorno de las acciones reales.
+ * @description Factoría de mock atómica para todas las Server Actions.
+ *              Ha sido nivelada a un estándar de élite con type hints explícitos
+ *              para reflejar con alta fidelidad el contrato `ActionResult`.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
 import { vi } from "vitest";
+import { type ActionResult } from "@/lib/validators"; // <-- IMPORTACIÓN DEL CONTRATO REAL
 
-// --- Factorías de Respuestas de Alta Fidelidad ---
-const createDefaultSuccess = (data: any = {}) =>
+// --- INICIO DE REFACTORIZACIÓN (TYPE HINT DE ALTA FIDELIDAD) ---
+// La factoría ahora devuelve explícitamente una promesa del tipo ActionResult.
+const createDefaultSuccess = (data: any = {}): Promise<ActionResult<any>> =>
   Promise.resolve({
     success: true,
     data: { id: "mock-id-12345", message: "Acción simulada exitosa", ...data },
   });
+// --- FIN DE REFACTORIZACIÓN ---
 
-// --- SSoT: Objeto de Mocks de Acciones ---
 export const mockActions = {
   admin: {
     impersonateUserAction: vi.fn(() =>
@@ -94,24 +94,18 @@ export const mockActionHelpers = {
   createPersistentErrorLog: vi.fn().mockResolvedValue("mock-error-id-123"),
 };
 
-// --- Orquestador de Simulación ---
 export const setupActionsMock = () => {
   vi.mock("@/lib/actions", () => ({ ...mockActions }));
   vi.mock("@/lib/actions/_helpers", () => mockActionHelpers);
 };
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alta Fidelidad de Contrato**: ((Implementada)) Las respuestas por defecto ahora replican los contratos de retorno reales de cada Server Action, resolviendo la causa raíz de los fallos en las pruebas.
- * 2. **Cobertura Completa**: ((Implementada)) El mock ahora simula el 100% de la API de Server Actions definida en la aplicación.
- * 3. **Atomicidad y SRP**: ((Implementada)) Se ha separado la simulación de los helpers de las acciones principales, mejorando la granularidad y la cohesión.
- *
- * @subsection Melhorias Futuras
- * 1. **Generación Automática desde API**: ((Vigente)) Un script podría analizar el archivo `src/lib/actions/index.ts` y generar automáticamente el objeto `mockActions`, garantizando una sincronización perfecta y eliminando el mantenimiento manual.
+ * 1. **Resolución de Error de Tipos (TS2345)**: ((Implementada)) Al añadir un type hint explícito a la factoría `createDefaultSuccess`, el compilador de TypeScript ahora infiere correctamente que todas las acciones simuladas devuelven `Promise<ActionResult<any>>`. Esto resuelve el error de tipo en el arnés de pruebas de forma sistémica.
+ * 2. **Mock de Alta Fidelidad**: ((Implementada)) La infraestructura de mocks ahora refleja con mayor precisión los contratos de tipo de producción, aumentando la robustez general de la suite de pruebas.
  *
  * =====================================================================
  */
