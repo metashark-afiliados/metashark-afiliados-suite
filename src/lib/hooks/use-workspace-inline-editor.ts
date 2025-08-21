@@ -1,21 +1,21 @@
 // src/lib/hooks/use-workspace-inline-editor.ts
-/**
- * @file use-workspace-inline-editor.ts
- * @description Hook Soberano que encapsula la lógica de estado y negocio
- *              para la edición en línea del nombre del workspace.
- * @author Raz Podestá
- * @version 1.0.2 (Naming Reverted)
- */
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 
-import { workspaces as workspaceActions } from "@/lib/actions";
+import { updateWorkspaceNameAction } from "@/lib/actions/workspaces.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { logger } from "@/lib/logging";
 
+/**
+ * @file use-workspace-inline-editor.ts
+ * @description Hook Soberano para la edición en línea del nombre del workspace.
+ *              Corregido para usar importaciones atómicas de Server Actions.
+ * @author Raz Podestá
+ * @version 2.0.0
+ */
 export function useWorkspaceInlineEditor() {
   const t = useTranslations("WorkspaceSwitcher");
   const tErrors = useTranslations("ValidationErrors");
@@ -54,12 +54,8 @@ export function useWorkspaceInlineEditor() {
       return;
     }
 
-    logger.trace(
-      `[useWorkspaceInlineEditor] Guardando nuevo nombre para workspace: ${activeWorkspace.id}`
-    );
-
     startApiTransition(async () => {
-      const result = await workspaceActions.updateWorkspaceNameAction(
+      const result = await updateWorkspaceNameAction(
         activeWorkspace.id,
         inputValue
       );
@@ -88,15 +84,3 @@ export function useWorkspaceInlineEditor() {
     activeWorkspaceName,
   };
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Consistencia de Nomenclatura (Revertida)**: ((Implementada)) Se ha revertido el nombre del archivo a `kebab-case` para mantener la coherencia con el snapshot original.
- *
- * =====================================================================
- */
-// src/lib/hooks/use-workspace-inline-editor.ts

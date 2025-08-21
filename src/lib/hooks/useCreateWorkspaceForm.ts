@@ -1,13 +1,4 @@
 // src/lib/hooks/useCreateWorkspaceForm.ts
-/**
- * @file useCreateWorkspaceForm.ts
- * @description Hook Soberano que encapsula la lógica completa para el formulario
- *              de creación de workspaces. Gestiona el estado con `react-hook-form`,
- *              la validación con Zod, la mutación con Server Actions, y el
- *              feedback al usuario con `react-hot-toast`.
- * @author Raz Podestá
- * @version 1.0.0
- */
 "use client";
 
 import { useTransition } from "react";
@@ -17,7 +8,7 @@ import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
 
-import { workspaces as workspaceActions } from "@/lib/actions";
+import { createWorkspaceAction } from "@/lib/actions/workspaces.actions";
 import { clientLogger } from "@/lib/logging";
 import { CreateWorkspaceSchema } from "@/lib/validators";
 
@@ -26,12 +17,13 @@ type FormData = z.infer<typeof CreateWorkspaceSchema>;
 /**
  * @public
  * @interface UseCreateWorkspaceFormProps
- * @description Contrato de props para el hook.
+ * @description Define el contrato de props para el hook `useCreateWorkspaceForm`.
  */
 interface UseCreateWorkspaceFormProps {
   /**
-   * Callback que se ejecuta después de una creación exitosa.
-   * Usualmente se utiliza para cerrar el modal que contiene el formulario.
+   * @property onSuccess
+   * @description Callback que se ejecuta después de una creación exitosa.
+   *              Usualmente se utiliza para cerrar el modal que contiene el formulario.
    */
   onSuccess: () => void;
 }
@@ -39,10 +31,16 @@ interface UseCreateWorkspaceFormProps {
 /**
  * @public
  * @function useCreateWorkspaceForm
- * @description Orquesta toda la lógica para el formulario de creación de workspaces.
+ * @description Hook Soberano que encapsula la lógica completa para el formulario
+ *              de creación de workspaces. Gestiona el estado con `react-hook-form`,
+ *              la validación con Zod, la mutación con Server Actions, y el
+ *              feedback al usuario con `react-hot-toast`.
  * @param {UseCreateWorkspaceFormProps} props - Las dependencias del hook.
- * @returns Un objeto con el estado y los manejadores para ser consumidos por un
- *          componente de presentación puro.
+ * @returns Un objeto con la instancia del formulario, el estado de carga y el
+ *          manejador de envío para ser consumidos por un componente de
+ *          presentación puro.
+ * @version 2.0.0
+ * @author Raz Podestá
  */
 export function useCreateWorkspaceForm({
   onSuccess,
@@ -71,7 +69,7 @@ export function useCreateWorkspaceForm({
       const formData = new FormData();
       formData.append("workspaceName", data.workspaceName);
 
-      const result = await workspaceActions.createWorkspaceAction(formData);
+      const result = await createWorkspaceAction(formData);
 
       if (result.success) {
         toast.success(t("create_form.success_toast"));
@@ -111,14 +109,11 @@ export function useCreateWorkspaceForm({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (Lógica)**: ((Implementada)) Este hook aísla completamente la lógica del formulario, adhiriéndose al Principio de Responsabilidad Única y a la "Filosofía LEGO".
- * 2. **Formulario Soberano**: ((Implementada)) Actúa como el "cerebro" del formulario, gestionando el estado, la validación y la comunicación con el servidor.
- * 3. **Full Observabilidad**: ((Implementada)) Las acciones clave son registradas con `clientLogger` para una depuración y monitoreo efectivos.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha reemplazado la importación del barril de acciones por una importación atómica, resolviendo una futura causa de fallo de compilación "server-only".
+ * 2. **Documentación TSDoc Completa**: ((Implementada)) Se ha añadido documentación TSDoc verbosa y precisa a todas las partes del hook, mejorando la claridad y mantenibilidad.
  *
  * @subsection Melhorias Futuras
  * 1. **Callback de Error**: ((Vigente)) El hook podría aceptar un callback `onError` opcional para permitir al componente consumidor ejecutar lógica personalizada en caso de fallo.
- * 2. **Valores Iniciales Dinámicos**: ((Vigente)) Podría aceptar un objeto `initialValues` para pre-poblar el formulario, útil para futuros flujos de "clonar workspace".
  *
  * =====================================================================
  */
-// src/lib/hooks/useCreateWorkspaceForm.ts
