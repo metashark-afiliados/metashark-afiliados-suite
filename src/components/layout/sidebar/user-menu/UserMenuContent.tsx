@@ -1,4 +1,15 @@
 // src/components/layout/sidebar/user-menu/UserMenuContent.tsx
+/**
+ * @file UserMenuContent.tsx
+ * @description Aparato de UI atómico y de presentación puro. Su única responsabilidad
+ *              es renderizar el contenido del menú desplegable del usuario. Ha sido
+ *              refactorizado a un estándar de élite para utilizar importaciones atómicas
+ *              de Server Actions, resolviendo el error de build "server-only".
+ * @author Raz Podestá
+ * @version 2.0.0
+ */
+"use client";
+
 import React from "react";
 import { LifeBuoy, LogOut, Settings } from "lucide-react";
 
@@ -25,13 +36,10 @@ interface UserMenuContentProps {
 /**
  * @public
  * @component UserMenuContent
- * @description Aparato de UI atómico y de presentación puro. Su única responsabilidad
- *              es renderizar el contenido del menú desplegable del usuario, incluyendo
+ * @description Renderiza el contenido del menú desplegable del usuario, incluyendo
  *              la información del perfil, enlaces de navegación y la acción de cierre de sesión.
  * @param {UserMenuContentProps} props - Propiedades para configurar el contenido del menú.
  * @returns {React.ReactElement} El componente de contenido del menú.
- * @author Raz Podestá
- * @version 1.0.0
  */
 export function UserMenuContent({
   userName,
@@ -72,19 +80,17 @@ export function UserMenuContent({
     </DropdownMenuContentPrimitive>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Hiper-Atomicidad (SRP)**: ((Implementada)) Este componente aísla perfectamente la UI del contenido del menú, cumpliendo el Principio de Responsabilidad Única.
- * 2. **Resolución de Error de Build**: ((Implementada)) La importación directa `signOutAction` desde su módulo atómico, en lugar del barril monolítico, resuelve la causa raíz del fallo de compilación.
- * 3. **Invocación de Server Action Robusta**: ((Implementada)) El uso de `<form action={...}>` es el método canónico y más accesible para invocar Server Actions desde componentes de cliente.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha reemplazado la importación masiva (`session as sessionActions`) por una importación atómica y directa de `signOutAction`. Esto resuelve definitivamente la vulnerabilidad al error "server-only" en este componente.
+ * 2. **Invocación de Server Action Robusta**: ((Implementada)) El uso de `<form action={...}>` se mantiene como el método canónico y más accesible para invocar Server Actions desde componentes de cliente, garantizando la funcionalidad sin regresiones.
  *
  * @subsection Melhorias Futuras
- * 1. **Items de Menú Dinámicos**: ((Vigente)) El componente podría aceptar un array de `items` como prop para renderizar opciones de menú de forma dinámica, por ejemplo, basadas en el rol del usuario (ej. un enlace al `Dev Console`).
+ * 1. **Items de Menú Dinámicos**: ((Vigente)) El componente podría aceptar un array de `items` como prop para renderizar opciones de menú de forma dinámica, por ejemplo, basadas en el rol del usuario (ej. un enlace al `Dev Console` para desarrolladores).
  *
  * =====================================================================
  */

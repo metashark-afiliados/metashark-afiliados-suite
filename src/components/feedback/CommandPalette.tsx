@@ -1,7 +1,18 @@
 // src/components/feedback/CommandPalette.tsx
+/**
+ * @file CommandPalette.tsx
+ * @description Orquestador de lógica para la paleta de comandos. Gestiona el estado
+ *              local (búsqueda, páginas), consume el contexto del dashboard y el
+ *              store de visibilidad, y define los callbacks para la ejecución de comandos.
+ *              Ha sido refactorizado para utilizar importaciones atómicas de Server Actions,
+ *              resolviendo el error de build "server-only".
+ * @author L.I.A. Legacy
+ * @version 4.0.0
+ */
 "use client";
 
 import React from "react";
+
 import { setActiveWorkspaceAction } from "@/lib/actions/workspaces.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useCommandPaletteStore } from "@/lib/hooks/use-command-palette";
@@ -12,11 +23,10 @@ import { CommandPaletteContent } from "./CommandPaletteContent";
 /**
  * @public
  * @component CommandPalette
- * @description Orquestador de lógica para la paleta de comandos. Corregido para
- *              utilizar importaciones de Server Action atómicas, resolviendo
- *              el error de build "server-only".
- * @author L.I.A. Legacy
- * @version 3.1.0
+ * @description Orquesta la lógica y el estado de la paleta de comandos,
+ *              pasando los datos y callbacks al componente de presentación puro
+ *              `CommandPaletteContent`.
+ * @returns {React.ReactElement} El componente de paleta de comandos.
  */
 export function CommandPalette() {
   const { user, workspaces, activeWorkspace, modules } = useDashboard();
@@ -82,14 +92,17 @@ export function CommandPalette() {
     />
   );
 }
-
 /**
  * =====================================================================
- *                           MEJora Continua
+ *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
  * 1. **Resolución Definitiva de Error de Build**: ((Implementada)) Se ha reemplazado la importación del barril de acciones por una importación atómica y directa de `setActiveWorkspaceAction`, eliminando la causa raíz del fallo de compilación.
+ * 2. **Documentación TSDoc de Élite**: ((Implementada)) El componente ha sido documentado exhaustivamente para clarificar su rol como orquestador de lógica.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Comandos de Acción Directa**: ((Vigente)) El `CommandPalette` podría ser extendido para ejecutar Server Actions que no son de navegación, como "Crear Nuevo Sitio". Esto requeriría añadir un nuevo tipo de `CommandItem` y expandir la lógica de `runCommand`.
  *
  * =====================================================================
  */

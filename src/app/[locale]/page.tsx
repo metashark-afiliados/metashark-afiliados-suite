@@ -3,10 +3,10 @@
  * @file src/app/[locale]/page.tsx
  * @description Página de Inicio Pública (Landing Page) de élite. Este Server Component
  *              orquesta la obtención de todo el contenido de la UI desde la capa de
- *              internacionalización y lo pasa como props a los componentes de cliente
- *              puros. Ha sido completamente sincronizado y validado para la Arquitectura v9.1.
+ *              internacionalización. Ha sido refactorizado para consumir la SSoT
+ *              canónica de íconos (`ICONS`), resolviendo un error de compilación crítico.
  * @author Raz Podestá
- * @version 6.0.0
+ * @version 7.0.0
  */
 import { redirect } from "next/navigation";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
@@ -23,7 +23,7 @@ import { Testimonials } from "@/components/landing/Testimonials";
 import { LandingFooter } from "@/components/layout/LandingFooter";
 import { LandingHeader } from "@/components/layout/LandingHeader";
 import { CursorTrail } from "@/components/ui/CursorTrail";
-import { getMappedIconName } from "@/config/icon-map";
+import { ICONS } from "@/config/icon-map";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 
@@ -95,7 +95,9 @@ export default async function HomePage({
     subtitle: t("FeaturesSection.subtitle"),
     features: t.raw("FeaturesSection.features").map((feature: any) => ({
       ...feature,
-      icon: getMappedIconName(feature.icon),
+      icon:
+        ICONS.TOOLS[feature.icon as keyof typeof ICONS.TOOLS] ||
+        ICONS.FEEDBACK.HELP,
     })),
   };
 
@@ -105,7 +107,9 @@ export default async function HomePage({
     description: t("ProcessSteps.description"),
     steps: t.raw("ProcessSteps.steps").map((step: any) => ({
       ...step,
-      iconName: getMappedIconName(step.iconName),
+      iconName:
+        ICONS.ACTIONS[step.iconName as keyof typeof ICONS.ACTIONS] ||
+        ICONS.FEEDBACK.HELP,
     })),
   };
 
@@ -121,7 +125,14 @@ export default async function HomePage({
       })),
   };
 
-  const metricsProps = { metrics: t.raw("Metrics.metrics") };
+  const metricsProps = {
+    metrics: t.raw("Metrics.metrics").map((metric: any) => ({
+      ...metric,
+      iconName:
+        ICONS.FEEDBACK[metric.iconName as keyof typeof ICONS.FEEDBACK] ||
+        ICONS.FEEDBACK.INFO,
+    })),
+  };
 
   const faqProps = {
     tag: t("FAQ.tag"),
@@ -196,21 +207,18 @@ export default async function HomePage({
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Full Observabilidad**: ((Implementada)) Se ha añadido `logger.trace` para monitorear el renderizado de la página, complementando el log de redirección existente.
- * 2. **Documentación TSDoc de Élite**: ((Implementada)) Se ha añadido documentación TSDoc verbosa al componente principal de la página.
- * 3. **Sincronización de Contratos I18n**: ((Vigente)) El componente ya consume los datos de i18n de forma correcta y sincronizada con los schemas.
- * 4. **Datos desde SSoT**: ((Vigente)) La lógica de obtención de datos desde la capa de i18n (`t` y `t.raw`) está correctamente implementada.
+ * 1. **Resolución de Error de Build (TS2305)**: ((Implementada)) Se ha eliminado la importación y el uso de la función obsoleta `getMappedIconName`. La lógica de construcción de props ahora consume directamente el manifiesto de íconos `ICONS`, resolviendo el error de compilación y alineando el componente con la SSoT canónica.
+ * 2. **Mapeo Robusto de Íconos**: ((Implementada)) La nueva lógica de mapeo es más robusta. Busca la clave del ícono en la categoría semántica apropiada del objeto `ICONS` y proporciona un ícono de fallback (`HELP` o `INFO`) si la clave no se encuentra, previniendo errores de renderizado.
  *
  * @subsection Melhorias Futuras
  * 1. **Carga de Datos desde CMS**: ((Vigente)) Para una flexibilidad de élite, el contenido de la landing page (especialmente `features`, `testimonials`, `faq`) podría ser obtenido desde un CMS Headless en lugar de los archivos de mensajes, permitiendo al equipo de marketing actualizar el contenido sin necesidad de un despliegue de código.
- * 2. **Abstracción de Lógica de Props**: ((Vigente)) La construcción de los objetos de `props` para cada componente hijo podría ser abstraída a funciones helper (ej. `getHeroProps(t)`) para mejorar la legibilidad y atomicidad de la página principal.
  *
  * =====================================================================
  */
-// src/app/[locale]/page.tsx

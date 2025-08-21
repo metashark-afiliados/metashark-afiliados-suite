@@ -4,10 +4,10 @@
  * @description Manifiesto de Iconos de Élite y Única Fuente de Verdad (SSoT).
  *              Este aparato mapea nombres de iconos semánticos y funcionales a los
  *              nombres de componentes literales de la librería `lucide-react`.
- *              Proporciona seguridad de tipos y centraliza la gestión de la
- *              iconografía de toda la aplicación.
+ *              Ha sido refactorizado para eliminar deuda técnica y corregir
+ *              inconsistencias, consolidándose como un manifiesto de alta fidelidad.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.0.0
  */
 
 export const ICONS = {
@@ -47,7 +47,7 @@ export const ICONS = {
     AI_IMAGES: "Image",
     ANALYZE_LANDING: "ScanSearch",
     AI_COPY: "PenTool",
-    ANALYZE_METRICS: "BarChartBig",
+    ANALYZE_METRICS: "ChartBarBig", // <-- CORREGIDO
     INTERACTIVE_QUIZ: "MessageCircleQuestion",
     BRAND_KIT: "Palette",
     CREATE_FUNNEL: "Network",
@@ -87,26 +87,16 @@ export const FLAT_ICONS = flattenIcons(ICONS);
 export type IconName = keyof typeof FLAT_ICONS;
 
 /**
- * @deprecated La función getMappedIconName está obsoleta. Use el objeto ICONS directamente.
- */
-export function getMappedIconName(conceptualName: string): string {
-  // Mantener por retrocompatibilidad mientras se refactoriza
-  const legacyMap: Record<string, string> = {
-    FilePenSquare: "FilePen",
-    BarChart3: "BarChartBig",
-    PieChart: "ChartPie",
-  };
-  return legacyMap[conceptualName] || conceptualName;
-}
-/**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Seguridad de Tipos y SSoT**: ((Implementada)) El aparato ahora exporta un objeto fuertemente tipado y semántico, `ICONS`, y un tipo `IconName` derivado.
- * 2. **Organización Semántica**: ((Implementada)) La agrupación por dominio funcional mejora drásticamente la legibilidad y la DX.
+ * 1. **Eliminación de Deuda Técnica**: ((Implementada)) Se ha eliminado por completo la función obsoleta y incorrecta `getMappedIconName`. El sistema ahora depende exclusivamente del objeto `ICONS` como única fuente de verdad.
+ * 2. **Sincronización de Datos**: ((Implementada)) Se ha corregido la clave `TOOLS.ANALYZE_METRICS` de `BarChartBig` a `ChartBarBig`, alineando el manifiesto con el nombre canónico de `lucide-react`.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Generación Automática**: ((Vigente)) Para una SSoT de élite, se podría crear un script que lea los nombres de los archivos de `lucide-react` y genere un tipo `LucideIconName` para ser usado en la validación Zod de los archivos de mensajes.
  *
  * =====================================================================
  */
-// src/config/icon-map.ts

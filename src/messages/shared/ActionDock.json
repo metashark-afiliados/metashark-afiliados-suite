@@ -3,49 +3,247 @@
   "en-US": {
     "more_button_label": "More Tools",
     "services": [
-      { "id": "create-campaign", "label": "New Campaign", "iconName": "FilePlus", "href": "/builder/new?type=campaign", "colorClass": "bg-blue-500/20 text-blue-400" },
-      { "id": "create-landing", "label": "Landing Page", "iconName": "LayoutTemplate", "href": "/builder/new?type=landing", "colorClass": "bg-green-500/20 text-green-400" },
-      { "id": "create-bridge", "label": "Bridge Page", "iconName": "ArrowRightLeft", "href": "/builder/new?type=bridge", "colorClass": "bg-purple-500/20 text-purple-400" },
-      { "id": "create-review", "label": "Review Page", "iconName": "Star", "href": "/builder/new?type=review", "colorClass": "bg-yellow-500/20 text-yellow-400" },
-      { "id": "create-images", "label": "AI Images", "iconName": "Image", "href": "/dashboard/tools/ai-images", "colorClass": "bg-pink-500/20 text-pink-400" },
-      { "id": "analyze-landing", "label": "Analyze Page", "iconName": "ScanSearch", "href": "/dashboard/tools/analyzer", "colorClass": "bg-cyan-500/20 text-cyan-400" },
-      { "id": "create-copy", "label": "AI Copy", "iconName": "PenTool", "href": "/dashboard/tools/ai-copywriter", "colorClass": "bg-orange-500/20 text-orange-400" },
-      { "id": "create-site", "label": "New Site", "iconName": "Globe", "href": "/dashboard/sites?action=create", "colorClass": "bg-red-500/20 text-red-400" },
-      { "id": "create-quiz", "label": "Quiz", "iconName": "Lightbulb", "href": "/builder/new?type=quiz", "colorClass": "bg-teal-500/20 text-teal-400" },
-      { "id": "branding-kit", "label": "Brand Kit", "iconName": "Palette", "href": "/dashboard/settings/branding", "colorClass": "bg-indigo-500/20 text-indigo-400" },
-      { "id": "view-metrics", "label": "Metrics", "iconName": "BarChartBig", "href": "/dashboard/analytics", "colorClass": "bg-lime-500/20 text-lime-400" }
+      {
+        "id": "create-campaign",
+        "label": "New Campaign",
+        "iconName": "FilePlus",
+        "href": "/builder/new?type=campaign",
+        "colorClass": "bg-blue-500/20 text-blue-400"
+      },
+      {
+        "id": "create-landing",
+        "label": "Landing Page",
+        "iconName": "LayoutTemplate",
+        "href": "/builder/new?type=landing",
+        "colorClass": "bg-green-500/20 text-green-400"
+      },
+      {
+        "id": "create-bridge",
+        "label": "Bridge Page",
+        "iconName": "ArrowRightLeft",
+        "href": "/builder/new?type=bridge",
+        "colorClass": "bg-purple-500/20 text-purple-400"
+      },
+      {
+        "id": "create-review",
+        "label": "Review Page",
+        "iconName": "Star",
+        "href": "/builder/new?type=review",
+        "colorClass": "bg-yellow-500/20 text-yellow-400"
+      },
+      {
+        "id": "create-images",
+        "label": "AI Images",
+        "iconName": "Image",
+        "href": "/dashboard/tools/ai-images",
+        "colorClass": "bg-pink-500/20 text-pink-400"
+      },
+      {
+        "id": "analyze-landing",
+        "label": "Analyze Page",
+        "iconName": "ScanSearch",
+        "href": "/dashboard/tools/analyzer",
+        "colorClass": "bg-cyan-500/20 text-cyan-400"
+      },
+      {
+        "id": "create-copy",
+        "label": "AI Copy",
+        "iconName": "PenTool",
+        "href": "/dashboard/tools/ai-copywriter",
+        "colorClass": "bg-orange-500/20 text-orange-400"
+      },
+      {
+        "id": "create-site",
+        "label": "New Site",
+        "iconName": "Globe",
+        "href": "/dashboard/sites?action=create",
+        "colorClass": "bg-red-500/20 text-red-400"
+      },
+      {
+        "id": "create-quiz",
+        "label": "Quiz",
+        "iconName": "Lightbulb",
+        "href": "/builder/new?type=quiz",
+        "colorClass": "bg-teal-500/20 text-teal-400"
+      },
+      {
+        "id": "branding-kit",
+        "label": "Brand Kit",
+        "iconName": "Palette",
+        "href": "/dashboard/settings/branding",
+        "colorClass": "bg-indigo-500/20 text-indigo-400"
+      },
+      {
+        "id": "view-metrics",
+        "label": "Metrics",
+        "iconName": "ChartBarBig",
+        "href": "/dashboard/analytics",
+        "colorClass": "bg-lime-500/20 text-lime-400"
+      }
     ]
   },
   "es-ES": {
     "more_button_label": "Más Herramientas",
     "services": [
-      { "id": "create-campaign", "label": "Nueva Campaña", "iconName": "FilePlus", "href": "/builder/new?type=campaign", "colorClass": "bg-blue-500/20 text-blue-400" },
-      { "id": "create-landing", "label": "Landing Page", "iconName": "LayoutTemplate", "href": "/builder/new?type=landing", "colorClass": "bg-green-500/20 text-green-400" },
-      { "id": "create-bridge", "label": "Bridge Page", "iconName": "ArrowRightLeft", "href": "/builder/new?type=bridge", "colorClass": "bg-purple-500/20 text-purple-400" },
-      { "id": "create-review", "label": "Review Page", "iconName": "Star", "href": "/builder/new?type=review", "colorClass": "bg-yellow-500/20 text-yellow-400" },
-      { "id": "create-images", "label": "Imágenes IA", "iconName": "Image", "href": "/dashboard/tools/ai-images", "colorClass": "bg-pink-500/20 text-pink-400" },
-      { "id": "analyze-landing", "label": "Analizar Página", "iconName": "ScanSearch", "href": "/dashboard/tools/analyzer", "colorClass": "bg-cyan-500/20 text-cyan-400" },
-      { "id": "create-copy", "label": "Copy IA", "iconName": "PenTool", "href": "/dashboard/tools/ai-copywriter", "colorClass": "bg-orange-500/20 text-orange-400" },
-      { "id": "create-site", "label": "Nuevo Sitio", "iconName": "Globe", "href": "/dashboard/sites?action=create", "colorClass": "bg-red-500/20 text-red-400" },
-      { "id": "create-quiz", "label": "Quiz", "iconName": "Lightbulb", "href": "/builder/new?type=quiz", "colorClass": "bg-teal-500/20 text-teal-400" },
-      { "id": "branding-kit", "label": "Kit de Marca", "iconName": "Palette", "href": "/dashboard/settings/branding", "colorClass": "bg-indigo-500/20 text-indigo-400" },
-      { "id": "view-metrics", "label": "Métricas", "iconName": "BarChartBig", "href": "/dashboard/analytics", "colorClass": "bg-lime-500/20 text-lime-400" }
+      {
+        "id": "create-campaign",
+        "label": "Nueva Campaña",
+        "iconName": "FilePlus",
+        "href": "/builder/new?type=campaign",
+        "colorClass": "bg-blue-500/20 text-blue-400"
+      },
+      {
+        "id": "create-landing",
+        "label": "Landing Page",
+        "iconName": "LayoutTemplate",
+        "href": "/builder/new?type=landing",
+        "colorClass": "bg-green-500/20 text-green-400"
+      },
+      {
+        "id": "create-bridge",
+        "label": "Bridge Page",
+        "iconName": "ArrowRightLeft",
+        "href": "/builder/new?type=bridge",
+        "colorClass": "bg-purple-500/20 text-purple-400"
+      },
+      {
+        "id": "create-review",
+        "label": "Review Page",
+        "iconName": "Star",
+        "href": "/builder/new?type=review",
+        "colorClass": "bg-yellow-500/20 text-yellow-400"
+      },
+      {
+        "id": "create-images",
+        "label": "Imágenes IA",
+        "iconName": "Image",
+        "href": "/dashboard/tools/ai-images",
+        "colorClass": "bg-pink-500/20 text-pink-400"
+      },
+      {
+        "id": "analyze-landing",
+        "label": "Analizar Página",
+        "iconName": "ScanSearch",
+        "href": "/dashboard/tools/analyzer",
+        "colorClass": "bg-cyan-500/20 text-cyan-400"
+      },
+      {
+        "id": "create-copy",
+        "label": "Copy IA",
+        "iconName": "PenTool",
+        "href": "/dashboard/tools/ai-copywriter",
+        "colorClass": "bg-orange-500/20 text-orange-400"
+      },
+      {
+        "id": "create-site",
+        "label": "Nuevo Sitio",
+        "iconName": "Globe",
+        "href": "/dashboard/sites?action=create",
+        "colorClass": "bg-red-500/20 text-red-400"
+      },
+      {
+        "id": "create-quiz",
+        "label": "Quiz",
+        "iconName": "Lightbulb",
+        "href": "/builder/new?type=quiz",
+        "colorClass": "bg-teal-500/20 text-teal-400"
+      },
+      {
+        "id": "branding-kit",
+        "label": "Kit de Marca",
+        "iconName": "Palette",
+        "href": "/dashboard/settings/branding",
+        "colorClass": "bg-indigo-500/20 text-indigo-400"
+      },
+      {
+        "id": "view-metrics",
+        "label": "Métricas",
+        "iconName": "ChartBarBig",
+        "href": "/dashboard/analytics",
+        "colorClass": "bg-lime-500/20 text-lime-400"
+      }
     ]
   },
   "pt-BR": {
     "more_button_label": "Mais Ferramentas",
     "services": [
-      { "id": "create-campaign", "label": "Nova Campanha", "iconName": "FilePlus", "href": "/builder/new?type=campaign", "colorClass": "bg-blue-500/20 text-blue-400" },
-      { "id": "create-landing", "label": "Landing Page", "iconName": "LayoutTemplate", "href": "/builder/new?type=landing", "colorClass": "bg-green-500/20 text-green-400" },
-      { "id": "create-bridge", "label": "Bridge Page", "iconName": "ArrowRightLeft", "href": "/builder/new?type=bridge", "colorClass": "bg-purple-500/20 text-purple-400" },
-      { "id": "create-review", "label": "Review Page", "iconName": "Star", "href": "/builder/new?type=review", "colorClass": "bg-yellow-500/20 text-yellow-400" },
-      { "id": "create-images", "label": "Imagens IA", "iconName": "Image", "href": "/dashboard/tools/ai-images", "colorClass": "bg-pink-500/20 text-pink-400" },
-      { "id": "analyze-landing", "label": "Analisar Página", "iconName": "ScanSearch", "href": "/dashboard/tools/analyzer", "colorClass": "bg-cyan-500/20 text-cyan-400" },
-      { "id": "create-copy", "label": "Copy IA", "iconName": "PenTool", "href": "/dashboard/tools/ai-copywriter", "colorClass": "bg-orange-500/20 text-orange-400" },
-      { "id": "create-site", "label": "Novo Site", "iconName": "Globe", "href": "/dashboard/sites?action=create", "colorClass": "bg-red-500/20 text-red-400" },
-      { "id": "create-quiz", "label": "Quiz", "iconName": "Lightbulb", "href": "/builder/new?type=quiz", "colorClass": "bg-teal-500/20 text-teal-400" },
-      { "id": "branding-kit", "label": "Kit de Marca", "iconName": "Palette", "href": "/dashboard/settings/branding", "colorClass": "bg-indigo-500/20 text-indigo-400" },
-      { "id": "view-metrics", "label": "Métricas", "iconName": "BarChartBig", "href": "/dashboard/analytics", "colorClass": "bg-lime-500/20 text-lime-400" }
+      {
+        "id": "create-campaign",
+        "label": "Nova Campanha",
+        "iconName": "FilePlus",
+        "href": "/builder/new?type=campaign",
+        "colorClass": "bg-blue-500/20 text-blue-400"
+      },
+      {
+        "id": "create-landing",
+        "label": "Landing Page",
+        "iconName": "LayoutTemplate",
+        "href": "/builder/new?type=landing",
+        "colorClass": "bg-green-500/20 text-green-400"
+      },
+      {
+        "id": "create-bridge",
+        "label": "Bridge Page",
+        "iconName": "ArrowRightLeft",
+        "href": "/builder/new?type=bridge",
+        "colorClass": "bg-purple-500/20 text-purple-400"
+      },
+      {
+        "id": "create-review",
+        "label": "Review Page",
+        "iconName": "Star",
+        "href": "/builder/new?type=review",
+        "colorClass": "bg-yellow-500/20 text-yellow-400"
+      },
+      {
+        "id": "create-images",
+        "label": "Imagens IA",
+        "iconName": "Image",
+        "href": "/dashboard/tools/ai-images",
+        "colorClass": "bg-pink-500/20 text-pink-400"
+      },
+      {
+        "id": "analyze-landing",
+        "label": "Analisar Página",
+        "iconName": "ScanSearch",
+        "href": "/dashboard/tools/analyzer",
+        "colorClass": "bg-cyan-500/20 text-cyan-400"
+      },
+      {
+        "id": "create-copy",
+        "label": "Copy IA",
+        "iconName": "PenTool",
+        "href": "/dashboard/tools/ai-copywriter",
+        "colorClass": "bg-orange-500/20 text-orange-400"
+      },
+      {
+        "id": "create-site",
+        "label": "Novo Site",
+        "iconName": "Globe",
+        "href": "/dashboard/sites?action=create",
+        "colorClass": "bg-red-500/20 text-red-400"
+      },
+      {
+        "id": "create-quiz",
+        "label": "Quiz",
+        "iconName": "Lightbulb",
+        "href": "/builder/new?type=quiz",
+        "colorClass": "bg-teal-500/20 text-teal-400"
+      },
+      {
+        "id": "branding-kit",
+        "label": "Kit de Marca",
+        "iconName": "Palette",
+        "href": "/dashboard/settings/branding",
+        "colorClass": "bg-indigo-500/20 text-indigo-400"
+      },
+      {
+        "id": "view-metrics",
+        "label": "Métricas",
+        "iconName": "ChartBarBig",
+        "href": "/dashboard/analytics",
+        "colorClass": "bg-lime-500/20 text-lime-400"
+      }
     ]
   }
 }

@@ -1,3 +1,4 @@
+
 {
   "en-US": {
     "navLink": "How it Works",
@@ -29,7 +30,7 @@
       },
       {
         "stepNumber": "03",
-        "iconName": "BarChart3",
+        "iconName": "ChartBarBig",
         "title": "Analyze & Optimize",
         "description": "Our predictive analytics dashboard gives you clear, actionable insights. Understand your traffic and optimize for maximum ROI.",
         "checklist": [
@@ -70,7 +71,7 @@
       },
       {
         "stepNumber": "03",
-        "iconName": "BarChart3",
+        "iconName": "ChartBarBig",
         "title": "Analiza y Optimiza",
         "description": "Nuestro panel de análisis predictivo te brinda insights claros y accionables. Entiende tu tráfico y optimiza para el máximo ROI.",
         "checklist": [
@@ -111,7 +112,7 @@
       },
       {
         "stepNumber": "03",
-        "iconName": "BarChart3",
+        "iconName": "ChartBarBig",
         "title": "Analise e Otimize",
         "description": "Nosso painel de análise preditiva oferece insights claros e acionáveis. Entenda seu tráfego e otimize para o máximo ROI.",
         "checklist": [

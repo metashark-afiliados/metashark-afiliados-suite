@@ -1,4 +1,13 @@
 // src/lib/hooks/useCreateWorkspaceForm.ts
+/**
+ * @file useCreateWorkspaceForm.ts
+ * @description Hook Soberano que encapsula la lógica completa para el formulario
+ *              de creación de workspaces. Gestiona el estado con `react-hook-form`,
+ *              la validación con Zod, la mutación con Server Actions, y el
+ *              feedback al usuario con `react-hot-toast`.
+ * @author Raz Podestá
+ * @version 3.0.0
+ */
 "use client";
 
 import { useTransition } from "react";
@@ -32,15 +41,11 @@ interface UseCreateWorkspaceFormProps {
  * @public
  * @function useCreateWorkspaceForm
  * @description Hook Soberano que encapsula la lógica completa para el formulario
- *              de creación de workspaces. Gestiona el estado con `react-hook-form`,
- *              la validación con Zod, la mutación con Server Actions, y el
- *              feedback al usuario con `react-hot-toast`.
+ *              de creación de workspaces.
  * @param {UseCreateWorkspaceFormProps} props - Las dependencias del hook.
  * @returns Un objeto con la instancia del formulario, el estado de carga y el
  *          manejador de envío para ser consumidos por un componente de
  *          presentación puro.
- * @version 2.0.0
- * @author Raz Podestá
  */
 export function useCreateWorkspaceForm({
   onSuccess,
@@ -109,11 +114,10 @@ export function useCreateWorkspaceForm({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build**: ((Implementada)) Se ha reemplazado la importación del barril de acciones por una importación atómica, resolviendo una futura causa de fallo de compilación "server-only".
- * 2. **Documentación TSDoc Completa**: ((Implementada)) Se ha añadido documentación TSDoc verbosa y precisa a todas las partes del hook, mejorando la claridad y mantenibilidad.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha reemplazado la importación masiva (`workspaces as workspaceActions`) por una importación atómica y directa de `createWorkspaceAction`. Esto resuelve la vulnerabilidad al error de build "server-only" y alinea el hook con la arquitectura de élite.
  *
  * @subsection Melhorias Futuras
- * 1. **Callback de Error**: ((Vigente)) El hook podría aceptar un callback `onError` opcional para permitir al componente consumidor ejecutar lógica personalizada en caso de fallo.
+ * 1. **Callback de Error**: ((Vigente)) El hook podría aceptar un callback `onError` opcional para permitir al componente consumidor ejecutar lógica personalizada en caso de fallo, como mantener el modal abierto.
  *
  * =====================================================================
  */
