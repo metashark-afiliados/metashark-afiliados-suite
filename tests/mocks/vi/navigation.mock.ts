@@ -5,7 +5,7 @@
  *              `@/lib/navigation`, delegando al motor `next-router-mock` y
  *              aumentando su `useRouter` para incluir `refresh`.
  * @author L.I.A. Legacy
- * @version 4.0.0
+ * @version 5.0.0
  */
 import { vi } from "vitest";
 import mockRouter from "next-router-mock";

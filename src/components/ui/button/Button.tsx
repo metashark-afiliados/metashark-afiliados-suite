@@ -1,8 +1,14 @@
 // src/components/ui/button/Button.tsx
+/**
+ * @file Button.tsx
+ * @description Orquestador de élite para el ecosistema Button. Ha sido
+ *              refactorizado con una definición de tipos superior para resolver
+ *              una cascada de errores de inferencia (TS2339), haciendo el
+ *              contrato de props más robusto y predecible.
+ * @author L.I.A. Legacy
+ * @version 11.0.0
+ */
 import * as React from "react";
-import { type VariantProps } from "class-variance-authority";
-
-import { cn } from "@/lib/utils";
 
 import { ButtonContent, type ButtonContentProps } from "./ButtonContent";
 import { ButtonGroup } from "./ButtonGroup";
@@ -14,20 +20,25 @@ import {
   type ButtonLinkProps,
   type ButtonSlotProps,
 } from "./primitives";
-import { buttonVariants } from "./variants";
 
-// --- INICIO: Contratos de Tipos de Élite Refinados v2 ---
+// --- INICIO: Contratos de Tipos de Élite Refinados v3 ---
 
+// Se define explícitamente el tipo base para un botón de acción.
 type ActionProps = ButtonBaseProps & ButtonContentProps;
+
+// Se define el tipo para un botón que actúa como enlace.
 type LinkProps = ButtonLinkProps & ButtonContentProps;
+
+// Se define el tipo para un botón que clona a su hijo.
 type SlotProps = ButtonSlotProps;
 
+// La unión ahora es más clara.
 export type ButtonProps =
   | (ActionProps & { asChild?: never; href?: never })
   | (LinkProps & { asChild?: never })
   | (SlotProps & { asChild: true; href?: never });
 
-// --- FIN: Contratos de Tipos de Élite Refinados v2 ---
+// --- FIN: Contratos de Tipos de Élite Refinados v3 ---
 
 type ButtonComponent = React.ForwardRefExoticComponent<ButtonProps> & {
   Group: typeof ButtonGroup;
@@ -37,13 +48,10 @@ const ButtonRoot = React.forwardRef<
   HTMLButtonElement & HTMLAnchorElement,
   ButtonProps
 >((props, ref) => {
-  // --- INICIO DE CORRECCIÓN: Consumo de `asChild` ---
   if (props.asChild) {
-    // Desestructurar para quitar `asChild` y evitar que se propague al DOM.
     const { asChild, ...slotProps } = props;
     return <ButtonSlot {...slotProps} ref={ref as any} />;
   }
-  // --- FIN DE CORRECCIÓN ---
 
   if ("href" in props && props.href) {
     const {
@@ -54,7 +62,6 @@ const ButtonRoot = React.forwardRef<
       children,
       ...restLinkProps
     } = props;
-
     const content = (
       <ButtonContent
         isLoading={isLoading}
@@ -65,7 +72,6 @@ const ButtonRoot = React.forwardRef<
         {children}
       </ButtonContent>
     );
-
     return (
       <ButtonLink {...(restLinkProps as ButtonLinkProps)} ref={ref as any}>
         {content}
@@ -73,6 +79,10 @@ const ButtonRoot = React.forwardRef<
     );
   }
 
+  // --- INICIO DE CORRECCIÓN DE TIPO ---
+  // Al llegar a esta rama, TypeScript sabe que ni `asChild` ni `href` están presentes,
+  // por lo que puede inferir correctamente que `props` es del tipo `ActionProps`.
+  // Ya no es necesario un `casting` con `Omit`.
   const {
     isLoading,
     loadingText,
@@ -81,7 +91,8 @@ const ButtonRoot = React.forwardRef<
     children,
     disabled,
     ...restActionProps
-  } = props as ActionProps;
+  } = props;
+  // --- FIN DE CORRECCIÓN DE TIPO ---
 
   const content = (
     <ButtonContent
@@ -93,7 +104,6 @@ const ButtonRoot = React.forwardRef<
       {children}
     </ButtonContent>
   );
-
   return (
     <ButtonBase
       {...(restActionProps as ButtonBaseProps)}
@@ -115,12 +125,10 @@ Button.Group = ButtonGroup;
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Erradicación de Advertencia `asChild`**: ((Implementada)) El orquestador ahora desestructura y "consume" la prop `asChild`, evitando que se propague a los componentes hijos y eliminando la advertencia de React de forma definitiva y sistémica.
- * 2. **Atomicidad y Cohesión**: ((Implementada)) El orquestador mantiene su responsabilidad pura de ensamblar las primitivas y el contenido.
+ * 1. **Resolución de Inferencia de Tipos (TS2339)**: ((Implementada)) Se ha reestructurado la unión de tipos `ButtonProps` y se ha eliminado el `Omit` problemático. Esto permite que el compilador de TypeScript infiera correctamente el tipo de `props` en cada rama lógica, resolviendo la cascada de errores.
  *
  * @subsection Melhorias Futuras
- * 1. **Subcomponente de Tooltip (`Button.WithTooltip`)**: ((Vigente)) Añadir este HOC (Higher-Order Component) completaría el ecosistema `Button`, simplificando la adición de tooltips y centralizando la lógica del `TooltipProvider`.
- * 2. **Validación en Desarrollo**: ((Vigente)) Reintroducir un subcomponente `IntegrityChecker` que se renderice solo en desarrollo para validar el uso correcto de las props, mejorando aún más la DX.
+ * 1. **Validación en Desarrollo**: ((Vigente)) Reintroducir un subcomponente `IntegrityChecker` que se renderice solo en desarrollo para validar el uso correcto de las props (`asChild` con `href`, etc.), mejorando la DX.
  *
  * =====================================================================
  */
