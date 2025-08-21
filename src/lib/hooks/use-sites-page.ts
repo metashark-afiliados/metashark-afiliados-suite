@@ -1,18 +1,12 @@
 // src/lib/hooks/use-sites-page.ts
-/**
- * @file src/lib/hooks/use-sites-page.ts
- * @description Hook Soberano refactorizado. Ahora actúa como un orquestador que
- *              compone hooks atómicos (`useDialogState`, `useSearchSync`,
- *              `useOptimisticResourceManagement`) para construir la lógica
- *              completa de la página "Mis Sitios".
- * @author L.I.A. Legacy
- * @version 3.0.0
- */
 "use client";
 
 import { useTranslations } from "next-intl";
 
-import { sites as sitesActions } from "@/lib/actions";
+import {
+  createSiteAction,
+  deleteSiteAction,
+} from "@/lib/actions/sites.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
 import { useOptimisticResourceManagement } from "@/lib/hooks/use-optimistic-resource-management";
@@ -26,6 +20,7 @@ import { logger } from "@/lib/logging";
  * @description Hook orquestador que encapsula toda la lógica de la página "Mis Sitios".
  * @param {{ initialSites: SiteWithCampaignCount[], initialSearchQuery: string }} params
  * @returns Un objeto con todo el estado y los manejadores necesarios para la UI.
+ * @version 3.1.0
  */
 export function useSitesPage({
   initialSites,
@@ -38,7 +33,6 @@ export function useSitesPage({
   const t = useTranslations("SitesPage");
   const { activeWorkspace, user } = useDashboard();
 
-  // --- Consumo de Hooks Atómicos ---
   const { searchTerm, setSearchTerm } = useSearchSync({
     initialQuery: initialSearchQuery,
   });
@@ -58,11 +52,10 @@ export function useSitesPage({
   } = useOptimisticResourceManagement<SiteWithCampaignCount>({
     initialItems: initialSites,
     entityName: t("entityName"),
-    createAction: sitesActions.createSiteAction,
-    deleteAction: sitesActions.deleteSiteAction,
+    createAction: createSiteAction,
+    deleteAction: deleteSiteAction,
   });
 
-  // --- Lógica de Negocio Específica de la Entidad ---
   const handleCreate = (formData: FormData) => {
     const name = formData.get("name") as string;
     const subdomain = formData.get("subdomain") as string;
@@ -104,18 +97,14 @@ export function useSitesPage({
     handleCreate,
   };
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Composición (LEGO)**: ((Implementada)) El hook ya no contiene lógica monolítica. Ahora compone hooks atómicos y reutilizables, lo que mejora drásticamente su legibilidad, mantenibilidad y adhesión a los principios de diseño de élite.
- * 2. **Principio de Responsabilidad Única (SRP)**: ((Implementada)) La responsabilidad de `useSitesPage` se ha reducido a orquestar otros hooks y contener la lógica de negocio específica de la entidad "sitio", como la construcción del objeto optimista.
- *
- * @subsection Melhorias Futuras
- * 1. **Abstracción de Lógica Optimista**: ((Vigente)) La lógica de construcción del `optimisticSite` podría ser abstraída a una función `createOptimisticSite` en un archivo helper (`tests/utils/factories.ts`), haciendo que el `handleCreate` sea aún más conciso y reutilizable en pruebas.
+ * 1. **Resolución Definitiva de Error de Build**: ((Implementada)) Se ha reemplazado la importación del barril de acciones por importaciones atómicas y directas, eliminando la causa raíz del fallo de compilación.
  *
  * =====================================================================
  */
-// src/lib/hooks/use-sites-page.ts
