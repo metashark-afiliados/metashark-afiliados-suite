@@ -1,20 +1,21 @@
 // src/lib/hooks/use-builder-header.ts
-/**
- * @file use-builder-header.ts
- * @description Hook Soberano para el `BuilderHeader`. Actualizado para consumir
- *              el estado y las acciones del historial desde `useBuilderStore.useHistory()`.
- * @author Raz Podestá
- * @version 1.1.0
- */
 "use client";
 
 import { useTranslations } from "next-intl";
 import { useCallback, useTransition } from "react";
 import toast from "react-hot-toast";
 
-import { builder as builderActions } from "@/lib/actions";
+import { updateCampaignContentAction } from "@/lib/actions/builder.actions";
 import { useBuilderStore } from "@/lib/builder/core/store";
 
+/**
+ * @file use-builder-header.ts
+ * @description Hook Soberano para el `BuilderHeader`. Corregido para usar
+ *              importaciones atómicas de Server Actions, resolviendo el error
+ *              de build "server-only".
+ * @author Raz Podestá
+ * @version 1.2.0
+ */
 export function useBuilderHeader() {
   const t = useTranslations("components.builder.BuilderHeader");
   const [isPending, startTransition] = useTransition();
@@ -28,11 +29,8 @@ export function useBuilderHeader() {
     devicePreview,
   } = useBuilderStore();
 
-  // --- INICIO DE CORRECCIÓN DE CONSUMO ---
-  // El historial se consume a través del hook `useHistory` adjunto.
   const history = useBuilderStore.useHistory();
   const campaignConfig = useBuilderStore((state) => state.campaignConfig);
-  // --- FIN DE CORRECCIÓN DE CONSUMO ---
 
   const handleSave = useCallback(() => {
     if (!campaignConfig) {
@@ -41,14 +39,14 @@ export function useBuilderHeader() {
     }
     setIsSaving(true);
     startTransition(async () => {
-      const result = await builderActions.updateCampaignContentAction(
+      const result = await updateCampaignContentAction(
         campaignConfig.id,
         campaignConfig
       );
       if (result.success) {
         toast.success(t("SaveButton.save_success"));
         setAsSaved();
-        history.clear(); // Limpia el historial después de guardar.
+        history.clear();
       } else {
         toast.error(result.error || t("SaveButton.save_error_default"));
       }
@@ -77,9 +75,12 @@ export function useBuilderHeader() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de API de Historial**: ((Implementada)) El hook ahora consume el historial a través de `useBuilderStore.useHistory()`, alineándose con la API canónica de `zustand-undo`.
- * 2. **Limpieza de Historial al Guardar**: ((Implementada)) Se ha añadido `history.clear()` al `handleSave`, una práctica de élite que asegura que después de guardar, el "deshacer" no revierta a un estado anterior al guardado.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha reemplazado la importación del barril de acciones por una importación atómica y directa, resolviendo la causa raíz del fallo de compilación "server-only".
+ * 2. **Sincronización de API de Historial**: ((Implementada)) El hook consume el historial a través de `useBuilderStore.useHistory()`, alineándose con la API canónica de `zustand-undo`.
+ * 3. **Limpieza de Historial al Guardar**: ((Implementada)) Se ha añadido `history.clear()` al `handleSave`, una práctica de élite que asegura que después de guardar, el "deshacer" no revierta a un estado anterior al guardado.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Manejo de Errores Granular**: ((Vigente)) Se podría mejorar el `toast.error` para mostrar mensajes más específicos basados en la clave de error devuelta por la Server Action.
  *
  * =====================================================================
  */
-// src/lib/hooks/use-builder-header.ts

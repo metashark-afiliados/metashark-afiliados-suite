@@ -5,9 +5,8 @@
  *              relacionadas con la entidad `campaigns`. Ensambla y exporta todas
  *              las acciones atómicas del directorio `campaigns/`.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
-"use server";
 
 export * from "./campaigns/archive.action";
 export * from "./campaigns/assign-site.action";
@@ -22,7 +21,7 @@ export * from "./campaigns/duplicate.action";
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Manifiesto**: ((Implementada)) Se ha convertido este archivo en un barril, resolviendo la causa raíz de los errores de exportación de módulo.
+ * 1. **Alineación Arquitectónica**: ((Implementada)) Se ha eliminado la directiva "use server", resolviendo la causa raíz del error de compilación.
  *
  * =====================================================================
  */
