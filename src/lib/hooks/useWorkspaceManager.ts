@@ -2,16 +2,17 @@
 /**
  * @file useWorkspaceManager.ts
  * @description Hook soberano y orquestador para la lógica del WorkspaceSwitcher.
- *              Sincronizado para proveer el callback `onSelectRename`.
+ *              Ha sido refactorizado a un estándar de élite para utilizar importaciones
+ *              atómicas de Server Actions, resolviendo un error de build crítico.
  * @author Raz Podestá
- * @version 1.1.0
+ * @version 2.0.0
  */
 "use client";
 
 import { useCallback, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import { workspaces as workspaceActions } from "@/lib/actions";
+import { setActiveWorkspaceAction } from "@/lib/actions/workspaces.actions";
 import { useWorkspaceDialogStore } from "@/lib/hooks/useWorkspaceDialogStore";
 import { logger } from "@/lib/logging";
 
@@ -30,7 +31,7 @@ export function useWorkspaceManager() {
       });
       closePopover();
       startTransition(() => {
-        workspaceActions.setActiveWorkspaceAction(workspaceId);
+        setActiveWorkspaceAction(workspaceId);
       });
     },
     [closePopover]
@@ -46,15 +47,14 @@ export function useWorkspaceManager() {
     openDialog("invite");
   }, [closePopover, openDialog]);
 
-  // --- INICIO DE CORRECCIÓN ---
   const handleRename = useCallback(() => {
     closePopover();
-    openDialog("rename" as any); // TODO: Añadir 'rename' al tipo WorkspaceDialogType
+    openDialog("rename");
   }, [closePopover, openDialog]);
-  // --- FIN DE CORRECCIÓN ---
 
   const handleSettings = useCallback(() => {
     closePopover();
+    // La navegación a una ruta estática no requiere `useRouter` de `next-intl`
     router.push("/dashboard/settings/workspace");
   }, [closePopover, router]);
 
@@ -70,23 +70,19 @@ export function useWorkspaceManager() {
     handleWorkspaceSelect,
     onSelectCreate: handleCreate,
     onSelectInvite: handleInvite,
-    onSelectRename: handleRename, // <-- Exportación añadida
+    onSelectRename: handleRename,
     onSelectSettings: handleSettings,
     onSelectDelete: handleDelete,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato**: ((Implementada)) El hook ahora exporta `onSelectRename`, resolviendo el error `TS2339`.
- *
- * @subsection Melhorias Futuras
- * 1. **Tipado de Diálogo**: ((Vigente)) El tipo `WorkspaceDialogType` en `useWorkspaceDialogStore` debe ser actualizado para incluir `"rename"`.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se ha reemplazado `import { workspaces }` por una importación atómica de `setActiveWorkspaceAction`. Esto desacopla el hook del barrel file `server-only`, resolviendo la causa del fallo de compilación.
+ * 2. **Simplificación de Dependencias**: ((Implementada)) El hook es ahora más modular y tiene dependencias más explícitas, mejorando la mantenibilidad.
  *
  * =====================================================================
  */
-// src/lib/hooks/useWorkspaceManager.ts
