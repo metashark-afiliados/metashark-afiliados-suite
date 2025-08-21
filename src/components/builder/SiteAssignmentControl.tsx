@@ -1,33 +1,19 @@
 // src/components/builder/SiteAssignmentControl.tsx
 /**
  * @file SiteAssignmentControl.tsx
- * @description Aparato de UI atómico y especializado. Su única responsabilidad
- *              es renderizar los controles para asignar una campaña huérfana
- *              a un sitio existente. Es un componente de cliente que gestiona
- *              su propio estado de datos y mutación.
+ * @description Orquestador de UI puro. Consume el hook `useSiteAssignment` y
+ *              ensambla los componentes atómicos `SiteSelector` y `CreateSiteModal`
+ *              para construir el flujo completo de asignación de sitios.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 3.0.0
  */
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
-import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 
-import { assignSiteToCampaignAction } from "@/lib/actions/campaigns/assign-site.action";
-import { useDashboard } from "@/lib/context/DashboardContext";
-import { type SiteBasicInfo, getSitesByWorkspaceId } from "@/lib/data/sites";
-import { logger } from "@/lib/logging";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { type ActionResult } from "@/lib/validators";
+import { useSiteAssignment } from "@/lib/hooks/use-site-assignment";
+import { CreateSiteModal } from "./CreateSiteModal";
+import { SiteSelector } from "./SiteSelector";
 
 interface SiteAssignmentControlProps {
   campaignId: string;
@@ -36,88 +22,77 @@ interface SiteAssignmentControlProps {
 export function SiteAssignmentControl({
   campaignId,
 }: SiteAssignmentControlProps) {
-  const t = useTranslations("SiteAssignmentControl");
-  const tErrors = useTranslations("CampaignsPage.errors");
-  const { activeWorkspace } = useDashboard();
-  const [sites, setSites] = useState<SiteBasicInfo[]>([]);
-  const [selectedSiteId, setSelectedSiteId] = useState<string>("");
-  const [isPending, startTransition] = useTransition();
-  const [isLoadingSites, setIsLoadingSites] = useState(true);
+  const {
+    sites,
+    selectedSiteId,
+    setSelectedSiteId,
+    isLoadingSites,
+    isAssigning,
+    isCreating,
+    isPending,
+    handleAssignSite,
+    isCreateDialogOpen,
+    openCreateDialog,
+    setCreateDialogOpen,
+    handleCreateSite,
+    activeWorkspace,
+    texts,
+  } = useSiteAssignment(campaignId);
 
-  useEffect(() => {
-    if (activeWorkspace) {
-      getSitesByWorkspaceId(activeWorkspace.id, { limit: 1000 })
-        .then(({ sites: fetchedSites }) => {
-          setSites(fetchedSites);
-        })
-        .catch((err) => {
-          logger.error(
-            "[SiteAssignmentControl] Fallo al obtener la lista de sitios",
-            err
-          );
-          toast.error(t("toast_load_sites_error"));
-        })
-        .finally(() => {
-          setIsLoadingSites(false);
-        });
-    }
-  }, [activeWorkspace, t]);
-
-  const handleAssignSite = () => {
-    if (!selectedSiteId) {
-      toast.error(t("toast_select_site_error"));
-      return;
-    }
-    startTransition(async () => {
-      const result: ActionResult<void> = await assignSiteToCampaignAction(
-        campaignId,
-        selectedSiteId
-      );
-      if (result.success) {
-        toast.success(t("toast_assign_success"));
-        // No se necesita `router.refresh()` aquí porque el `revalidatePath` en la
-        // server action se encargará de refrescar los datos del layout y la página.
-      } else {
-        toast.error(tErrors(result.error as any));
-      }
-    });
-  };
-
-  if (!activeWorkspace || isLoadingSites) {
+  if (isLoadingSites) {
     return (
       <div className="text-sm text-muted-foreground p-4 border-t flex items-center gap-2">
         <Loader2 className="h-4 w-4 animate-spin" />
-        {t("loading_context")}
+        {texts.t("loading_context")}
       </div>
     );
   }
 
+  const formTexts = {
+    nameLabel: texts.tSitesPage("form.nameLabel"),
+    namePlaceholder: texts.tSitesPage("form.namePlaceholder"),
+    subdomainLabel: texts.tSitesPage("form.subdomainLabel"),
+    subdomainInUseError: texts.tSitesPage("form.subdomainInUseError"),
+    descriptionLabel: texts.tSitesPage("form.descriptionLabel"),
+    descriptionPlaceholder: texts.tSitesPage("form.descriptionPlaceholder"),
+    creatingButton: texts.tSitesPage("form.creatingButton"),
+    createButton: texts.tSitesPage("form.createButton"),
+  };
+
   return (
-    <div className="p-4 border-t space-y-3">
-      <h4 className="font-semibold">{t("section_title")}</h4>
-      <p className="text-sm text-muted-foreground">{t("description")}</p>
-      <div className="flex items-center gap-2">
-        <Select onValueChange={setSelectedSiteId} value={selectedSiteId}>
-          <SelectTrigger>
-            <SelectValue placeholder={t("select_placeholder")} />
-          </SelectTrigger>
-          <SelectContent>
-            {sites.map((site) => (
-              <SelectItem key={site.id} value={site.id}>
-                {site.name} ({site.subdomain})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button
-          onClick={handleAssignSite}
-          disabled={isPending || !selectedSiteId}
-        >
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {t("assign_button")}
-        </Button>
+    <>
+      <div className="p-4 border-t space-y-3">
+        <h4 className="font-semibold">{texts.t("section_title")}</h4>
+        <p className="text-sm text-muted-foreground">
+          {texts.t("description")}
+        </p>
+        <SiteSelector
+          sites={sites}
+          selectedSiteId={selectedSiteId}
+          onSiteSelect={setSelectedSiteId}
+          onAssign={handleAssignSite}
+          onCreateNew={openCreateDialog}
+          isPending={isPending}
+          isAssigning={isAssigning}
+          texts={{
+            select_placeholder: texts.t("select_placeholder"),
+            assign_button: texts.t("assign_button"),
+            createSiteButton: texts.tSitesPage("header.createSiteButton"),
+          }}
+        />
       </div>
-    </div>
+      <CreateSiteModal
+        isOpen={isCreateDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        workspaceId={activeWorkspace?.id || ""}
+        onCreateSite={handleCreateSite}
+        isCreating={isCreating}
+        texts={{
+          dialogTitle: texts.tSitesPage("header.createDialogTitle"),
+          formTexts,
+        }}
+      />
+    </>
   );
 }
 
@@ -127,12 +102,8 @@ export function SiteAssignmentControl({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Asignación Funcional**: ((Implementada)) Este nuevo aparato encapsula toda la UI y lógica del lado del cliente para la asignación de sitios.
- * 2. **Obtención de Datos Segura**: ((Implementada)) El componente utiliza una función de la capa de datos (`getSitesByWorkspaceId`) para obtener de forma segura solo los sitios a los que el usuario tiene acceso.
- * 3. **Full Internacionalización**: ((Implementada)) Todos los textos se consumen desde la capa de i18n, incluyendo los mensajes de error de la Server Action.
- *
- * @subsection Melhorias Futuras
- * 1. **Creación de Sitio "In-line"**: ((Vigente)) Añadir un botón o una opción en el `<Select>` para "Crear Nuevo Sitio", que abriría un modal para crear un sitio sin abandonar el builder, mejorando drásticamente el flujo de usuario.
+ * 1. **Arquitectura de Ensamblaje (LEGO)**: ((Implementada)) El componente ahora es un orquestador puro que sigue el patrón "Hook, Ensamblador, Componentes Atómicos", una implementación canónica de la "Filosofía LEGO".
+ * 2. **Legibilidad y Mantenibilidad Mejoradas**: ((Implementada)) La complejidad ha sido distribuida en aparatos de responsabilidad única, haciendo el código más fácil de entender, probar y mantener.
  *
  * =====================================================================
  */

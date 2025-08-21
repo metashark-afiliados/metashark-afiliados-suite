@@ -1,11 +1,10 @@
 // src/lib/validators/schemas.ts
 /**
  * @file validators/schemas.ts
- * @description Biblioteca de Schemas de Zod y SSoT. Refactorizado a un
- *              estándar de élite eliminando los namespaces de los mensajes
- *              de error para una arquitectura de i18n desacoplada.
+ * @description Biblioteca de Schemas de Zod y SSoT. Corregido para alinear
+ *              el contrato de datos entre cliente y servidor.
  * @author Raz Podestá
- * @version 2.5.0
+ * @version 2.6.0
  */
 import { z } from "zod";
 
@@ -62,11 +61,11 @@ export const UpdateSiteSchema = z
 
 export const DeleteSiteSchema = z.object({ siteId: UuidSchema });
 
-export const CreateWorkspaceSchema = z
-  .object({
-    workspaceName: NameSchema,
-  })
-  .transform(keysToSnakeCase);
+// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
+export const CreateWorkspaceSchema = z.object({
+  workspaceName: NameSchema,
+});
+// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
 export const UpdateWorkspaceNameSchema = z.object({
   name: NameSchema,
@@ -126,13 +125,14 @@ export const ClientEnrichmentSchema = z.object({
   fingerprint: z.string().min(1, { message: "fingerprint_required" }),
   browser_context: z.record(z.any()).nullable().optional(),
 });
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura I18n Desacoplada**: ((Implementada)) Se han eliminado los prefijos de namespace de los mensajes de error de Zod. Esto resuelve el error de `MISSING_MESSAGE` y establece un patrón arquitectónico correcto.
+ * 1. **Sincronización de Contrato Cliente-Servidor**: ((Implementada)) Se ha eliminado la transformación a `snake_case` del `CreateWorkspaceSchema`. Esto alinea el contrato de validación del cliente con el contrato esperado por la Server Action, resolviendo la causa raíz del fallo en las pruebas.
  *
  * =====================================================================
  */

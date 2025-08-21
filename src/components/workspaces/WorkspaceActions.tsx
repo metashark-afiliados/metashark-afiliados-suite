@@ -1,40 +1,42 @@
 // src/components/workspaces/WorkspaceActions.tsx
 /**
- * @file src/components/workspaces/WorkspaceActions.tsx
- * @description Aparato de UI atómico que renderiza la lista de acciones de gestión.
- *              Ha sido nivelado para renderizar condicionalmente las acciones
- *              basado en los flags de permisos consumidos del `useWorkspaceContext`.
+ * @file WorkspaceActions.tsx
+ * @description Componente de presentación 100% puro que renderiza las acciones de
+ *              gestión de un workspace. Es completamente agnóstico al estado,
+ *              recibiendo los flags de permisos y los callbacks a través de props.
  * @author Raz Podestá
- * @version 1.2.0
+ * @version 2.0.0
  */
-"use client";
-
+import { FileEdit, PlusCircle, Settings, Trash2, UserPlus } from "lucide-react";
 import React from "react";
-import { PlusCircle, Settings, Trash2, UserPlus } from "lucide-react";
 
-import { useWorkspaceContext } from "@/lib/hooks/use-workspace-context";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
 import {
   CommandGroup,
   CommandItem,
   CommandSeparator,
 } from "@/components/ui/command";
+import { useTypedTranslations } from "@/lib/i18n/hooks";
 
-interface WorkspaceActionsProps {
+export interface WorkspaceActionsProps {
+  canEdit: boolean;
+  canDelete: boolean;
   onSelectCreate: () => void;
   onSelectInvite: () => void;
+  onSelectRename: () => void;
   onSelectSettings: () => void;
   onSelectDelete: () => void;
 }
 
 export function WorkspaceActions({
+  canEdit,
+  canDelete,
   onSelectCreate,
   onSelectInvite,
+  onSelectRename,
   onSelectSettings,
   onSelectDelete,
 }: WorkspaceActionsProps): React.ReactElement {
   const t = useTypedTranslations("WorkspaceSwitcher");
-  const { canEdit, canDelete } = useWorkspaceContext(); // <-- CONSUMIR FLAGS
 
   return (
     <CommandGroup>
@@ -42,12 +44,15 @@ export function WorkspaceActions({
         <PlusCircle className="mr-2 h-5 w-5" />
         {t("createWorkspace_button")}
       </CommandItem>
-      {/* --- LÓGICA DE PERMISOS DE ÉLITE --- */}
       {canEdit && (
         <>
           <CommandItem onSelect={onSelectInvite} className="cursor-pointer">
             <UserPlus className="mr-2 h-5 w-5" />
             {t("inviteMember_button")}
+          </CommandItem>
+          <CommandItem onSelect={onSelectRename} className="cursor-pointer">
+            <FileEdit className="mr-2 h-5 w-5" />
+            {t("renameWorkspace_button")}
           </CommandItem>
           <CommandItem onSelect={onSelectSettings} className="cursor-pointer">
             <Settings className="mr-2 h-5 w-5" />
@@ -76,10 +81,11 @@ export function WorkspaceActions({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **UI Consciente de Permisos Granulares**: ((Implementada)) Las acciones "Invitar", "Ajustes" y "Eliminar" ahora se renderizan condicionalmente basado en los flags `canEdit` y `canDelete`, siguiendo el principio de "mínimo privilegio" en la UI.
+ * 1. **Componente Puro y Desacoplado**: ((Implementada)) Se ha eliminado la dependencia del `useWorkspaceContext`. El componente es ahora 100% controlado por props, lo que aumenta su reutilización y testabilidad.
+ * 2. **Funcionalidad Extendida**: ((Implementada)) Se ha añadido la opción "Renombrar" (`onSelectRename`), completando el conjunto de acciones de gestión.
  *
  * @subsection Melhorias Futuras
- * 1. **Tooltips de Permiso Denegado**: ((Vigente)) Para acciones deshabilitadas en lugar de ocultas, se podría envolver el `CommandItem` en un `Tooltip` que explique por qué la acción no está disponible (ej. "Solo los propietarios pueden eliminar").
+ * 1. **Renderizado Declarativo**: ((Vigente)) La lista de acciones podría ser definida como un array de objetos de configuración, permitiendo que el componente se renderice a través de un `.map()` para un código más declarativo.
  *
  * =====================================================================
  */

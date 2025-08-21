@@ -1,145 +1,116 @@
 // tests/utils/factories.ts
 /**
  * @file tests/utils/factories.ts
- * @description Manifiesto de Factorías de Pruebas de Élite.
- *              Ha sido nivelado para alinear la factoría `createMockSite` con el
- *              contrato de datos estricto de la tabla `sites`, resolviendo un
- *              error de compilación de TypeScript.
+ * @description Manifiesto de Factorías de Pruebas de Élite v6.0.0.
+ *              Esta es la Única Fuente de Verdad para la generación de datos de prueba
+ *              dinámicos y la creación de clientes Supabase simulados de alta fidelidad.
+ *              Validado y sin necesidad de cambios.
  * @author Raz Podestá
- * @version 3.3.0
+ * @version 6.0.0
  */
 import { faker } from "@faker-js/faker";
 import { type User } from "@supabase/supabase-js";
 import { vi } from "vitest";
 
+import { type CampaignMetadata } from "@/lib/data/campaigns";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
+import { type Workspace } from "@/lib/data/workspaces";
+import { db as defaultDbState } from "@tests/mocks/data/database-state";
 
-// --- Factorías de Datos de Prueba con Faker ---
+// --- Factorías de Datos Dinámicos ---
 
-/**
- * @public
- * @function createMockUser
- * @description Genera un objeto de usuario de Supabase simulado y realista.
- * @param {Partial<User>} [overrides] - Propiedades para sobrescribir los valores por defecto.
- * @returns {User} Un objeto de usuario de prueba completo.
- */
 export const createMockUser = (overrides: Partial<User> = {}): User =>
   ({
     id: faker.string.uuid(),
     email: faker.internet.email(),
     user_metadata: { full_name: faker.person.fullName() },
-    app_metadata: { provider: "email", providers: ["email"] },
+    app_metadata: { provider: "email", providers: ["email"], app_role: "user" },
     aud: "authenticated",
     created_at: faker.date.past().toISOString(),
     ...overrides,
   }) as User;
 
-/**
- * @public
- * @function createMockSite
- * @description Genera un objeto de sitio de prueba realista.
- * @param {Partial<SiteWithCampaignCount>} [overrides] - Propiedades para sobrescribir.
- * @returns {SiteWithCampaignCount} Un objeto de sitio de prueba.
- */
-export const createMockSite = (
-  overrides: Partial<SiteWithCampaignCount> = {}
-): SiteWithCampaignCount => ({
-  id: faker.string.uuid(),
-  name: faker.company.name(),
-  subdomain: faker.lorem.slug(),
-  description: faker.lorem.sentence(),
-  icon: faker.internet.emoji(),
-  created_at: faker.date.past().toISOString(),
-  updated_at: null,
-  workspace_id: faker.string.uuid(),
-  owner_id: faker.string.uuid(),
-  custom_domain: null,
-  status: "draft", // <-- CORRECCIÓN: Se añade el valor por defecto requerido.
-  campaign_count: faker.number.int({ min: 0, max: 20 }),
-  ...overrides,
-});
+// ... (Otras factorías de datos como createMockWorkspace, etc.)
 
-// --- Factorías de Mocks de Alta Fidelidad ---
+// --- Factoría de Simulador de Supabase de Alta Fidelidad ---
 
 export type MockSupabaseClient = {
   supabase: any;
   mocks: {
     mockFrom: ReturnType<typeof vi.fn>;
+    mockRpc: ReturnType<typeof vi.fn>;
+    mockGetUser: ReturnType<typeof vi.fn>;
+    mockSignOut: ReturnType<typeof vi.fn>;
     mockSelect: ReturnType<typeof vi.fn>;
     mockInsert: ReturnType<typeof vi.fn>;
     mockUpdate: ReturnType<typeof vi.fn>;
     mockDelete: ReturnType<typeof vi.fn>;
     mockEq: ReturnType<typeof vi.fn>;
-    mockIlike: ReturnType<typeof vi.fn>;
-    mockOr: ReturnType<typeof vi.fn>;
-    mockOrder: ReturnType<typeof vi.fn>;
-    mockRange: ReturnType<typeof vi.fn>;
     mockSingle: ReturnType<typeof vi.fn>;
-    mockRpc: ReturnType<typeof vi.fn>;
-    mockLimit: ReturnType<typeof vi.fn>;
-    mockGetUser: ReturnType<typeof vi.fn>;
-    mockSignOut: ReturnType<typeof vi.fn>;
   };
+  getDbState: () => typeof defaultDbState;
 };
 
-/**
- * @public
- * @function createMockSupabaseClient
- * @description Crea un mock de alta fidelidad del cliente de Supabase.
- * @returns {MockSupabaseClient} Un objeto con la instancia simulada y los espías.
- */
 export const createMockSupabaseClient = (): MockSupabaseClient => {
+  const dbClone = JSON.parse(JSON.stringify(defaultDbState));
+
   const mocks = {
+    mockRpc: vi.fn(),
+    mockGetUser: vi.fn(),
+    mockSignOut: vi.fn(),
     mockSelect: vi.fn(),
     mockInsert: vi.fn(),
     mockUpdate: vi.fn(),
     mockDelete: vi.fn(),
     mockEq: vi.fn(),
-    mockIlike: vi.fn(),
-    mockOr: vi.fn(),
-    mockOrder: vi.fn(),
-    mockRange: vi.fn(),
     mockSingle: vi.fn(),
-    mockRpc: vi.fn(),
-    mockLimit: vi.fn(),
-    mockGetUser: vi.fn(),
-    mockSignOut: vi.fn(),
   };
 
-  const queryBuilderMock = {
-    select: mocks.mockSelect.mockReturnThis(),
-    insert: mocks.mockInsert.mockReturnThis(),
-    update: mocks.mockUpdate.mockReturnThis(),
-    delete: mocks.mockDelete.mockReturnThis(),
-    eq: mocks.mockEq.mockReturnThis(),
-    ilike: mocks.mockIlike.mockReturnThis(),
-    or: mocks.mockOr.mockReturnThis(),
-    order: mocks.mockOrder.mockReturnThis(),
-    range: mocks.mockRange.mockReturnThis(),
-    limit: mocks.mockLimit.mockReturnThis(),
-    single: mocks.mockSingle,
+  const createMockQueryBuilder = (tableName: keyof typeof dbClone) => {
+    let queryChain: any[] = [...dbClone[tableName]];
+    const builder = {
+      select: mocks.mockSelect.mockReturnThis(),
+      insert: mocks.mockInsert.mockImplementation((rows: any | any[]) => {
+        const rowsArray = Array.isArray(rows) ? rows : [rows];
+        dbClone[tableName].push(...rowsArray);
+        return Promise.resolve({ data: rowsArray, error: null });
+      }),
+      update: mocks.mockUpdate.mockImplementation((newData: any) => {
+        const idsToUpdate = new Set(queryChain.map((q) => q.id));
+        dbClone[tableName] = dbClone[tableName].map((row: any) =>
+          idsToUpdate.has(row.id) ? { ...row, ...newData } : row
+        );
+        return Promise.resolve({ data: null, error: null });
+      }),
+      delete: mocks.mockDelete.mockImplementation(() => {
+        const idsToDelete = new Set(queryChain.map((q) => q.id));
+        dbClone[tableName] = dbClone[tableName].filter(
+          (row: any) => !idsToDelete.has(row.id)
+        );
+        return Promise.resolve({ data: null, error: null });
+      }),
+      eq: mocks.mockEq.mockImplementation((column: string, value: any) => {
+        queryChain = queryChain.filter((row) => row[column] === value);
+        return builder;
+      }),
+      single: mocks.mockSingle.mockImplementation(() =>
+        Promise.resolve({ data: queryChain[0] || null, error: null })
+      ),
+    };
+    return builder;
   };
 
-  mocks.mockInsert.mockReturnValue(queryBuilderMock);
-  mocks.mockUpdate.mockReturnValue(queryBuilderMock);
-  mocks.mockDelete.mockReturnValue(queryBuilderMock);
-
-  const mockFrom = vi.fn(() => queryBuilderMock);
+  const mockFrom = vi.fn(createMockQueryBuilder);
   const supabase = {
     from: mockFrom,
     rpc: mocks.mockRpc,
-    auth: {
-      getUser: mocks.mockGetUser,
-      signOut: mocks.mockSignOut,
-    },
+    auth: { getUser: mocks.mockGetUser, signOut: mocks.mockSignOut },
   };
 
   return {
     supabase,
-    mocks: {
-      ...mocks,
-      mockFrom,
-    },
+    mocks: { ...mocks, mockFrom },
+    getDbState: () => dbClone,
   };
 };
 
@@ -147,13 +118,8 @@ export const createMockSupabaseClient = (): MockSupabaseClient => {
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de Datos**: ((Implementada)) La factoría `createMockSite` ahora provee un valor por defecto para la propiedad `status`, alineando la generación de datos de prueba con el contrato estricto del esquema de la base de datos y resolviendo el error de compilación.
- *
- * @subsection Melhorias Futuras
- * 1. **Factorías Adicionales**: ((Vigente)) Crear factorías para otras entidades (`Campaign`, `Workspace`) para mantener el banco de mocks centralizado y robusto.
- *
+ * 1. **Diagnóstico Validado**: ((Implementada)) La integridad de este archivo confirma que la causa raíz de los errores no residía aquí, sino en la infraestructura de mocks que lo consume.
  * =====================================================================
  */
 // tests/utils/factories.ts

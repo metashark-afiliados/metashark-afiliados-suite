@@ -2,9 +2,9 @@
 /**
  * @file WorkspaceSwitcher.schema.ts
  * @description Define el contrato de datos para el namespace 'WorkspaceSwitcher'.
- *              Ha sido nivelado para incluir el ciclo de vida de eliminación.
+ *              Sincronizado para incluir el ciclo de vida de renombrar.
  * @author Raz Podestá
- * @version 2.1.0
+ * @version 2.2.0
  */
 import { z } from "zod";
 
@@ -17,9 +17,11 @@ export const WorkspaceSwitcherSchema = z.object({
   createWorkspace_button: z.string(),
   inviteMember_button: z.string(),
   inviteMember_description: z.string(),
+  renameWorkspace_button: z.string(),
   workspaceSettings_button: z.string(),
-  deleteWorkspace_button: z.string(), // <-- NUEVO
+  deleteWorkspace_button: z.string(),
 
+  onboarding_title: z.string(),
   onboarding_welcome_title: z.string(),
   onboarding_welcome_description: z.string(),
 
@@ -32,7 +34,6 @@ export const WorkspaceSwitcherSchema = z.object({
   }),
 
   edit_form: z.object({
-    // <-- NUEVO
     name_aria_label: z.string(),
     success_toast: z.string(),
   }),
@@ -48,8 +49,16 @@ export const WorkspaceSwitcherSchema = z.object({
     send_button: z.string(),
   }),
 
+  // --- INICIO DE SINCRONIZACIÓN ---
+  rename_dialog: z.object({
+    title: z.string(),
+    description: z.string(),
+    save_button: z.string(),
+    saving_button: z.string(),
+  }),
+  // --- FIN DE SINCRONIZACIÓN ---
+
   delete_dialog: z.object({
-    // <-- NUEVO
     title: z.string(),
     description: z.string(),
     confirmation_label: z.string(),
@@ -63,7 +72,7 @@ export const WorkspaceSwitcherSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Completitud de Ciclo de Vida**: ((Implementada)) Se han añadido las claves para la funcionalidad de edición y eliminación.
+ * 1. **Sincronización de Contrato Completo**: ((Implementada)) Se han añadido `renameWorkspace_button` y el objeto `rename_dialog`, completando el contrato de i18n y resolviendo el error `TS2345`.
  *
  * =====================================================================
  */

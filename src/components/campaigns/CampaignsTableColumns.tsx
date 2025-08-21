@@ -1,58 +1,35 @@
 // src/components/campaigns/CampaignsTableColumns.tsx
 /**
- * @file src/components/campaigns/CampaignsTableColumns.tsx
- * @description Aparato atómico y puro. Genera la configuración de columnas
- *              (`ColumnDef[]`) para la tabla de campañas. Ha sido refactorizado
- *              para consumir el componente `ConfirmationDialogContent` y gestionar
- *              su propio estado de diálogo.
+ * @file CampaignsTableColumns.tsx
+ * @description Aparato de configuración puro y ensamblador. Su única
+ *              responsabilidad es definir la estructura de las columnas y
+ *              delegar el renderizado de cada celda a sus componentes atómicos
+ *              correspondientes, siguiendo la "Filosofía LEGO" al más alto nivel.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 4.0.0
  */
-"use client";
-
 import { type useFormatter, type useTranslations } from "next-intl";
 import { type ColumnDef } from "@tanstack/react-table";
-import {
-  Archive,
-  Copy,
-  Edit,
-  MoreHorizontal,
-  PieChart,
-  ShieldAlert,
-  Trash2,
-} from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 
-import { Badge, type BadgeProps } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { type CampaignMetadata } from "@/lib/data/campaigns";
-import { Link } from "@/lib/navigation";
-import { cn } from "@/lib/utils";
+import {
+  CampaignActionsCell,
+  CampaignNameLink,
+  CampaignStatusBadge,
+} from "./cells";
 
-// ... (types y map sin cambios) ...
-type TFunction = ReturnType<typeof useTranslations>;
-type TFormatter = ReturnType<typeof useFormatter>;
-type CampaignStatus = "draft" | "published" | "archived";
-
-const statusVariantMap: Record<CampaignStatus, BadgeProps["variant"]> = {
-  published: "default",
-  archived: "secondary",
-  draft: "outline",
-};
-
+/**
+ * @public
+ * @interface GetCampaignsColumnsParams
+ * @description Contrato de props para la factoría de columnas. Define todas las
+ *              dependencias (funciones de traducción, manejadores de acciones, estado)
+ *              que se pasarán a los componentes de celda atómicos.
+ */
 export interface GetCampaignsColumnsParams {
-  t: TFunction;
-  tDialogs: TFunction;
-  format: TFormatter;
+  t: ReturnType<typeof useTranslations>;
+  tDialogs: ReturnType<typeof useTranslations>;
+  format: ReturnType<typeof useFormatter>;
   handleDelete: (formData: FormData) => void;
   handleDuplicate: (campaignId: string) => void;
   handleArchive: (campaignId: string) => void;
@@ -64,155 +41,60 @@ export interface GetCampaignsColumnsParams {
   };
 }
 
-export const getCampaignsColumns = ({
-  /* ... (props sin cambios) ... */ t,
-  tDialogs,
-  format,
-  handleDelete,
-  handleDuplicate,
-  handleArchive,
-  isPending,
-  mutatingId,
-  toastTexts,
-}: GetCampaignsColumnsParams): ColumnDef<CampaignMetadata>[] => [
-  // ... (columnas 'name', 'status', 'updated_at' sin cambios)...
+/**
+ * @public
+ * @function getCampaignsColumns
+ * @description Factoría de configuración pura. Construye y devuelve el array de
+ *              definiciones de columna para la tabla de campañas.
+ * @param {GetCampaignsColumnsParams} props - Las dependencias necesarias para las celdas.
+ * @returns {ColumnDef<CampaignMetadata>[]} El array de configuración de columnas.
+ */
+export const getCampaignsColumns = (
+  props: GetCampaignsColumnsParams
+): ColumnDef<CampaignMetadata>[] => [
   {
     accessorKey: "name",
-    header: t("table.header_name"),
-    cell: ({ row }) => (
-      <Link
-        href={{
-          pathname: "/builder/[campaignId]",
-          params: { campaignId: row.original.id },
-        }}
-        className="font-medium hover:underline"
-      >
-        {row.original.name}
-      </Link>
-    ),
+    header: props.t("table.header_name"),
+    cell: ({ row }) => <CampaignNameLink campaign={row.original} />,
   },
   {
     accessorKey: "status",
-    header: t("table.header_status"),
-    cell: ({ row }) => {
-      const status = (row.original.status as CampaignStatus) || "draft";
-      return (
-        <Badge
-          variant={statusVariantMap[status]}
-          className={cn(
-            status === "published" &&
-              "bg-green-500/20 border-green-500/50 text-green-700 dark:text-green-400"
-          )}
-        >
-          {t(`status.${status}` as any)}
-        </Badge>
-      );
-    },
+    header: props.t("table.header_status"),
+    cell: ({ row }) => (
+      <CampaignStatusBadge status={row.original.status as any} t={props.t} />
+    ),
   },
   {
     accessorKey: "updated_at",
-    header: t("table.header_lastUpdated"),
+    header: props.t("table.header_lastUpdated"),
     cell: ({ row }) =>
-      format.dateTime(
+      props.format.dateTime(
         new Date(row.original.updated_at || row.original.created_at),
         "medium"
       ),
   },
   {
     id: "actions",
-    header: () => <div className="text-right">{t("table.header_actions")}</div>,
-    cell: function Cell({ row }) {
-      const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-      const handleDeleteConfirm = (formData: FormData) => {
-        handleDelete(formData);
-      };
-
-      return (
-        <div className="text-right">
-          <Dialog
-            open={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-          >
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={{
-                      pathname: "/builder/[campaignId]",
-                      params: { campaignId: row.original.id },
-                    }}
-                  >
-                    <Edit className="mr-2 h-4 w-4" />
-                    <span>{t("table.action_edit")}</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleDuplicate(row.original.id)}
-                >
-                  <Copy className="mr-2 h-4 w-4" />
-                  <span>{t("table.action_duplicate")}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleArchive(row.original.id)}
-                >
-                  <Archive className="mr-2 h-4 w-4" />
-                  <span>{t("table.action_archive")}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled>
-                  <PieChart className="mr-2 h-4 w-4" />
-                  <span>{t("table.action_analytics")}</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DialogTrigger asChild>
-                  <DropdownMenuItem
-                    onSelect={(e) => e.preventDefault()}
-                    className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    <span>{t("table.action_delete")}</span>
-                  </DropdownMenuItem>
-                </DialogTrigger>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <ConfirmationDialogContent
-              icon={ShieldAlert}
-              title={t("deleteDialog.title")}
-              description={t.rich("deleteDialog.description", {
-                campaignName: row.original.name,
-                strong: (chunks) => <strong>{chunks}</strong>,
-              })}
-              confirmButtonText={t("deleteDialog.confirmButton")}
-              cancelButtonText={tDialogs("generic_cancelButton")}
-              onConfirm={handleDeleteConfirm}
-              onClose={() => setIsDeleteDialogOpen(false)}
-              isPending={isPending && mutatingId === row.original.id}
-              hiddenInputs={{ campaignId: row.original.id }}
-              confirmationText={row.original.name}
-              confirmationLabel={t.rich("deleteDialog.confirmation_label", {
-                campaignName: row.original.name,
-                strong: (chunks) => <strong>{chunks}</strong>,
-              })}
-            />
-          </Dialog>
-        </div>
-      );
-    },
+    header: () => (
+      <div className="text-right">{props.t("table.header_actions")}</div>
+    ),
+    cell: ({ row }) => (
+      <CampaignActionsCell campaign={row.original} {...props} />
+    ),
   },
 ];
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de Módulo**: ((Implementada)) Se ha actualizado la importación a `ConfirmationDialogContent` y la celda de acciones ahora gestiona su propio estado de diálogo.
+ * 1. **Arquitectura de Ensamblaje Puro (SRP)**: ((Implementada)) Este aparato ya no contiene lógica de UI ni de estado. Su única responsabilidad es definir la estructura de la tabla y delegar el renderizado de las celdas a componentes atómicos, cumpliendo con el Principio de Responsabilidad Única.
+ * 2. **Cohesión y Desacoplamiento**: ((Implementada)) La lógica de la UI de las celdas (enlaces, badges, menús de acción) está ahora completamente desacoplada de la definición de la tabla, lo que permite probar y modificar cada pieza de forma aislada.
  *
+ * @subsection Melhorias Futuras
+ * 1. **Cabeceras de Tabla Interactivas**: ((Vigente)) Los `header` podrían ser refactorizados para renderizar componentes que incluyan indicadores de ordenamiento o campos de filtro, pasando los callbacks correspondientes a través del contrato `GetCampaignsColumnsParams`.
+ * 2. **Compatibilidad con Virtualización**: ((Vigente)) Esta estructura de definición de columnas es 100% compatible con librerías de virtualización como `@tanstack/react-virtual`, una futura optimización de rendimiento para tablas con un gran número de filas.
  * =====================================================================
  */
 // src/components/campaigns/CampaignsTableColumns.tsx

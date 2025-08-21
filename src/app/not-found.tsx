@@ -2,10 +2,10 @@
 /**
  * @file src/app/not-found.tsx
  * @description Manejador de Errores 404 Global. Refactorizado a un estándar de
- *              élite, resolviendo el error de build `React.Children.only` y
- *              cumpliendo los protocolos de i18n.
+ *              élite, blindando la composición de hijos para el componente Link
+ *              para ser inmune al error `React.Children.only`.
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 3.1.0
  */
 "use client";
 
@@ -38,18 +38,18 @@ export default function NotFound(): React.ReactElement {
         <div className="mt-10 flex gap-4">
           <Button variant="outline" asChild>
             <Link href="/">
-              <span className="inline-flex items-center justify-center">
+              <>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {t("backToHome")}
-              </span>
+              </>
             </Link>
           </Button>
           <Button asChild>
             <Link href="/dashboard">
-              <span className="inline-flex items-center justify-center">
+              <>
                 <Home className="mr-2 h-4 w-4" />
                 {t("goToDashboard")}
-              </span>
+              </>
             </Link>
           </Button>
         </div>
@@ -61,11 +61,11 @@ export default function NotFound(): React.ReactElement {
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha envuelto el contenido de los `Link` (icono + texto) en un `<span>`, proporcionando un único hijo y resolviendo el error `React.Children.only`.
- * 2. **Full Internacionalización**: ((Implementada)) Se ha eliminado el texto codificado en duro, y el componente ahora consume `useTranslations` y el `Link` de `next-intl`, saldando la deuda técnica.
+ * 1. **Composición Robusta**: ((Implementada)) El contenido del `Link` ahora está envuelto en un `React.Fragment`, proporcionando un único hijo explícito al `Button` y resolviendo de forma definitiva el error `React.Children.only`.
  *
+ * @subsection Melhorias Futuras
+ * 1. **Sugerencias de Rutas**: ((Vigente)) Se podría implementar una lógica que sugiera rutas similares a la no encontrada para mejorar la UX.
  * =====================================================================
  */
 // src/app/not-found.tsx

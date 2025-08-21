@@ -2,11 +2,10 @@
 /**
  * @file playwright.config.ts
  * @description Configuración canónica para la suite de pruebas E2E con Playwright.
- *              Alineada con la estrategia de entorno único, utiliza `.env.local`
- *              como la SSoT para las pruebas locales y el comando `pnpm dev`.
- *              Ahora incluye el `globalSetup` para limpieza de base de datos.
+ *              Nivelada para incluir pruebas cross-browser, garantizando una
+ *              experiencia de usuario consistente en las plataformas principales.
  * @author Raz Podestá
- * @version 1.1.0
+ * @version 2.0.0
  */
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
@@ -16,7 +15,6 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cargar explícitamente las variables de entorno desde .env.local
 dotenv.config({ path: path.resolve(__dirname, "..", ".env.local") });
 
 export default defineConfig({
@@ -26,17 +24,24 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
-  // --- INICIO DE CORRECCIÓN: GLOBAL SETUP ---
-  globalSetup: "./tests/e2e/global-setup.ts", // Ruta al script de setup global
-  // --- FIN DE CORRECCIÓN ---
+  globalSetup: "./tests/e2e/global-setup.ts",
   use: {
     baseURL: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     trace: "on-first-retry",
+    storageState: "./tests/e2e/storageState.json", // Usar el estado de sesión guardado
   },
   projects: [
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
     },
   ],
   webServer: {
@@ -54,10 +59,12 @@ export default defineConfig({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Activación de Limpieza E2E**: ((Implementada)) Se ha añadido la propiedad `globalSetup` en la configuración, vinculando el script de limpieza de la base de datos a la ejecución de las pruebas E2E.
+ * 1. **Pruebas Cross-Browser**: ((Implementada)) Se han añadido proyectos para Firefox y WebKit, garantizando que las pruebas E2E se ejecuten en los tres motores de renderizado principales.
+ * 2. **Persistencia de Sesión Activada**: ((Implementada)) La configuración `use.storageState` está ahora activa, permitiendo que el `global-setup` acelere la suite de pruebas.
  *
  * @subsection Melhorias Futuras
- * 1. **Setup por Proyecto**: ((Vigente)) Si se introducen múltiples "proyectos" de Playwright (ej. `api-tests`), cada uno podría tener su propio `globalSetup` para una limpieza más granular.
+ * 1. **Perfiles Móviles**: ((Vigente)) Añadir proyectos para dispositivos móviles (`devices['Pixel 5']`, `devices['iPhone 12']`) para validar la experiencia responsiva.
  *
  * =====================================================================
  */
+// playwright.config.ts

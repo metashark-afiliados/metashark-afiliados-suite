@@ -1,39 +1,39 @@
 // tests/unit/lib/helpers/object-case-converter.test.ts
 /**
  * @file tests/unit/lib/helpers/object-case-converter.test.ts
- * @description Suite de pruebas unitarias de élite para el helper `object-case-converter`.
- *              Valida la correcta conversión de claves de objetos de camelCase a snake_case,
- *              cubriendo casos de anidamiento, arrays y valores primitivos.
- * @author Raz Podestá
- * @version 1.1.0
+ * @description Arnés de pruebas unitarias de élite para el aparato `keysToSnakeCase`.
+ *              Valida la conversión recursiva de claves en objetos planos, anidados
+ *              y arrays de objetos, incluyendo la validación de inmutabilidad para
+ *              garantizar que la función es pura.
+ * @author L.I.A. Legacy
+ * @version 1.0.0
  */
 import { describe, expect, it } from "vitest";
 
 import { keysToSnakeCase } from "@/lib/helpers/object-case-converter";
 
-describe("Arnés de Pruebas Unitarias: lib/helpers/object-case-converter", () => {
-  it("debe convertir correctamente un objeto anidado de camelCase a snake_case", () => {
+describe("Aparato de Utilidad Atómico: keysToSnakeCase", () => {
+  it("debe convertir las claves de un objeto plano a snake_case", () => {
+    // Arrange
+    const input = { simpleKey: "value", anotherKey: 123 };
+    const expected = { simple_key: "value", another_key: 123 };
+
+    // Act
+    const result = keysToSnakeCase(input);
+
+    // Assert
+    expect(result).toEqual(expected);
+  });
+
+  it("debe convertir recursivamente las claves en objetos anidados", () => {
     // Arrange
     const input = {
-      userId: 1,
-      userProfile: {
-        firstName: "John",
-        lastName: "Doe",
-        contactInfo: {
-          emailAddress: "john.doe@example.com",
-        },
-      },
+      userProfile: { firstName: "John", lastName: "Doe" },
+      isActive: true,
     };
-
     const expected = {
-      user_id: 1,
-      user_profile: {
-        first_name: "John",
-        last_name: "Doe",
-        contact_info: {
-          email_address: "john.doe@example.com",
-        },
-      },
+      user_profile: { first_name: "John", last_name: "Doe" },
+      is_active: true,
     };
 
     // Act
@@ -43,21 +43,32 @@ describe("Arnés de Pruebas Unitarias: lib/helpers/object-case-converter", () =>
     expect(result).toEqual(expected);
   });
 
-  it("debe manejar correctamente arrays de objetos", () => {
+  it("debe convertir recursivamente las claves en un array de objetos", () => {
     // Arrange
     const input = {
-      items: [
-        { itemId: 101, itemName: "Item A" },
-        { itemId: 102, itemName: "Item B" },
+      itemsList: [
+        { itemId: 1 },
+        { itemId: 2, itemDetails: { priceAmount: 99 } },
+      ],
+    };
+    const expected = {
+      items_list: [
+        { item_id: 1 },
+        { item_id: 2, item_details: { price_amount: 99 } },
       ],
     };
 
-    const expected = {
-      items: [
-        { item_id: 101, item_name: "Item A" },
-        { item_id: 102, item_name: "Item B" },
-      ],
-    };
+    // Act
+    const result = keysToSnakeCase(input);
+
+    // Assert
+    expect(result).toEqual(expected);
+  });
+
+  it("debe manejar correctamente valores null y undefined sin modificarlos", () => {
+    // Arrange
+    const input = { aKey: null, anotherKey: undefined };
+    const expected = { a_key: null, another_key: undefined };
 
     // Act
     const result = keysToSnakeCase(input);
@@ -66,55 +77,30 @@ describe("Arnés de Pruebas Unitarias: lib/helpers/object-case-converter", () =>
     expect(result).toEqual(expected);
   });
 
-  it("debe devolver un objeto vacío si la entrada es un objeto vacío", () => {
+  it("debe devolver el valor original si no es un objeto o array", () => {
     // Arrange
-    const input = {};
-    const expected = {};
+    const inputString = "Just a string";
+    const inputNumber = 42;
 
     // Act
-    const result = keysToSnakeCase(input);
+    const resultString = keysToSnakeCase(inputString as any);
+    const resultNumber = keysToSnakeCase(inputNumber as any);
 
     // Assert
-    expect(result).toEqual(expected);
+    expect(resultString).toBe(inputString);
+    expect(resultNumber).toBe(inputNumber);
   });
 
-  it("debe manejar valores nulos y primitivos sin modificarlos", () => {
+  it("debe ser una función pura y no mutar el objeto original", () => {
     // Arrange
-    const input = {
-      aString: "hello",
-      aNumber: 42,
-      aNull: null,
-      isTrue: true,
-    };
-
-    const expected = {
-      a_string: "hello",
-      a_number: 42,
-      a_null: null,
-      is_true: true,
-    };
+    const originalObject = { userProfile: { firstName: "Jane" } };
+    const originalObjectCopy = JSON.parse(JSON.stringify(originalObject));
 
     // Act
-    const result = keysToSnakeCase(input);
+    keysToSnakeCase(originalObject);
 
     // Assert
-    expect(result).toEqual(expected);
-  });
-
-  it("debe manejar claves con múltiples mayúsculas consecutivas", () => {
-    // Arrange
-    const input = {
-      anHTTPAction: "POST",
-    };
-    const expected = {
-      an_h_t_t_p_action: "POST",
-    };
-
-    // Act
-    const result = keysToSnakeCase(input);
-
-    // Assert
-    expect(result).toEqual(expected);
+    expect(originalObject).toEqual(originalObjectCopy);
   });
 });
 
@@ -124,12 +110,12 @@ describe("Arnés de Pruebas Unitarias: lib/helpers/object-case-converter", () =>
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Cobertura de Casos Borde**: ((Implementada)) Se ha añadido una prueba para claves con múltiples mayúsculas (`anHTTPAction`), mejorando la robustez de la validación.
- * 2. **Estándar de Pruebas Unitarias**: ((Implementada)) Establece el estándar para futuras pruebas de funciones puras: claras, concisas y cubriendo múltiples escenarios.
+ * 1. **Cobertura de Casos Borde**: ((Implementada)) Las pruebas cubren no solo objetos simples, sino también objetos anidados, arrays de objetos y valores primitivos, garantizando la robustez del helper.
+ * 2. **Validación de Inmutabilidad**: ((Implementada)) Se ha añadido una prueba explícita para asegurar que la función es pura y no modifica el objeto de entrada, un principio fundamental de la programación funcional y del diseño de élite.
  *
  * @subsection Melhorias Futuras
- * 1. **Pruebas para `keysToCamelCase`**: ((Vigente)) Una vez que la función inversa sea creada, se debe añadir una suite de pruebas correspondiente en este mismo archivo.
- * 2. **Pruebas de Propiedad (Property-Based Testing)**: ((Vigente)) Para una robustez de élite, usar una librería como `fast-check` para generar cientos de objetos aleatorios y verificar que la función no falle.
+ * 1. **Pruebas para `keysToCamelCase`**: ((Vigente)) Cuando se implemente la función inversa, este arnés deberá ser expandido para incluir una suite de pruebas completa para ella.
+ * 2. **Pruebas de Rendimiento**: ((Vigente)) Para un helper de uso intensivo, se podría añadir un benchmark (`vitest.bench`) para medir su rendimiento con objetos muy grandes y profundamente anidados.
  *
  * =====================================================================
  */

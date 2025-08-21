@@ -1,9 +1,12 @@
 // tests/unit/app/not-found.test.tsx
 /**
  * @file not-found.test.tsx
- * @description Arnés de pruebas para validar la infraestructura de mocks reconstruida.
+ * @description Arnés de pruebas para `NotFound`. Valida el renderizado y la
+ *              navegación utilizando la infraestructura de mocks `next-router-mock`.
+ *              Ahora se ejecuta correctamente gracias a la infraestructura de
+ *              pruebas "Reloj Suizo".
  * @author L.I.A. Legacy
- * @version 1.3.1
+ * @version 3.0.0
  */
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
@@ -12,14 +15,11 @@ import NotFound from "@/app/not-found";
 import { render } from "@tests/utils/render";
 
 describe("Componente Atómico: NotFound", () => {
-  it("debe renderizar correctamente sin errores de composición o i18n", () => {
+  it("debe renderizar los textos de i18n y los enlaces con los href correctos", () => {
     // Arrange
-    // La utilidad `render` ya se encarga de los mocks.
-    // El mock de `useTranslations` ahora devuelve claves predecibles y no necesita datos reales.
-    render(<NotFound /> /* Eliminado: , { messages: {} } */);
+    render(<NotFound />);
 
-    // Assert
-    // Las aserciones ahora verifican las claves de i18n devueltas por el mock.
+    // Assert: Contenido de i18n
     expect(
       screen.getByRole("heading", {
         name: /\[i18n\] pages.NotFoundPage.title/i,
@@ -29,6 +29,7 @@ describe("Componente Atómico: NotFound", () => {
       screen.getByText("[i18n] pages.NotFoundPage.description")
     ).toBeInTheDocument();
 
+    // Assert: Enlaces y Navegación
     const homeLink = screen.getByRole("link", {
       name: /\[i18n\] pages.NotFoundPage.backToHome/i,
     });
@@ -42,17 +43,13 @@ describe("Componente Atómico: NotFound", () => {
     expect(dashboardLink).toHaveAttribute("href", "/dashboard");
   });
 });
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
  * @subsection Melhorias Adicionadas
- * 1. **Principios DRY y Coherencia**: ((Implementada)) Se ha eliminado el parámetro `messages: {}` redundante de la llamada `render`, ya que el mock global de `next-intl` no lo requiere, lo que mejora la limpieza del código de prueba y se alinea con la arquitectura de mocks global.
- * 2. **Aserciones actualizadas**: ((Implementada)) Las aserciones ahora se basan en el formato de salida del mock de `next-intl` (ej. `[i18n] pages.NotFoundPage.title`).
- *
- * @subsection Melhorias Futuras
- * 1. **Sincronización con Infraestructura v3.0**: ((Vigente)) Las aserciones han sido actualizadas para coincidir con la salida del nuevo mock de `useTranslations`.
- *
+ * 1. **Prueba Estabilizada**: ((Implementada)) Este arnés de pruebas ahora pasa, validando que la infraestructura de mocks y el componente `NotFound` funcionan correctamente en conjunto.
  * =====================================================================
  */
+// tests/unit/app/not-found.test.tsx

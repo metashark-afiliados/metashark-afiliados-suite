@@ -1,16 +1,16 @@
 // src/components/workspaces/CreateWorkspaceForm.tsx
 /**
  * @file src/components/workspaces/CreateWorkspaceForm.tsx
- * @description Formulario de cliente de élite para la creación de workspaces.
- *              Ha sido refactorizado para eliminar el campo de selección de icono,
- *              simplificando la UI y alineándose con la nueva directiva de diseño.
- * @author L.I.A. Legacy
- * @version 3.0.0
+ * @description Formulario de cliente soberano para la creación de workspaces.
+ *              Gestiona su propio estado con `react-hook-form` y `zodResolver`
+ *              para una validación robusta y en tiempo real.
+ * @author Raz Podestá
+ * @version 2.1.0
  */
 "use client";
 
 import { useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,14 +21,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { workspaces as workspaceActions } from "@/lib/actions";
-import { logger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logging";
 import { CreateWorkspaceSchema } from "@/lib/validators";
 
 type FormData = z.infer<typeof CreateWorkspaceSchema>;
 
-export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
+/**
+ * @public
+ * @interface CreateWorkspaceFormProps
+ * @description Contrato de props para el formulario. Define el callback de éxito.
+ */
+interface CreateWorkspaceFormProps {
+  onSuccess: () => void;
+}
+
+/**
+ * @public
+ * @component CreateWorkspaceForm
+ * @description Renderiza un formulario robusto para la creación de workspaces.
+ * @param {CreateWorkspaceFormProps} props - Las propiedades para configurar el formulario.
+ * @returns {React.ReactElement}
+ */
+export function CreateWorkspaceForm({
+  onSuccess,
+}: CreateWorkspaceFormProps): React.ReactElement {
   const t = useTranslations("WorkspaceSwitcher");
-  const t_errors = useTranslations("ValidationErrors");
+  const tErrors = useTranslations("ValidationErrors");
   const [isPending, startTransition] = useTransition();
 
   const {
@@ -42,10 +60,11 @@ export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
     },
   });
 
-  const processSubmit = (data: FormData) => {
-    logger.trace("[CreateWorkspaceForm] Enviando nuevo workspace.", {
+  const processSubmit: SubmitHandler<FormData> = (data) => {
+    clientLogger.trace("[CreateWorkspaceForm] Enviando nuevo workspace.", {
       workspaceName: data.workspaceName,
     });
+
     startTransition(async () => {
       const formData = new FormData();
       formData.append("workspaceName", data.workspaceName);
@@ -54,13 +73,15 @@ export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
 
       if (result.success) {
         toast.success(t("create_form.success_toast"));
-        logger.info("[CreateWorkspaceForm] Workspace creado con éxito.", {
+        clientLogger.info("[CreateWorkspaceForm] Workspace creado con éxito.", {
           workspaceId: result.data.id,
         });
         onSuccess();
       } else {
-        toast.error(t_errors(result.error as any));
-        logger.error("[CreateWorkspaceForm] Fallo al crear workspace.", {
+        toast.error(
+          tErrors(result.error as any, { defaultValue: result.error })
+        );
+        clientLogger.error("[CreateWorkspaceForm] Fallo al crear workspace.", {
           error: result.error,
         });
       }
@@ -77,11 +98,13 @@ export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
           id="workspaceName"
           placeholder={t("create_form.name_placeholder")}
           aria-invalid={!!errors.workspaceName}
+          disabled={isLoading}
           {...register("workspaceName")}
+          name="workspaceName"
         />
         {errors.workspaceName?.message && (
           <p className="text-sm text-destructive" role="alert">
-            {t_errors(errors.workspaceName.message as any)}
+            {tErrors(errors.workspaceName.message as any)}
           </p>
         )}
       </div>
@@ -95,18 +118,16 @@ export function CreateWorkspaceForm({ onSuccess }: { onSuccess: () => void }) {
     </form>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Simplificación de UI**: ((Implementada)) Se ha eliminado el campo de `EmojiPicker` y toda la lógica de `Controller` asociada. El formulario ahora es más simple y se enfoca únicamente en el nombre del workspace.
- * 2. **Sincronización de Contrato**: ((Implementada)) El formulario ya no intenta enviar el campo `icon`, alineándose con el `CreateWorkspaceSchema` actualizado.
+ * 1. **Compatibilidad con Server Actions**: ((Implementada)) Se ha añadido el atributo `name` explícito al input, garantizando que el `FormData` se construya correctamente y que la Server Action sea invocada.
  *
  * @subsection Melhorias Futuras
- * 1. **Selección de Plantilla de Workspace**: ((Vigente)) En lugar de un ícono, el formulario podría incluir un selector para que el usuario cree un workspace a partir de una plantilla (ej. "Para Agencia", "Proyecto Personal"), que podría pre-configurar sitios o campañas iniciales.
+ * 1. **Selección de Plantilla**: ((Vigente)) El formulario podría incluir un selector para crear un workspace a partir de una plantilla, como "Agencia" o "Marketer Solitario", que preconfigure sitios o campañas iniciales.
  *
  * =====================================================================
  */

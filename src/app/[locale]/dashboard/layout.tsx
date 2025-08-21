@@ -1,145 +1,31 @@
 // src/app/[locale]/dashboard/layout.tsx
-/**
- * @file src/app/[locale]/dashboard/layout.tsx
- * @description Layout principal del dashboard, refactorizado a la Arquitectura v10.2
- *              ("Guardián de Contexto"). Implementa una lógica de selección de workspace
- *              de élite, maneja todos los casos borde (usuario nuevo, solo invitaciones,
- *              sin workspaces) y elimina la dependencia de la ruta obsoleta `/welcome`.
- * @author Raz Podestá
- * @version 10.2.0
- */
 import React from "react";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { createPersistentErrorLog } from "@/lib/actions/_helpers";
-import { CommandPalette } from "@/components/feedback/CommandPalette";
-import { LiaChatWidget } from "@/components/feedback/LiaChatWidget";
+import { DashboardContextProviders } from "@/components/layout/DashboardContextProviders";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
+import { getLayoutData } from "@/components/layout/dashboard.loader";
+import { GlobalOverlays } from "@/components/layout/GlobalOverlays";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
-import {
-  DashboardProvider,
-  type DashboardContextProps,
-} from "@/lib/context/DashboardContext";
-import {
-  campaignsData,
-  modules as modulesData,
-  notifications,
-  workspaces,
-} from "@/lib/data";
 import { logger } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/server";
-import { type Enums } from "@/lib/types/database";
 
-async function getLayoutData(): Promise<DashboardContextProps | null> {
-  try {
-    const cookieStore = cookies();
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) return null;
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile) {
-      logger.error(
-        `[DashboardLayout] INCONSISTENCIA: No se encontró perfil para ${user.id}.`
-      );
-      await supabase.auth.signOut();
-      return null;
-    }
-
-    const [userWorkspaces, pendingInvitations, modules] = await Promise.all([
-      workspaces.getWorkspacesByUserId(user.id, supabase),
-      notifications.getPendingInvitationsByEmail(user.email!, supabase),
-      modulesData.getFeatureModulesForUser(user, supabase),
-    ]);
-
-    // --- INICIO DE LÓGICA DE CONTEXTO DE ÉLITE ---
-    const activeWorkspaceId = cookieStore.get("active_workspace_id")?.value;
-    let activeWorkspace =
-      userWorkspaces.find((ws) => ws.id === activeWorkspaceId) || null;
-
-    if (!activeWorkspace && userWorkspaces.length > 0) {
-      activeWorkspace = userWorkspaces[0];
-      logger.info(
-        `[DashboardLayout] No hay cookie de workspace activa. Estableciendo el primero por defecto para ${user.id}.`
-      );
-    }
-
-    if (userWorkspaces.length === 0 && pendingInvitations.length === 0) {
-      logger.info(
-        `[DashboardLayout] Usuario ${user.id} sin workspaces ni invitaciones. Renderizando estado vacío.`
-      );
-    }
-
-    if (!activeWorkspace) {
-      return {
-        user,
-        profile,
-        modules,
-        pendingInvitations,
-        workspaces: [],
-        activeWorkspace: null,
-        activeWorkspaceRole: null,
-        recentCampaigns: [],
-      };
-    }
-    // --- FIN DE LÓGICA DE CONTEXTO DE ÉLITE ---
-
-    const { data: memberRole } = await supabase
-      .from("workspace_members")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("workspace_id", activeWorkspace.id)
-      .single();
-
-    const activeWorkspaceRole =
-      (memberRole?.role as Enums<"workspace_role">) || null;
-
-    const recentCampaigns =
-      await campaignsData.management.getRecentCampaignsByWorkspaceId(
-        activeWorkspace.id,
-        4,
-        supabase
-      );
-
-    return {
-      user,
-      profile,
-      workspaces: userWorkspaces,
-      activeWorkspace,
-      activeWorkspaceRole,
-      pendingInvitations,
-      modules,
-      recentCampaigns,
-    };
-  } catch (error) {
-    logger.error(
-      "[DashboardLayout:getLayoutData] Fallo crítico.",
-      error
-    );
-    await createPersistentErrorLog(
-      "DashboardLayout:getLayoutData",
-      error as Error
-    );
-    return null;
-  }
-}
-
+/**
+ * @public
+ * @component DashboardLayout
+ * @description Orquesta la estructura, obtención de datos y proveedores de contexto
+ *              para toda la sección autenticada de la aplicación. Actúa como un
+ *              ensamblador puro, delegando la lógica a aparatos atómicos.
+ * @param {{ children: React.ReactNode }} props
+ * @returns {Promise<React.ReactElement>}
+ * @author Raz Podestá
+ * @version 11.0.0
+ */
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }): Promise<React.ReactElement> {
-  logger.trace("[DashboardLayout] Renderizando layout de servidor...");
+  logger.trace("[DashboardLayout] Ensamblando layout de élite...");
   const layoutData = await getLayoutData();
 
   if (!layoutData) {
@@ -147,7 +33,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <DashboardProvider value={layoutData}>
+    <DashboardContextProviders value={layoutData}>
       <div className="flex min-h-screen w-full bg-muted/40">
         <DashboardSidebar />
         <div className="flex flex-1 flex-col">
@@ -155,21 +41,23 @@ export default async function DashboardLayout({
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
         </div>
-        <LiaChatWidget />
-        <CommandPalette />
-        {!layoutData.profile.has_completed_onboarding && <WelcomeModal />}
+        <GlobalOverlays />
       </div>
-    </DashboardProvider>
+    </DashboardContextProviders>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Lógica de Contexto de Élite**: ((Implementada)) El layout ahora maneja correctamente todos los casos borde: selecciona el primer workspace por defecto para nuevos usuarios, y permite el renderizado del dashboard en un estado limitado para usuarios sin workspaces (con o sin invitaciones).
- * 2. **Eliminación de Deuda Arquitectónica**: ((Implementada)) Se ha eliminado toda la lógica y redirecciones relacionadas con la ruta obsoleta `/welcome`.
+ * 1. **Atomicidad Radical (Ensamblador Puro)**: ((Implementada)) El layout ha sido deconstruido en aparatos atómicos con responsabilidades únicas (`loader`, `providers`, `overlays`), cumpliendo la directiva al más alto nivel. El `DashboardLayout` ahora es un ensamblador puro y de alta legibilidad.
+ * 2. **Visión Holística 360°**: ((Implementada)) La nueva estructura cohesiva demuestra una visión completa del flujo de datos, desde la obtención en el `loader` hasta la provisión en los `ContextProviders` y el consumo en los `GlobalOverlays` y `children`. No hay regresiones funcionales; toda la lógica del original se ha preservado y organizado mejor.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Layouts Anidados Dinámicos**: ((Vigente)) Para futuras secciones del dashboard con estructuras diferentes (ej. un layout de ancho completo para un editor), se podría implementar una lógica para que `getLayoutData` también devuelva un `layoutType` que este componente usaría para renderizar condicionalmente diferentes estructuras de `div`.
  *
  * =====================================================================
  */

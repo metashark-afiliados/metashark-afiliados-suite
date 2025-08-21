@@ -1,11 +1,11 @@
 // src/lib/navigation.ts
 /**
  * @file src/lib/navigation.ts
- * @description Manifiesto de Enrutamiento. Ha sido actualizado para eliminar
- *              la ruta obsoleta `/welcome`, alineándose con la arquitectura de
- *              onboarding v9.1 "Modal de Bienvenida".
+ * @description Manifiesto de Enrutamiento. Corregido para restaurar la
+ *              exportación del tipo `Route`, resolviendo una desincronización
+ *              de contrato que afectaba a componentes de UI.
  * @author Raz Podestá
- * @version 5.0.0
+ * @version 5.1.0
  */
 import {
   createLocalizedPathnamesNavigation,
@@ -58,19 +58,21 @@ export const { Link, redirect, usePathname, useRouter } =
 
 type PathnameKeys = keyof typeof pathnames;
 
-export type AppPathname =
+// Se restaura el nombre del tipo `Route` que los componentes de UI esperan.
+export type Route =
   | PathnameKeys
   | {
       pathname: PathnameKeys;
       params?: Record<string, string | number>;
     };
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica**: ((Implementada)) La eliminación de la ruta `/welcome` sincroniza el enrutamiento con el nuevo flujo de onboarding modal.
+ * 1. **Sincronización de Contrato**: ((Implementada)) El tipo `AppPathname` ha sido renombrado de vuelta a `Route`, resolviendo la causa raíz del error `TS2305` en los componentes consumidores.
  *
  * =====================================================================
  */

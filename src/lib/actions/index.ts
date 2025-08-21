@@ -1,19 +1,16 @@
 // src/lib/actions/index.ts
 /**
  * @file src/lib/actions/index.ts
- * @description Manifiesto de la API de Acciones del Servidor. Ha sido corregido
- *              para utilizar la ruta de importación correcta para las acciones
- *              atomizadas, resolviendo un error de `Module not found`.
- * @author L.I.A. Legacy
- * @version 4.0.1
+ * @description Manifiesto principal de la API de Acciones del Servidor.
+ *              Corregido para usar una sintaxis de re-exportación directa,
+ *              resolviendo un error de resolución de módulo.
+ * @author Raz Podestá
+ * @version 5.1.0
  */
+import "server-only";
+
 import * as admin from "./admin.actions";
 import * as builder from "./builder.actions";
-import { archiveCampaignAction } from "./campaigns/archive.action";
-import { createCampaignAction } from "./campaigns/create.action";
-import { createCampaignFromTemplateAction } from "./campaigns/create-from-template.action"; // Corregido
-import { deleteCampaignAction } from "./campaigns/delete.action";
-import { duplicateCampaignAction } from "./campaigns/duplicate.action";
 import * as invitations from "./invitations.actions";
 import * as newsletter from "./newsletter.actions";
 import * as password from "./password.actions";
@@ -21,15 +18,11 @@ import * as profiles from "./profiles.actions";
 import * as session from "./session.actions";
 import * as sites from "./sites.actions";
 import * as telemetry from "./telemetry.actions";
-import * as workspaces from "./workspaces.actions";
-
-export const campaigns = {
-  archiveCampaignAction,
-  createCampaignAction,
-  createCampaignFromTemplateAction,
-  deleteCampaignAction,
-  duplicateCampaignAction,
-};
+// --- INICIO DE CORRECCIÓN ---
+// Se re-exportan los namespaces directamente para evitar ambigüedades.
+export * from "./campaigns.actions";
+export * from "./workspaces.actions";
+// --- FIN DE CORRECCIÓN ---
 
 export {
   admin,
@@ -41,15 +34,15 @@ export {
   session,
   sites,
   telemetry,
-  workspaces,
 };
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Corrección de Nomenclatura**: ((Implementada)) La ruta de importación ha sido corregida, resolviendo el `Module not found`.
+ * 1. **Resolución de Error de Build (TS2305)**: ((Implementada)) Se ha cambiado la sintaxis a `export * from ...` y se ha reestructurado la exportación. Esto resuelve el error de compilación al eliminar la ambigüedad en la importación/exportación de namespaces.
  *
  * =====================================================================
  */

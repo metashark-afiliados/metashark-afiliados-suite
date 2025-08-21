@@ -1,13 +1,11 @@
 // src/app/api/auth/callback/route.ts
 /**
  * @file src/app/api/auth/callback/route.ts
- * @description Route Handler para el callback de autenticación. Ha sido
- *              refactorizado a un estándar de élite para manejar tanto el flujo
- *              de producción real como el flujo simulado del modo de desarrollo,
- *              estableciendo la cookie de sesión correcta en cada caso y resolviendo
- *              el bloqueo de autenticación.
+ * @description Route Handler para el callback de autenticación. Nivelado a un
+ *              estándar de élite con validación de seguridad para prevenir
+ *              vulnerabilidades de "Open Redirect".
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
@@ -19,13 +17,35 @@ const isDevMode =
   process.env.NODE_ENV === "development" &&
   process.env.DEV_MODE_ENABLED === "true";
 
+/**
+ * @private
+ * @function isValidRedirect
+ * @description Valida que una ruta de redirección sea segura (interna).
+ * @param {string} path - La ruta a validar.
+ * @returns {boolean} `true` si la ruta es segura.
+ */
+const isValidRedirect = (path: string): boolean => {
+  return path.startsWith("/") && !path.startsWith("//") && !path.includes(":");
+};
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next");
-  const redirectTo = next ? `${origin}${next}` : `${origin}/dashboard`;
+  const next = searchParams.get("next"); // ej. "/dashboard/sites"
 
-  // --- INICIO DE REFACTORIZACIÓN (MANEJO DE MODO DESARROLLO) ---
+  // --- INICIO DE LÓGICA DE SEGURIDAD "OPEN REDIRECT" ---
+  let redirectTo = `${origin}/dashboard`;
+  if (next && isValidRedirect(next)) {
+    redirectTo = `${origin}${next}`;
+    logger.trace(`[AuthCallback] Redirección segura validada para: ${next}`);
+  } else if (next) {
+    logger.warn(`[SEGURIDAD] Intento de Open Redirect bloqueado.`, {
+      nextParam: next,
+      fallback: redirectTo,
+    });
+  }
+  // --- FIN DE LÓGICA DE SEGURIDAD ---
+
   if (isDevMode && code === "dev-mock-code") {
     logger.info(
       "[AuthCallback:DevMock] Código simulado recibido. Estableciendo sesión de desarrollo."
@@ -37,9 +57,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.redirect(redirectTo);
   }
-  // --- FIN DE REFACTORIZACIÓN ---
 
-  // --- LÓGICA DE PRODUCCIÓN ---
   if (code) {
     const supabase = createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -60,9 +78,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Si hay un error en producción o no hay código, redirigir a una página de error.
-  const redirectUrl = `${origin}/auth/login?error=true&message=Could not authenticate user. Please try again.`;
-  return NextResponse.redirect(redirectUrl);
+  const errorUrl = `${origin}/auth/login?error=true&message=error_oauth_failed`;
+  return NextResponse.redirect(errorUrl);
 }
 
 /**
@@ -71,13 +88,11 @@ export async function GET(request: NextRequest) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Flujo de Autenticación Simulado Completo**: ((Implementada)) Este aparato ahora maneja el código simulado (`dev-mock-code`), establece la cookie de sesión de desarrollo y redirige al dashboard. Esto completa el ciclo de autenticación en el entorno de desarrollo.
- * 2. **Cero Regresiones**: ((Implementada)) La lógica original de producción se ha preservado completamente, asegurando que el flujo real no se vea afectado.
- * 3. **Observabilidad Contextual**: ((Implementada)) Se han añadido logs específicos para el modo de desarrollo, mejorando la capacidad de diagnóstico.
+ * 1. **Prevención de Open Redirect**: ((Implementada)) Se ha añadido la función `isValidRedirect` y la lógica correspondiente para validar el parámetro `next`. Esto fortalece la seguridad del flujo de autenticación, una mejora crítica.
+ * 2. **Observabilidad de Seguridad**: ((Implementada)) Se ha añadido un `logger.warn` específico para registrar intentos de redirección maliciosos, proporcionando una visibilidad clara sobre posibles ataques.
  *
  * @subsection Melhorias Futuras
- * 1. **Validación de URL de Redirección**: ((Vigente)) Para una seguridad de élite, la URL en el parámetro `next` debería ser validada contra una lista blanca de rutas permitidas para prevenir vulnerabilidades de "Open Redirect".
- * 2. **Mensajes de Error Internacionalizados**: ((Vigente)) El mensaje de error en la URL de redirección está codificado. Debería ser una clave de i18n que la página de login pueda traducir.
+ * 1. **Lista Blanca de Rutas**: ((Vigente)) Para una seguridad aún más estricta, la función `isValidRedirect` podría ser mejorada para validar la ruta contra el `ROUTE_MANIFEST`, asegurando que solo se pueda redirigir a rutas conocidas por la aplicación.
  *
  * =====================================================================
  */
