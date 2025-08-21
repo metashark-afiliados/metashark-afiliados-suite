@@ -1,19 +1,11 @@
 // src/lib/hooks/useUsersPage.ts
-/**
- * @file useUsersPage.ts
- * @description Hook Soberano que encapsula toda la lógica de estado y de negocio
- *              para la página de Gestión de Usuarios del Dev Console. Orquesta
- *              hooks atómicos y gestiona las mutaciones de datos.
- * @author Raz Podestá
- * @version 1.0.0
- */
 "use client";
 
 import { useTransition, useCallback } from "react";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 
-import { admin as adminActions } from "@/lib/actions";
+import { updateUserRoleAction } from "@/lib/actions/admin.actions";
 import { useSearchSync } from "@/lib/hooks/ui/useSearchSync";
 import { clientLogger } from "@/lib/logging";
 import { useRouter } from "@/lib/navigation";
@@ -29,14 +21,11 @@ interface UseUsersPageProps {
  * @description Orquesta la lógica de estado y las acciones para la página de gestión de usuarios.
  * @param {UseUsersPageProps} props - Las propiedades de inicialización del hook.
  * @returns Un objeto con el estado y los manejadores para ser consumidos por la UI.
+ * @version 2.0.0
  */
 export function useUsersPage({ initialSearchQuery }: UseUsersPageProps) {
-  const tToasts = useTranslations(
-    "app.dev-console.AdminDashboard.admin_toasts"
-  );
-  const tErrors = useTranslations(
-    "app.dev-console.AdminDashboard.admin_errors"
-  );
+  const tToasts = useTranslations("app.dev-console.UserManagementTable");
+  const tErrors = useTranslations("ValidationErrors");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -55,11 +44,11 @@ export function useUsersPage({ initialSearchQuery }: UseUsersPageProps) {
       );
 
       startTransition(async () => {
-        const result = await adminActions.updateUserRoleAction(userId, newRole);
+        const result = await updateUserRoleAction(userId, newRole);
 
         if (result.success) {
-          toast.success(tToasts("user_role_updated_success"));
-          router.refresh(); // SSoT es el servidor, refrescamos para obtener el estado real.
+          toast.success(tToasts("role_update_success_toast"));
+          router.refresh();
         } else {
           toast.error(
             tErrors(result.error as any, { defaultValue: result.error })
@@ -77,20 +66,14 @@ export function useUsersPage({ initialSearchQuery }: UseUsersPageProps) {
     handleRoleChange,
   };
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (Lógica)**: ((Implementada)) Este hook aísla completamente la lógica de la página de gestión de usuarios, convirtiendo al componente `users-client.tsx` en un presentador puro.
- * 2. **Composición de Hooks**: ((Implementada)) Demuestra la "Filosofía LEGO" al componer y orquestar el hook atómico `useSearchSync`.
- * 3. **Gestión de Estado Moderna**: ((Implementada)) Utiliza `useTransition` para gestionar el estado de carga de las Server Actions, previniendo que la UI se bloquee.
- *
- * @subsection Melhorias Futuras
- * 1. **UI Optimista**: ((Vigente)) Para una UX instantánea, se podría integrar `useOptimistic` para reflejar el cambio de rol en la UI inmediatamente, antes de que la Server Action complete.
- * 2. **Gestión de Filtros Avanzados**: ((Vigente)) El hook podría ser extendido para gestionar filtros adicionales (ej. filtrar por rol) y sincronizarlos con la URL, similar a `useCampaignsPage`.
+ * 1. **Resolución Definitiva de Error de Build**: ((Implementada)) Se ha reemplazado la importación del barril de acciones por una importación atómica y directa de `updateUserRoleAction`.
  *
  * =====================================================================
  */
-// src/lib/hooks/useUsersPage.ts
