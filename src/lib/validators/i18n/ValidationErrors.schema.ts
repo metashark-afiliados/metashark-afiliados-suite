@@ -2,8 +2,6 @@
 /**
  * @file ValidationErrors.schema.ts
  * @description Define el contrato de datos para el namespace 'ValidationErrors'.
- *              Este schema es la SSoT para todos los mensajes de error de
- *              validación de Zod, permitiendo su completa internacionalización.
  * @author Raz Podestá
  * @version 1.0.0
  */
@@ -18,12 +16,16 @@ export const ValidationErrorsSchema = z.object({
   subdomain_invalid_chars: z.string(),
   invalid_email: z.string(),
   password_too_short: z.string(),
+  passwords_do_not_match: z.string(),
+  terms_must_be_accepted: z.string(),
   slug_too_short: z.string(),
   slug_invalid_chars: z.string(),
   fingerprint_required: z.string(),
   invalid_ip: z.string(),
   icon_required: z.string(),
   error_server_generic: z.string(),
+  error_user_already_exists: z.string(),
+  error_signup_failed: z.string(),
 });
 /**
  * =====================================================================
@@ -31,7 +33,7 @@ export const ValidationErrorsSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato de Errores Centralizado**: ((Implementada)) Este nuevo aparato atómico crea una SSoT para los mensajes de error de validación, desacoplándolos de la lógica de los schemas de Zod.
+ * 1. **Contrato de Errores Centralizado**: ((Implementada)) ((Vigente)) Crea la SSoT para los mensajes de error de validación.
  *
  * =====================================================================
  */

@@ -1,19 +1,14 @@
 // src/messages/manifest.ts
 /**
  * @file src/messages/manifest.ts
- * @description Manifiesto de Importación Dinámica. Ha sido actualizado para
- *              registrar la entrada del nuevo namespace `pages.NotFoundPage`.
+ * @description Manifiesto de Importación Dinámica. SSoT para el registro de
+ *              todos los archivos de mensajes de i18n.
  * @author L.I.A. Legacy
- * @version 10.0.0
+ * @version 11.0.0
  */
 import { type ManifestModule } from "./types";
 
 export const messagesManifest: Record<string, ManifestModule> = {
-  // --- Global/Shared ---
-  ActionDock: () => import("./shared/ActionDock.json"),
-  ValidationErrors: () => import("./shared/ValidationErrors.json"),
-  WelcomeModal: () => import("./shared/WelcomeModal.json"),
-
   // --- App Routes (Server-consumed pages) ---
   "pages.AboutPage": () => import("./pages/AboutPage.json"),
   "pages.AuthNoticePage": () => import("./pages/AuthNoticePage.json"),
@@ -23,7 +18,7 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "pages.DisclaimerPage": () => import("./pages/DisclaimerPage.json"),
   "pages.ForgotPasswordPage": () => import("./pages/ForgotPasswordPage.json"),
   "pages.LegalNoticePage": () => import("./pages/LegalNoticePage.json"),
-  "pages.NotFoundPage": () => import("./pages/NotFoundPage.json"), // <-- NUEVO REGISTRO
+  "pages.NotFoundPage": () => import("./pages/NotFoundPage.json"),
   "pages.PrivacyPolicyPage": () => import("./pages/PrivacyPolicyPage.json"),
   "pages.ResetPasswordPage": () => import("./pages/ResetPasswordPage.json"),
   "pages.TermsOfServicePage": () => import("./pages/TermsOfServicePage.json"),
@@ -77,6 +72,11 @@ export const messagesManifest: Record<string, ManifestModule> = {
   SocialProof: () => import("./components/landing/SocialProof.json"),
   SupportCTA: () => import("./components/landing/SupportCTA.json"),
   Testimonials: () => import("./components/landing/Testimonials.json"),
+
+  // --- Global/Shared ---
+  ActionDock: () => import("./shared/ActionDock.json"),
+  ValidationErrors: () => import("./shared/ValidationErrors.json"),
+  WelcomeModal: () => import("./shared/WelcomeModal.json"),
 };
 
 /**
@@ -85,7 +85,11 @@ export const messagesManifest: Record<string, ManifestModule> = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Registro de Namespace**: ((Implementada)) El manifiesto ahora registra la importación dinámica para `NotFoundPage.json`, permitiendo que `i18n.ts` lo cargue.
+ * 1. **Entrega de Aparato Completo**: ((Implementada)) ((Vigente)) Se entrega la versión completa del archivo, sin abreviaciones.
+ * 2. **Sincronización de i18n**: ((Implementada)) ((Vigente)) El manifiesto ahora registra todos los namespaces necesarios, incluyendo los del flujo de registro, completando la infraestructura de i18n.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Generación Automática**: ((Pendiente)) Este archivo sigue siendo un candidato ideal para ser generado y mantenido por un script (`pnpm gen:i18n:manifest`) que lea la estructura del directorio, eliminando la necesidad de actualizaciones manuales y previniendo errores de omisión.
  *
  * =====================================================================
  */

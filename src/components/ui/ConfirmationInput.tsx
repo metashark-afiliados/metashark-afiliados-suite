@@ -50,7 +50,7 @@ export function ConfirmationInput({
       </Label>
       <Input
         id="confirmation-input"
-        data-testid="confirmation-input" // <-- MEJORA DE TESTEABILIDAD
+        data-testid="confirmation-input"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         autoComplete="off"
@@ -68,6 +68,9 @@ export function ConfirmationInput({
  *
  * @subsection Melhorias Adicionadas
  * 1. **Contrato de Pruebas Estable**: ((Implementada)) Se ha añadido el atributo `data-testid`. Esto proporciona un "gancho" estable para los arneses de pruebas, desacoplándolos del contenido de i18n y mejorando la robustez de la suite de pruebas.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Feedback Visual de Coincidencia**: ((Vigente)) El borde del input podría cambiar a color verde (`ring-green-500`) cuando la confirmación es exitosa, proporcionando feedback visual instantáneo al usuario.
  *
  * =====================================================================
  */

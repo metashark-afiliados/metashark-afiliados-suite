@@ -1,14 +1,11 @@
 // src/components/layout/LandingHeader.tsx
 /**
  * @file src/components/layout/LandingHeader.tsx
- * @description Componente de presentación puro que renderiza el encabezado para
- *              las páginas públicas (no autenticadas). Es completamente agnóstico
- *              al contenido, recibiendo todos sus textos y datos de enlace a través
- *              de su contrato de props. Compone otros aparatos atómicos como `SmartLink`
- *              y `ThemeSwitcher`.
- *              ¡IMPORTANTE!: Refactorizado para Rebranding Completo.
- * @author L.I.A. Legacy
- * @version 2.0.0
+ * @description Componente de presentación puro que renderiza el encabezado para las
+ *              páginas públicas. Refactorizado a un estándar de élite para invocar
+ *              el flujo de autenticación modal en lugar de navegar a páginas obsoletas.
+ * @author Raz Podestá
+ * @version 3.0.0
  */
 "use client";
 
@@ -21,14 +18,10 @@ import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { type NavLinkItem, SmartLink } from "@/components/ui/SmartLink";
 import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
+import { useAuthModalStore } from "@/lib/hooks/ui/useAuthModalStore";
+import { clientLogger } from "@/lib/logging";
 import { Link } from "@/lib/navigation";
-import { cn } from "@/lib/utils";
 
-/**
- * @public
- * @interface LandingHeaderProps
- * @description Define el contrato de props para el `LandingHeader`.
- */
 export interface LandingHeaderProps {
   navLinks: NavLinkItem[];
   signInText: string;
@@ -39,8 +32,9 @@ export interface LandingHeaderProps {
 /**
  * @public
  * @component LandingHeader
- * @description Renderiza una cabecera responsiva con navegación principal para
- *              escritorio y un menú lateral (`Sheet`) para dispositivos móviles.
+ * @description Orquestador de UI para el encabezado de la página de inicio.
+ *              Gestiona la navegación, el cambio de tema/idioma y dispara el
+ *              modal de autenticación global.
  * @param {LandingHeaderProps} props - Propiedades para configurar el encabezado.
  * @returns {React.ReactElement}
  */
@@ -51,20 +45,31 @@ export function LandingHeader({
   openMenuText,
 }: LandingHeaderProps): React.ReactElement {
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
+  const { openModal } = useAuthModalStore();
 
-  const rootPath = "/";
-  const loginPath = "/auth/login";
-  const signupPath = "/auth/signup";
+  /**
+   * @private
+   * @function handleAuthAction
+   * @description Centraliza la lógica para abrir el modal de autenticación,
+   *              registrando el evento y cerrando el menú móvil si está abierto.
+   * @param {'login' | 'signup'} view - La vista del modal a abrir.
+   */
+  const handleAuthAction = (view: "login" | "signup") => {
+    clientLogger.info(
+      `[LandingHeader] Intento de autenticación iniciado desde el header.`,
+      { view }
+    );
+    openModal(view);
+    setIsSheetOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        <Link href={rootPath} className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
           <Image
             src="/images/logo.png"
-            // --- INICIO DE REFACTORIZACIÓN: Rebranding ---
-            alt="Logo de ConvertiKit" // Rebranding
-            // --- FIN DE REFACTORIZACIÓN ---
+            alt="Logo de ConvertiKit"
             width={40}
             height={40}
             priority
@@ -90,11 +95,11 @@ export function LandingHeader({
           <div className="hidden md:flex items-center gap-2">
             <ThemeSwitcher />
             <LanguageSwitcher />
-            <Button variant="ghost" asChild>
-              <Link href={loginPath}>{signInText}</Link>
+            <Button variant="ghost" onClick={() => handleAuthAction("login")}>
+              {signInText}
             </Button>
-            <Button asChild>
-              <Link href={signupPath}>{signUpText}</Link>
+            <Button onClick={() => handleAuthAction("signup")}>
+              {signUpText}
             </Button>
           </div>
 
@@ -133,11 +138,14 @@ export function LandingHeader({
                 <div className="mt-8 pt-8 border-t border-border/40 flex flex-col gap-4">
                   <ThemeSwitcher />
                   <LanguageSwitcher />
-                  <Button variant="ghost" asChild>
-                    <Link href={loginPath}>{signInText}</Link>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleAuthAction("login")}
+                  >
+                    {signInText}
                   </Button>
-                  <Button asChild>
-                    <Link href={signupPath}>{signUpText}</Link>
+                  <Button onClick={() => handleAuthAction("signup")}>
+                    {signUpText}
                   </Button>
                 </div>
               </SheetContent>
@@ -155,10 +163,13 @@ export function LandingHeader({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Rebranding Completo**: ((Implementada)) El `alt` del logo de la imagen ha sido actualizado a "Logo de ConvertiKit", asegurando la coherencia de marca con el `REBRANDING_MANIFESTO.md`.
+ * 1. **Integración de Flujo Modal**: ((Implementada)) ((Vigente)) Los botones de autenticación ahora invocan `useAuthModalStore.openModal` en lugar de navegar directamente, cumpliendo los requisitos de la Fase III del roadmap.
+ * 2. **Full Observabilidad del Embudo**: ((Implementada)) ((Vigente)) Se ha añadido `clientLogger.info` a `handleAuthAction` para rastrear el inicio del embudo de conversión de usuarios.
+ * 3. **Mejora de UX Móvil**: ((Implementada)) ((Vigente)) La acción de autenticación ahora cierra automáticamente el menú móvil, proporcionando una experiencia de usuario fluida.
  *
  * @subsection Melhorias Futuras
- * 1. **Menú Móvil Atómico**: ((Vigente)) La lógica y el JSX para el menú móvil (`<Sheet>`) podrían ser extraídos a su propio componente (`MobileMenu.tsx`) para una mayor atomicidad y simplificación del `LandingHeader`.
+ * 1. **Menú Móvil Atómico (`MobileMenu.tsx`)**: ((Pendiente)) La lógica del `<Sheet>` podría ser extraída a su propio componente atómico para una máxima granularidad y reutilización, aunque la implementación actual es robusta.
  *
  * =====================================================================
  */
+// src/components/layout/LandingHeader.tsx

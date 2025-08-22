@@ -1,3 +1,4 @@
+
 {
   "en-US": {
     "invalid_uuid": "Invalid identifier.",
@@ -8,12 +9,16 @@
     "subdomain_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed.",
     "invalid_email": "Please enter a valid email address.",
     "password_too_short": "Password must be at least 8 characters.",
+    "passwords_do_not_match": "Passwords do not match.",
+    "terms_must_be_accepted": "You must accept the terms and conditions.",
     "slug_too_short": "Slug must be at least 3 characters.",
     "slug_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed.",
     "fingerprint_required": "Client fingerprint is required.",
     "invalid_ip": "Invalid IP address format.",
     "icon_required": "Icon is required.",
-    "error_server_generic": "A server error occurred. Please try again."
+    "error_server_generic": "A server error occurred. Please try again.",
+    "error_user_already_exists": "A user with this email already exists.",
+    "error_signup_failed": "Could not create account. Please try again."
   },
   "es-ES": {
     "invalid_uuid": "Identificador inválido.",
@@ -24,12 +29,16 @@
     "subdomain_invalid_chars": "Solo se permiten letras minúsculas, números y guiones.",
     "invalid_email": "Por favor, introduce un correo electrónico válido.",
     "password_too_short": "La contraseña debe tener al menos 8 caracteres.",
+    "passwords_do_not_match": "Las contraseñas no coinciden.",
+    "terms_must_be_accepted": "Debes aceptar los términos y condiciones.",
     "slug_too_short": "El slug debe tener al menos 3 caracteres.",
     "slug_invalid_chars": "Solo se permiten letras minúsculas, números y guiones.",
     "fingerprint_required": "La huella digital del cliente es requerida.",
     "invalid_ip": "Formato de dirección IP inválido.",
     "icon_required": "El ícono es requerido.",
-    "error_server_generic": "Ocurrió un error en el servidor. Por favor, inténtalo de nuevo."
+    "error_server_generic": "Ocurrió un error en el servidor. Por favor, inténtalo de nuevo.",
+    "error_user_already_exists": "Ya existe un usuario con este correo electrónico.",
+    "error_signup_failed": "No se pudo crear la cuenta. Por favor, inténtalo de nuevo."
   },
   "pt-BR": {
     "invalid_uuid": "Identificador inválido.",
@@ -40,11 +49,15 @@
     "subdomain_invalid_chars": "Apenas letras minúsculas, números e hifens são permitidos.",
     "invalid_email": "Por favor, insira um e-mail válido.",
     "password_too_short": "A senha deve ter pelo menos 8 caracteres.",
+    "passwords_do_not_match": "As senhas não coincidem.",
+    "terms_must_be_accepted": "Você deve aceitar os termos e condições.",
     "slug_too_short": "O slug deve ter pelo menos 3 caracteres.",
     "slug_invalid_chars": "Apenas letras minúsculas, números e hifens são permitidos.",
     "fingerprint_required": "A impressão digital do cliente é necessária.",
     "invalid_ip": "Formato de endereço IP inválido.",
     "icon_required": "O ícone é obrigatório.",
-    "error_server_generic": "Ocorreu um erro no servidor. Por favor, tente novamente."
+    "error_server_generic": "Ocorreu um erro no servidor. Por favor, tente novamente.",
+    "error_user_already_exists": "Já existe um usuário com este e-mail.",
+    "error_signup_failed": "Não foi possível criar a conta. Por favor, tente novamente."
   }
 }

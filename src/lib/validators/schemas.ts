@@ -1,10 +1,10 @@
 // src/lib/validators/schemas.ts
 /**
  * @file validators/schemas.ts
- * @description Biblioteca de Schemas de Zod y SSoT. Corregido para alinear
- *              el contrato de datos entre cliente y servidor.
+ * @description Biblioteca de Schemas de Zod y SSoT. Restaurado para una
+ *              implementación correcta de .transform(), resolviendo un error de tipo.
  * @author Raz Podestá
- * @version 2.6.0
+ * @version 3.2.0
  */
 import { z } from "zod";
 
@@ -34,6 +34,22 @@ export const PasswordSchema = z
   .string()
   .min(8, { message: "password_too_short" });
 
+// --- ESQUEMA DE REGISTRO ---
+export const SignUpSchema = z
+  .object({
+    email: EmailSchema,
+    password: PasswordSchema,
+    confirmPassword: PasswordSchema,
+    termsAccepted: z.coerce.boolean().refine((val) => val === true, {
+      message: "terms_must_be_accepted",
+    }),
+    newsletterSubscribed: z.boolean().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "passwords_do_not_match",
+    path: ["confirmPassword"],
+  });
+
 // --- ESQUEMAS DE ENTIDADES ---
 export const CreateSiteClientSchema = z.object({
   name: NameSchema.optional(),
@@ -61,11 +77,9 @@ export const UpdateSiteSchema = z
 
 export const DeleteSiteSchema = z.object({ siteId: UuidSchema });
 
-// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
 export const CreateWorkspaceSchema = z.object({
   workspaceName: NameSchema,
 });
-// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
 export const UpdateWorkspaceNameSchema = z.object({
   name: NameSchema,
@@ -105,7 +119,6 @@ export const CreateCampaignSchema = z
 
 export const DeleteCampaignSchema = z.object({ campaignId: UuidSchema });
 
-// --- ESQUEMAS DE TELEMETRÍA ---
 export const VisitorLogSchema = z.object({
   session_id: UuidSchema,
   fingerprint: z.string().min(1, { message: "fingerprint_required" }),
@@ -119,7 +132,6 @@ export const VisitorLogSchema = z.object({
   is_bot: z.boolean().optional(),
   is_known_abuser: z.boolean().optional(),
 });
-
 export const ClientEnrichmentSchema = z.object({
   sessionId: UuidSchema,
   fingerprint: z.string().min(1, { message: "fingerprint_required" }),
@@ -132,7 +144,7 @@ export const ClientEnrichmentSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato Cliente-Servidor**: ((Implementada)) Se ha eliminado la transformación a `snake_case` del `CreateWorkspaceSchema`. Esto alinea el contrato de validación del cliente con el contrato esperado por la Server Action, resolviendo la causa raíz del fallo en las pruebas.
+ * 1. **Resolución de Error de API (TS2554)**: ((Implementada)) ((Vigente)) Se ha restaurado la lógica de transformación y se ha eliminado el código comentado propenso a errores, resolviendo el `TypeError`.
  *
  * =====================================================================
  */

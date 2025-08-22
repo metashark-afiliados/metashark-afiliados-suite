@@ -1,24 +1,19 @@
 // tests/mocks/data/database-state.ts
 /**
  * @file database-state.ts
- * @description Manifiesto de Datos y SSoT para la DB simulada. Ha sido
- *              sincronizado para reflejar la estructura cruda de la base de
- *              datos (`icon_name`), resolviendo el error de tipo `TS2352` y
- *              actuando como una fuente de verdad de alta fidelidad.
+ * @description Manifiesto de Datos y SSoT para la DB simulada.
+ *              Sincronizado para reflejar la estructura cruda de la base de
+ *              datos (`icon_name`), actuando como una fuente de verdad de alta fidelidad.
  * @author L.I.A. Legacy
  * @version 5.0.0
  */
 import { type User } from "@supabase/supabase-js";
 import { type Json, type Tables } from "@/lib/types/database";
 
-// --- Actores del Teatro de Pruebas ---
 export const DEV_USER: User = {
   id: "dev-user-001",
   email: "dev@convertikit.com",
-  user_metadata: {
-    full_name: "Raz Podestá",
-    avatar_url: "https://avatar.url/dev.png",
-  },
+  user_metadata: { full_name: "Raz Podestá" },
   app_metadata: {
     provider: "email",
     providers: ["email"],
@@ -28,7 +23,6 @@ export const DEV_USER: User = {
   created_at: new Date().toISOString(),
 };
 
-// --- Escenarios del Teatro de Pruebas ---
 export const DEV_WORKSPACE: Tables<"workspaces"> = {
   id: "dev-ws-001",
   name: "Development Workspace",
@@ -44,7 +38,7 @@ export const db = {
       id: DEV_USER.id,
       email: DEV_USER.email!,
       full_name: DEV_USER.user_metadata?.full_name as string,
-      avatar_url: DEV_USER.user_metadata?.avatar_url as string,
+      avatar_url: "",
       app_role: "developer",
       plan_type: "enterprise",
       has_completed_onboarding: true,
@@ -105,28 +99,8 @@ export const db = {
       required_plan: "free",
       display_order: 0,
     },
-    {
-      id: "sites",
-      title: "My Sites",
-      description: "Manage your sites",
-      tooltip: null,
-      icon_name: "Globe",
-      href: "/dashboard/sites",
-      status: "active",
-      required_plan: "free",
-      display_order: 1,
-    },
   ] as Tables<"feature_modules">[],
 };
 
 export const MOCKED_USER = DEV_USER;
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de DB**: ((Implementada)) El mock de `feature_modules` ahora utiliza `icon_name`, alineándose con la SSoT de `tables/feature_modules.ts` y resolviendo el error `TS2352`.
- *
- * =====================================================================
- */
+// tests/mocks/data/database-state.ts

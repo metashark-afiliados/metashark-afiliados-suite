@@ -1,45 +1,80 @@
 // tests/mocks/index.ts
-import React from "react";
-import { type User } from "@supabase/supabase-js";
-import { vi } from "vitest";
-
-import { type DashboardContextProps } from "@/lib/context/DashboardContext";
-import * as DUMMY_DATA from "@tests/mocks/data/database-state";
-import { setupActionsMock } from "./vi/actions.mock";
-import { setupDashboardContextMock } from "./vi/context.mock";
-import { setupNavigationMock } from "./vi/navigation.mock";
-import { setupNextIntlMock } from "./vi/next-intl.mock";
-import { setupSupabaseMock } from "./vi/supabase.mock";
-
 /**
  * @file tests/mocks/index.ts
- * @description Orquestador de Mocks de Módulos Definitivo v14.1.0.
- *              El mock para 'next/cache' ha sido corregido para exportar
- *              funciones, resolviendo un TypeError crítico en las pruebas.
- * @author Raz Podestá
- * @version 14.1.0
+ * @description El Cerebro de la Simulación y SSoT para todos los mocks globales.
+ *              Ha sido blindado con tipos explícitos en el mock de Zustand para
+ *              garantizar una seguridad de tipos completa.
+ * @author L.I.A. Legacy
+ * @version 8.1.0
  */
+import { vi } from "vitest";
+import { create } from "zustand";
 
-// --- MOCKS DE INFRAESTRUCTURA ---
-vi.mock("server-only", () => ({}));
+import { setupActionsMock } from "./actions.mock";
+import { setupNavigationMock } from "./navigation.mock";
+import { setupNextIntlMock } from "./next-intl.mock";
+import { setupSupabaseMock } from "./supabase.mock";
 
-// --- INICIO DE CORRECCIÓN (TypeError: cache is not a function) ---
-// La API real de `cache` es una función que recibe una función.
-// El mock ahora replica este comportamiento.
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-  revalidateTag: vi.fn(),
-  unstable_cache: (fn: any) => fn,
-  cache: (fn: any) => fn,
+export const mockOpenModal = vi.fn();
+export const mockSetTheme = vi.fn();
+
+// --- Mock de Zustand de Alta Fidelidad y Autocontenido ---
+type AuthModalView = "login" | "signup";
+interface MockAuthModalState {
+  isOpen: boolean;
+  view: AuthModalView;
+  openModal: (view: AuthModalView) => void;
+  closeModal: () => void;
+  switchView: (view: AuthModalView) => void;
+}
+
+const useMockAuthModalStore = create<MockAuthModalState>((set) => ({
+  isOpen: false,
+  view: "login",
+  // --- INICIO DE CORRECCIÓN DE TIPO ---
+  openModal: vi.fn((view: AuthModalView) => {
+    mockOpenModal(view);
+    set({ isOpen: true, view });
+  }),
+  closeModal: vi.fn(() => set({ isOpen: false })),
+  switchView: vi.fn((view: AuthModalView) => set({ view })),
+  // --- FIN DE CORRECCIÓN DE TIPO ---
 }));
-// --- FIN DE CORRECCIÓN ---
+
+vi.mock("@/lib/hooks/ui/useAuthModalStore", () => ({
+  useAuthModalStore: useMockAuthModalStore,
+}));
+// --- Fin del Mock de Zustand ---
+
+vi.mock("next-themes", () => ({
+  useTheme: () => ({ setTheme: mockSetTheme, theme: "dark" }),
+}));
 
 vi.mock("react-hot-toast", () => ({
   default: {
     success: vi.fn(),
     error: vi.fn(),
-    promise: vi.fn(),
+    promise: vi.fn(
+      (
+        promise: Promise<any>,
+        {
+          success,
+        }: {
+          loading: React.ReactNode;
+          success: (data: any) => React.ReactNode;
+          error: (err: any) => React.ReactNode;
+        }
+      ) => promise.then((data) => success(data))
+    ),
   },
+}));
+
+vi.mock("server-only", () => ({}));
+
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
+  cache: (fn: any) => fn,
 }));
 
 export const setupGlobalMocks = () => {
@@ -47,7 +82,6 @@ export const setupGlobalMocks = () => {
   setupNavigationMock();
   setupActionsMock();
   setupSupabaseMock();
-  setupDashboardContextMock();
 };
 
 /**
@@ -56,7 +90,8 @@ export const setupGlobalMocks = () => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de TypeError Crítico**: ((Implementada)) Se ha corregido el mock de `next/cache` para que exporte funciones, alineándolo con la API real y resolviendo la causa raíz de la falla de la suite de pruebas.
+ * 1. **Seguridad de Tipos Completa**: ((Implementada)) ((Vigente)) Se han añadido tipos explícitos a los parámetros de las acciones del mock de Zustand, resolviendo el error `TS7006` y garantizando el cumplimiento de la regla `noImplicitAny`.
  *
  * =====================================================================
  */
+// tests/mocks/index.ts

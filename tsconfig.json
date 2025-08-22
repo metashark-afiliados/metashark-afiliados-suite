@@ -1,3 +1,4 @@
+// tsconfig.json
 {
   "compilerOptions": {
     "strict": true,
@@ -35,13 +36,16 @@
     "**/*.tsx",
     "**/*.json",
     ".next/types/**/*.ts",
+    // --- INICIO DE MEJORA: INCLUSIÓN EXPLÍCITA DE ARCHIVOS CRÍTICOS ---
+    "src/lib/hooks/useHandleErrors.ts", // Nuevo hook de manejo de errores
+    "tests/mocks/factories/context.factory.ts", // Nueva factoría de mocks
+    // --- FIN DE MEJORA ---
     "src/components/auth/LoginForm.tsx.old",
     "src/lib/actions/auth.actions.ts.old",
     "src/middleware/handlers/auth/index.ts.old",
     "vitest.config.ts",
     "vitest.setup.ts",
     "tests/config/vitest.setup.ts"
-    // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
   ],
   "exclude": ["node_modules"]
 }

@@ -1,20 +1,20 @@
 // tests/utils/ProvidersWrapper.tsx
 /**
  * @file tests/utils/ProvidersWrapper.tsx
- * @description Arnés de Proveedores de Contexto de Élite v13.1.0.
- *              Este aparato es un componente de cliente atómico y puro cuya única
- *              responsabilidad es envolver a los componentes bajo prueba en TODOS
- *              los proveedores de contexto globales necesarios para un renderizado
- *              de alta fidelidad. Actúa como el puente entre los datos de prueba
- *              simulados y la UI, garantizando un entorno de prueba hermético y estable.
- * @author Raz Podestá
- * @version 13.1.0
+ * @description Aparato de infraestructura de pruebas: El Simulador de Entorno.
+ *              Esta es la Única Fuente de Verdad para la composición del árbol
+ *              de proveedores del entorno de pruebas. Envuelve los componentes
+ *              bajo prueba con todos los contextos necesarios (`DashboardProvider`,
+ *              `NextIntlClientProvider`, `MemoryRouterProvider`, `TooltipProvider`),
+ *              inyectando datos simulados para crear un entorno de renderizado
+ *              aislado y de alta fidelidad.
+ * @author L.I.A. Legacy
+ * @version 1.0.0
  */
 import React from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { MemoryRouterProvider } from "next-router-mock/MemoryRouterProvider";
 
-import { Command } from "@/components/ui/command";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   DashboardProvider,
@@ -25,39 +25,51 @@ import { WorkspaceProvider } from "@/lib/hooks/useWorkspaceContext.tsx";
 /**
  * @public
  * @interface ProvidersWrapperProps
- * @description Define el contrato de props para el arnés de proveedores.
+ * @description Contrato de props para el componente `ProvidersWrapper`.
  */
-interface ProvidersWrapperProps {
+export interface ProvidersWrapperProps {
   children: React.ReactNode;
   dashboardContextValue: DashboardContextProps;
   locale: string;
   messages: Record<string, any>;
+  providerOverrides?: {
+    /** Si es `false`, no envolverá con `WorkspaceProvider`. */
+    withWorkspaceProvider?: boolean;
+  };
 }
 
 /**
  * @public
  * @component ProvidersWrapper
- * @description Ensambla la jerarquía completa de proveedores de contexto en el orden
- *              correcto para simular el árbol de componentes de la aplicación real.
- * @param {ProvidersWrapperProps} props - Propiedades para configurar los proveedores.
- * @returns {React.ReactElement}
+ * @description Componente que envuelve a los componentes bajo prueba con todos
+ *              los proveedores de contexto necesarios.
+ * @param {ProvidersWrapperProps} props - Las propiedades para configurar los proveedores.
+ * @returns {React.ReactElement} El árbol de componentes envuelto.
  */
 export const ProvidersWrapper: React.FC<ProvidersWrapperProps> = ({
   children,
   dashboardContextValue,
   locale,
   messages,
+  providerOverrides = {},
 }) => {
+  const { withWorkspaceProvider = true } = providerOverrides;
+  let content = children;
+
+  // Envolver condicionalmente con WorkspaceProvider si es necesario.
+  if (withWorkspaceProvider) {
+    content = <WorkspaceProvider>{content}</WorkspaceProvider>;
+  }
+
   return (
     <MemoryRouterProvider>
-      <NextIntlClientProvider locale={locale} messages={messages}>
+      <NextIntlClientProvider
+        locale={locale}
+        messages={messages}
+        timeZone="UTC"
+      >
         <DashboardProvider value={dashboardContextValue}>
-          <WorkspaceProvider>
-            <TooltipProvider>
-              {/* Ciertos componentes como WorkspaceSwitcher esperan estar dentro de un <Command> provider para funcionar correctamente en pruebas. */}
-              <Command>{children}</Command>
-            </TooltipProvider>
-          </WorkspaceProvider>
+          <TooltipProvider>{content}</TooltipProvider>
         </DashboardProvider>
       </NextIntlClientProvider>
     </MemoryRouterProvider>
@@ -70,12 +82,11 @@ export const ProvidersWrapper: React.FC<ProvidersWrapperProps> = ({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Estabilidad del Arnés de Pruebas**: ((Implementada)) Se ha corregido la ruta de importación de `WorkspaceProvider` y se ha añadido el proveedor `<Command>`, resolviendo errores de runtime que impedían el renderizado de componentes complejos y estabilizando la suite de pruebas.
- * 2. **Alta Fidelidad de Entorno**: ((Implementada)) El wrapper ahora incluye TODOS los proveedores de contexto globales, garantizando que cualquier componente pueda ser renderizado en un entorno que simula fielmente la aplicación real.
- * 3. **Componente Puro y Controlado**: ((Implementada)) El wrapper es un componente de presentación 100% puro que recibe todo su estado a través de props, haciéndolo predecible y desacoplado.
+ * 1. **Entorno de Prueba de Alta Fidelidad**: ((Implementada)) Este aparato simula el entorno de la aplicación completa, permitiendo que los componentes que dependen de múltiples contextos (`useDashboard`, `useWorkspaceContext`, `useTranslations`) se rendericen correctamente.
+ * 2. **Composición Flexible**: ((Implementada)) La prop `providerOverrides` permite a las pruebas desactivar proveedores específicos, facilitando la prueba de componentes en aislamiento sin su contexto completo.
  *
  * @subsection Melhorias Futuras
- * 1. **Inyección de Mocks de Router**: ((Vigente)) Para pruebas más avanzadas, el `MemoryRouterProvider` podría aceptar una prop `url` para simular el renderizado de un componente en una ruta específica, permitiendo probar lógica dependiente del `pathname`.
+ * 1. **Proveedores Dinámicos**: ((Vigente)) En lugar de una lógica booleana simple, `providerOverrides` podría aceptar un array de nombres de proveedores a omitir (`omitProviders: ['WorkspaceProvider']`), haciendo la configuración más explícita y escalable.
  *
  * =====================================================================
  */
