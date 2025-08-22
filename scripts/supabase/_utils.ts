@@ -1,21 +1,17 @@
 // scripts/supabase/_utils.ts
-/**
- * @file _utils.ts
- * @description Helper de utilidad compartido para los scripts de diagnóstico de Supabase.
- *              Carga y valida las variables de entorno desde el archivo canónico `.env.local`.
- * @author L.I.A. Legacy
- * @version 1.0.0
- */
 import chalk from "chalk";
 import dotenv from "dotenv";
 import path from "path";
 
 /**
- * @public
- * @function loadEnvironment
- * @description Carga las variables de entorno desde `.env.local` y valida que
- *              todas las claves requeridas para los scripts de Supabase estén presentes.
- * @throws {Error} Si el archivo de entorno no se encuentra o faltan variables críticas.
+ * @file _utils.ts
+ * @description Helper de utilidad compartido para los scripts de Supabase.
+ *              Ha sido refactorizado a un estándar de élite para validar las
+ *              variables de entorno canónicas, asegurando que las herramientas
+ *              de diagnóstico y mantenimiento funcionen en un entorno local
+ *              consistente con la nueva arquitectura de configuración.
+ * @author L.I.A. Legacy
+ * @version 3.0.0
  */
 export function loadEnvironment(): void {
   const envFile = ".env.local";
@@ -42,11 +38,16 @@ export function loadEnvironment(): void {
     throw new Error(`No se pudo cargar el archivo de entorno: ${envFile}.`);
   }
 
+  // --- INICIO DE REFACTORIZACIÓN: Alineación con SSoT Canónica ---
+  // Se validan las claves estándar que deben existir en .env.local para que los
+  // scripts funcionen correctamente en un entorno de desarrollo.
   const requiredVars = [
     "NEXT_PUBLIC_SUPABASE_URL",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_DB_URL",
+    "SUPABASE_DB_URL_DIRECT",
   ];
+  // --- FIN DE REFACTORIZACIÓN ---
+
   const missingVars = requiredVars.filter((v) => !process.env[v]);
 
   if (missingVars.length > 0) {
@@ -77,7 +78,11 @@ export function loadEnvironment(): void {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Estabilización de Scripts**: ((Implementada)) La restauración de este archivo resuelve el error de compilación `TS2307` en `diagnose-schema.ts`, haciendo que nuestras herramientas de diagnóstico vuelvan a ser funcionales.
+ * 1. **Sincronización con SSoT de Configuración**: ((Implementada)) El helper ahora valida la existencia de las variables de entorno estándar (`NEXT_PUBLIC_SUPABASE_URL`, etc.), alineándose con el nuevo `.env.example` y garantizando que los scripts de utilidad (como `diag:all`) funcionen correctamente en un entorno de desarrollo local.
+ * 2. **Cero Regresiones**: ((Implementada)) La lógica de carga de `dotenv` se ha mantenido, asegurando la funcionalidad base.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Validación de Formato**: ((Vigente)) El helper podría ser mejorado para no solo verificar la existencia de las variables, sino también su formato (ej. que la URL de Supabase sea una URL válida) para una detección de errores más proactiva.
  *
  * =====================================================================
  */

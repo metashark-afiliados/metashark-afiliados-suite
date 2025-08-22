@@ -1,16 +1,7 @@
 // src/app/[locale]/dashboard/sites/sites-client.tsx
-/**
- * @file src/app/[locale]/dashboard/sites/sites-client.tsx
- * @description Orquestador de UI de élite. Ha sido sincronizado para proveer
- *              el `confirmationLabel` requerido por el `SiteCard`, resolviendo
- *              el error de tipo de build final.
- * @author Raz Podestá
- * @version 4.1.0
- */
 "use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
 import { PlusCircle } from "lucide-react";
 
 import { CreateSiteForm } from "@/components/sites/CreateSiteForm";
@@ -37,6 +28,17 @@ interface SitesClientProps {
   searchQuery: string;
 }
 
+/**
+ * @public
+ * @component SitesClient
+ * @description Orquestador de UI de élite. Ensambla la página "Mis Sitios",
+ *              consume el hook soberano `useSitesPage` y construye los objetos
+ *              de props de texto para sus componentes hijos.
+ * @param {SitesClientProps} props - Propiedades para configurar el componente.
+ * @returns {React.ReactElement | null}
+ * @version 5.0.0
+ * @author Raz Podestá
+ */
 export function SitesClient({
   initialSites,
   totalCount,
@@ -45,8 +47,6 @@ export function SitesClient({
   searchQuery,
 }: SitesClientProps): React.ReactElement | null {
   logger.trace("[SitesClient] Renderizando orquestador de UI del cliente.");
-  const t = useTranslations("SitesPage");
-  const tDialogs = useTranslations("Dialogs");
 
   const {
     sites,
@@ -60,12 +60,15 @@ export function SitesClient({
     setCreateDialogOpen,
     openCreateDialog,
     handleCreate,
+    t,
+    tDialogs,
   } = useSitesPage({ initialSites, initialSearchQuery: searchQuery });
 
   if (!activeWorkspaceId) {
     return null;
   }
 
+  // --- Lógica de Construcción de Props de Presentación ---
   const breadcrumbs = [
     { label: t("breadcrumbs.dashboard"), href: "/dashboard" },
     { label: t("breadcrumbs.sites") },
@@ -77,6 +80,49 @@ export function SitesClient({
       {t("header.createSiteButton")}
     </Button>
   );
+
+  const formTexts = {
+    nameLabel: t("form.nameLabel"),
+    namePlaceholder: t("form.namePlaceholder"),
+    subdomainLabel: t("form.subdomainLabel"),
+    subdomainInUseError: t("form.subdomainInUseError"),
+    descriptionLabel: t("form.descriptionLabel"),
+    descriptionPlaceholder: t("form.descriptionPlaceholder"),
+    creatingButton: t("form.creatingButton"),
+    createButton: t("form.createButton"),
+  };
+
+  const gridTexts = {
+    emptyStateTitle: t("grid.emptyStateTitle"),
+    emptyStateDescription: t("grid.emptyStateDescription"),
+  };
+
+  const cardTexts = {
+    campaignCount: (count: number) => t("card.campaignCount", { count }),
+    manageCampaignsButton: t("card.manageCampaignsButton"),
+    deleteSiteAriaLabel: (subdomain: string) =>
+      t("card.deleteSiteAriaLabel", { subdomain }),
+    openSiteAriaLabel: t("card.openSiteAriaLabel"),
+    popoverTitle: t("card.popoverTitle"),
+    popoverDescription: t("card.popoverDescription"),
+  };
+
+  const deleteDialogTexts = {
+    title: t("deleteDialog.title"),
+    description: (subdomain: string) =>
+      t.rich("deleteDialog.description", {
+        subdomain,
+        strong: (chunks) => <strong>{chunks}</strong>,
+      }),
+    confirmButton: t("deleteDialog.confirmButton"),
+    cancelButton: tDialogs("generic_cancelButton"),
+    confirmationLabel: (subdomain: string) =>
+      t.rich("deleteDialog.confirmation_label", {
+        subdomain,
+        strong: (chunks) => <strong>{chunks}</strong>,
+      }),
+  };
+  // --- Fin de la Lógica de Construcción ---
 
   return (
     <div className="flex flex-col gap-6">
@@ -93,17 +139,10 @@ export function SitesClient({
           <CreateSiteForm
             workspaceId={activeWorkspaceId}
             onSuccess={handleCreate}
-            isPending={isPending}
-            texts={{
-              nameLabel: t("form.nameLabel"),
-              namePlaceholder: t("form.namePlaceholder"),
-              subdomainLabel: t("form.subdomainLabel"),
-              subdomainInUseError: t("form.subdomainInUseError"),
-              descriptionLabel: t("form.descriptionLabel"),
-              descriptionPlaceholder: t("form.descriptionPlaceholder"),
-              creatingButton: t("form.creatingButton"),
-              createButton: t("form.createButton"),
-            }}
+            isPending={
+              isPending && (mutatingId?.startsWith("optimistic-") ?? false)
+            }
+            texts={formTexts}
           />
         </DialogContent>
       </Dialog>
@@ -122,36 +161,9 @@ export function SitesClient({
         onDelete={handleDelete!}
         isPending={isPending}
         deletingSiteId={mutatingId}
-        texts={{
-          emptyStateTitle: t("grid.emptyStateTitle"),
-          emptyStateDescription: t("grid.emptyStateDescription"),
-        }}
-        cardTexts={{
-          campaignCount: (count: number) => t("card.campaignCount", { count }),
-          manageCampaignsButton: t("card.manageCampaignsButton"),
-          deleteSiteAriaLabel: (subdomain: string) =>
-            t("card.deleteSiteAriaLabel", { subdomain }),
-          openSiteAriaLabel: t("card.openSiteAriaLabel"),
-          popoverTitle: t("card.popoverTitle"),
-          popoverDescription: t("card.popoverDescription"),
-        }}
-        deleteDialogTexts={{
-          title: t("deleteDialog.title"),
-          description: (subdomain: string) =>
-            t.rich("deleteDialog.description", {
-              subdomain,
-              strong: (chunks) => <strong>{chunks}</strong>,
-            }),
-          confirmButton: t("deleteDialog.confirmButton"),
-          cancelButton: tDialogs("generic_cancelButton"),
-          // --- INICIO DE CORRECCIÓN DE CONTRATO ---
-          confirmationLabel: (subdomain: string) =>
-            t.rich("deleteDialog.confirmation_label", {
-              subdomain,
-              strong: (chunks) => <strong>{chunks}</strong>,
-            }),
-          // --- FIN DE CORRECCIÓN DE CONTRATO ---
-        }}
+        texts={gridTexts}
+        cardTexts={cardTexts}
+        deleteDialogTexts={deleteDialogTexts}
       />
 
       <PaginationControls
@@ -176,7 +188,7 @@ export function SitesClient({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build**: ((Implementada)) Se ha añadido la clave `confirmationLabel` al objeto `deleteDialogTexts`, alineando el componente con el contrato actualizado de `SiteCard` y resolviendo el error de tipo de build.
+ * 1. **Restauración de SRP**: ((Implementada)) El componente `sites-client` vuelve a asumir su rol correcto de construir los datos de presentación (textos) a partir de las funciones `t` que recibe del hook, resolviendo el error de compilación.
  *
  * =====================================================================
  */

@@ -1,12 +1,4 @@
 // src/middleware/lib/supabase-edge.client.ts
-/**
- * @file src/middleware/lib/supabase-edge.client.ts
- * @description Aparato de utilidad para crear un cliente Supabase para el Edge.
- *              Ha sido refactorizado para consumir las variables de entorno con prefijo
- *              `INTEGRATION_` gestionadas por la integración de Vercel.
- * @author L.I.A. Legacy
- * @version 11.1.0
- */
 import "server-only";
 
 import { type NextRequest, type NextResponse } from "next/server";
@@ -14,13 +6,28 @@ import { type CookieOptions, createServerClient } from "@supabase/ssr";
 
 import { type Database } from "@/lib/types/database";
 
+/**
+ * @public
+ * @async
+ * @function createEdgeClient
+ * @description Factoría para crear una instancia del cliente Supabase para el Edge Runtime.
+ *              Implementa la estrategia de fallback en cascada para las variables de entorno,
+ *              garantizando la funcionalidad tanto en Vercel como en desarrollo local.
+ * @param {NextRequest} request - El objeto de la petición entrante.
+ * @param {NextResponse} response - El objeto de la respuesta para establecer cookies.
+ * @returns {Promise<import('@supabase/supabase-js').SupabaseClient<Database>>} Un cliente Supabase para el Edge.
+ * @author Raz Podestá
+ * @version 12.0.0
+ */
 export async function createEdgeClient(
   request: NextRequest,
   response: NextResponse
 ) {
   return createServerClient<Database>(
-    process.env.INTEGRATION_NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.INTEGRATION_NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.INTEGRATION_NEXT_PUBLIC_SUPABASE_URL ||
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.INTEGRATION_NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -48,7 +55,12 @@ export async function createEdgeClient(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación con Vercel**: ((Implementada)) El cliente de Edge ahora consume las variables de entorno con prefijo, alineándose con la configuración actual del despliegue y resolviendo el error de build.
+ * 1. **Resiliencia de Entorno**: ((Implementada)) La factoría ahora es agnóstica al entorno, utilizando la estrategia de fallback en cascada para las variables de Supabase. Esto hace que todo el pipeline del middleware sea funcional en un entorno de desarrollo local.
+ * 2. **Documentación TSDoc de Élite**: ((Implementada)) La documentación ha sido actualizada para reflejar la nueva arquitectura de variables de entorno.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Centralización de Nombres de Variables**: ((Vigente)) Los nombres literales de las variables de entorno se repiten en 3 archivos. Centralizarlos en un único archivo de configuración (`src/config/env.config.ts`) eliminaría la duplicación y el riesgo de errores de tipeo.
  *
  * =====================================================================
  */
+// src/middleware/lib/supabase-edge.client.ts

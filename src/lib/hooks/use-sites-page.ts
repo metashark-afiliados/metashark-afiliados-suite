@@ -17,10 +17,12 @@ import { logger } from "@/lib/logging";
 /**
  * @public
  * @function useSitesPage
- * @description Hook orquestador que encapsula toda la lógica de la página "Mis Sitios".
+ * @description Hook orquestador soberano que encapsula toda la lógica de estado y
+ *              acciones para la página "Mis Sitios". Delega la construcción
+ *              de textos y JSX a la capa de presentación.
  * @param {{ initialSites: SiteWithCampaignCount[], initialSearchQuery: string }} params
  * @returns Un objeto con todo el estado y los manejadores necesarios para la UI.
- * @version 3.1.0
+ * @version 4.1.0
  * @author Raz Podestá
  */
 export function useSitesPage({
@@ -30,8 +32,9 @@ export function useSitesPage({
   initialSites: SiteWithCampaignCount[];
   initialSearchQuery: string;
 }) {
-  logger.trace("[useSitesPage] Hook orquestador inicializado.");
+  logger.trace("[useSitesPage] Hook soberano inicializado.");
   const t = useTranslations("SitesPage");
+  const tDialogs = useTranslations("Dialogs");
   const { activeWorkspace, user } = useDashboard();
 
   const { searchTerm, setSearchTerm } = useSearchSync({
@@ -60,11 +63,6 @@ export function useSitesPage({
   const handleCreate = (formData: FormData) => {
     const name = formData.get("name") as string;
     const subdomain = formData.get("subdomain") as string;
-    logger.trace(`[useSitesPage] Acción de creación iniciada`, {
-      name,
-      subdomain,
-      workspaceId: activeWorkspace?.id,
-    });
 
     const optimisticSite: Omit<SiteWithCampaignCount, "id"> = {
       name: name || subdomain,
@@ -91,11 +89,13 @@ export function useSitesPage({
     mutatingId,
     searchTerm,
     setSearchTerm,
-    handleDelete: handleDelete, // Se exporta directamente, puede ser undefined
+    handleDelete,
     isCreateDialogOpen,
     setCreateDialogOpen,
     openCreateDialog,
     handleCreate,
+    t, // Devuelve las funciones de traducción
+    tDialogs, // Devuelve las funciones de traducción
   };
 }
 
@@ -105,7 +105,9 @@ export function useSitesPage({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Seguridad de Tipos**: ((Implementada)) Se ha eliminado el operador de aserción no nula (`!`) en `handleDelete`. El hook ahora exporta `handleDelete` tal como lo recibe (posiblemente `undefined`), y es responsabilidad del componente consumidor (`sites-client.tsx`) manejar este caso.
+ * 1. **Resolución de Error Crítico (TS2552)**: ((Implementada)) Se ha eliminado la construcción de objetos de texto con JSX del hook, resolviendo la causa raíz del error de compilación.
+ * 2. **Restauración de SRP**: ((Implementada)) El hook ahora se enfoca exclusivamente en la lógica de estado y de negocio, dejando la construcción de la UI (incluyendo textos con formato) al componente de presentación, lo cual es una arquitectura más limpia.
  *
  * =====================================================================
  */
+// src/lib/hooks/use-sites-page.ts

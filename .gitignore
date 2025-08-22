@@ -3,6 +3,10 @@
 /node_modules
 /.pnpm-lock.yaml
 
+
+#DB
+db
+
 # Ficheros de entorno locales
 .env.local
 .env.*

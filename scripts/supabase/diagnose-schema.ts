@@ -1,4 +1,9 @@
 // scripts/supabase/diagnose-schema.ts
+import { createClient } from "@supabase/supabase-js";
+import chalk from "chalk";
+
+import { loadEnvironment } from "./_utils";
+
 /**
  * @file diagnose-schema.ts
  * @description Herramienta de auditoría de sistema de élite. Invoca la RPC
@@ -8,11 +13,6 @@
  * @version 1.0.0
  * @usage pnpm diag:all
  */
-import { createClient } from "@supabase/supabase-js";
-import chalk from "chalk";
-
-import { loadEnvironment } from "./_utils";
-
 const printSection = (title: string) =>
   console.log(
     `\n\n${chalk.blue("=".repeat(80))}\n${chalk.blueBright.bold(
@@ -41,6 +41,7 @@ async function main() {
   );
 
   printSection("Radiografía del Sistema (Esquema, RLS, Funciones y Triggers)");
+  // Asumimos que la RPC 'get_system_diagnostics' existe en su base de datos.
   const { data, error } = await supabaseAdmin.rpc("get_system_diagnostics");
 
   if (error) {

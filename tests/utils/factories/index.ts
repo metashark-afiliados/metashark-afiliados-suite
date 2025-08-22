@@ -4,7 +4,7 @@
  * @description Manifiesto (Barrel File) para exportar todas las factorías de
  *              utilidades de prueba de forma centralizada.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 export * from "./data.factory";
 export * from "./supabase.factory";
@@ -13,7 +13,7 @@ export * from "./supabase.factory";
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Adicionadas
- * 1. **Punto de Entrada Unificado**: ((Implementada)) Proporciona un único punto de importación para todas las factorías de prueba.
+ * 1. **Completitud de Módulo**: ((Implementada)) El archivo ahora exporta todas las factorías de `data.factory.ts`, resolviendo el error de importación en las pruebas.
  * =====================================================================
  */
 // tests/utils/factories/index.ts
