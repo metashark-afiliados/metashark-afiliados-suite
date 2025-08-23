@@ -44,12 +44,10 @@ export { Checkbox };
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia Crítica**: ((Implementada)) La reconstrucción de este aparato resuelve el error `TS2307` en `SignUpForm.tsx`, que impedía la compilación del flujo de registro.
- * 2. **Componente de Formulario Esencial**: ((Implementada)) Proporciona un control de formulario fundamental requerido para el cumplimiento legal y las opciones de suscripción.
+ * 1. **Componente de Formulario Esencial**: ((Implementada)) Proporciona un control de formulario fundamental requerido para el cumplimiento legal y las opciones de suscripción en el nuevo `SignUpForm`.
  *
  * @subsection Melhorias Futuras
- * 1. **Estado Indeterminado**: ((Vigente)) Radix UI soporta un estado "indeterminate" para checkboxes. El componente podría ser mejorado para aceptar una prop `checked="indeterminate"` y aplicar estilos visuales para este estado, útil para checkboxes padre en árboles de selección.
+ * 1. **Estado Indeterminado**: ((Vigente)) Radix UI soporta un estado "indeterminate". El componente podría ser mejorado para aceptar una prop `checked="indeterminate"` y aplicar estilos para este estado.
  *
  * =====================================================================
  */
-// src/components/ui/Checkbox.tsx

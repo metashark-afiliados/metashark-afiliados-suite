@@ -1,10 +1,11 @@
+// src/components/layout/sidebar/NavList.tsx
 /**
  * @file src/components/layout/sidebar/NavList.tsx
  * @description Aparato de UI atómico que renderiza la lista de navegación principal
  *              del dashboard. Su contrato de props usa un tipo `href` agnóstico
  *              para resolver conflictos de tipos con `next-intl`.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
 "use client";
 
@@ -17,6 +18,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Palette,
 } from "lucide-react";
 
 import { useDashboard } from "@/lib/context/DashboardContext";
@@ -79,11 +81,20 @@ export function NavList(): React.ReactElement {
   ];
 
   if (userRole === "developer") {
-    mainNavLinks.push({
-      href: "/dev-console",
-      label: t("devConsole"),
-      icon: ShieldCheck,
-    });
+    // --- INICIO DE MODIFICACIÓN ---
+    mainNavLinks.push(
+      {
+        href: "/dashboard/resources/icons",
+        label: t("iconLibrary"), // Nueva clave i18n
+        icon: Palette,
+      },
+      {
+        href: "/dev-console",
+        label: t("devConsole"),
+        icon: ShieldCheck,
+      }
+    );
+    // --- FIN DE MODIFICACIÓN ---
   }
 
   return (
@@ -96,12 +107,3 @@ export function NavList(): React.ReactElement {
     </nav>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Adicionadas
- * 1. **Navegación Basada en Roles**: ((Implementada)) Renderiza condicionalmente el enlace a `dev-console`.
- * =====================================================================
- */

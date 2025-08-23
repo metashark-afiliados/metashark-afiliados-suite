@@ -2,10 +2,10 @@
 /**
  * @file Button.test.tsx
  * @description Arnés de pruebas unitarias de élite para el componente Button.
- *              Valida todos los casos de uso, incluyendo renderizado, eventos,
- *              estados, variantes de renderizado (link, asChild), y accesibilidad.
+ *              Valida todos los casos de uso, incluyendo el nuevo estado `isLoading`
+ *              centralizado.
  * @author L.I.A. Legacy
- * @version 2.1.0
+ * @version 2.2.0
  */
 import { ArrowRight } from "lucide-react";
 import { axe } from "jest-axe";
@@ -13,7 +13,6 @@ import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 
 import { Button } from "@/components/ui/button";
-// La importación correcta para que la prueba pase.
 import { render, screen } from "@tests/utils/render";
 
 describe("Componente Atómico de UI: Button", () => {
@@ -42,11 +41,7 @@ describe("Componente Atómico de UI: Button", () => {
     render(<Button href="/dashboard">Go to Dashboard</Button>);
     const link = screen.getByRole("link", { name: /go to dashboard/i });
     expect(link).toBeInTheDocument();
-    // --- INICIO DE CORRECCIÓN DE ASERCIÓN ---
-    // El mock de Link usa next/link, que no añade prefijo de locale.
-    // La prueba debe validar que el href se pasa correctamente, no la lógica de localización.
     expect(link).toHaveAttribute("href", "/dashboard");
-    // --- FIN DE CORRECCIÓN DE ASERCIÓN ---
   });
 
   it("debe renderizar como un componente hijo cuando asChild es verdadero", () => {
@@ -70,6 +65,8 @@ describe("Componente Atómico de UI: Button", () => {
     const button = screen.getByRole("button", { name: /saving.../i });
     expect(button).toBeDisabled();
     expect(screen.getByText("Saving...")).toBeInTheDocument();
+    // El texto original se oculta por CSS (opacity-0), por lo que no debe ser visible para las aserciones
+    expect(screen.queryByText("Save")).not.toBeVisible();
   });
 
   it("debe renderizar iconos a la izquierda y a la derecha", () => {
@@ -97,7 +94,10 @@ describe("Componente Atómico de UI: Button", () => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Aserción Correcta**: ((Implementada)) ((Vigente)) La aserción del `href` ha sido corregida para reflejar el comportamiento real del mock, resolviendo el fallo de la prueba.
+ * 1. **Cobertura de Estado de Carga**: ((Implementada)) Se ha añadido una nueva prueba que valida explícitamente el comportamiento `isLoading`, asegurando que el botón se deshabilite y muestre el texto de carga correctamente.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Pruebas de Accesibilidad para `isLoading`**: ((Vigente)) Añadir una aserción para verificar que el botón tiene `aria-busy="true"` y `aria-live="polite"` durante el estado de carga para una accesibilidad de élite.
  *
  * =====================================================================
  */

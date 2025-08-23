@@ -1,13 +1,12 @@
 // src/config/icon-map.ts
 /**
  * @file icon-map.ts
- * @description Manifiesto de Iconos de Élite y Única Fuente de Verdad (SSoT).
- *              Este aparato mapea nombres de iconos semánticos y funcionales a los
- *              nombres de componentes literales de la librería `lucide-react`.
- *              Ha sido refactorizado para eliminar deuda técnica y corregir
- *              inconsistencias, consolidándose como un manifiesto de alta fidelidad.
+ * @description Manifiesto de Iconos de Élite y SSoT. Ha sido revertido a un
+ *              estado estable para ser un mapa puramente semántico, eliminando
+ *              la validación Zod en tiempo de importación para resolver
+ *              un error crítico de servidor.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 4.1.0 (Stable Revert)
  */
 
 export const ICONS = {
@@ -47,7 +46,7 @@ export const ICONS = {
     AI_IMAGES: "Image",
     ANALYZE_LANDING: "ScanSearch",
     AI_COPY: "PenTool",
-    ANALYZE_METRICS: "ChartBarBig", // <-- CORREGIDO
+    ANALYZE_METRICS: "ChartBarBig",
     INTERACTIVE_QUIZ: "MessageCircleQuestion",
     BRAND_KIT: "Palette",
     CREATE_FUNNEL: "Network",
@@ -71,8 +70,10 @@ export const ICONS = {
   },
 } as const;
 
-// Helper para aplanar el objeto anidado en un solo nivel para facilitar el mapeo
-function flattenIcons(obj: typeof ICONS) {
+// Helper para aplanar el objeto anidado para el tipo IconName
+function flattenIcons<T extends Record<string, Record<string, string>>>(
+  obj: T
+) {
   const result: { [key: string]: string } = {};
   for (const category of Object.values(obj)) {
     for (const [key, value] of Object.entries(category)) {
@@ -83,7 +84,6 @@ function flattenIcons(obj: typeof ICONS) {
 }
 
 export const FLAT_ICONS = flattenIcons(ICONS);
-
 export type IconName = keyof typeof FLAT_ICONS;
 
 /**
@@ -92,11 +92,11 @@ export type IconName = keyof typeof FLAT_ICONS;
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Eliminación de Deuda Técnica**: ((Implementada)) Se ha eliminado por completo la función obsoleta y incorrecta `getMappedIconName`. El sistema ahora depende exclusivamente del objeto `ICONS` como única fuente de verdad.
- * 2. **Sincronización de Datos**: ((Implementada)) Se ha corregido la clave `TOOLS.ANALYZE_METRICS` de `BarChartBig` a `ChartBarBig`, alineando el manifiesto con el nombre canónico de `lucide-react`.
+ * 1. **Estabilidad del Servidor Restaurada**: ((Implementada)) Se ha eliminado la validación Zod en tiempo de importación, resolviendo la causa raíz del `ZodError` en el servidor y restaurando la capacidad de compilación del proyecto.
  *
  * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) Para una SSoT de élite, se podría crear un script que lea los nombres de los archivos de `lucide-react` y genere un tipo `LucideIconName` para ser usado en la validación Zod de los archivos de mensajes.
+ * 1. **Validación en Consumidores**: ((Vigente)) La responsabilidad de la validación se traslada correctamente a los schemas de i18n, que es donde debe residir.
  *
  * =====================================================================
  */
+// src/config/icon-map.ts

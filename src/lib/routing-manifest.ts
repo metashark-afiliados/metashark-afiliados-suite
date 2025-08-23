@@ -3,10 +3,10 @@
  * @file src/lib/routing-manifest.ts
  * @description Manifiesto de Seguridad Declarativo. Esta es la Única Fuente de Verdad
  *              para todas las reglas de seguridad de enrutamiento de la aplicación.
- *              Desacopla la configuración de seguridad de la lógica de ejecución del
- *              middleware, adhiriéndose al principio de "Configuración sobre Código".
+ *              Refactorizado para alinearse con la arquitectura de "Páginas Dedicadas",
+ *              resolviendo la causa raíz del error 404 en las rutas de autenticación.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
  */
 import { type Database } from "@/lib/types/database";
 
@@ -61,8 +61,8 @@ export const ROUTE_MANIFEST: RouteSecurityRule[] = [
   { path: "/welcome", classification: "protected" },
   { path: "/unauthorized", classification: "protected" },
   // Rutas de autenticación (solo para no autenticados)
-  { path: "/auth/login", classification: "auth" },
-  { path: "/auth/signup", classification: "auth" },
+  { path: "/login", classification: "auth" },
+  { path: "/signup", classification: "auth" },
   { path: "/forgot-password", classification: "auth" },
   { path: "/reset-password", classification: "auth" },
   // Ruta pública (catch-all) al final
@@ -74,12 +74,12 @@ export const ROUTE_MANIFEST: RouteSecurityRule[] = [
  *                           MEJORA CONTINUA
  * =====================================================================
  *
+ * @subsection Melhorias Adicionadas
+ * 1. **Resolución de Error 404**: ((Implementada)) Se han corregido las rutas de `/auth/login` y `/auth/signup` a `/login` y `/signup` respectivamente. Esta es la corrección fundamental que alinea el middleware de seguridad con la estructura de archivos de la aplicación, resolviendo la causa raíz del error 404.
+ * 2. **Consolidación de Arquitectura**: ((Implementada)) Este cambio refuerza la arquitectura de "Páginas Dedicadas" como la única SSoT para la autenticación, eliminando la ambigüedad de las rutas antiguas.
+ *
  * @subsection Melhorias Futuras
  * 1. **Carga desde Base de Datos**: ((Vigente)) Para una gestión de permisos dinámica sin necesidad de redespliegues, este manifiesto podría ser cargado desde una tabla `route_rules` en Supabase y cacheado agresivamente en el Edge.
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error Crítico**: ((Implementada)) La reconstrucción de este aparato resuelve directamente los errores `TS2307` y `TS7006` en `src/middleware/handlers/auth/index.ts`, desbloqueando la funcionalidad del middleware de seguridad.
- * 2. **Arquitectura Declarativa**: ((Implementada)) Este manifiesto es un ejemplo canónico del principio "Configuración sobre Código", haciendo que la lógica de seguridad sea fácil de leer, auditar y extender.
  *
  * =====================================================================
  */

@@ -1,4 +1,4 @@
-// tsconfig.json
+
 {
   "compilerOptions": {
     "strict": true,
@@ -32,20 +32,16 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.json",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "*.config.js",
+    "*.config.mjs",
+    "scripts/**/*.ts",
     ".next/types/**/*.ts",
-    // --- INICIO DE MEJORA: INCLUSIÓN EXPLÍCITA DE ARCHIVOS CRÍTICOS ---
-    "src/lib/hooks/useHandleErrors.ts", // Nuevo hook de manejo de errores
-    "tests/mocks/factories/context.factory.ts", // Nueva factoría de mocks
-    // --- FIN DE MEJORA ---
-    "src/components/auth/LoginForm.tsx.old",
-    "src/lib/actions/auth.actions.ts.old",
-    "src/middleware/handlers/auth/index.ts.old",
-    "vitest.config.ts",
-    "vitest.setup.ts",
-    "tests/config/vitest.setup.ts"
+    "test/config/*.ts",
+    "test/config/*.tsx"
   ],
   "exclude": ["node_modules"]
 }

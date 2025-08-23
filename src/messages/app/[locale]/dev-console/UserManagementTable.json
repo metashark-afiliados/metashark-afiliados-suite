@@ -1,3 +1,4 @@
+
 {
   "en-US": {
     "table_header": {
@@ -6,6 +7,7 @@
       "role": "Role",
       "actions": "Actions"
     },
+    "table_description": "Manage all users on the platform.",
     "search_placeholder": "Search by email or name...",
     "clear_search_aria": "Clear search",
     "table_empty_state": "No users found.",
@@ -24,6 +26,7 @@
       "role": "Rol",
       "actions": "Acciones"
     },
+    "table_description": "Gestiona todos los usuarios de la plataforma.",
     "search_placeholder": "Buscar por email o nombre...",
     "clear_search_aria": "Limpiar búsqueda",
     "table_empty_state": "No se encontraron usuarios.",
@@ -42,6 +45,7 @@
       "role": "Função",
       "actions": "Ações"
     },
+    "table_description": "Gerencie todos os usuários na plataforma.",
     "search_placeholder": "Buscar por e-mail ou nome...",
     "clear_search_aria": "Limpar busca",
     "table_empty_state": "Nenhum usuário encontrado.",
@@ -54,4 +58,3 @@
     "role_update_error_toast": "Falha ao atualizar a função do usuário."
   }
 }
-

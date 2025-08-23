@@ -1,10 +1,10 @@
 // src/lib/validators/schemas.ts
 /**
  * @file validators/schemas.ts
- * @description Biblioteca de Schemas de Zod y SSoT. Restaurado para una
- *              implementación correcta de .transform(), resolviendo un error de tipo.
+ * @description Biblioteca de Schemas de Zod y SSoT. Corregido para alinear
+ *              la validación de `termsAccepted` con la lógica de UI de un formulario.
  * @author Raz Podestá
- * @version 3.2.0
+ * @version 4.1.0
  */
 import { z } from "zod";
 
@@ -12,13 +12,15 @@ import { keysToSnakeCase } from "@/lib/helpers/object-case-converter";
 import { slugify } from "@/lib/utils/text";
 
 // --- ESQUEMAS BASE ATÓMICOS ---
-const UuidSchema = z.string().uuid({ message: "invalid_uuid" });
-const NameSchema = z
+export const UuidSchema = z.string().uuid({ message: "invalid_uuid" });
+
+export const NameSchema = z
   .string({ required_error: "name_required" })
   .trim()
   .min(3, { message: "name_too_short" })
   .max(40, { message: "name_too_long" });
-const SubdomainSchema = z
+
+export const SubdomainSchema = z
   .string()
   .trim()
   .min(3, { message: "subdomain_too_short" })
@@ -26,23 +28,27 @@ const SubdomainSchema = z
     message: "subdomain_invalid_chars",
   })
   .transform((subdomain) => subdomain.toLowerCase());
+
 export const EmailSchema = z
   .string()
   .trim()
   .email({ message: "invalid_email" });
+
 export const PasswordSchema = z
   .string()
   .min(8, { message: "password_too_short" });
 
-// --- ESQUEMA DE REGISTRO ---
+// --- ESQUEMA DE REGISTRO (ARQUITECTURA DE PÁGINA DEDICADA) ---
 export const SignUpSchema = z
   .object({
     email: EmailSchema,
     password: PasswordSchema,
     confirmPassword: PasswordSchema,
-    termsAccepted: z.coerce.boolean().refine((val) => val === true, {
+    // --- INICIO DE CORRECCIÓN ---
+    termsAccepted: z.boolean().refine((val) => val === true, {
       message: "terms_must_be_accepted",
     }),
+    // --- FIN DE CORRECCIÓN ---
     newsletterSubscribed: z.boolean().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -119,6 +125,7 @@ export const CreateCampaignSchema = z
 
 export const DeleteCampaignSchema = z.object({ campaignId: UuidSchema });
 
+// --- ESQUEMAS DE TELEMETRÍA ---
 export const VisitorLogSchema = z.object({
   session_id: UuidSchema,
   fingerprint: z.string().min(1, { message: "fingerprint_required" }),
@@ -132,6 +139,7 @@ export const VisitorLogSchema = z.object({
   is_bot: z.boolean().optional(),
   is_known_abuser: z.boolean().optional(),
 });
+
 export const ClientEnrichmentSchema = z.object({
   sessionId: UuidSchema,
   fingerprint: z.string().min(1, { message: "fingerprint_required" }),
@@ -144,8 +152,10 @@ export const ClientEnrichmentSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de API (TS2554)**: ((Implementada)) ((Vigente)) Se ha restaurado la lógica de transformación y se ha eliminado el código comentado propenso a errores, resolviendo el `TypeError`.
+ * 1. **Resolución de Errores de Tipo**: ((Implementada)) La modificación de `termsAccepted` a `z.boolean().refine(...)` resuelve los errores `TS2322` y `TS2345` al alinear el contrato del validador con el ciclo de vida real de un formulario.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Mensajes de Error en `refine`**: ((Vigente)) El mensaje de error para `refine` está codificado. Podría ser una clave de i18n (`"terms_must_be_accepted"`) para una internacionalización completa.
  *
  * =====================================================================
  */
-// src/lib/validators/schemas.ts

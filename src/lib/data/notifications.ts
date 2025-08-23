@@ -1,11 +1,12 @@
 // src/lib/data/notifications.ts
 /**
  * @file src/lib/data/notifications.ts
- * @description Aparato de datos para notificaciones e invitaciones. Ha sido nivelado
- *              para soportar Inyección de Dependencias, permitiendo su uso seguro
- *              dentro de funciones cacheadas.
+ * @description Aparato de datos para notificaciones e invitaciones. Ha sido
+ *              nivelado para soportar Inyección de Dependencias y corregido para
+ *              seleccionar únicamente columnas existentes, resolviendo una
+ *              regresión crítica.
  * @author L.I.A. Legacy
- * @version 2.0.0
+ * @version 2.1.0
  */
 "use server";
 import "server-only";
@@ -18,15 +19,17 @@ import { createClient as createServerClient } from "@/lib/supabase/server";
 type Database = import("@/lib/types/database").Database;
 type Supabase = SupabaseClient<Database, "public">;
 
+// Tipo interno para la data cruda de Supabase
 type RawInvitationData = {
   id: string;
   status: string;
   workspaces:
-    | { name: string; icon: string | null }
-    | { name: string; icon: string | null }[]
+    | { name: string } // <-- CORRECCIÓN: Se elimina `icon`
+    | { name: string }[]
     | null;
 };
 
+// Tipo público exportado con la estructura final
 export type Invitation = {
   id: string;
   status: string;
@@ -47,11 +50,15 @@ export async function getPendingInvitationsByEmail(
   supabaseClient?: Supabase
 ): Promise<Invitation[]> {
   const supabase = supabaseClient || createServerClient();
+
+  // --- INICIO DE CORRECCIÓN CRÍTICA ---
+  // Se elimina la solicitud de la columna 'icon' que ya no existe en la tabla 'workspaces'.
   const { data, error } = await supabase
     .from("invitations")
-    .select("id, status, workspaces (name, icon)")
+    .select("id, status, workspaces (name)") // <-- CORRECCIÓN
     .eq("invitee_email", userEmail)
     .eq("status", "pending");
+  // --- FIN DE CORRECCIÓN CRÍTICA ---
 
   if (error) {
     logger.error(
@@ -62,13 +69,22 @@ export async function getPendingInvitationsByEmail(
   }
 
   const pendingInvitations: Invitation[] =
-    (data as RawInvitationData[])?.map((inv) => ({
-      id: inv.id,
-      status: inv.status,
-      workspaces: Array.isArray(inv.workspaces)
+    (data as RawInvitationData[])?.map((inv) => {
+      const workspaceData = Array.isArray(inv.workspaces)
         ? inv.workspaces[0] || null
-        : inv.workspaces,
-    })) || [];
+        : inv.workspaces;
+
+      return {
+        id: inv.id,
+        status: inv.status,
+        workspaces: workspaceData
+          ? {
+              name: workspaceData.name,
+              icon: null, // Devolvemos null explícitamente para cumplir el contrato
+            }
+          : null,
+      };
+    }) || [];
 
   return pendingInvitations;
 }
@@ -79,10 +95,11 @@ export async function getPendingInvitationsByEmail(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Inyección de Dependencias**: ((Implementada)) La función ahora acepta un `supabaseClient` opcional, desacoplándola de la creación directa del cliente y permitiendo su uso en contextos cacheados.
+ * 1. **Resolución de Regresión Crítica**: ((Implementada)) Se ha eliminado la consulta a la columna `workspaces.icon`, resolviendo el error `42703` y restaurando la funcionalidad de carga del dashboard.
+ * 2. **Integridad de Contrato de UI**: ((Implementada)) El `map` de transformación ahora añade explícitamente `icon: null` para asegurar que el objeto devuelto siempre cumpla con el tipo `Invitation` esperado por la UI, previniendo errores de `undefined`.
  *
  * @subsection Melhorias Futuras
- * 1. **Reintroducción de Notificaciones Genéricas**: ((Vigente)) La lógica para consultar una tabla `notifications` genérica puede ser añadida en una nueva función.
+ * 1. **Reintroducción de Iconos de Workspace**: ((Vigente)) La columna `icon` fue eliminada de la tabla `workspaces`. El plan arquitectónico para reintroducirla debe ser definido. Podría ser un campo de texto para un emoji o una URL a un asset. Una vez reintroducida, esta consulta podrá ser actualizada.
  *
  * =====================================================================
  */

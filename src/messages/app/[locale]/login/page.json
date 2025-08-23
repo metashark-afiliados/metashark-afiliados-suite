@@ -1,0 +1,39 @@
+
+{
+  "en-US": {
+    "metadataTitle": "Sign In",
+    "title": "Welcome back to ConvertiKit",
+    "subtitle": "Enter your credentials to access your dashboard.",
+    "signInButton": "Sign In",
+    "signInButton_pending": "Signing In...",
+    "alreadyHaveAccount": "Already have an account? Sign in",
+    "error_invalid_credentials": "Invalid email or password. Please try again.",
+    "error_oauth_failed": "OAuth sign-in failed. Please try again or use another method.",
+    "error_oauth_provider_missing": "OAuth provider information is missing.",
+    "error_profile_creation_failed": "Profile creation failed. Please try again or contact support."
+  },
+  "es-ES": {
+    "metadataTitle": "Iniciar Sesión",
+    "title": "Bienvenido de nuevo a ConvertiKit",
+    "subtitle": "Introduce tus credenciales para acceder a tu panel.",
+    "signInButton": "Iniciar Sesión",
+    "signInButton_pending": "Iniciando Sesión...",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta? Inicia sesión",
+    "error_invalid_credentials": "Email o contraseña inválidos. Por favor, inténtalo de nuevo.",
+    "error_oauth_failed": "Falló el inicio de sesión con OAuth. Por favor, inténtalo de nuevo o usa otro método.",
+    "error_oauth_provider_missing": "Falta la información del proveedor de OAuth.",
+    "error_profile_creation_failed": "La creación del perfil falló. Por favor, intenta de nuevo o contacta a soporte."
+  },
+  "pt-BR": {
+    "metadataTitle": "Entrar",
+    "title": "Bem-vindo de volta à ConvertiKit",
+    "subtitle": "Insira suas credenciais para acessar seu painel.",
+    "signInButton": "Entrar",
+    "signInButton_pending": "Entrando...",
+    "alreadyHaveAccount": "Já tem uma conta? Entrar",
+    "error_invalid_credentials": "E-mail ou senha inválidos. Por favor, tente novamente.",
+    "error_oauth_failed": "Falha no login com OAuth. Por favor, tente novamente ou use outro método.",
+    "error_oauth_provider_missing": "Faltam as informações do provedor OAuth.",
+    "error_profile_creation_failed": "A criação do perfil falhou. Por favor, tente novamente ou contate o suporte."
+  }
+}

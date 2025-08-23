@@ -1,54 +1,32 @@
 // src/components/ui/input.tsx
 /**
- * @file src/components/ui/input.tsx
- * @description Componente de Input de élite. Ha sido nivelado para incluir un
- *              estado de error visual (`hasError`), estandarizando el feedback
- *              de validación en toda la aplicación.
- * @author Raz Podestá
- * @version 6.0.0
+ * @file input.tsx
+ * @description Componente de Input de UI atómico, basado en la implementación
+ *              canónica de Shadcn/UI. Ha sido refactorizado a un estándar de élite
+ *              para incluir una prop `hasError` que gestiona centralizadamente los
+ *              estilos de validación.
+ * @author Metashark (adaptado de Shadcn/UI) & L.I.A. Legacy
+ * @version 2.0.0
  */
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-export const inputVariants = cva(
-  "flex w-full rounded-md border text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default: "border-input bg-background",
-        ghost:
-          "border-transparent bg-transparent hover:bg-accent focus-visible:bg-accent focus-visible:ring-transparent",
-      },
-      size: {
-        default: "h-10 px-3 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-);
-
 export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
-    VariantProps<typeof inputVariants> {
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   hasError?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, variant, size, hasError = false, ...props }, ref) => {
+  ({ className, type, hasError, ...props }, ref) => {
     return (
       <input
         type={type}
         className={cn(
-          inputVariants({ variant, size, className }),
+          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
           hasError &&
-            "border-destructive text-destructive focus-visible:ring-destructive"
+            "border-destructive ring-destructive focus-visible:ring-destructive",
+          className
         )}
         ref={ref}
         {...props}
@@ -66,10 +44,10 @@ export { Input };
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Estado de Error Visual**: ((Implementada)) Se ha añadido la prop `hasError` que aplica clases de estilo destructivas, estandarizando el feedback de validación de errores.
+ * 1. **Gestión de Estado de Error Centralizada**: ((Implementada)) La adición de la prop `hasError` centraliza la lógica de estilo para errores de validación. Ahora, cualquier formulario puede indicar un estado de error a un `Input` de forma declarativa, garantizando consistencia visual en toda la aplicación.
  *
  * @subsection Melhorias Futuras
- * 1. **Iconos de Estado**: ((Vigente)) Añadir props `leftIcon` y `rightIcon` para renderizar iconos dentro del campo de entrada, útiles para mostrar iconos de validación (check, x) o decorativos.
+ * 1. **Icono de Estado**: ((Vigente)) Añadir una prop `statusIcon: 'success' | 'error'` que renderice un icono de `Check` o `AlertTriangle` dentro del campo de entrada para un feedback visual más explícito.
  *
  * =====================================================================
  */

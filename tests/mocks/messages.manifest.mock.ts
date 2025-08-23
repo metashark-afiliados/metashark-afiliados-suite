@@ -3,55 +3,15 @@
  * @file tests/mocks/messages.manifest.mock.ts
  * @description Manifiesto de Mocks de Mensajes de i18n para el Entorno de Pruebas.
  *              Esta es la Única Fuente de Verdad para la carga de mensajes de
- *              i18n mockeados. Ha sido calibrado para devolver un `Promise`
- *              que resuelve un objeto con una exportación `default`, alineándose
- *              con el tipo `ManifestModule` y resolviendo el error `TS2739`.
- *              CORRECCIÓN: Se han reemplazado los `require()` por `import()`
- *              para compatibilidad con el entorno de módulos de Vitest.
+ *              i18n mockeados. Ha sido restaurado a su estado completo y canónico
+ *              para ser un espejo de alta fidelidad del manifiesto de producción.
  * @author L.I.A. Legacy
- * @version 1.0.3
+ * @version 3.0.0
  */
 import { type ManifestModule } from "@/messages/types";
 
-// Este mock directamente proporciona el mapeo que `src/messages/manifest.ts` normalmente proporcionaría.
-// La clave para resolver los errores de "Cannot find module" es usar `import()` en lugar de `require()`.
-// `import()` es asíncrono, pero se envuelve en `Promise.resolve()` para satisfacer el contrato de `ManifestModule`.
 export const mockedMessagesManifest: Record<string, ManifestModule> = {
-  // Global/Shared
-  ActionDock: () =>
-    Promise.resolve(import("@/messages/shared/ActionDock.json")),
-  ValidationErrors: () =>
-    Promise.resolve(import("@/messages/shared/ValidationErrors.json")),
-  WelcomeModal: () =>
-    Promise.resolve(import("@/messages/shared/WelcomeModal.json")),
-
-  // App Routes (Server-consumed pages)
-  "pages.AboutPage": () =>
-    Promise.resolve(import("@/messages/pages/AboutPage.json")),
-  "pages.AuthNoticePage": () =>
-    Promise.resolve(import("@/messages/pages/AuthNoticePage.json")),
-  "pages.BlogPage": () =>
-    Promise.resolve(import("@/messages/pages/BlogPage.json")),
-  "pages.ContactPage": () =>
-    Promise.resolve(import("@/messages/pages/ContactPage.json")),
-  "pages.CookiePolicyPage": () =>
-    Promise.resolve(import("@/messages/pages/CookiePolicyPage.json")),
-  "pages.DisclaimerPage": () =>
-    Promise.resolve(import("@/messages/pages/DisclaimerPage.json")),
-  "pages.ForgotPasswordPage": () =>
-    Promise.resolve(import("@/messages/pages/ForgotPasswordPage.json")),
-  "pages.LegalNoticePage": () =>
-    Promise.resolve(import("@/messages/pages/LegalNoticePage.json")),
-  "pages.NotFoundPage": () =>
-    Promise.resolve(import("@/messages/pages/NotFoundPage.json")),
-  "pages.PrivacyPolicyPage": () =>
-    Promise.resolve(import("@/messages/pages/PrivacyPolicyPage.json")),
-  "pages.ResetPasswordPage": () =>
-    Promise.resolve(import("@/messages/pages/ResetPasswordPage.json")),
-  "pages.TermsOfServicePage": () =>
-    Promise.resolve(import("@/messages/pages/TermsOfServicePage.json")),
-
-  // Client Components (useTranslations) & App-level Schemas
+  // --- Namespaces a Nivel de App ---
   "app.dev-console.CampaignsTable": () =>
     Promise.resolve(
       import("@/messages/app/[locale]/dev-console/CampaignsTable.json")
@@ -68,99 +28,144 @@ export const mockedMessagesManifest: Record<string, ManifestModule> = {
     Promise.resolve(
       import("@/messages/app/[locale]/dev-console/UserManagementTable.json")
     ),
-  AuthLayout: () =>
+  "app.[locale].auth.layout": () =>
     Promise.resolve(import("@/messages/app/[locale]/auth/layout.json")),
-  AuthFooter: () =>
-    Promise.resolve(import("@/messages/components/auth/AuthFooter.json")),
-  LoginForm: () =>
-    Promise.resolve(import("@/messages/components/auth/LoginForm.json")),
-  OAuthButton: () =>
-    Promise.resolve(import("@/messages/components/auth/OAuthButton.json")),
-  BuilderPage: () =>
+  "app.[locale].auth.login.page": () =>
+    Promise.resolve(import("@/messages/app/[locale]/auth/login/page.json")),
+  "app.[locale].auth.signup.page": () =>
+    Promise.resolve(import("@/messages/app/[locale]/auth/signup/page.json")),
+  "app.[locale].builder.page": () =>
     Promise.resolve(import("@/messages/app/[locale]/builder/page.json")),
-  CampaignsPage: () =>
+  "app.[locale].dashboard.page": () =>
+    Promise.resolve(import("@/messages/app/[locale]/dashboard/page.json")),
+  "app.[locale].dashboard.sites.page": () =>
+    Promise.resolve(
+      import("@/messages/app/[locale]/dashboard/sites/page.json")
+    ),
+  "app.[locale].dashboard.sites.[siteId].campaigns.page": () =>
     Promise.resolve(
       import(
         "@/messages/app/[locale]/dashboard/sites/[siteId]/campaigns/page.json"
       )
     ),
-  CommandPalette: () =>
-    Promise.resolve(
-      import("@/messages/components/feedback/CommandPalette.json")
-    ),
-  DashboardHeader: () =>
-    Promise.resolve(
-      import("@/messages/components/layout/DashboardHeader.json")
-    ),
-  DashboardPage: () =>
-    Promise.resolve(import("@/messages/app/[locale]/dashboard/page.json")),
-  DashboardSidebar: () =>
-    Promise.resolve(
-      import("@/messages/components/layout/DashboardSidebar.json")
-    ),
-  DevConsoleSidebar: () =>
-    Promise.resolve(
-      import("@/messages/components/dev-console/DevSidebar.json")
-    ),
-  Dialogs: () =>
-    Promise.resolve(import("@/messages/components/ui/Dialogs.json")),
-  EmojiPicker: () =>
-    Promise.resolve(import("@/messages/components/ui/EmojiPicker.json")),
-  InvitationBell: () =>
-    Promise.resolve(
-      import("@/messages/components/dashboard/InvitationBell.json")
-    ),
-  LiaChatWidget: () =>
-    Promise.resolve(
-      import("@/messages/components/feedback/LiaChatWidget.json")
-    ),
-  LoginPage: () =>
-    Promise.resolve(import("@/messages/app/[locale]/auth/login/page.json")),
-  SignUpPage: () =>
-    Promise.resolve(import("@/messages/app/[locale]/auth/signup/page.json")),
-  SiteAssignmentControl: () =>
+
+  // --- Namespaces de Componentes ---
+  "components.auth.LoginForm": () =>
+    Promise.resolve(import("@/messages/components/auth/LoginForm.json")),
+  "components.auth.OAuthButton": () =>
+    Promise.resolve(import("@/messages/components/auth/OAuthButton.json")),
+  "components.auth.SupabaseAuthUI": () =>
+    Promise.resolve(import("@/messages/components/auth/SupabaseAuthUI.json")),
+  "components.builder.BlocksPalette": () =>
+    Promise.resolve(import("@/messages/components/builder/BlocksPalette.json")),
+  "components.builder.BuilderHeader": () =>
+    Promise.resolve(import("@/messages/components/builder/BuilderHeader.json")),
+  "components.builder.Canvas": () =>
+    Promise.resolve(import("@/messages/components/builder/Canvas.json")),
+  "components.builder.SettingsPanel": () =>
+    Promise.resolve(import("@/messages/components/builder/SettingsPanel.json")),
+  "components.builder.SiteAssignmentControl": () =>
     Promise.resolve(
       import("@/messages/components/builder/SiteAssignmentControl.json")
     ),
-  SitesPage: () =>
+  "components.dashboard.InvitationBell": () =>
     Promise.resolve(
-      import("@/messages/app/[locale]/dashboard/sites/page.json")
+      import("@/messages/components/dashboard/InvitationBell.json")
     ),
-  SupabaseAuthUI: () =>
-    Promise.resolve(import("@/messages/components/auth/SupabaseAuthUI.json")),
-  ThemeSwitcher: () =>
+  "components.dev-console.DevSidebar": () =>
+    Promise.resolve(
+      import("@/messages/components/dev-console/DevSidebar.json")
+    ),
+  "components.feedback.CommandPalette": () =>
+    Promise.resolve(
+      import("@/messages/components/feedback/CommandPalette.json")
+    ),
+  "components.feedback.LiaChatWidget": () =>
+    Promise.resolve(
+      import("@/messages/components/feedback/LiaChatWidget.json")
+    ),
+  "components.landing.BottomCTA": () =>
+    Promise.resolve(import("@/messages/components/landing/BottomCTA.json")),
+  "components.landing.FAQ": () =>
+    Promise.resolve(import("@/messages/components/landing/FAQ.json")),
+  "components.landing.Features": () =>
+    Promise.resolve(import("@/messages/components/landing/Features.json")),
+  "components.landing.Hero": () =>
+    Promise.resolve(import("@/messages/components/landing/Hero.json")),
+  "components.landing.Metrics": () =>
+    Promise.resolve(import("@/messages/components/landing/Metrics.json")),
+  "components.landing.Newsletter": () =>
+    Promise.resolve(import("@/messages/components/landing/Newsletter.json")),
+  "components.landing.ProcessSteps": () =>
+    Promise.resolve(import("@/messages/components/landing/ProcessSteps.json")),
+  "components.landing.SocialProof": () =>
+    Promise.resolve(import("@/messages/components/landing/SocialProof.json")),
+  "components.landing.SupportCTA": () =>
+    Promise.resolve(import("@/messages/components/landing/SupportCTA.json")),
+  "components.landing.Testimonials": () =>
+    Promise.resolve(import("@/messages/components/landing/Testimonials.json")),
+  "components.layout.AuthLayout": () =>
+    Promise.resolve(import("@/messages/components/layout/AuthLayout.json")),
+  "components.layout.DashboardHeader": () =>
+    Promise.resolve(
+      import("@/messages/components/layout/DashboardHeader.json")
+    ),
+  "components.layout.DashboardSidebar": () =>
+    Promise.resolve(
+      import("@/messages/components/layout/DashboardSidebar.json")
+    ),
+  "components.layout.LandingFooter": () =>
+    Promise.resolve(import("@/messages/components/layout/LandingFooter.json")),
+  "components.layout.LandingHeader": () =>
+    Promise.resolve(import("@/messages/components/layout/LandingHeader.json")),
+  "components.ui.Dialogs": () =>
+    Promise.resolve(import("@/messages/components/ui/Dialogs.json")),
+  "components.ui.EmojiPicker": () =>
+    Promise.resolve(import("@/messages/components/ui/EmojiPicker.json")),
+  "components.ui.LanguageSwitcher": () =>
+    Promise.resolve(import("@/messages/components/ui/LanguageSwitcher.json")),
+  "components.ui.ThemeSwitcher": () =>
     Promise.resolve(import("@/messages/components/ui/ThemeSwitcher.json")),
-  WorkspaceSwitcher: () =>
+  "components.workspaces.WorkspaceSwitcher": () =>
     Promise.resolve(
       import("@/messages/components/workspaces/WorkspaceSwitcher.json")
     ),
-  LanguageSwitcher: () =>
-    Promise.resolve(import("@/messages/components/ui/LanguageSwitcher.json")),
 
-  // Landing Page Sections
-  BottomCTA: () =>
-    Promise.resolve(import("@/messages/components/landing/BottomCTA.json")),
-  FAQ: () => Promise.resolve(import("@/messages/components/landing/FAQ.json")),
-  FeaturesSection: () =>
-    Promise.resolve(import("@/messages/components/landing/Features.json")),
-  HeroSection: () =>
-    Promise.resolve(import("@/messages/components/landing/Hero.json")),
-  LandingFooter: () =>
-    Promise.resolve(import("@/messages/components/layout/LandingFooter.json")),
-  LandingHeader: () =>
-    Promise.resolve(import("@/messages/components/layout/LandingHeader.json")),
-  Metrics: () =>
-    Promise.resolve(import("@/messages/components/landing/Metrics.json")),
-  Newsletter: () =>
-    Promise.resolve(import("@/messages/components/landing/Newsletter.json")),
-  ProcessSteps: () =>
-    Promise.resolve(import("@/messages/components/landing/ProcessSteps.json")),
-  SocialProof: () =>
-    Promise.resolve(import("@/messages/components/landing/SocialProof.json")),
-  SupportCTA: () =>
-    Promise.resolve(import("@/messages/components/landing/SupportCTA.json")),
-  Testimonials: () =>
-    Promise.resolve(import("@/messages/components/landing/Testimonials.json")),
+  // --- Namespaces de Páginas ---
+  "pages.AboutPage": () =>
+    Promise.resolve(import("@/messages/pages/AboutPage.json")),
+  "pages.AuthNoticePage": () =>
+    Promise.resolve(import("@/messages/pages/AuthNoticePage.json")),
+  "pages.BlogPage": () =>
+    Promise.resolve(import("@/messages/pages/BlogPage.json")),
+  "pages.ContactPage": () =>
+    Promise.resolve(import("@/messages/pages/ContactPage.json")),
+  "pages.CookiePolicyPage": () =>
+    Promise.resolve(import("@/messages/pages/CookiePolicyPage.json")),
+  "pages.DisclaimerPage": () =>
+    Promise.resolve(import("@/messages/pages/DisclaimerPage.json")),
+  "pages.ForgotPasswordPage": () =>
+    Promise.resolve(import("@/messages/pages/ForgotPasswordPage.json")),
+  "pages.IconGalleryPage": () =>
+    Promise.resolve(import("@/messages/pages/IconGalleryPage.json")),
+  "pages.LegalNoticePage": () =>
+    Promise.resolve(import("@/messages/pages/LegalNoticePage.json")),
+  "pages.NotFoundPage": () =>
+    Promise.resolve(import("@/messages/pages/NotFoundPage.json")),
+  "pages.PrivacyPolicyPage": () =>
+    Promise.resolve(import("@/messages/pages/PrivacyPolicyPage.json")),
+  "pages.ResetPasswordPage": () =>
+    Promise.resolve(import("@/messages/pages/ResetPasswordPage.json")),
+  "pages.TermsOfServicePage": () =>
+    Promise.resolve(import("@/messages/pages/TermsOfServicePage.json")),
+
+  // --- Namespaces Compartidos ---
+  "shared.ActionDock": () =>
+    Promise.resolve(import("@/messages/shared/ActionDock.json")),
+  "shared.ValidationErrors": () =>
+    Promise.resolve(import("@/messages/shared/ValidationErrors.json")),
+  "shared.WelcomeModal": () =>
+    Promise.resolve(import("@/messages/shared/WelcomeModal.json")),
 };
 /**
  * =====================================================================
@@ -168,11 +173,10 @@ export const mockedMessagesManifest: Record<string, ManifestModule> = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Compatibilidad con Entorno ESM de Vitest**: ((Implementada)) Se han reemplazado todas las llamadas `require()` por `import()`. Esto resuelve los errores `MODULE_NOT_FOUND` y alinea el mock con el entorno de ejecución de Vitest.
- * 2. **Integridad de Contrato de `ManifestModule`**: ((Implementada)) Cada `import()` se envuelve en `Promise.resolve()`, asegurando que el tipo de retorno coincida con el contrato `ManifestModule` (que espera una promesa que resuelve un objeto con `default`).
+ * 1. **Sincronización Completa**: ((Implementada)) Se ha restaurado el manifiesto para que incluya todos los namespaces de la aplicación, creando un espejo completo y de alta fidelidad para el entorno de pruebas. Esto es crítico para la estabilidad del script `generate-schema.ts`.
  *
  * @subsection Melhorias Futuras
- * 1. **Garantizar la Sincronía en Mocks**: ((Vigente)) Aunque `import()` es asíncrono, dado que estamos en un entorno de pruebas, podríamos considerar la posibilidad de precargar todos estos módulos en un `beforeAll` con `await Promise.all(...)` y luego usar los valores resueltos directamente para evitar cualquier potencial asincronía en las aserciones. (Esto se abordará en `vitest.setup.ts` y `render.tsx`).
+ * 1. **Generación Automática**: ((Vigente)) Este manifiesto de mocks sigue siendo un candidato ideal para ser generado automáticamente a partir del manifiesto de producción, eliminando cualquier posibilidad de desincronización futura.
  *
  * =====================================================================
  */

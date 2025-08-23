@@ -1,0 +1,30 @@
+
+{
+  "en-US": {
+    "metadataTitle": "Icon Library",
+    "pageTitle": "Icon Library",
+    "pageDescription": "Browse, search, and copy the names of all available icons in the project.",
+    "searchPlaceholder": "Search over 1300 icons...",
+    "clearSearchAriaLabel": "Clear search",
+    "noResults": "No icons found matching your search.",
+    "copySuccessMessage": "Copied '{iconName}' to clipboard!"
+  },
+  "es-ES": {
+    "metadataTitle": "Biblioteca de Iconos",
+    "pageTitle": "Biblioteca de Iconos",
+    "pageDescription": "Explora, busca y copia los nombres de todos los iconos disponibles en el proyecto.",
+    "searchPlaceholder": "Buscar en más de 1300 iconos...",
+    "clearSearchAriaLabel": "Limpiar búsqueda",
+    "noResults": "No se encontraron iconos que coincidan con tu búsqueda.",
+    "copySuccessMessage": "¡Copiado '{iconName}' al portapapeles!"
+  },
+  "pt-BR": {
+    "metadataTitle": "Biblioteca de Ícones",
+    "pageTitle": "Biblioteca de Ícones",
+    "pageDescription": "Navegue, pesquise e copie os nomes de todos os ícones disponíveis no projeto.",
+    "searchPlaceholder": "Pesquisar mais de 1300 ícones...",
+    "clearSearchAriaLabel": "Limpar busca",
+    "noResults": "Nenhum ícone encontrado para sua busca.",
+    "copySuccessMessage": "Copiado '{iconName}' para a área de transferência!"
+  }
+}

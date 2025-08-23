@@ -1,11 +1,11 @@
 // src/lib/actions/auth.actions.ts
 /**
  * @file src/lib/actions/auth.actions.ts
- * @description Contiene las Server Actions para el flujo de autenticación.
- *              Ha sido refactorizado para un manejo de tipos de FormData
- *              explícito y seguro, resolviendo errores de tipo.
+ * @description SSoT de Server Actions para el ciclo de vida de autenticación.
+ *              Ha sido blindado para garantizar la seguridad de tipos al
+ *              registrar errores, resolviendo una regresión crítica.
  * @author Raz Podestá
- * @version 9.1.0
+ * @version 10.1.0
  */
 "use server";
 import "server-only";
@@ -25,17 +25,15 @@ import {
   SignUpSchema,
 } from "@/lib/validators";
 
-// (signInWithEmailAction sin cambios)
 export async function signInWithEmailAction(
   prevState: any,
   formData: FormData
-): Promise<ActionResult<never> | void> {
-  // ...código idéntico...
+): Promise<ActionResult<never>> {
   const emailResult = EmailSchema.safeParse(formData.get("email"));
   const passwordResult = PasswordSchema.safeParse(formData.get("password"));
 
   if (!emailResult.success || !passwordResult.success) {
-    return { success: false, error: "error_invalid_credentials" };
+    return { success: false, error: "LoginPage.error_invalid_credentials" };
   }
 
   const supabase = createClient();
@@ -47,14 +45,12 @@ export async function signInWithEmailAction(
   if (error) {
     logger.warn(
       `[AuthActions] Failed password sign-in for ${emailResult.data}`,
-      {
-        error: error.message,
-      }
+      { error: error.message }
     );
-    return { success: false, error: "error_invalid_credentials" };
+    return { success: false, error: "LoginPage.error_invalid_credentials" };
   }
 
-  return redirect("/dashboard");
+  redirect("/dashboard");
 }
 
 export async function signUpAction(
@@ -62,11 +58,8 @@ export async function signUpAction(
   formData: FormData
 ): Promise<ActionResult<never>> {
   const origin = headers().get("origin");
-  // --- INICIO DE REFACTORIZACIÓN: MANEJO SEGURO DE TIPOS ---
   const rawData = Object.fromEntries(formData);
-  const emailForLog =
-    typeof rawData.email === "string" ? rawData.email : "invalid_email_type";
-  // --- FIN DE REFACTORIZACIÓN ---
+
   try {
     const parsedData = SignUpSchema.parse(rawData);
 
@@ -85,38 +78,44 @@ export async function signUpAction(
         email: parsedData.email,
       });
       if (error.message.includes("User already registered")) {
-        return { success: false, error: "error_user_already_exists" };
+        return {
+          success: false,
+          error: "ValidationErrors.error_user_already_exists",
+        };
       }
-      return { success: false, error: "error_signup_failed" };
+      return { success: false, error: "ValidationErrors.error_signup_failed" };
     }
 
-    return redirect("/auth-notice?message=check-email-for-confirmation");
+    redirect("/auth-notice?message=check-email-for-confirmation");
   } catch (error) {
     if (error instanceof ZodError) {
       const firstError = error.errors[0];
       return { success: false, error: firstError.message };
     }
 
-    // --- INICIO DE REFACTORIZACIÓN: PASO DE TIPO SEGURO ---
+    // --- INICIO DE BLINDAJE DE TIPO ---
+    const emailForLog =
+      typeof rawData.email === "string" ? rawData.email : "invalid_email_type";
     await createPersistentErrorLog("signUpAction", error as Error, {
       email: emailForLog,
     });
-    // --- FIN DE REFACTORIZACIÓN ---
-    return { success: false, error: "error_unexpected" };
+    // --- FIN DE BLINDAJE DE TIPO ---
+
+    return { success: false, error: "ValidationErrors.error_unexpected" };
   }
 }
 
-// (signInWithOAuthAction sin cambios)
 export async function signInWithOAuthAction(formData: FormData): Promise<void> {
-  // ...código idéntico...
   const provider = formData.get("provider") as Provider | null;
   const origin = headers().get("origin");
-  const loginUrl = new URL(`${origin}/auth/login`);
+  const loginUrl = new URL(`${origin}/login`);
 
   if (!provider) {
-    logger.warn("[AuthActions] Provider de OAuth faltante en la petición.");
     loginUrl.searchParams.set("error", "true");
-    loginUrl.searchParams.set("message", "error_oauth_provider_missing");
+    loginUrl.searchParams.set(
+      "message",
+      "LoginPage.error_oauth_provider_missing"
+    );
     return redirect(loginUrl.toString());
   }
 
@@ -129,28 +128,26 @@ export async function signInWithOAuthAction(formData: FormData): Promise<void> {
   });
 
   if (error) {
-    logger.error(`[AuthActions] OAuth sign-in error with ${provider}`, error);
     await createPersistentErrorLog("signInWithOAuthAction", error, {
       provider,
     });
     loginUrl.searchParams.set("error", "true");
-    loginUrl.searchParams.set("message", "error_oauth_failed");
+    loginUrl.searchParams.set("message", "LoginPage.error_oauth_failed");
     return redirect(loginUrl.toString());
   }
 
   return redirect(data.url);
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Manejo Seguro de Tipos de FormData**: ((Implementada)) ((Vigente)) La acción `signUpAction` ahora convierte `FormData` a un objeto plano y extrae el email como string al inicio. Esto garantiza que todos los usos posteriores de `email` (validación Zod, logging) sean tipo-seguros, resolviendo el error `TS2345`.
+ * 1. **Blindaje de Seguridad de Tipos**: ((Implementada)) Se ha añadido una sanitización explícita del `email` antes de pasarlo al `createPersistentErrorLog`. Esto resuelve el error de compilación `TS2345` y previene que un tipo `File` pueda ser enviado al logger.
  *
  * @subsection Melhorias Futuras
- * 1. **Helper de Sanitización de FormData**: ((Pendiente)) La lógica de `Object.fromEntries(formData)` y la extracción segura de valores podría abstraerse a un helper reutilizable `sanitizeFormData(formData, expectedKeys)` para otras Server Actions.
+ * 1. **Helper `sanitizeFormData`**: ((Vigente)) La lógica de sanitización (`typeof rawData.email === 'string' ? ...`) es un patrón que podría abstraerse a un helper reutilizable para otras acciones que manejen `FormData`.
  *
  * =====================================================================
  */

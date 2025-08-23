@@ -2,14 +2,14 @@
 /**
  * @file FeaturesSection.schema.ts
  * @description Define el contrato de datos para el namespace 'FeaturesSection'.
- *              Ha sido nivelado a un estándar de élite para que 'features'
- *              sea un array de objetos, alineando el contrato con la lógica
- *              de renderizado del componente consumidor y la estructura del
- *              archivo de mensajes, resolviendo un `TypeError` en runtime.
+ *              Ha sido nivelado a un estándar de élite para validar el `icon`
+ *              contra el enum Zod de iconos de Lucide, garantizando la
+ *              integridad de los datos a nivel de SSoT.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.0.0
  */
 import { z } from "zod";
+import { LucideIconNameSchema } from "@/config/lucide-icon-names"; // <-- Importación del nuevo SSoT
 
 /**
  * @public
@@ -28,7 +28,9 @@ export const FeaturesSectionSchema = z.object({
    */
   features: z.array(
     z.object({
-      icon: z.string().describe("Nombre del icono de lucide-react."),
+      icon: LucideIconNameSchema.describe(
+        "Nombre del icono de lucide-react, validado."
+      ), // <-- BLINDAJE IMPLEMENTADO
       title: z.string(),
       description: z.string(),
     })
@@ -41,9 +43,7 @@ export const FeaturesSectionSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de Datos**: ((Implementada)) Se ha corregido el tipo de `features` de un objeto plano a `z.array(z.object(...))`, resolviendo la causa raíz del error de runtime `t.raw(...).map is not a function`.
- * 2. **Contrato de Alto Nivel**: ((Implementada)) La nueva estructura es más flexible y escalable, permitiendo añadir o eliminar características editando únicamente el archivo de mensajes sin necesidad de modificar el schema.
- * 3. **Documentación Embebida**: ((Implementada)) Se ha añadido documentación TSDoc y `.describe()` para mejorar la claridad del contrato.
+ * 1. **Blindaje de Contrato de Datos**: ((Implementada)) El campo `icon` ya no es un `z.string()` genérico. Ahora está validado por el `LucideIconNameSchema`, previniendo arquitectónicamente el uso de un nombre de icono inválido en los archivos de mensajes.
  *
  * @subsection Melhorias Futuras
  * 1. **Validación de Array No Vacío**: ((Vigente)) Se podría añadir `.nonempty()` al schema `features` para asegurar que siempre haya al menos una característica definida en los archivos de mensajes.

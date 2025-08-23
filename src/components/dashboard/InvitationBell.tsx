@@ -3,11 +3,10 @@
  * @file src/components/dashboard/InvitationBell.tsx
  * @description Aparato de UI atómico y de alta cohesión. Su única responsabilidad
  *              es gestionar y mostrar la interfaz para las notificaciones de
- *              invitaciones de workspace. Es un componente de cliente que consume
- *              el contexto del dashboard y el hook de i18n tipado para ser
- *              completamente internacionalizado y observable.
+ *              invitaciones de workspace. Consume el namespace de i18n canónico
+ *              y proporciona un feedback de usuario granular al aceptar una invitación.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
@@ -36,12 +35,11 @@ import { logger } from "@/lib/logging";
  * @component InvitationBell
  * @description Gestiona y muestra el icono de notificaciones y la lista desplegable
  *              de invitaciones a workspaces pendientes. Se suscribe a actualizaciones
- *              en tiempo real y maneja la lógica para aceptar invitaciones, proporcionando
- *              feedback visual al usuario a través de `toast` y `useTransition`.
+ *              en tiempo real y maneja la lógica para aceptar invitaciones.
  * @returns {React.ReactElement} El componente de la campana de notificaciones.
  */
 export function InvitationBell(): React.ReactElement {
-  const t = useTypedTranslations("InvitationBell");
+  const t = useTypedTranslations("components.dashboard.InvitationBell");
   const { user, pendingInvitations } = useDashboard();
   const [isPending, startTransition] = React.useTransition();
   const invitations = useRealtimeInvitations(user, pendingInvitations);
@@ -55,7 +53,11 @@ export function InvitationBell(): React.ReactElement {
       const result =
         await invitationActions.acceptInvitationAction(invitationId);
       if (result.success) {
-        toast.success(result.data.message || t("accept_invitation_success"));
+        const acceptedInvitation = invitations.find(
+          (inv) => inv.id === invitationId
+        );
+        const workspaceName = acceptedInvitation?.workspaces?.name || "...";
+        toast.success(t("accept_invitation_success", { workspaceName }));
       } else {
         toast.error(result.error || t("accept_invitation_error"));
       }
@@ -126,20 +128,18 @@ export function InvitationBell(): React.ReactElement {
     </DropdownMenu>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Notificaciones Genéricas**: ((Vigente)) Este componente poderia evoluir para manejar múltiplos tipos de notificações (não apenas convites) obtidas de uma tabela `notifications` genérica, tornando-se um centro de notificações completo.
- * 2. **Marcar como Lida**: ((Vigente)) Adicionar uma ação para marcar uma notificação como lida sem necessariamente aceitar o convite.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Atômico e de Alta Coesão**: ((Implementada)) Este aparato encapsula uma única e complexa responsabilidade: a gestão da UI de convites, melhorando a coesão do `DashboardHeader`.
- * 2. **Experiência em Tempo Real**: ((Implementada)) Ao consumir o hook `useRealtimeInvitations`, este componente se atualiza em tempo real, fornecendo uma UX moderna e colaborativa.
- * 3. **Observabilidade e Feedback**: ((Implementada)) A interação do usuário é registrada (`logger.trace`), e o resultado da Server Action é comunicado de forma clara através de `toast`, seguindo os padrões de observabilidade.
+ * 1. **Sincronización de i18n**: ((Implementada)) El componente ahora consume el namespace canónico `"components.dashboard.InvitationBell"`, alineándose con la infraestructura de i18n refactorizada.
+ * 2. **Feedback de Usuario Mejorado**: ((Implementada)) La función `handleAccept` utiliza el nombre del workspace para un `toast` más granular, mejorando la UX.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Notificaciones Genéricas**: ((Vigente)) Este componente podría evolucionar para manejar múltiples tipos de notificaciones (no solo invitaciones) obtenidas de una tabla `notifications` genérica, convirtiéndose en un centro de notificaciones completo.
+ * 2. **Marcar como Lida**: ((Vigente)) Añadir una acción para marcar una notificación como leída sin necesariamente aceptar la invitación.
  *
  * =====================================================================
  */

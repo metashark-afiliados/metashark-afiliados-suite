@@ -1,0 +1,57 @@
+
+{
+  "en-US": {
+    "metadataTitle": "Sign Up",
+    "title": "Create your Account",
+    "subtitle": "Join the platform to start building.",
+    "email_label": "Email Address",
+    "password_label": "Password",
+    "confirm_password_label": "Confirm Password",
+    "terms_label": "I accept the terms and conditions",
+    "signUpButton": "Create Account",
+    "signUpButton_pending": "Creating...",
+    "dontHaveAccount": "Don't have an account? Sign up",
+    "legalNotice": "By signing up, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>.",
+    "strength_weak": "Strength: <strong>Weak</strong>",
+    "strength_fair": "Strength: <strong>Fair</strong>",
+    "strength_good": "Strength: <strong>Good</strong>",
+    "strength_strong": "Strength: <strong>Strong</strong>",
+    "newsletter_label": "Subscribe to our newsletter for tips and updates."
+  },
+  "es-ES": {
+    "metadataTitle": "Crear Cuenta",
+    "title": "Crea tu Cuenta",
+    "subtitle": "Únete a la plataforma para empezar a construir.",
+    "email_label": "Dirección de Correo Electrónico",
+    "password_label": "Contraseña",
+    "confirm_password_label": "Confirmar Contraseña",
+    "terms_label": "Acepto los términos y condiciones",
+    "signUpButton": "Crear Cuenta",
+    "signUpButton_pending": "Creando...",
+    "dontHaveAccount": "¿No tienes una cuenta? Regístrate",
+    "legalNotice": "Al registrarte, aceptas nuestros <terms>Términos de Servicio</terms> y <privacy>Política de Privacidad</privacy>.",
+    "strength_weak": "Fortaleza: <strong>Débil</strong>",
+    "strength_fair": "Fortaleza: <strong>Regular</strong>",
+    "strength_good": "Fortaleza: <strong>Buena</strong>",
+    "strength_strong": "Fortaleza: <strong>Fuerte</strong>",
+    "newsletter_label": "Suscríbete a nuestro boletín para recibir consejos y actualizaciones."
+  },
+  "pt-BR": {
+    "metadataTitle": "Criar Conta",
+    "title": "Crie sua Conta",
+    "subtitle": "Junte-se à plataforma para começar a construir.",
+    "email_label": "Endereço de E-mail",
+    "password_label": "Senha",
+    "confirm_password_label": "Confirmar Senha",
+    "terms_label": "Eu aceito os termos e condições",
+    "signUpButton": "Criar Conta",
+    "signUpButton_pending": "Criando...",
+    "dontHaveAccount": "Não tem uma conta? Cadastre-se",
+    "legalNotice": "Ao se inscrever, você concorda com nossos <terms>Termos de Serviço</terms> e <privacy>Política de Privacidade</privacy>.",
+    "strength_weak": "Força: <strong>Fraca</strong>",
+    "strength_fair": "Força: <strong>Razoável</strong>",
+    "strength_good": "Força: <strong>Boa</strong>",
+    "strength_strong": "Força: <strong>Forte</strong>",
+    "newsletter_label": "Inscreva-se na nossa newsletter para receber dicas e atualizações."
+  }
+}

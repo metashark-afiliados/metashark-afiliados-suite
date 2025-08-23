@@ -3,9 +3,10 @@
  * @file src/components/layout/DashboardHeader.tsx
  * @description Header contextual del dashboard. Refactorizado a la Arquitectura v9.1,
  *              es ahora un componente de presentación puro cuyo contenido es dictado
- *              por la página que lo renderiza a través de props.
+ *              por la página que lo renderiza a través de props. Ha sido sincronizado
+ *              con la arquitectura de i18n canónica.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
 "use client";
 
@@ -36,7 +37,7 @@ export function DashboardHeader({
   primaryAction,
 }: DashboardHeaderProps): React.ReactElement {
   const { open } = useCommandPaletteStore();
-  const t = useTypedTranslations("DashboardHeader");
+  const t = useTypedTranslations("components.layout.DashboardHeader");
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-card px-4 sm:h-[60px] sm:px-6">
@@ -82,11 +83,11 @@ export function DashboardHeader({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Implementación de Arquitectura v9.1**: ((Implementada)) Se ha eliminado el `WorkspaceSwitcher`. El header ahora es un componente de presentación puro que renderiza `breadcrumbs` y `primaryAction` dinámicamente.
- * 2. **Composición de Componentes**: ((Implementada)) El header ahora compone el nuevo `Breadcrumbs`, demostrando la "Filosofía LEGO".
+ * 1. **Sincronización de i18n**: ((Implementada)) Se ha corregido la llamada a `useTypedTranslations` para usar el namespace canónico `"components.layout.DashboardHeader"`, resolviendo el error de tipo `TS2345`.
  *
  * @subsection Melhorias Futuras
- * 1. **Acciones Secundarias Flexibles**: ((Vigente)) La prop `primaryAction` podría expandirse a un `actions: React.ReactNode` para permitir pasar múltiples botones o menús.
+ * 1. **Acciones Secundarias Flexibles**: ((Vigente)) La prop `primaryAction` podría expandirse a un `actions: React.ReactNode` para permitir pasar múltiples botones o menús, aumentando la flexibilidad del componente.
+ * 2. **Título de Página Móvil**: ((Vigente)) En vistas móviles, donde los `breadcrumbs` pueden ser muy largos, se podría mostrar un título de página más simple (`title: string`) en su lugar.
  *
  * =====================================================================
  */

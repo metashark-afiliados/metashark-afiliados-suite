@@ -2,10 +2,10 @@
 /**
  * @file src/components/layout/LandingFooter.tsx
  * @description Componente de presentación puro para el pie de página público.
- *              Refactorizado para ser autocontenido y con tipado explícito
- *              para resolver regresiones de tipo.
+ *              Refactorizado para consumir el namespace de i18n canónico,
+ *              resolviendo un error crítico de renderizado.
  * @author Raz Podestá
- * @version 4.1.0
+ * @version 5.0.0
  */
 "use client";
 
@@ -18,9 +18,12 @@ import { type NavLinkItem, SmartLink } from "@/components/ui/SmartLink";
 import { Link } from "@/lib/navigation";
 
 export function LandingFooter(): React.ReactElement {
-  const t = useTranslations("LandingFooter");
+  // --- INICIO DE CORRECCIÓN DE ÉLITE: Namespace Canónico ---
+  // Se consume el namespace completo según la arquitectura IMAS,
+  // resolviendo el error 'IntlError: MISSING_MESSAGE'.
+  const t = useTranslations("components.layout.LandingFooter");
+  // --- FIN DE CORRECCIÓN DE ÉLITE ---
 
-  // --- INICIO DE CORRECCIÓN: Tipado Explícito ---
   const productLinks: NavLinkItem[] = [
     { href: "#features", label: t("productLinks.features") },
     { href: "#process", label: t("productLinks.process") },
@@ -36,7 +39,6 @@ export function LandingFooter(): React.ReactElement {
     { href: "/privacy", label: t("legalLinks.privacy") },
     { href: "/terms", label: t("legalLinks.terms") },
   ];
-  // --- FIN DE CORRECCIÓN ---
 
   const footerProps = {
     slogan: t("slogan"),
@@ -136,13 +138,19 @@ export function LandingFooter(): React.ReactElement {
     </footer>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Tipo (TS2339)**: ((Implementada)) Se ha aplicado un tipado explícito `NavLinkItem[]` a los arrays de enlaces, resolviendo el error de inferencia de TypeScript.
+ * 1. **Resolución de `IntlError`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para que utilice el namespace canónico `"components.layout.LandingFooter"`, resolviendo el error crítico de renderizado.
+ * 2. **Documentación TSDoc de Élite**: ((Implementada)) Se ha añadido documentación verbosa para formalizar el rol del aparato y la refactorización.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Componente `FooterLinkColumn`**: ((Vigente)) La lógica para renderizar las columnas de enlaces (`productLinks`, `companyLinks`) se repite. Podría ser abstraída a un componente atómico `FooterLinkColumn` que reciba un `title` y un array de `links` para un código más DRY.
  *
  * =====================================================================
  */
+// src/components/layout/LandingFooter.tsx

@@ -2,11 +2,10 @@
 /**
  * @file src/components/ui/ThemeSwitcher.tsx
  * @description Componente de cliente que permite al usuario cambiar entre
- *              los temas claro, oscuro y el predeterminado del sistema.
- *              Utiliza `next-themes` para la gestión del estado del tema y es
- *              completamente internacionalizado.
+ *              los temas. Ha sido refactorizado para consumir el namespace
+ *              de i18n canónico.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 1.1.0
  */
 "use client";
 
@@ -23,18 +22,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-/**
- * @public
- * @component ThemeSwitcher
- * @description Renderiza un botón con un menú desplegable para cambiar el tema.
- *              El icono del botón cambia dinámicamente para reflejar el tema actual,
- *              utilizando una técnica de CSS puro con clases `dark:` para una
- *              transición fluida y sin JavaScript.
- * @returns {React.ReactElement}
- */
 export function ThemeSwitcher(): React.ReactElement {
   const { setTheme } = useTheme();
-  const t = useTranslations("ThemeSwitcher");
+  const t = useTranslations("components.ui.ThemeSwitcher");
 
   return (
     <DropdownMenu>
@@ -59,18 +49,13 @@ export function ThemeSwitcher(): React.ReactElement {
     </DropdownMenu>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Funcionalidad de Tema**: ((Implementada)) Este nuevo aparato proporciona la funcionalidad central para la experiencia de tema dual (claro/oscuro), una pieza clave de la nueva visión de diseño.
- * 2. **Full Internacionalización**: ((Implementada)) Todos los textos, incluyendo el `aria-label` para accesibilidad, son consumidos desde la capa de `next-intl`.
- *
- * @subsection Melhorias Futuras
- * 1. **Indicador de Tema Activo**: ((Vigente)) Añadir un indicador visual (ej. un icono de `Check`) en el `DropdownMenuItem` que corresponda al tema actualmente activo (`theme` de `useTheme()`) para mejorar el feedback al usuario.
+ * 1. **Resolución de `IntlError`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para usar el namespace canónico, eliminando el error de mensaje faltante.
  *
  * =====================================================================
  */

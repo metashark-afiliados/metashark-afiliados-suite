@@ -4,11 +4,14 @@
  * @description Componente de presentación 100% puro que renderiza las acciones de
  *              gestión de un workspace. Es completamente agnóstico al estado,
  *              recibiendo los flags de permisos y los callbacks a través de props.
+ *              Ha sido validado contra la nueva arquitectura de i18n.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
-import { FileEdit, PlusCircle, Settings, Trash2, UserPlus } from "lucide-react";
+"use client";
+
 import React from "react";
+import { FileEdit, PlusCircle, Settings, Trash2, UserPlus } from "lucide-react";
 
 import {
   CommandGroup,
@@ -36,7 +39,7 @@ export function WorkspaceActions({
   onSelectSettings,
   onSelectDelete,
 }: WorkspaceActionsProps): React.ReactElement {
-  const t = useTypedTranslations("WorkspaceSwitcher");
+  const t = useTypedTranslations("components.workspaces.WorkspaceSwitcher");
 
   return (
     <CommandGroup>
@@ -81,11 +84,11 @@ export function WorkspaceActions({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Puro y Desacoplado**: ((Implementada)) Se ha eliminado la dependencia del `useWorkspaceContext`. El componente es ahora 100% controlado por props, lo que aumenta su reutilización y testabilidad.
- * 2. **Funcionalidad Extendida**: ((Implementada)) Se ha añadido la opción "Renombrar" (`onSelectRename`), completando el conjunto de acciones de gestión.
+ * 1. **Sincronización de i18n**: ((Implementada)) Se ha validado que el componente consume el namespace canónico `"components.workspaces.WorkspaceSwitcher"`, alineándose con la infraestructura de i18n refactorizada y resolviendo el error de tipo `TS2345`.
+ * 2. **Componente Puro y Desacoplado**: ((Vigente)) El componente es 100% controlado por props, lo que aumenta su reutilización y testabilidad.
  *
  * @subsection Melhorias Futuras
- * 1. **Renderizado Declarativo**: ((Vigente)) La lista de acciones podría ser definida como un array de objetos de configuración, permitiendo que el componente se renderice a través de un `.map()` para un código más declarativo.
+ * 1. **Renderizado Declarativo**: ((Vigente)) La lista de acciones podría ser definida como un array de objetos de configuración y renderizada a través de un `.map()` para un código más declarativo y fácil de extender.
  *
  * =====================================================================
  */

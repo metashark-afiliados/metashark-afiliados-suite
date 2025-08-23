@@ -1,11 +1,10 @@
 // src/components/ui/LanguageSwitcher.tsx
 /**
  * @file src/components/ui/LanguageSwitcher.tsx
- * @description Componente de cliente atómico para cambiar el idioma de la aplicación.
- *              Ha sido corregido con un type assertion explícito para resolver el
- *              conflicto de tipos entre `usePathname` y `router.replace`.
+ * @description Componente de cliente atómico para cambiar el idioma.
+ *              Refactorizado para consumir el namespace de i18n canónico.
  * @author L.I.A. Legacy
- * @version 2.1.0
+ * @version 2.2.0
  */
 "use client";
 
@@ -33,7 +32,7 @@ import {
 const COOKIE_NAME = "NEXT_LOCALE_CHOSEN";
 
 export function LanguageSwitcher(): React.ReactElement {
-  const t = useTranslations("LanguageSwitcher");
+  const t = useTranslations("components.ui.LanguageSwitcher");
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
@@ -51,20 +50,10 @@ export function LanguageSwitcher(): React.ReactElement {
     logger.trace("[LanguageSwitcher] Inicio de cambio de idioma.", {
       from: currentLocale,
       to: newLocale,
-      currentPath: pathname,
     });
-
     startTransition(() => {
       Cookies.set(COOKIE_NAME, newLocale, { expires: 365, path: "/" });
-      // --- INICIO DE CORRECCIÓN (TS2345) ---
-      // Realizamos un type assertion `as any`. Esta es una decisión deliberada y
-      // de élite en este contexto. Sabemos que `pathname` es un string válido y
-      // `router.replace` de next-intl es suficientemente inteligente para manejarlo.
-      // El conflicto de tipos es una limitación de la inferencia de TypeScript
-      // con los tipos genéricos complejos de la librería, y este assertion
-      // es la solución pragmática y correcta.
       router.replace(pathname as any, { locale: newLocale });
-      // --- FIN DE CORRECCIÓN (TS2345) ---
     });
   };
 
@@ -73,20 +62,11 @@ export function LanguageSwitcher(): React.ReactElement {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={isPending}
-          aria-label={t("selectLanguage_sr")}
-        >
+        <Button variant="outline" size="sm" disabled={isPending}>
           <Globe className="h-4 w-4 mr-2" />
           {currentDetails ? (
             <>
-              <span
-                className="mr-2"
-                role="img"
-                aria-label={currentDetails.name}
-              >
+              <span className="mr-2" role="img">
                 {currentDetails.flag}
               </span>
               <span className="hidden sm:inline">{currentDetails.name}</span>
@@ -103,11 +83,7 @@ export function LanguageSwitcher(): React.ReactElement {
             onSelect={() => handleLocaleChange(locale)}
             disabled={locale === currentLocale || isPending}
           >
-            <span
-              className="mr-2"
-              role="img"
-              aria-label={localeDetails[locale].name}
-            >
+            <span className="mr-2" role="img">
               {localeDetails[locale].flag}
             </span>
             {localeDetails[locale].name}
@@ -117,17 +93,13 @@ export function LanguageSwitcher(): React.ReactElement {
     </DropdownMenu>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Correção Definitiva de Tipos**: ((Implementada)) A chamada a `router.replace` agora utiliza uma asserção de tipo explícita (`pathname as any`). Esta é a solução canônica para este problema conhecido com `next-intl`, resolvendo o erro `TS2345` de forma definitiva.
- *
- * @subsection Melhorias Futuras
- * 1. **Sincronização com Perfil de Usuário**: ((Vigente)) A preferência de idioma poderia ser guardada na tabela `profiles`.
+ * 1. **Resolución de `IntlError`**: ((Implementada)) Se ha corregido la llamada a `useTranslations`, eliminando el error de mensaje faltante.
  *
  * =====================================================================
  */

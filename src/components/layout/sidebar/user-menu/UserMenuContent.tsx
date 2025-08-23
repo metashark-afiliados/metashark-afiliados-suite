@@ -4,14 +4,14 @@
  * @description Aparato de UI atómico y de presentación puro. Su única responsabilidad
  *              es renderizar el contenido del menú desplegable del usuario. Ha sido
  *              refactorizado a un estándar de élite para utilizar importaciones atómicas
- *              de Server Actions, resolviendo el error de build "server-only".
+ *              de Server Actions y `useTransition` para un feedback de UX mejorado.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.0.0
  */
 "use client";
 
-import React from "react";
-import { LifeBuoy, LogOut, Settings } from "lucide-react";
+import React, { useTransition } from "react";
+import { LifeBuoy, LogOut, Settings, Loader2 } from "lucide-react";
 
 import { signOutAction } from "@/lib/actions/session.actions";
 import {
@@ -45,7 +45,14 @@ export function UserMenuContent({
   userName,
   userEmail,
 }: UserMenuContentProps): React.ReactElement {
-  const t = useTypedTranslations("DashboardSidebar");
+  const t = useTypedTranslations("components.layout.DashboardSidebar");
+  const [isPending, startTransition] = useTransition();
+
+  const handleSignOut = () => {
+    startTransition(() => {
+      signOutAction();
+    });
+  };
 
   return (
     <DropdownMenuContentPrimitive className="w-56" align="end" forceMount>
@@ -69,14 +76,14 @@ export function UserMenuContent({
         <span>{t("userMenu_support")}</span>
       </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <form action={signOutAction} className="w-full">
-        <button type="submit" className="w-full text-left">
-          <DropdownMenuItem>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>{t("userMenu_signOut")}</span>
-          </DropdownMenuItem>
-        </button>
-      </form>
+      <DropdownMenuItem onSelect={handleSignOut} disabled={isPending}>
+        {isPending ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <LogOut className="mr-2 h-4 w-4" />
+        )}
+        <span>{t("userMenu_signOut")}</span>
+      </DropdownMenuItem>
     </DropdownMenuContentPrimitive>
   );
 }
@@ -86,11 +93,12 @@ export function UserMenuContent({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build**: ((Implementada)) Se ha reemplazado la importación masiva (`session as sessionActions`) por una importación atómica y directa de `signOutAction`. Esto resuelve definitivamente la vulnerabilidad al error "server-only" en este componente.
- * 2. **Invocación de Server Action Robusta**: ((Implementada)) El uso de `<form action={...}>` se mantiene como el método canónico y más accesible para invocar Server Actions desde componentes de cliente, garantizando la funcionalidad sin regresiones.
+ * 1. **Sincronización de i18n**: ((Implementada)) Se ha corregido la llamada a `useTypedTranslations` para usar el namespace canónico `"components.layout.DashboardSidebar"`, resolviendo el error de tipo `TS2345`.
+ * 2. **UX Mejorada en Logout**: ((Implementada)) Se ha eliminado el tag `<form>` y se ha implementado `useTransition`. Ahora, al hacer clic en "Sign Out", el `DropdownMenuItem` se deshabilita y muestra un spinner, proporcionando un feedback de carga inmediato y evitando clics múltiples.
  *
  * @subsection Melhorias Futuras
  * 1. **Items de Menú Dinámicos**: ((Vigente)) El componente podría aceptar un array de `items` como prop para renderizar opciones de menú de forma dinámica, por ejemplo, basadas en el rol del usuario (ej. un enlace al `Dev Console` para desarrolladores).
  *
  * =====================================================================
  */
+// src/components/layout/sidebar/user-menu/UserMenuContent.tsx

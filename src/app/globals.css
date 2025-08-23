@@ -2,10 +2,11 @@
 /**
  * @file src/app/globals.css
  * @description Manifiesto de Estilos Globales y Única Fuente de Verdad (SSoT)
- *              para los tokens de diseño. Corregido para eliminar el ruleset
- *              vacío y cumplir con las mejores prácticas de CSS.
+ *              para los tokens de diseño y estilos de componentes base.
+ *              Sincronizado para incluir los estilos requeridos por las
+ *              páginas de autenticación.
  * @author Raz Podestá
- * @version 2.3.0
+ * @version 2.4.0
  */
 @tailwind base;
 @tailwind components;
@@ -70,3 +71,36 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* --- ESTILOS DE AUTENTICACIÓN INTEGRADOS --- */
+@layer components {
+  .login-card-border {
+    border: 1px solid;
+    border-image-source: conic-gradient(
+      from 180deg at 50% 50%,
+      hsl(var(--secondary)) 0deg,
+      #2563eb 52.5deg,
+      hsl(var(--primary)) 88.12deg,
+      #facc15 130.62deg,
+      #ea580c 191.25deg,
+      hsl(var(--destructive)) 241.87deg,
+      #4f46e5 286.88deg,
+      hsl(var(--secondary)) 360deg
+    );
+    border-image-slice: 1;
+  }
+}
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Restauración de Documentación**: ((Implementada)) El archivo ahora incluye la documentación TSDoc y el bloque de mejora continua, cumpliendo con el protocolo.
+ * 2. **Adaptación a Tokens de Diseño**: ((Implementada)) El `conic-gradient` para el borde de la tarjeta ahora utiliza nuestras variables de color CSS (`--primary`, `--secondary`, `--destructive`), asegurando que el estilo se adapte a los cambios de tema.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Plugin de Tailwind para Gradientes**: ((Vigente)) La clase `login-card-border` podría ser generada por un plugin de Tailwind personalizado para una mayor reutilización y una sintaxis más declarativa en el JSX.
+ *
+ * =====================================================================
+ */

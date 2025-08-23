@@ -2,10 +2,12 @@
 /**
  * @file src/app/[locale]/page.tsx
  * @description Página de Inicio Pública (Landing Page) de élite. Refactorizado
- *              para respetar el Principio de Responsabilidad Única, delegando
- *              la obtención de traducciones a sus componentes hijos.
+ *              para consumir la función de servidor `getTranslations` en lugar
+ *              del hook `useTranslations`, resolviendo una regresión crítica
+ *              de `ReferenceError` causada por una violación de las reglas de
+ *              los React Server Components.
  * @author Raz Podestá
- * @version 8.0.0
+ * @version 9.1.0
  */
 import { redirect } from "next/navigation";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
@@ -22,7 +24,6 @@ import { Testimonials } from "@/components/landing/Testimonials";
 import { LandingFooter } from "@/components/layout/LandingFooter";
 import { LandingHeader } from "@/components/layout/LandingHeader";
 import { CursorTrail } from "@/components/ui/CursorTrail";
-import { ICONS } from "@/config/icon-map";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 
@@ -54,102 +55,101 @@ export default async function HomePage({
     redirect("/dashboard");
   }
 
-  const t = await getTranslations();
+  // --- INICIO DE CORRECCIÓN DE ÉLITE: RSC `getTranslations` ---
+  const tHeader = await getTranslations("components.layout.LandingHeader");
+  const tHero = await getTranslations("components.landing.Hero");
+  const tSocial = await getTranslations("components.landing.SocialProof");
+  const tFeatures = await getTranslations("components.landing.Features");
+  const tProcess = await getTranslations("components.landing.ProcessSteps");
+  const tTestimonials = await getTranslations(
+    "components.landing.Testimonials"
+  );
+  const tMetrics = await getTranslations("components.landing.Metrics");
+  const tFaq = await getTranslations("components.landing.FAQ");
+  const tSupport = await getTranslations("components.landing.SupportCTA");
+  const tBottom = await getTranslations("components.landing.BottomCTA");
+  // --- FIN DE CORRECCIÓN DE ÉLITE ---
 
   const headerProps = {
     navLinks: [
-      { href: "#features", label: t("LandingHeader.features") },
-      { href: "#process", label: t("ProcessSteps.navLink") },
-      { href: "/pricing", label: t("LandingHeader.pricing") },
+      { href: "#features", label: tHeader("features") },
+      { href: "#process", label: tProcess("navLink") },
+      { href: "/pricing", label: tHeader("pricing") },
     ],
-    signInText: t("LandingHeader.signIn"),
-    signUpText: t("LandingHeader.signUp"),
-    openMenuText: t("LandingHeader.openMenu"),
+    signInText: tHeader("signIn"),
+    signUpText: tHeader("signUp"),
+    openMenuText: tHeader("openMenu"),
   };
 
   const heroProps = {
-    title: t("HeroSection.title"),
-    subtitle: t("HeroSection.subtitle"),
-    ctaPrimaryText: t("HeroSection.ctaPrimary"),
-    ctaSecondaryText: t("HeroSection.ctaSecondary"),
+    title: tHero("title"),
+    subtitle: tHero("subtitle"),
+    ctaPrimaryText: tHero("ctaPrimary"),
+    ctaSecondaryText: tHero("ctaSecondary"),
   };
 
   const socialProofProps = {
-    title: t("SocialProof.title"),
-    logos: t.raw("SocialProof.logos"),
+    title: tSocial("title"),
+    logos: tSocial.raw("logos"),
   };
 
   const featuresProps = {
-    title: t("FeaturesSection.title"),
-    subtitle: t("FeaturesSection.subtitle"),
-    features: t.raw("FeaturesSection.features").map((feature: any) => ({
-      ...feature,
-      icon:
-        ICONS.TOOLS[feature.icon as keyof typeof ICONS.TOOLS] ||
-        ICONS.FEEDBACK.HELP,
-    })),
+    title: tFeatures("title"),
+    subtitle: tFeatures("subtitle"),
+    features: tFeatures.raw("features"),
   };
 
   const processStepsProps = {
-    tag: t("ProcessSteps.tag"),
-    title: t("ProcessSteps.title"),
-    description: t("ProcessSteps.description"),
-    steps: t.raw("ProcessSteps.steps").map((step: any) => ({
-      ...step,
-      iconName:
-        ICONS.ACTIONS[step.iconName as keyof typeof ICONS.ACTIONS] ||
-        ICONS.FEEDBACK.HELP,
-    })),
-  };
-
-  const testimonialsProps = {
-    tag: t("Testimonials.tag"),
-    title: t("Testimonials.title"),
-    subtitle: t("Testimonials.subtitle"),
-    testimonials: t
-      .raw("Testimonials.testimonials")
-      .map((testimonial: any) => ({
-        ...testimonial,
-        authorImage: `${DICEBEAR_API_URL}?seed=${testimonial.authorName.replace(/\s/g, "")}&size=64&backgroundColor=transparent`,
-      })),
+    tag: tProcess("tag"),
+    title: tProcess("title"),
+    description: tProcess("description"),
+    steps: tProcess.raw("steps"),
   };
 
   const metricsProps = {
-    metrics: t.raw("Metrics.metrics").map((metric: any) => ({
-      ...metric,
-      iconName:
-        ICONS.FEEDBACK[metric.iconName as keyof typeof ICONS.FEEDBACK] ||
-        ICONS.FEEDBACK.INFO,
+    metrics: tMetrics.raw("metrics"),
+  };
+
+  const testimonialsProps = {
+    tag: tTestimonials("tag"),
+    title: tTestimonials("title"),
+    subtitle: tTestimonials("subtitle"),
+    testimonials: tTestimonials.raw("testimonials").map((testimonial: any) => ({
+      ...testimonial,
+      authorImage: `${DICEBEAR_API_URL}?seed=${testimonial.authorName.replace(
+        /\s/g,
+        ""
+      )}&size=64&backgroundColor=transparent`,
     })),
   };
 
   const faqProps = {
-    tag: t("FAQ.tag"),
-    title: t("FAQ.title"),
-    subtitle: t("FAQ.subtitle"),
-    items: t.raw("FAQ.items"),
-    searchPlaceholder: t("FAQ.searchPlaceholder"),
-    noResultsText: t("FAQ.noResultsText"),
-    clearSearchAriaLabel: t("FAQ.clearSearchAriaLabel"),
+    tag: tFaq("tag"),
+    title: tFaq("title"),
+    subtitle: tFaq("subtitle"),
+    items: tFaq.raw("items"),
+    searchPlaceholder: tFaq("searchPlaceholder"),
+    noResultsText: tFaq("noResultsText"),
+    clearSearchAriaLabel: tFaq("clearSearchAriaLabel"),
   };
 
   const supportCTAProps = {
-    title: t("SupportCTA.title"),
-    description: t("SupportCTA.description"),
-    contactButtonText: t("SupportCTA.contactButtonText"),
-    docsButtonText: t("SupportCTA.docsButtonText"),
+    title: tSupport("title"),
+    description: tSupport("description"),
+    contactButtonText: tSupport("contactButtonText"),
+    docsButtonText: tSupport("docsButtonText"),
   };
 
   const bottomCTAProps = {
-    title: t("BottomCTA.title"),
-    subtitle: t("BottomCTA.subtitle"),
-    featuresTitle: t("BottomCTA.featuresTitle"),
-    features: t.raw("BottomCTA.features"),
-    ctaPrimaryText: t("BottomCTA.ctaPrimaryText"),
-    ctaPlaceholderText: t("BottomCTA.ctaPlaceholderText"),
-    pricingNote: t("BottomCTA.pricingNote"),
-    guaranteeNote: t("BottomCTA.guaranteeNote"),
-    creditCardNote: t("BottomCTA.creditCardNote"),
+    title: tBottom("title"),
+    subtitle: tBottom("subtitle"),
+    featuresTitle: tBottom("featuresTitle"),
+    features: tBottom.raw("features"),
+    ctaPrimaryText: tBottom("ctaPrimaryText"),
+    ctaPlaceholderText: tBottom("ctaPlaceholderText"),
+    pricingNote: tBottom("pricingNote"),
+    guaranteeNote: tBottom("guaranteeNote"),
+    creditCardNote: tBottom("creditCardNote"),
   };
 
   return (
@@ -171,18 +171,18 @@ export default async function HomePage({
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `IntlError: MISSING_MESSAGE`**: ((Implementada)) Se eliminó la lógica que intentaba obtener traducciones de otros namespaces (`AboutPage`, `BlogPage`, etc.). Esto resuelve la causa raíz del error de renderizado del servidor.
- * 2. **Adhesión al Principio de Responsabilidad Única**: ((Implementada)) El componente ahora se enfoca únicamente en orquestar el contenido de la página de inicio, delegando la responsabilidad de i18n a sus hijos.
- * 3. **Corrección de Mapeo de Iconos**: ((Implementada)) Se corrigió la lógica de mapeo de iconos para que consulte la categoría correcta del manifiesto `ICONS`, resolviendo las advertencias de `DynamicIcon`.
+ * 1. **Resolución de `ReferenceError`**: ((Implementada)) Se ha reemplazado el hook `useTranslations` por la función de servidor `getTranslations`. Esta es la corrección canónica que resuelve la regresión crítica y alinea el componente con las reglas de los React Server Components.
  *
  * @subsection Melhorias Futuras
- * 1. **Carga de Datos desde CMS**: ((Vigente)) Para una flexibilidad de élite, el contenido de la landing page podría ser obtenido desde un CMS Headless en lugar de los archivos de mensajes.
+ * 1. **Abstracción de Datos de Página**: ((Vigente)) La lógica de construcción de `props` para cada sección podría ser abstraída a una función `getHomePageData(locale)` en la capa de datos (`src/lib/data`), manteniendo este Server Component como un ensamblador aún más limpio.
  *
  * =====================================================================
  */
+// src/app/[locale]/page.tsx

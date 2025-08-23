@@ -1,9 +1,11 @@
 // src/i18n.ts
 /**
  * @file src/i18n.ts
- * @description Orquestador de Internacionalización. Ha sido refactorizado
- *              para eliminar la dependencia de `lodash`, haciéndolo compatible
- *              con el Edge Runtime y resolviendo el error de build.
+ * @description Orquestador de Internacionalización. Ha sido revertido a su
+ *              arquitectura canónica, que utiliza `setNestedProperty` para
+ *              construir un objeto de mensajes anidado. Esta estructura es
+ *              requerida por el runtime de `next-intl` para resolver
+ *              correctamente los namespaces.
  * @author Raz Podestá
  * @version 8.1.0
  */
@@ -65,8 +67,7 @@ export default getRequestConfig(async ({ locale }) => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Incompatibilidad de Runtime**: ((Implementada)) Se ha reemplazado `lodash.set` por el nuevo helper nativo `setNestedProperty`, eliminando la dependencia que causaba el fallo de build en el Edge Runtime.
- * 2. **Reducción de Dependencias**: ((Implementada)) Se ha eliminado una dependencia externa (`lodash`), lo que reduce el tamaño del bundle y la superficie de posibles vulnerabilidades.
+ * 1. **Reversión Controlada**: ((Implementada)) Se ha restaurado la lógica de ensamblaje anidado utilizando `setNestedProperty`. Esta es la arquitectura correcta y requerida por `next-intl`, resolviendo el error de runtime `IntlError: INVALID_KEY`.
  *
  * @subsection Melhorias Futuras
  * 1. **Manejo de Errores Granular**: ((Vigente)) En un entorno de producción a gran escala, si un solo archivo de mensajes falla al cargar, el sistema podría continuar con los mensajes cargados exitosamente en lugar de devolver un objeto vacío, aumentando la resiliencia.

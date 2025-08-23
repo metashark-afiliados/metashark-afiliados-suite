@@ -1,3 +1,4 @@
+
 {
   "en-US": {
     "app_title": "ConvertiKit",
@@ -9,6 +10,7 @@
     "mySites": "My Sites",
     "liaChat": "L.I.A. Chat",
     "settings": "Settings",
+    "iconLibrary": "Icon Library",
     "devConsole": "Dev Console",
     "userMenu_accountSettings": "Account Settings",
     "userMenu_support": "Support",
@@ -24,6 +26,7 @@
     "mySites": "Mis Sitios",
     "liaChat": "Chat L.I.A.",
     "settings": "Ajustes",
+    "iconLibrary": "Biblioteca de Iconos",
     "devConsole": "Dev Console",
     "userMenu_accountSettings": "Ajustes de Cuenta",
     "userMenu_support": "Soporte",
@@ -39,6 +42,7 @@
     "mySites": "Meus Sites",
     "liaChat": "Chat L.I.A.",
     "settings": "Configurações",
+    "iconLibrary": "Biblioteca de Ícones",
     "devConsole": "Console Dev",
     "userMenu_accountSettings": "Configurações da Conta",
     "userMenu_support": "Suporte",

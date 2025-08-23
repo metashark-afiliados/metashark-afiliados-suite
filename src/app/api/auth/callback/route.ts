@@ -2,48 +2,60 @@
 /**
  * @file src/app/api/auth/callback/route.ts
  * @description Route Handler de élite para el callback de autenticación. Ha sido
- *              refactorizado para establecer la cookie `active_workspace_id`
- *              después del primer login, garantizando una redirección fluida
- *              y sin interrupciones al dashboard.
+ *              refactorizado con una lógica de sondeo resiliente para eliminar la
+ *              condición de carrera entre la creación de la sesión y la ejecución
+ *              del trigger de la base de datos, garantizando un onboarding robusto.
  * @author Raz Podestá
- * @version 4.0.0
+ * @version 5.0.0
  */
 import { type NextRequest, NextResponse } from "next/server";
+import { type User } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
+import { type Tables } from "@/lib/types/database";
 
-/**
- * @private
- * @function isValidRedirect
- * @description Valida que una ruta de redirección sea segura (interna).
- * @param {string} path - La ruta a validar.
- * @returns {boolean} `true` si la ruta es segura.
- */
 const isValidRedirect = (path: string): boolean => {
   return path.startsWith("/") && !path.startsWith("//") && !path.includes(":");
 };
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
- * @public
+ * @private
  * @async
- * @function GET
- * @description Maneja el callback de autenticación de Supabase. Intercambia el
- *              código por una sesión y, si es el primer login, establece el
- *              contexto del workspace activo.
- * @param {NextRequest} request - La petición entrante.
- * @returns {Promise<NextResponse>} Una redirección al dashboard o a una página de error.
+ * @function waitForProfile
+ * @description Sondea la tabla de perfiles hasta que se encuentre un perfil
+ *              para el usuario o se agoten los reintentos.
+ * @param {User} user - El objeto de usuario de Supabase.
+ * @returns {Promise<Tables<'profiles'> | null>} El perfil encontrado o null.
  */
+async function waitForProfile(user: User): Promise<Tables<"profiles"> | null> {
+  const supabase = createClient();
+  let attempts = 0;
+  while (attempts < 5) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+    if (profile) return profile;
+    attempts++;
+    logger.trace(
+      `[AuthCallback] Perfil para ${user.id} no encontrado (intento ${attempts}). Esperando 300ms...`
+    );
+    await delay(300);
+  }
+  return null;
+}
+
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next");
-
-  let redirectTo = new URL(`${origin}/dashboard`);
-  if (next && isValidRedirect(next)) {
-    redirectTo = new URL(`${origin}${next}`);
-    logger.trace(`[AuthCallback] Redirección segura validada para: ${next}`);
-  }
+  const next = searchParams.get("next") || "/dashboard";
+  const redirectTo = isValidRedirect(next)
+    ? new URL(`${origin}${next}`)
+    : new URL(`${origin}/dashboard`);
 
   if (code) {
     const supabase = createClient();
@@ -53,51 +65,42 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && session) {
-      logger.info(
-        "[AuthCallback] Intercambio de código exitoso. Sesión creada.",
-        { userId: session.user.id }
-      );
+      logger.info("[AuthCallback] Sesión creada. Esperando perfil...", {
+        userId: session.user.id,
+      });
 
-      // --- LÓGICA DE ÉLITE: ESTABLECER WORKSPACE ACTIVO EN PRIMER LOGIN ---
-      const { data: firstWorkspace, error: workspaceError } = await supabase
+      const profile = await waitForProfile(session.user);
+      if (!profile) {
+        logger.error(
+          `[AuthCallback] INCONSISTENCIA CRÍTICA: Perfil para ${session.user.id} no fue creado por el trigger a tiempo.`
+        );
+        await supabase.auth.signOut();
+        const errorUrl = new URL(`${origin}/login`);
+        errorUrl.searchParams.set("error", "true");
+        errorUrl.searchParams.set("message", "error_profile_creation_failed");
+        return NextResponse.redirect(errorUrl);
+      }
+
+      const { data: firstWorkspace } = await supabase
         .from("workspaces")
         .select("id")
         .eq("owner_id", session.user.id)
         .limit(1)
         .single();
 
-      if (workspaceError) {
-        logger.error(
-          `[AuthCallback] Error crítico: no se pudo obtener el workspace inicial para el usuario ${session.user.id}`,
-          workspaceError
-        );
-        // Continuar a pesar del error para no bloquear al usuario.
-      } else if (firstWorkspace) {
-        logger.info(
-          `[AuthCallback] Workspace inicial encontrado. Estableciendo cookie active_workspace_id.`,
-          { workspaceId: firstWorkspace.id }
-        );
-        const response = NextResponse.redirect(redirectTo);
+      const response = NextResponse.redirect(redirectTo);
+      if (firstWorkspace) {
         response.cookies.set("active_workspace_id", firstWorkspace.id, {
           path: "/",
           httpOnly: true,
           sameSite: "lax",
         });
-        return response;
       }
-      // --- FIN DE LÓGICA DE ÉLITE ---
-
-      return NextResponse.redirect(redirectTo);
-    }
-
-    if (error) {
-      logger.error("[AuthCallback] Error en exchangeCodeForSession.", {
-        error: error.message,
-      });
+      return response;
     }
   }
 
-  const errorUrl = new URL(`${origin}/auth/login`);
+  const errorUrl = new URL(`${origin}/login`);
   errorUrl.searchParams.set("error", "true");
   errorUrl.searchParams.set("message", "error_oauth_failed");
   return NextResponse.redirect(errorUrl);
@@ -109,12 +112,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Flujo de Usuario Sin Fricciones**: ((Implementada)) La nueva lógica consulta y establece la cookie `active_workspace_id` en el primer inicio de sesión. Esto elimina la necesidad de una página intermedia y lleva al usuario directamente a un dashboard funcional.
- * 2. **Resiliencia**: ((Implementada)) El código maneja el caso en que la consulta del workspace falle, permitiendo que la redirección continúe para no bloquear al usuario.
- * 3. **Observabilidad Completa**: ((Implementada)) Se han añadido logs detallados para cada paso del proceso, incluyendo la creación de la cookie.
+ * 1. **Resolución de Condición de Carrera**: ((Implementada)) Se ha introducido la función `waitForProfile` que sondea la base de datos, eliminando la causa raíz del fallo de redirección al garantizar que el perfil del usuario exista antes de continuar. Esto resuelve el error `error_profile_creation_failed`.
+ * 2. **Resiliencia Mejorada**: ((Implementada)) Si el perfil no se crea después de los reintentos, se cierra la sesión (`signOut`) y se redirige al usuario con un mensaje de error claro, evitando estados de sesión corruptos.
+ * 3. **Full Observabilidad**: ((Implementada)) Se ha añadido `logger.trace` para monitorear los intentos de sondeo y `logger.error` para el caso de fallo crítico, proporcionando visibilidad completa del flujo.
  *
  * @subsection Melhorias Futuras
- * 1. **Validación de `next` con Lista Blanca**: ((Vigente)) Para una seguridad máxima, la ruta `next` debería ser validada contra una lista blanca de rutas permitidas de la aplicación, en lugar de solo una validación de formato.
+ * 1. **Sondeo Exponencial (Exponential Backoff)**: ((Vigente)) Para una resiliencia de élite, el `delay` podría aumentar exponencialmente en cada reintento (ej. 100ms, 200ms, 400ms), lo que puede ser más eficiente bajo alta carga.
+ * 2. **Webhooks de Supabase**: ((Vigente)) La solución definitiva y de máximo rendimiento sería utilizar un webhook de Supabase. El trigger de la base de datos podría llamar a una Edge Function que emita un evento (ej. a través de Supabase Realtime o Vercel KV) cuando el perfil esté listo, y el `callback` podría esperar ese evento en lugar de sondear.
  *
  * =====================================================================
  */
+// src/app/api/auth/callback/route.ts

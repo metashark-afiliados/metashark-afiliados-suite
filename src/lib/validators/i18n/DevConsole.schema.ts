@@ -2,8 +2,9 @@
 /**
  * @file DevConsole.schema.ts
  * @description Define el contrato de datos para el namespace 'DevConsole'.
+ *              Sincronizado para incluir la nueva clave de descripción.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 1.1.0
  */
 import { z } from "zod";
 
@@ -15,6 +16,7 @@ export const DevConsoleSchema = z.object({
       role: z.string(),
       actions: z.string(),
     }),
+    table_description: z.string(),
     search_placeholder: z.string(),
     clear_search_aria: z.string(),
     table_empty_state: z.string(),
@@ -63,6 +65,12 @@ export const DevConsoleSchema = z.object({
     empty_state: z.string(),
     dialog_title_geo: z.string(),
     dialog_title_utms: z.string(),
+    pagination: z.object({
+      // <-- Añadido para consistencia
+      previousPageLabel: z.string(),
+      nextPageLabel: z.string(),
+      pageLabelTemplate: z.string(),
+    }),
   }),
 });
 
@@ -71,7 +79,8 @@ export const DevConsoleSchema = z.object({
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad**: ((Implementada)) Schema aislado para su namespace.
+ * 1. **Sincronización de Contrato**: ((Implementada)) Se ha añadido `table_description` al schema, garantizando la integridad del contrato de i18n.
+ * 2. **Consistencia de Schema**: ((Implementada)) Se añadió el objeto `pagination` a `TelemetryTable` para que coincida con la estructura de las otras tablas.
  * =====================================================================
  */
 // src/lib/validators/i18n/DevConsole.schema.ts

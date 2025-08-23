@@ -1,11 +1,10 @@
 // src/app/[locale]/dev-console/users/users-client.tsx
 /**
  * @file users-client.tsx
- * @description Orquestador de UI de élite y de presentación puro. Consume el
- *              hook soberano `useUsersPage` y ensambla los componentes atómicos
- *              para construir la página de Gestión de Usuarios.
+ * @description Orquestador de UI de élite. Ha sido refactorizado para componer
+ *              el nuevo aparato atómico `UsersPageHeader`, mejorando el SRP.
  * @author Raz Podestá
- * @version 5.0.0
+ * @version 6.0.0
  */
 "use client";
 
@@ -16,8 +15,8 @@ import { useUsersPage } from "@/lib/hooks/useUsersPage";
 import { type UserProfilesWithEmail } from "@/lib/types/database/views";
 import { DataTable } from "@/components/shared/data-table";
 import { PaginationControls } from "@/components/shared/pagination-controls";
-import { SearchInput } from "@/components/ui/SearchInput";
-import { getUsersColumns } from "./../components/users-table-columns";
+import { getUsersColumns } from "../components/users-table-columns";
+import { UsersPageHeader } from "./components/UsersPageHeader";
 
 type ProfileRow = UserProfilesWithEmail["Row"];
 
@@ -40,7 +39,6 @@ export function UsersClient({
   const { isPending, searchTerm, setSearchTerm, handleRoleChange } =
     useUsersPage({ initialSearchQuery: searchQuery });
 
-  // La definición de columnas se obtiene de la factoría atómica.
   const columns = React.useMemo(
     () => getUsersColumns({ t, isPending, handleRoleChange }),
     [t, isPending, handleRoleChange]
@@ -48,21 +46,14 @@ export function UsersClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{t("table_header.email")}</h1>
-          <p className="text-muted-foreground">
-            Manage all users on the platform.
-          </p>
-        </div>
-        <SearchInput
-          placeholder={t("search_placeholder")}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          clearAriaLabel={t("clear_search_aria")}
-          className="w-full sm:max-w-xs"
-        />
-      </div>
+      <UsersPageHeader
+        title={t("table_header.email")}
+        description={t("table_description")}
+        searchPlaceholder={t("search_placeholder")}
+        searchValue={searchTerm}
+        onSearchChange={(e) => setSearchTerm(e.target.value)}
+        clearSearchAriaLabel={t("clear_search_aria")}
+      />
       <DataTable
         columns={columns}
         data={profiles}
@@ -89,11 +80,11 @@ export function UsersClient({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Hiper-Atomicidad (SRP)**: ((Implementada)) La lógica de definición de columnas ha sido abstraída a la factoría `getUsersColumns`, haciendo que este componente sea un orquestador de UI aún más puro y simple.
- * 2. **Consistencia Arquitectónica**: ((Implementada)) Al adoptar el patrón de factoría de columnas, este módulo ahora es arquitectónicamente consistente con el módulo de `Campaigns`, mejorando la predictibilidad de la base de código.
+ * 1. **Hiper-Atomicidad (SRP)**: ((Implementada)) La lógica de presentación del encabezado ha sido abstraída, haciendo que este componente sea un orquestador de UI aún más puro.
+ * 2. **Internacionalización Corregida**: ((Implementada)) El texto de descripción ahora se consume desde la capa de i18n, eliminando un texto codificado.
  *
  * @subsection Melhorias Futuras
- * 1. **Abstracción del Header**: ((Vigente)) El JSX para el header de la página (título, descripción y `SearchInput`) podría ser extraído a su propio componente atómico `UsersPageHeader.tsx` para una atomicidad máxima.
+ * 1. **Abstracción de `DataTable`**: ((Vigente)) La composición de `DataTable` y `PaginationControls` es un patrón repetido. Podría abstraerse a un componente `PaginatedDataTable` para una mayor reutilización.
  *
  * =====================================================================
  */
