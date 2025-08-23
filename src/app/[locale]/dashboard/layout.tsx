@@ -41,6 +41,7 @@ export default async function DashboardLayout({
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
         </div>
+        {/* --- INYECCIÓN DE CAPA DE UI GLOBAL --- */}
         <GlobalOverlays />
       </div>
     </DashboardContextProviders>
@@ -53,12 +54,11 @@ export default async function DashboardLayout({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (Ensamblador Puro)**: ((Implementada)) El layout ha sido deconstruido en aparatos atómicos con responsabilidades únicas (`loader`, `providers`, `overlays`), cumpliendo la directiva al más alto nivel. El `DashboardLayout` ahora es un ensamblador puro y de alta legibilidad.
- * 2. **Visión Holística 360°**: ((Implementada)) La nueva estructura cohesiva demuestra una visión completa del flujo de datos, desde la obtención en el `loader` hasta la provisión en los `ContextProviders` y el consumo en los `GlobalOverlays` y `children`. No hay regresiones funcionales; toda la lógica del original se ha preservado y organizado mejor.
+ * 1. **Integración de Capa de UI Global**: ((Implementada)) Se ha añadido el componente `<GlobalOverlays />` al layout. Este cambio crítico inyecta el `AuthDialog` y otros componentes modales en el árbol de la aplicación, haciéndolos funcionalmente disponibles en todo el entorno autenticado.
+ * 2. **Atomicidad Radical (Ensamblador Puro)**: ((Vigente)) El `DashboardLayout` mantiene su rol de ensamblador puro, componiendo aparatos atómicos con responsabilidades únicas.
  *
  * @subsection Melhorias Futuras
  * 1. **Layouts Anidados Dinámicos**: ((Vigente)) Para futuras secciones del dashboard con estructuras diferentes (ej. un layout de ancho completo para un editor), se podría implementar una lógica para que `getLayoutData` también devuelva un `layoutType` que este componente usaría para renderizar condicionalmente diferentes estructuras de `div`.
  *
  * =====================================================================
  */
-// src/app/[locale]/dashboard/layout.tsx

@@ -15,7 +15,7 @@ import { useAuthModalStore } from "@/lib/hooks/ui/useAuthModalStore";
 import { clientLogger } from "@/lib/logging";
 import { AuthFooter } from "./AuthFooter";
 import { LoginForm } from "./LoginForm";
-// import { SignUpForm } from './SignUpForm'; // Se añadirá en un futuro aparato
+import { SignUpForm } from "./SignUpForm";
 
 /**
  * @public
@@ -47,14 +47,7 @@ export function AuthDialog(): React.ReactElement {
           <DialogDescription>{subtitle}</DialogDescription>
         </DialogHeader>
         <div className="px-6 py-4">
-          {/* Renderizado condicional del formulario */}
-          {
-            isLoginView ? (
-              <LoginForm />
-            ) : (
-              <LoginForm />
-            ) /* Placeholder para SignUpForm */
-          }
+          {isLoginView ? <LoginForm /> : <SignUpForm />}
         </div>
         <AuthFooter type={view} onSwitchView={switchView} />
       </DialogContent>
@@ -69,14 +62,11 @@ export function AuthDialog(): React.ReactElement {
  *
  * @subsection Melhorias Adicionadas
  * 1. **Arquitectura Desacoplada**: ((Implementada)) El componente se suscribe al store de Zustand, eliminando la necesidad de `prop drilling` y permitiendo un control global del estado del modal.
- * 2. **Renderizado Condicional**: ((Implementada)) La lógica para mostrar el título y subtítulo correctos (login vs. signup) está centralizada aquí, basada en el estado del store.
- * 3. **Composición Atómica (LEGO)**: ((Implementada)) Actúa como un ensamblador puro, componiendo los aparatos atómicos `LoginForm` y `AuthFooter` en una unidad funcional cohesiva.
+ * 2. **Renderizado Condicional**: ((Implementada)) La lógica para mostrar el contenido correcto (login vs. signup) está centralizada aquí, basada en el estado del store.
  *
  * @subsection Melhorias Futuras
- * 1. **Carga Dinámica de Formularios**: ((Vigente)) Para una optimización de rendimiento de élite, los componentes `LoginForm` y `SignUpForm` pueden ser cargados dinámicamente con `React.lazy` o `next/dynamic`. Esto aseguraría que el código JavaScript para los formularios solo se cargue cuando el usuario abra el modal, reduciendo el tamaño del bundle inicial de la página.
- * 2. **Transiciones de Vista Animadas**: ((Vigente)) Al cambiar entre la vista de `login` y `signup`, se podría utilizar `framer-motion` con `AnimatePresence` para crear una transición animada suave (ej. un fundido o un deslizamiento lateral) entre los formularios, mejorando la calidad percibida de la UI.
- * 3. **Contexto de Invocación**: ((Vigente)) El store `useAuthModalStore` podría ser extendido para aceptar un payload opcional (ej. `openModal('login', { title: 'Tu sesión ha expirado' })`). Este componente podría leer ese payload y sobrescribir los títulos por defecto para proporcionar un feedback más contextual al usuario.
+ * 1. **Carga Dinámica de Formularios**: ((Vigente)) Para una optimización de rendimiento de élite, los componentes `LoginForm` y `SignUpForm` pueden ser cargados dinámicamente con `React.lazy` o `next/dynamic`.
+ * 2. **Transiciones de Vista Animadas**: ((Vigente)) Al cambiar entre la vista de `login` y `signup`, se podría utilizar `framer-motion` con `AnimatePresence` para crear una transición animada suave.
  *
  * =====================================================================
  */
-// src/components/auth/AuthDialog.tsx

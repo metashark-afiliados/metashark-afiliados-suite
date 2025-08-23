@@ -2,10 +2,11 @@
 /**
  * @file tests/mocks/index.ts
  * @description El Cerebro de la Simulación y SSoT para todos los mocks globales.
- *              Ha sido blindado con tipos explícitos en el mock de Zustand para
- *              garantizar una seguridad de tipos completa.
+ *              Ha sido blindado con un mock para `React.cache` para garantizar la
+ *              compatibilidad del entorno de pruebas de Vitest con la capa de datos
+ *              que utiliza React Server Components APIs.
  * @author L.I.A. Legacy
- * @version 8.1.0
+ * @version 9.0.0
  */
 import { vi } from "vitest";
 import { create } from "zustand";
@@ -15,10 +16,24 @@ import { setupNavigationMock } from "./navigation.mock";
 import { setupNextIntlMock } from "./next-intl.mock";
 import { setupSupabaseMock } from "./supabase.mock";
 
+// --- INICIO DE CORRECCIÓN DE INFRAESTRUCTURA: Mock de React.cache ---
+vi.mock("react", async (importOriginal) => {
+  const actualReact = await importOriginal<typeof import("react")>();
+  return {
+    ...actualReact,
+    cache: (fn: any) => fn, // Simulación simple: devuelve la función original
+  };
+});
+
+// Mock para next/cache que también usa React.cache internamente
+vi.mock("next/cache", () => ({
+  unstable_cache: (fn: any) => fn,
+}));
+// --- FIN DE CORRECCIÓN DE INFRAESTRUCTURA ---
+
 export const mockOpenModal = vi.fn();
 export const mockSetTheme = vi.fn();
 
-// --- Mock de Zustand de Alta Fidelidad y Autocontenido ---
 type AuthModalView = "login" | "signup";
 interface MockAuthModalState {
   isOpen: boolean;
@@ -31,20 +46,17 @@ interface MockAuthModalState {
 const useMockAuthModalStore = create<MockAuthModalState>((set) => ({
   isOpen: false,
   view: "login",
-  // --- INICIO DE CORRECCIÓN DE TIPO ---
   openModal: vi.fn((view: AuthModalView) => {
     mockOpenModal(view);
     set({ isOpen: true, view });
   }),
   closeModal: vi.fn(() => set({ isOpen: false })),
   switchView: vi.fn((view: AuthModalView) => set({ view })),
-  // --- FIN DE CORRECCIÓN DE TIPO ---
 }));
 
 vi.mock("@/lib/hooks/ui/useAuthModalStore", () => ({
   useAuthModalStore: useMockAuthModalStore,
 }));
-// --- Fin del Mock de Zustand ---
 
 vi.mock("next-themes", () => ({
   useTheme: () => ({ setTheme: mockSetTheme, theme: "dark" }),
@@ -71,12 +83,6 @@ vi.mock("react-hot-toast", () => ({
 
 vi.mock("server-only", () => ({}));
 
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-  revalidateTag: vi.fn(),
-  cache: (fn: any) => fn,
-}));
-
 export const setupGlobalMocks = () => {
   setupNextIntlMock();
   setupNavigationMock();
@@ -90,8 +96,7 @@ export const setupGlobalMocks = () => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Seguridad de Tipos Completa**: ((Implementada)) ((Vigente)) Se han añadido tipos explícitos a los parámetros de las acciones del mock de Zustand, resolviendo el error `TS7006` y garantizando el cumplimiento de la regla `noImplicitAny`.
+ * 1. **Resolución de Error de Infraestructura**: ((Implementada)) El mock para `React.cache` y `next/cache` resuelve el `TypeError` fundamental, estabilizando el entorno de pruebas para toda la capa de datos.
  *
  * =====================================================================
  */
-// tests/mocks/index.ts

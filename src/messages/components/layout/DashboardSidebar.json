@@ -1,5 +1,7 @@
 {
   "en-US": {
+    "app_title": "ConvertiKit",
+    "app_description": "AI-Powered Affiliate Marketing SaaS Platform.",
     "brand_name": "ConvertiKit",
     "logo_alt_text": "ConvertiKit Logo",
     "logo_aria_label": "Go to dashboard homepage",
@@ -13,6 +15,8 @@
     "userMenu_signOut": "Sign Out"
   },
   "es-ES": {
+    "app_title": "ConvertiKit",
+    "app_description": "Plataforma SaaS para Marketing de Afiliados impulsada por IA.",
     "brand_name": "ConvertiKit",
     "logo_alt_text": "Logo de ConvertiKit",
     "logo_aria_label": "Ir a la página principal del dashboard",
@@ -26,6 +30,8 @@
     "userMenu_signOut": "Cerrar Sesión"
   },
   "pt-BR": {
+    "app_title": "ConvertiKit",
+    "app_description": "Plataforma SaaS de Marketing de Afiliados com IA.",
     "brand_name": "ConvertiKit",
     "logo_alt_text": "Logo da ConvertiKit",
     "logo_aria_label": "Ir para a página principal do painel",

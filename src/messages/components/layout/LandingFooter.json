@@ -1,31 +1,78 @@
 
 {
   "en-US": {
+    "brand_name": "ConvertiKit",
+    "logo_alt_text": "ConvertiKit Logo",
     "slogan": "Your strategic co-pilot for affiliate marketing.",
     "product": "Product",
     "company": "Company",
     "stayUpdated": "Stay Updated",
     "newsletterPrompt": "Join our newsletter for the latest news and tips.",
     "subscribe": "Subscribe",
-    "allRightsReserved": "© {year} ConvertiKit. All rights reserved."
+    "placeholder_email": "Enter your email...",
+    "allRightsReserved": "© {year} ConvertiKit. All rights reserved.",
+    "productLinks": {
+      "features": "Features",
+      "process": "How it Works",
+      "pricing": "Pricing"
+    },
+    "companyLinks": {
+      "about": "About Us",
+      "blog": "Blog"
+    },
+    "legalLinks": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    }
   },
   "es-ES": {
+    "brand_name": "ConvertiKit",
+    "logo_alt_text": "Logo de ConvertiKit",
     "slogan": "Tu copiloto estratégico para el marketing de afiliados.",
     "product": "Producto",
     "company": "Compañía",
     "stayUpdated": "Mantente Actualizado",
     "newsletterPrompt": "Únete a nuestro boletín para recibir las últimas noticias y consejos.",
     "subscribe": "Suscribirse",
-    "allRightsReserved": "© {year} ConvertiKit. Todos los derechos reservados."
+    "placeholder_email": "Introduce tu email...",
+    "allRightsReserved": "© {year} ConvertiKit. Todos los derechos reservados.",
+    "productLinks": {
+      "features": "Características",
+      "process": "Cómo Funciona",
+      "pricing": "Precios"
+    },
+    "companyLinks": {
+      "about": "Sobre Nosotros",
+      "blog": "Blog"
+    },
+    "legalLinks": {
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio"
+    }
   },
   "pt-BR": {
+    "brand_name": "ConvertiKit",
+    "logo_alt_text": "Logo da ConvertiKit",
     "slogan": "Seu copiloto estratégico para marketing de afiliados.",
     "product": "Produto",
     "company": "Empresa",
     "stayUpdated": "Mantenha-se Atualizado",
     "newsletterPrompt": "Junte-se à nossa newsletter para receber as últimas notícias e dicas.",
     "subscribe": "Inscrever-se",
-    "allRightsReserved": "© {year} ConvertiKit. Todos os direitos reservados."
+    "placeholder_email": "Digite seu e-mail...",
+    "allRightsReserved": "© {year} ConvertiKit. Todos os direitos reservados.",
+    "productLinks": {
+      "features": "Recursos",
+      "process": "Como Funciona",
+      "pricing": "Preços"
+    },
+    "companyLinks": {
+      "about": "Sobre Nós",
+      "blog": "Blog"
+    },
+    "legalLinks": {
+      "privacy": "Política de Privacidade",
+      "terms": "Termos de Serviço"
+    }
   }
 }
-

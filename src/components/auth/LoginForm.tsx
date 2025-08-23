@@ -2,10 +2,11 @@
 /**
  * @file src/components/auth/LoginForm.tsx
  * @description Componente de cliente que encapsula la UI de autenticación.
- *              Ha sido corregido para consumir las claves de i18n desde los
- *              namespaces correctos, resolviendo un error de mensaje faltante.
+ *              Ha sido refactorizado a un estándar de élite para componer el
+ *              aparato atómico `OAuthButton`, mejorando la reutilización y la
+ *              separación de responsabilidades.
  * @author Raz Podestá
- * @version 5.1.0
+ * @version 5.0.0
  */
 "use client";
 
@@ -40,7 +41,7 @@ function SubmitButton() {
 export function LoginForm(): React.ReactElement {
   const tSupabase = useTranslations("SupabaseAuthUI");
   const tLogin = useTranslations("LoginPage");
-  const tForm = useTranslations("LoginForm"); // <-- CORRECCIÓN: Namespace añadido
+  const tForm = useTranslations("LoginForm");
   const searchParams = useSearchParams();
   const oauthError = searchParams.get("error");
   const oauthMessageKey = searchParams.get("message");
@@ -83,7 +84,6 @@ export function LoginForm(): React.ReactElement {
             id="password"
             name="password"
             type="password"
-            defaultValue="password"
             required
             className="mt-1"
           />
@@ -97,7 +97,7 @@ export function LoginForm(): React.ReactElement {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-card px-2 text-muted-foreground">
-            {tForm("signInWith")} {/* <-- CORRECCIÓN: Namespace corregido */}
+            {tForm("signInWith")}
           </span>
         </div>
       </div>
@@ -112,11 +112,12 @@ export function LoginForm(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Corrección de Namespace I18n**: ((Implementada)) Se ha añadido la carga del namespace `LoginForm` y se ha corregido la llamada `t()` para usarlo. Esto resuelve el error de `MISSING_MESSAGE` y restaura la UI a su estado funcional completo.
+ * 1. **Composición Atómica**: ((Implementada)) El componente ahora consume el nuevo `OAuthButton`, eliminando la lógica y el marcado de OAuth duplicados. Esto mejora la cohesión y el principio DRY.
+ * 2. **Separación de Responsabilidades (SRP)**: ((Implementada)) `LoginForm` ya no necesita saber sobre `signInWithOAuthAction`. Su única responsabilidad es la autenticación por email/contraseña y ensamblar otros componentes de autenticación.
  *
  * @subsection Melhorias Futuras
  * 1. **Múltiples Proveedores OAuth**: ((Vigente)) Se podría renderizar dinámicamente una lista de `<OAuthButton />` basada en una configuración.
+ * 2. **Enlace "Olvidé mi contraseña"**: ((Vigente)) Añadir un `SmartLink` debajo del campo de contraseña que redirija a `/forgot-password`.
  *
  * =====================================================================
  */
-// src/components/auth/LoginForm.tsx

@@ -2,10 +2,10 @@
 /**
  * @file src/components/layout/LandingHeader.tsx
  * @description Componente de presentación puro que renderiza el encabezado para las
- *              páginas públicas. Refactorizado a un estándar de élite para invocar
- *              el flujo de autenticación modal en lugar de navegar a páginas obsoletas.
+ *              páginas públicas. Refactorizado a un estándar de élite para aplicar
+ *              el branding canónico y microinteracciones a los botones de acción.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 3.1.0
  */
 "use client";
 
@@ -29,15 +29,6 @@ export interface LandingHeaderProps {
   openMenuText: string;
 }
 
-/**
- * @public
- * @component LandingHeader
- * @description Orquestador de UI para el encabezado de la página de inicio.
- *              Gestiona la navegación, el cambio de tema/idioma y dispara el
- *              modal de autenticación global.
- * @param {LandingHeaderProps} props - Propiedades para configurar el encabezado.
- * @returns {React.ReactElement}
- */
 export function LandingHeader({
   navLinks,
   signInText,
@@ -47,18 +38,10 @@ export function LandingHeader({
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const { openModal } = useAuthModalStore();
 
-  /**
-   * @private
-   * @function handleAuthAction
-   * @description Centraliza la lógica para abrir el modal de autenticación,
-   *              registrando el evento y cerrando el menú móvil si está abierto.
-   * @param {'login' | 'signup'} view - La vista del modal a abrir.
-   */
   const handleAuthAction = (view: "login" | "signup") => {
-    clientLogger.info(
-      `[LandingHeader] Intento de autenticación iniciado desde el header.`,
-      { view }
-    );
+    clientLogger.info(`[LandingHeader] Intento de autenticación iniciado.`, {
+      view,
+    });
     openModal(view);
     setIsSheetOpen(false);
   };
@@ -98,7 +81,10 @@ export function LandingHeader({
             <Button variant="ghost" onClick={() => handleAuthAction("login")}>
               {signInText}
             </Button>
-            <Button onClick={() => handleAuthAction("signup")}>
+            <Button
+              onClick={() => handleAuthAction("signup")}
+              className="transition-transform hover:scale-105 hover:shadow-lg hover:shadow-primary/30"
+            >
               {signUpText}
             </Button>
           </div>
@@ -156,20 +142,18 @@ export function LandingHeader({
     </header>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Integración de Flujo Modal**: ((Implementada)) ((Vigente)) Los botones de autenticación ahora invocan `useAuthModalStore.openModal` en lugar de navegar directamente, cumpliendo los requisitos de la Fase III del roadmap.
- * 2. **Full Observabilidad del Embudo**: ((Implementada)) ((Vigente)) Se ha añadido `clientLogger.info` a `handleAuthAction` para rastrear el inicio del embudo de conversión de usuarios.
- * 3. **Mejora de UX Móvil**: ((Implementada)) ((Vigente)) La acción de autenticación ahora cierra automáticamente el menú móvil, proporcionando una experiencia de usuario fluida.
+ * 1. **Alineación con Branding**: ((Implementada)) El botón "Sign Up" ahora utiliza la variante `default` (implícita), que consume `bg-primary`, alineándose con el manifiesto de branding. El botón "Sign In" utiliza `variant="ghost"`, estableciendo una clara jerarquía visual.
+ * 2. **Feedback Visual (Microinteracciones)**: ((Implementada)) Se han añadido clases de `hover` al CTA primario para proporcionar un feedback de interactividad claro y una sensación de mayor calidad.
+ * 3. **Consistencia y No Regresión**: ((Implementada)) Todas las funcionalidades, incluyendo la navegación, la apertura de modales y el menú móvil, se han preservado intactas. El componente sigue siendo un presentador puro.
  *
  * @subsection Melhorias Futuras
- * 1. **Menú Móvil Atómico (`MobileMenu.tsx`)**: ((Pendiente)) La lógica del `<Sheet>` podría ser extraída a su propio componente atómico para una máxima granularidad y reutilización, aunque la implementación actual es robusta.
+ * 1. **Animación con Framer Motion**: ((Vigente)) Para una UX de élite, los botones podrían ser envueltos en `<motion.button>` para añadir animaciones más sofisticadas en el estado `whileHover`.
  *
  * =====================================================================
  */
-// src/components/layout/LandingHeader.tsx

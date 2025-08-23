@@ -4,7 +4,7 @@
  * @description Manifiesto de Importación Dinámica. SSoT para el registro de
  *              todos los archivos de mensajes de i18n.
  * @author L.I.A. Legacy
- * @version 11.0.0
+ * @version 12.0.0
  */
 import { type ManifestModule } from "./types";
 
@@ -32,7 +32,6 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./app/[locale]/dev-console/TelemetryTable.json"),
   "app.dev-console.UserManagementTable": () =>
     import("./app/[locale]/dev-console/UserManagementTable.json"),
-  AuthLayout: () => import("./app/[locale]/auth/layout.json"),
   AuthFooter: () => import("./components/auth/AuthFooter.json"),
   LoginForm: () => import("./components/auth/LoginForm.json"),
   OAuthButton: () => import("./components/auth/OAuthButton.json"),
@@ -48,8 +47,6 @@ export const messagesManifest: Record<string, ManifestModule> = {
   EmojiPicker: () => import("./components/ui/EmojiPicker.json"),
   InvitationBell: () => import("./components/dashboard/InvitationBell.json"),
   LiaChatWidget: () => import("./components/feedback/LiaChatWidget.json"),
-  LoginPage: () => import("./app/[locale]/auth/login/page.json"),
-  SignUpPage: () => import("./app/[locale]/auth/signup/page.json"),
   SiteAssignmentControl: () =>
     import("./components/builder/SiteAssignmentControl.json"),
   SitesPage: () => import("./app/[locale]/dashboard/sites/page.json"),
@@ -85,12 +82,11 @@ export const messagesManifest: Record<string, ManifestModule> = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Entrega de Aparato Completo**: ((Implementada)) ((Vigente)) Se entrega la versión completa del archivo, sin abreviaciones.
- * 2. **Sincronización de i18n**: ((Implementada)) ((Vigente)) El manifiesto ahora registra todos los namespaces necesarios, incluyendo los del flujo de registro, completando la infraestructura de i18n.
+ * 1. **Resolución de Error de Build**: ((Implementada)) Se han eliminado las referencias a `AuthLayout`, `LoginPage` y `SignUpPage`, que apuntaban a archivos de mensajes inexistentes. Esta es la corrección directa del error `Module not found`.
+ * 2. **Sincronización Arquitectónica**: ((Implementada)) El manifiesto ahora refleja el estado real y canónico del proyecto después de la "Operación Autenticación Modal", eliminando la deuda técnica.
  *
  * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Pendiente)) Este archivo sigue siendo un candidato ideal para ser generado y mantenido por un script (`pnpm gen:i18n:manifest`) que lea la estructura del directorio, eliminando la necesidad de actualizaciones manuales y previniendo errores de omisión.
+ * 1. **Generación Automática**: ((Vigente)) Este archivo sigue siendo un candidato ideal para ser generado y mantenido por el script `pnpm gen:i18n:manifest` para prevenir futuras desincronizaciones.
  *
  * =====================================================================
  */
-// src/messages/manifest.ts

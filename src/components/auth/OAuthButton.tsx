@@ -58,7 +58,7 @@ export function OAuthButton({
 
   if (!details) {
     clientLogger.error(`[OAuthButton] Proveedor no soportado: ${provider}`);
-    return <></>; // No renderizar nada si el proveedor no está configurado
+    return <></>;
   }
 
   const { icon: Icon, name } = details;
@@ -88,4 +88,3 @@ export function OAuthButton({
  *
  * =====================================================================
  */
-// src/components/auth/OAuthButton.tsx

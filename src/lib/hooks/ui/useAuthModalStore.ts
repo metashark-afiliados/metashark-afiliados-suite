@@ -79,14 +79,11 @@ export const useAuthModalStore = create<AuthModalState & AuthModalActions>(
  *
  * @subsection Melhorias Adicionadas
  * 1. **Estado Global Desacoplado**: ((Implementada)) Este store proporciona una solución de élite para gestionar el estado de una UI global, permitiendo que cualquier componente invoque el modal sin acoplamiento directo.
- * 2. **Gestión de Vistas de Modal**: ((Implementada)) El store centraliza toda la lógica de estado del modal (visibilidad y vista activa) en un único lugar.
- * 3. **Full Observabilidad**: ((Implementada)) Todas las acciones de mutación de estado son registradas con `clientLogger` para una depuración y trazabilidad completas.
- * 4. **Organización Arquitectónica**: ((Implementada)) El aparato ha sido reubicado en `src/lib/hooks/ui/` para una mayor cohesión de la estructura de archivos.
+ * 2. **Full Observabilidad**: ((Implementada)) Todas las acciones de mutación de estado son registradas con `clientLogger` para una depuración y trazabilidad completas.
  *
  * @subsection Melhorias Futuras
  * 1. **Manejo de Estado de Carga/Error**: ((Vigente)) El store podría expandirse para mantener un estado `isLoading` o `errorMessage` para el proceso de autenticación.
- * 2. **Persistencia de URL de Redirección (`next`)**: ((Vigente)) El store podría almacenar el parámetro `next` de la URL.
+ * 2. **Persistencia de URL de Redirección (`next`)**: ((Vigente)) El store podría almacenar el parámetro `next` de la URL para redirigir al usuario a su destino original después de un inicio de sesión exitoso.
  *
  * =====================================================================
  */
-// src/lib/hooks/ui/useAuthModalStore.ts

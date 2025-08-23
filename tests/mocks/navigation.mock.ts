@@ -39,15 +39,3 @@ export const setupNavigationMock = () => {
     ...mockedImplementation,
   }));
 };
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Spy Exportable Consistente**: ((Implementada)) ((Vigente)) Se exporta `redirectSpy` de forma consistente para ser consumido por cualquier arnés de pruebas.
- *
- * =====================================================================
- */
-// tests/mocks/navigation.mock.ts

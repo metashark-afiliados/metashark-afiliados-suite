@@ -57,19 +57,16 @@ describe("Componente Orquestador: LandingHeader", () => {
     expect(mockOpenModal).toHaveBeenCalledWith("signup");
   });
 });
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Validación de Contrato**: ((Implementada)) ((Vigente)) Las aserciones ahora validan que se llame a `mockOpenModal`, confirmando que el `LandingHeader` se integra correctamente con el nuevo sistema de estado global.
- * 2. **No Regresión**: ((Implementada)) ((Vigente)) La prueba de renderizado de enlaces de navegación se mantiene, asegurando que la refactorización no rompió la funcionalidad existente.
+ * 1. **Validación de Contrato**: ((Implementada)) Las aserciones validan que se llame a `mockOpenModal`, confirmando que el `LandingHeader` se integra correctamente con el sistema de estado global.
  *
  * @subsection Melhorias Futuras
- * 1. **Pruebas de Menú Móvil**: ((Pendiente)) Añadir pruebas específicas para simular un clic en el `SheetTrigger` y verificar que el menú móvil (`SheetContent`) se abre y contiene los botones que también invocan `openModal`.
+ * 1. **Pruebas de Menú Móvil**: ((Vigente)) Añadir pruebas específicas para simular un clic en el `SheetTrigger` y verificar que el menú móvil se abre y sus botones también invocan `openModal`.
  *
  * =====================================================================
  */
-// tests/unit/components/layout/LandingHeader.test.tsx

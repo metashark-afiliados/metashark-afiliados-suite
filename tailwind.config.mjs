@@ -1,22 +1,19 @@
 // tailwind.config.mjs
 /**
  * @file tailwind.config.mjs
- * @description Configuración canónica y de élite de Tailwind CSS. Ha sido
- *              nivelado para consumir la Única Fuente de Verdad desde
- *              `src/app/globals.css`, alineándose con la arquitectura de
- *              Tailwind CSS v4.1 y garantizando una consistencia de diseño
- *              absoluta.
+ * @description Configuración canónica y de élite de Tailwind CSS v3.
+ *              Esta es la Única Fuente de Verdad (SSoT) para todos los tokens
+ *              de diseño y plugins activos. Ha sido depurado para eliminar
+ *              dependencias no utilizadas.
  * @author Raz Podestá
- * @version 8.0.0
+ * @version 8.2.0
  */
 import aspectRatio from "@tailwindcss/aspect-ratio";
-import containerQueries from "@tailwindcss/container-queries";
 import forms from "@tailwindcss/forms";
 import typography from "@tailwindcss/typography";
 import scrollbarHide from "tailwind-scrollbar-hide";
 import tailwindcssAnimate from "tailwindcss-animate";
 import debugScreens from "tailwindcss-debug-screens";
-import radixPlugin from "tailwindcss-radix";
 import defaultTheme from "tailwindcss/defaultTheme";
 
 /** @type {import('tailwindcss').Config} */
@@ -26,39 +23,38 @@ const config = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--color-border) / <alpha-value>)",
-        input: "hsl(var(--color-input) / <alpha-value>)",
-        ring: "hsl(var(--color-ring) / <alpha-value>)",
-        background: "hsl(var(--color-background) / <alpha-value>)",
-        foreground: "hsl(var(--color-foreground) / <alpha-value>)",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--color-primary) / <alpha-value>)",
-          foreground: "hsl(var(--color-primary-foreground) / <alpha-value>)",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--color-secondary) / <alpha-value>)",
-          foreground: "hsl(var(--color-secondary-foreground) / <alpha-value>)",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
-          DEFAULT: "hsl(var(--color-destructive) / <alpha-value>)",
-          foreground:
-            "hsl(var(--color-destructive-foreground) / <alpha-value>)",
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "hsl(var(--color-muted) / <alpha-value>)",
-          foreground: "hsl(var(--color-muted-foreground) / <alpha-value>)",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--color-accent) / <alpha-value>)",
-          foreground: "hsl(var(--color-accent-foreground) / <alpha-value>)",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
-          DEFAULT: "hsl(var(--color-popover) / <alpha-value>)",
-          foreground: "hsl(var(--color-popover-foreground) / <alpha-value>)",
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "hsl(var(--color-card) / <alpha-value>)",
-          foreground: "hsl(var(--color-card-foreground) / <alpha-value>)",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
       },
       borderRadius: {
@@ -90,27 +86,9 @@ const config = {
     typography,
     forms,
     aspectRatio,
-    containerQueries,
-    radixPlugin,
     scrollbarHide,
     process.env.NODE_ENV === "development" ? debugScreens : {},
   ],
 };
 
 export default config;
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica Definitiva**: ((Implementada)) Se ha refactorizado la sección `theme.extend.colors` para que consuma las variables CSS definidas en `globals.css`. Esta es la corrección fundamental que resuelve el blocker de compilación.
- * 2. **Cero Regresiones de Plugins**: ((Implementada)) Se ha preservado intacta toda la configuración de `plugins` del archivo original.
- *
- * @subsection Melhorias Futuras
- * 1. **Plugin de Tema Programático**: ((Vigente)) La lógica para generar esta sección `colors` podría ser abstraída a un plugin local de Tailwind para un enfoque aún más DRY.
- *
- * =====================================================================
- */
-// tailwind.config.mjs

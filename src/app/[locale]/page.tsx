@@ -1,12 +1,11 @@
 // src/app/[locale]/page.tsx
 /**
  * @file src/app/[locale]/page.tsx
- * @description Página de Inicio Pública (Landing Page) de élite. Este Server Component
- *              orquesta la obtención de todo el contenido de la UI desde la capa de
- *              internacionalización. Ha sido refactorizado para consumir la SSoT
- *              canónica de íconos (`ICONS`), resolviendo un error de compilación crítico.
+ * @description Página de Inicio Pública (Landing Page) de élite. Refactorizado
+ *              para respetar el Principio de Responsabilidad Única, delegando
+ *              la obtención de traducciones a sus componentes hijos.
  * @author Raz Podestá
- * @version 7.0.0
+ * @version 8.0.0
  */
 import { redirect } from "next/navigation";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
@@ -31,14 +30,6 @@ const DICEBEAR_API_URL =
   process.env.NEXT_PUBLIC_DICEBEAR_API_URL ||
   "https://api.dicebear.com/7.x/personas/svg";
 
-/**
- * @public
- * @async
- * @page HomePage
- * @description Orquesta y ensambla la landing page completa.
- * @param {object} props - Propiedades de la página, incluyendo `params`.
- * @returns {Promise<JSX.Element>} El componente de la página de inicio renderizado.
- */
 export default async function HomePage({
   params: { locale },
 }: {
@@ -64,8 +55,6 @@ export default async function HomePage({
   }
 
   const t = await getTranslations();
-
-  // --- Construcción de Props para Componentes Hijos ---
 
   const headerProps = {
     navLinks: [
@@ -163,31 +152,6 @@ export default async function HomePage({
     creditCardNote: t("BottomCTA.creditCardNote"),
   };
 
-  const footerProps = {
-    slogan: t("LandingFooter.slogan"),
-    productColumnTitle: t("LandingFooter.product"),
-    companyColumnTitle: t("LandingFooter.company"),
-    productLinks: [
-      { href: "#features", label: t("LandingHeader.features") },
-      { href: "#process", label: t("ProcessSteps.navLink") },
-      { href: "/pricing", label: t("LandingHeader.pricing") },
-    ],
-    companyLinks: [
-      { href: "/about", label: t("AboutPage.hero.title") },
-      { href: "/blog", label: t("BlogPage.hero.title") },
-    ],
-    legalLinks: [
-      { href: "/privacy", label: t("PrivacyPolicyPage.title") },
-      { href: "/terms", label: t("TermsOfServicePage.title") },
-    ],
-    newsletterTitle: t("LandingFooter.stayUpdated"),
-    newsletterPrompt: t("LandingFooter.newsletterPrompt"),
-    subscribeButtonText: t("LandingFooter.subscribe"),
-    allRightsReservedText: t("LandingFooter.allRightsReserved", {
-      year: new Date().getFullYear(),
-    }),
-  };
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <CursorTrail />
@@ -203,22 +167,22 @@ export default async function HomePage({
         <SupportCTA {...supportCTAProps} />
         <BottomCTA {...bottomCTAProps} />
       </main>
-      <LandingFooter {...footerProps} />
+      <LandingFooter />
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build (TS2305)**: ((Implementada)) Se ha eliminado la importación y el uso de la función obsoleta `getMappedIconName`. La lógica de construcción de props ahora consume directamente el manifiesto de íconos `ICONS`, resolviendo el error de compilación y alineando el componente con la SSoT canónica.
- * 2. **Mapeo Robusto de Íconos**: ((Implementada)) La nueva lógica de mapeo es más robusta. Busca la clave del ícono en la categoría semántica apropiada del objeto `ICONS` y proporciona un ícono de fallback (`HELP` o `INFO`) si la clave no se encuentra, previniendo errores de renderizado.
+ * 1. **Resolución de `IntlError: MISSING_MESSAGE`**: ((Implementada)) Se eliminó la lógica que intentaba obtener traducciones de otros namespaces (`AboutPage`, `BlogPage`, etc.). Esto resuelve la causa raíz del error de renderizado del servidor.
+ * 2. **Adhesión al Principio de Responsabilidad Única**: ((Implementada)) El componente ahora se enfoca únicamente en orquestar el contenido de la página de inicio, delegando la responsabilidad de i18n a sus hijos.
+ * 3. **Corrección de Mapeo de Iconos**: ((Implementada)) Se corrigió la lógica de mapeo de iconos para que consulte la categoría correcta del manifiesto `ICONS`, resolviendo las advertencias de `DynamicIcon`.
  *
  * @subsection Melhorias Futuras
- * 1. **Carga de Datos desde CMS**: ((Vigente)) Para una flexibilidad de élite, el contenido de la landing page (especialmente `features`, `testimonials`, `faq`) podría ser obtenido desde un CMS Headless en lugar de los archivos de mensajes, permitiendo al equipo de marketing actualizar el contenido sin necesidad de un despliegue de código.
+ * 1. **Carga de Datos desde CMS**: ((Vigente)) Para una flexibilidad de élite, el contenido de la landing page podría ser obtenido desde un CMS Headless en lugar de los archivos de mensajes.
  *
  * =====================================================================
  */

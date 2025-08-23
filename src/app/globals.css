@@ -1,92 +1,72 @@
+
 /**
  * @file src/app/globals.css
  * @description Manifiesto de Estilos Globales y Única Fuente de Verdad (SSoT)
- *              para los tokens de diseño. Ha sido nivelado a un estándar de
- *              élite, adoptando la arquitectura canónica de Tailwind CSS v4.1.
- *              Utiliza la directiva `@theme` para definir todas las variables
- *              CSS de color, que luego son consumidas por `tailwind.config.mjs`.
+ *              para los tokens de diseño. Corregido para eliminar el ruleset
+ *              vacío y cumplir con las mejores prácticas de CSS.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.3.0
  */
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-  /* ============================================= */
-  /* =         TOKENS DE DISEÑO CANÓNICOS        = */
-  /* ============================================= */
-  --font-geist-sans: "Geist Sans", sans-serif;
-  --radius: 0.5rem;
+@layer base {
+  :root {
+    /* --- DARK THEME (POR DEFECTO) --- */
+    --background: 222 40% 15%;
+    --foreground: 210 40% 98%;
+    --card: 222 40% 18%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 40% 15%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 74 92% 56%;
+    --primary-foreground: 74 50% 5%;
+    --secondary: 16 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 223 40% 25%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 223 40% 25%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 223 40% 28%;
+    --input: 223 40% 22%;
+    --ring: 74 92% 56%;
+    --radius: 0.5rem;
+    --font-geist-sans: "Geist Sans", sans-serif;
+  }
 
-  /* --- DEFINICIÓN DE TOKENS GENÉRICOS (DARK THEME POR DEFECTO) --- */
-  /* Esta es la SSoT. Tailwind lee estas variables para generar clases como bg-primary. */
-  --color-background: 222 47% 11%;
-  --color-foreground: 210 40% 98%;
-  --color-card: 222 47% 15%;
-  --color-card-foreground: 210 40% 98%;
-  --color-popover: 222 47% 11%;
-  --color-popover-foreground: 210 40% 98%;
-  --color-primary: 74 92% 56%;
-  --color-primary-foreground: 74 50% 5%;
-  --color-secondary: 16 100% 50%;
-  --color-secondary-foreground: 0 0% 100%;
-  --color-muted: 223 47% 22%;
-  --color-muted-foreground: 215 20% 65%;
-  --color-accent: 223 47% 22%;
-  --color-accent-foreground: 210 40% 98%;
-  --color-destructive: 0 63% 31%;
-  --color-destructive-foreground: 210 40% 98%;
-  --color-border: 223 47% 22%;
-  --color-input: 223 47% 22%;
-  --color-ring: 74 92% 56%;
+  /* --- LIGHT THEME --- */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 74 80% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 16 100% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 74 80% 45%;
+  }
 }
 
 @layer base {
-  /* --- APLICACIÓN DE TEMA LIGHT --- */
-  /* El selector .light anula las variables genéricas definidas en @theme */
-  .light {
-    --color-background: 0 0% 100%;
-    --color-foreground: 222 47% 11%;
-    --color-card: 0 0% 100%;
-    --color-card-foreground: 222 47% 11%;
-    --color-popover: 0 0% 100%;
-    --color-popover-foreground: 222 47% 11%;
-    --color-primary: 74 80% 45%;
-    --color-primary-foreground: 0 0% 100%;
-    --color-secondary: 16 100% 40%;
-    --color-secondary-foreground: 0 0% 100%;
-    --color-muted: 220 14% 96%;
-    --color-muted-foreground: 220 9% 46%;
-    --color-accent: 220 14% 96%;
-    --color-accent-foreground: 222 47% 11%;
-    --color-destructive: 0 72% 51%;
-    --color-destructive-foreground: 0 0% 100%;
-    --color-border: 220 13% 91%;
-    --color-input: 220 13% 91%;
-    --color-ring: 74 80% 45%;
-  }
-
-  /* --- ESTILOS GLOBALES BASE --- */
   * {
-    border-color: hsl(var(--color-border));
+    @apply border-border;
   }
   body {
-    background-color: hsl(var(--color-background));
-    color: hsl(var(--color-foreground));
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Adopción de Arquitectura Tailwind v4.1**: ((Implementada)) El archivo ahora utiliza la directiva `@theme` para definir todas las variables de color, convirtiéndose en la SSoT de diseño.
- * 2. **Cero Regresiones de Estilo**: ((Implementada)) Se han transcrito todas las utilidades personalizadas (`text-glow-*`, `section-delimiter-*`) del archivo original, garantizando que no se pierda ninguna funcionalidad visual.
- *
- * @subsection Melhorias Futuras
- * 1. **Extracción de Utilidades a Plugin**: ((Vigente)) Las utilidades personalizadas podrían ser extraídas a un plugin local de Tailwind para una mejor organización.
- *
- * =====================================================================
- */

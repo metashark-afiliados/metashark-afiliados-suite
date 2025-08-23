@@ -2,9 +2,10 @@
 /**
  * @file src/lib/validators/i18n.schema.ts
  * @description Manifiesto de Tipos y SSoT para el contrato de i18n. Ha sido
- *              actualizado para integrar el nuevo schema de `NotFoundPage`.
+ *              actualizado para eliminar las referencias a los schemas de las
+ *              páginas de autenticación obsoletas.
  * @author L.I.A. Legacy
- * @version 17.0.0
+ * @version 18.0.0
  */
 import { z } from "zod";
 
@@ -12,7 +13,7 @@ import { z } from "zod";
 import { AboutPageSchema } from "./i18n/AboutPage.schema";
 import { ActionDockSchema } from "./i18n/ActionDock.schema";
 import { AdminDashboardSchema } from "./i18n/AdminDashboard.schema";
-import { AuthLayoutSchema } from "./i18n/AuthLayout.schema";
+// import { AuthLayoutSchema } from "./i18n/AuthLayout.schema"; // Obsoleto
 import { AuthNoticePageSchema } from "./i18n/AuthNoticePage.schema";
 import { BlogPageSchema } from "./i18n/BlogPage.schema";
 import { BottomCTASchema } from "./i18n/BottomCTA.schema";
@@ -43,15 +44,15 @@ import { LandingsGalleryPageSchema } from "./i18n/LandingsGalleryPage.schema";
 import { LanguageSwitcherSchema } from "./i18n/LanguageSwitcher.schema";
 import { LegalNoticePageSchema } from "./i18n/LegalNoticePage.schema";
 import { LiaChatWidgetSchema } from "./i18n/LiaChatWidget.schema";
-import { LoginPageSchema } from "./i18n/LoginPage.schema";
+// import { LoginPageSchema } from "./i18n/LoginPage.schema"; // Obsoleto
 import { MetricsSchema } from "./i18n/Metrics.schema";
 import { NewsletterSchema } from "./i18n/Newsletter.schema";
-import { NotFoundPageSchema } from "./i18n/NotFoundPage.schema"; // <-- NUEVA IMPORTACIÓN
+import { NotFoundPageSchema } from "./i18n/NotFoundPage.schema";
 import { PrivacyPolicyPageSchema } from "./i18n/PrivacyPolicyPage.schema";
 import { ProcessStepsSchema } from "./i18n/ProcessSteps.schema";
 import { PublicSitePageSchema } from "./i18n/PublicSitePage.schema";
 import { ResetPasswordPageSchema } from "./i18n/ResetPasswordPage.schema";
-import { SignUpPageSchema } from "./i18n/SignUpPage.schema";
+// import { SignUpPageSchema } from "./i18n/SignUpPage.schema"; // Obsoleto
 import { SiteAssignmentControlSchema } from "./i18n/SiteAssignmentControl.schema";
 import { SitesPageSchema } from "./i18n/SitesPage.schema";
 import { SmartLinkSchema } from "./i18n/SmartLink.schema";
@@ -72,7 +73,7 @@ export const i18nSchema = z.object({
   AboutPage: AboutPageSchema,
   ActionDock: ActionDockSchema,
   AdminDashboard: AdminDashboardSchema,
-  AuthLayout: AuthLayoutSchema,
+  // AuthLayout: AuthLayoutSchema, // Obsoleto
   AuthNoticePage: AuthNoticePageSchema,
   BlogPage: BlogPageSchema,
   BottomCTA: BottomCTASchema,
@@ -103,15 +104,15 @@ export const i18nSchema = z.object({
   LanguageSwitcher: LanguageSwitcherSchema,
   LegalNoticePage: LegalNoticePageSchema,
   LiaChatWidget: LiaChatWidgetSchema,
-  LoginPage: LoginPageSchema,
+  // LoginPage: LoginPageSchema, // Obsoleto
   Metrics: MetricsSchema,
   Newsletter: NewsletterSchema,
-  "pages.NotFoundPage": NotFoundPageSchema, // <-- NUEVO NAMESPACE
+  "pages.NotFoundPage": NotFoundPageSchema,
   PrivacyPolicyPage: PrivacyPolicyPageSchema,
   ProcessSteps: ProcessStepsSchema,
   PublicSitePage: PublicSitePageSchema,
   ResetPasswordPage: ResetPasswordPageSchema,
-  SignUpPage: SignUpPageSchema,
+  // SignUpPage: SignUpPageSchema, // Obsoleto
   SiteAssignmentControl: SiteAssignmentControlSchema,
   SitesPage: SitesPageSchema,
   SmartLink: SmartLinkSchema,
@@ -137,8 +138,10 @@ export type MessagesType = z.infer<typeof i18nSchema>;
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Integración de Contrato**: ((Implementada)) El schema principal de i18n ahora integra `NotFoundPageSchema`, completando la definición de tipos para la página 404.
+ * 1. **Resolución de Dependencias Rotas**: ((Implementada)) Se han eliminado las referencias a `AuthLayoutSchema`, `LoginPageSchema`, y `SignUpPageSchema`, que ahora son schemas huérfanos. Esto previene futuros errores de compilación si esos archivos fueran eliminados.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Generación Automática**: ((Vigente)) Este archivo es un candidato ideal para ser generado por el script `pnpm gen:i18n:schema`, que leería el directorio `src/lib/validators/i18n` para construir las importaciones y el objeto Zod.
  *
  * =====================================================================
  */
-// src/lib/validators/i18n.schema.ts
