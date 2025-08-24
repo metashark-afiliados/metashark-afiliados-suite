@@ -1,27 +1,24 @@
 // src/app/[locale]/login/page.tsx
 /**
  * @file page.tsx
- * @description Página de inicio de sesión. Refactorizada a un Componente de
- *              Cliente para resolver el conflicto de renderizado dinámico
- *              durante el build estático.
+ * @description Página de inicio de sesión. Refactorizada para eliminar la llamada
+ *              a `unstable_setRequestLocale`, que es incompatible con Client
+ *              Components, resolviendo un error crítico de runtime.
  * @author Raz Podestá
- * @version 4.0.0
+ * @version 5.0.0
  */
-"use client"; // <-- DIRECTIVA CRÍTICA
+"use client";
 
 import { useTranslations } from "next-intl";
-import { unstable_setRequestLocale } from "next-intl/server"; // Aún se necesita para el locale
+// unstable_setRequestLocale ha sido eliminado.
 
 import { LoginForm } from "@/components/authentication/login-form";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 
-export default function LoginPage({
-  params: { locale },
-}: {
-  params: { locale: string };
-}): React.ReactElement {
-  unstable_setRequestLocale(locale); // Establece el locale para la página
+export default function LoginPage(): React.ReactElement {
+  // La llamada a unstable_setRequestLocale ha sido eliminada.
+  // El locale se obtiene del contexto provisto por el Root Layout.
   const t = useTranslations("pages.LoginPage");
   const tSignUp = useTranslations("pages.SignUpPage");
 
@@ -47,7 +44,11 @@ export default function LoginPage({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build**: ((Implementada)) La conversión a un Client Component resuelve el error de renderizado estático.
+ * 1. **Resolución de Error de Runtime**: ((Implementada)) Se ha eliminado la llamada a `unstable_setRequestLocale`, que es una API exclusiva para Server Components, resolviendo la causa raíz del fallo de despliegue en Vercel.
+ * 2. **Alineación Arquitectónica**: ((Implementada)) El componente ahora adhiere estrictamente a las reglas de los Client Components.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Paso de `locale` Explícito**: ((Vigente)) Aunque el contexto funciona, una práctica de élite aún más robusta sería que el `RootLayout` leyera los `params` y los pasara explícitamente a un proveedor de contexto, en lugar de que cada página lo haga. (Nota: Esto ya se está haciendo correctamente).
  *
  * =====================================================================
  */

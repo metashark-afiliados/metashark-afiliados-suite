@@ -5,7 +5,7 @@
  *              ESTE ARCHIVO ES GENERADO AUTOMÁTICAMENTE. NO LO EDITE MANUALMENTE.
  *              Ejecute 'pnpm gen:icons' para actualizarlo.
  * @author Script de Generación Automática
- * @version 2025-08-23T07:15:11.393Z
+ * @version 2025-08-24T14:52:10.411Z
  */
 import { z } from 'zod';
 
@@ -1521,3 +1521,5 @@ export const lucideIconNames = [
 ] as const;
 
 export const LucideIconNameSchema = z.enum(lucideIconNames);
+
+export type LucideIconName = z.infer<typeof LucideIconNameSchema>;

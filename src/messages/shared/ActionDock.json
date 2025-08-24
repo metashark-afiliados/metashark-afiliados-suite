@@ -58,125 +58,129 @@
         "href": "#",
         "colorClass": "bg-orange-500",
         "textColor": "text-white"
-      },
-      {
-        "id": "placeholder1",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder2",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder3",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder4",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder5",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder6",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder7",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder8",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder9",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder10",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder11",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder12",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder13",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
-      },
-      {
-        "id": "placeholder14",
-        "label": "Placeholder",
-        "iconName": "Circle",
-        "href": "#",
-        "colorClass": "bg-slate-500",
-        "textColor": "text-white"
       }
     ]
   },
   "es-ES": {
-    "services": []
+    "more_button_label": "Más Herramientas",
+    "services": [
+      {
+        "id": "new-design",
+        "label": "Nuevo Diseño",
+        "iconName": "FilePlus",
+        "href": "/builder/new?type=campaign",
+        "colorClass": "bg-blue-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "landing-page",
+        "label": "Landing Page",
+        "iconName": "LayoutTemplate",
+        "href": "/builder/new?type=landing",
+        "colorClass": "bg-green-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "doc",
+        "label": "Documento",
+        "iconName": "FileText",
+        "href": "#",
+        "colorClass": "bg-sky-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "whiteboard",
+        "label": "Pizarra",
+        "iconName": "Presentation",
+        "href": "#",
+        "colorClass": "bg-indigo-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "presentation",
+        "label": "Presentación",
+        "iconName": "Videotape",
+        "href": "#",
+        "colorClass": "bg-purple-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "social-media",
+        "label": "Redes Sociales",
+        "iconName": "Share2",
+        "href": "#",
+        "colorClass": "bg-rose-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "video",
+        "label": "Video",
+        "iconName": "Video",
+        "href": "#",
+        "colorClass": "bg-orange-500",
+        "textColor": "text-white"
+      }
+    ]
   },
   "pt-BR": {
-    "services": []
+    "more_button_label": "Mais Ferramentas",
+    "services": [
+      {
+        "id": "new-design",
+        "label": "Novo Design",
+        "iconName": "FilePlus",
+        "href": "/builder/new?type=campaign",
+        "colorClass": "bg-blue-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "landing-page",
+        "label": "Landing Page",
+        "iconName": "LayoutTemplate",
+        "href": "/builder/new?type=landing",
+        "colorClass": "bg-green-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "doc",
+        "label": "Documento",
+        "iconName": "FileText",
+        "href": "#",
+        "colorClass": "bg-sky-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "whiteboard",
+        "label": "Quadro Branco",
+        "iconName": "Presentation",
+        "href": "#",
+        "colorClass": "bg-indigo-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "presentation",
+        "label": "Apresentação",
+        "iconName": "Videotape",
+        "href": "#",
+        "colorClass": "bg-purple-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "social-media",
+        "label": "Redes Sociais",
+        "iconName": "Share2",
+        "href": "#",
+        "colorClass": "bg-rose-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "video",
+        "label": "Vídeo",
+        "iconName": "Video",
+        "href": "#",
+        "colorClass": "bg-orange-500",
+        "textColor": "text-white"
+      }
+    ]
   }
 }

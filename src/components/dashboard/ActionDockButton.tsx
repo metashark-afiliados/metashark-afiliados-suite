@@ -1,15 +1,15 @@
 // src/components/dashboard/ActionDockButton.tsx
 /**
  * @file ActionDockButton.tsx
- * @description Aparato de UI atómico. Sincronizado para aceptar la prop `isEven`
- *              y aplicar estilos de fondo alternos.
+ * @description Aparato de UI atómico. Refactorizado para un estándar de élite
+ *              con tipos blindados y consumo directo de `iconName`.
  * @author Raz Podestá
- * @version 3.1.0
+ * @version 4.0.0
  */
 "use client";
 
 import { motion } from "framer-motion";
-import { type LucideIcon } from "lucide-react";
+import { type LucideIconName } from "@/config/lucide-icon-names"; // <-- TIPO BLINDADO
 
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import {
@@ -24,11 +24,11 @@ import { cn } from "@/lib/utils";
 export interface ActionDockButtonProps {
   id: string;
   label: string;
-  iconName: string | LucideIcon;
+  iconName: LucideIconName; // <-- TIPO BLINDADO
   href: any;
   colorClass: string;
   textColor: string;
-  isEven?: boolean; // <-- PROP AÑADIDA
+  isEven?: boolean;
 }
 
 export function ActionDockButton({
@@ -44,7 +44,6 @@ export function ActionDockButton({
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
-  // --- LÓGICA DE ESTILO ALTERNO ---
   const alternateBgClass = isEven ? "dark:bg-slate-800" : "dark:bg-slate-900";
 
   return (
@@ -59,13 +58,13 @@ export function ActionDockButton({
               <div
                 className={cn(
                   "flex h-16 w-16 items-center justify-center rounded-2xl transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-lg",
-                  "shadow-md", // Sombra base
-                  alternateBgClass // Fondo de grafito
+                  "shadow-md",
+                  alternateBgClass
                 )}
               >
                 <DynamicIcon
-                  name={iconName as string}
-                  className={cn("h-8 w-8", textColor, colorClass)} // Color vivo aplicado al icono
+                  name={iconName}
+                  className={cn("h-8 w-8", textColor, colorClass)}
                 />
               </div>
               <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
