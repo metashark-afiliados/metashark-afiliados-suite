@@ -2,11 +2,10 @@
 /**
  * @file sign-up-form.tsx
  * @description Formulario de cliente soberano para el registro. Alineado con la
- *              arquitectura de ConvertiKit, consume las Server Actions y validadores
- *              canónicos del proyecto. Actualizado para importar sus dependencias
- *              atómicas desde el directorio canónico.
+ *              arquitectura de ConvertiKit. Corregido para importar explícitamente
+ *              desde el manifiesto del módulo de validadores.
  * @author Raz Podestá
- * @version 4.1.0
+ * @version 4.2.0
  */
 "use client";
 
@@ -24,10 +23,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { signUpAction } from "@/lib/actions/auth.actions";
-import { SignUpSchema } from "@/lib/validators";
-// --- INICIO DE CORRECCIÓN DE RUTA DE IMPORTACIÓN ---
+// --- INICIO DE CORRECCIÓN DE IMPORTACIÓN ---
+import { SignUpSchema } from "@/lib/validators/index.ts";
+// --- FIN DE CORRECCIÓN DE IMPORTACIÓN ---
 import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
-// --- FIN DE CORRECCIÓN DE RUTA DE IMPORTACIÓN ---
 
 type FormData = z.infer<typeof SignUpSchema>;
 
@@ -190,7 +189,7 @@ export function SignupForm() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia**: ((Implementada)) Se ha corregido la ruta de importación de `PasswordStrengthMeter` para que apunte a la nueva ubicación canónica, resolviendo uno de los errores de compilación `TS2307`.
+ * 1. **Resolución de Error de Compilación `TS2307`**: ((Implementada)) La ruta de importación de `SignUpSchema` ha sido corregida a `@/lib/validators/index.ts`, resolviendo el fallo de resolución de módulo en este archivo.
  *
  * @subsection Melhorias Futuras
  * 1. **Abstracción de `SubmitButton`**: ((Vigente)) La lógica del botón de envío con estado de carga es un patrón repetido. Podría ser abstraído a un componente `SubmitButton` atómico para mayor reutilización y cumplimiento del principio DRY.

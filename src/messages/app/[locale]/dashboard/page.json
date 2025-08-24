@@ -5,7 +5,8 @@
     },
     "welcomeHero": {
       "title": "What will we design today, {username}?",
-      "searchPlaceholder": "Customize your campaigns however you want",
+      "title_rich": "What will we create today, <italic>{firstName}</italic>?",
+      "searchPlaceholder": "Personalize your campaigns however you want",
       "tabs": {
         "myDesigns": "My Designs",
         "templates": "Templates",
@@ -25,6 +26,7 @@
     },
     "welcomeHero": {
       "title": "¿Qué vamos a diseñar hoy, {username}?",
+      "title_rich": "¿Qué vamos a crear hoy, <italic>{firstName}</italic>?",
       "searchPlaceholder": "Personaliza tus campañas como quieras",
       "tabs": {
         "myDesigns": "Mis Diseños",
@@ -45,6 +47,7 @@
     },
     "welcomeHero": {
       "title": "O que vamos criar hoje, {username}?",
+      "title_rich": "O que vamos criar hoje, <italic>{firstName}</italic>?",
       "searchPlaceholder": "Personalize suas campanhas como quiser",
       "tabs": {
         "myDesigns": "Meus Designs",

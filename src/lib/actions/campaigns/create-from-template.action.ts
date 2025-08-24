@@ -1,107 +1,76 @@
 // src/lib/actions/campaigns/create-from-template.action.ts
+/**
+ * @file create-from-template.action.ts
+ * @description Orquestador de Server Action para crear una campaña.
+ *              Sincronizado para consumir el helper de payload desde su
+ *              nuevo módulo atómico.
+ * @author Raz Podestá
+ * @version 5.0.0
+ */
 "use server";
 import "server-only";
 
-import { revalidatePath } from "next/cache";
-
-import { requireSitePermission } from "@/lib/auth/user-permissions";
+import { campaignsData } from "@/lib/data";
 import { logger } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/server";
 import { type ActionResult } from "@/lib/validators";
+import { BOILERPLATE_CAMPAIGN_ID } from "@/lib/builder/boilerplate";
+import { generateCampaignPayload } from "@/lib/builder/campaign-payload.helper"; // <-- RUTA CORREGIDA
 
+import { createPersistentErrorLog } from "../_helpers";
 import {
-  createAuditLog,
-  createPersistentErrorLog,
-  getAuthenticatedUser,
-} from "../_helpers";
+  handlePostCreationEffects,
+  validateCampaignCreationPermissions,
+} from "./_helpers";
 
 /**
  * @public
  * @async
  * @function createCampaignFromTemplateAction
- * @description [Arquitectura v12.0] Crea una campaña a partir de un tipo de plantilla.
- *              El `siteId` es opcional. Si no se provee, la campaña se crea en un
- *              estado "huérfano" (no asignado), permitiendo su creación soberana.
- * @param {string} campaignType - El tipo de campaña a crear (ej. "landing").
+ * @description Orquesta el flujo de creación de una nueva campaña.
+ * @param {string} campaignType - El tipo de campaña a crear.
  * @param {string} [siteId] - El ID opcional del sitio al que se asignará.
- * @returns {Promise<ActionResult<{ id: string }>>} El resultado de la operación.
+ * @returns {Promise<ActionResult<{ id: string }, { errorId: string }>>}
  */
 export async function createCampaignFromTemplateAction(
   campaignType: string,
   siteId?: string
-): Promise<ActionResult<{ id: string }>> {
-  const authResult = await getAuthenticatedUser();
-  if ("error" in authResult) return authResult.error;
-  const { user } = authResult;
+): Promise<ActionResult<{ id: string }, { errorId: string }>> {
+  if (process.env.DEV_MODE_BOILERPLATE_CAMPAIGN === "true") {
+    logger.warn(
+      "[ActionOrchestrator] MODO BOILERPLATE ACTIVO. Omitiendo DB y devolviendo ID estático."
+    );
+    return { success: true, data: { id: BOILERPLATE_CAMPAIGN_ID } };
+  }
 
-  logger.trace("[CreateCampaignAction] Iniciando creación de campaña.", {
-    userId: user.id,
+  logger.trace("[ActionOrchestrator] Iniciando creación de campaña.", {
     siteId: siteId || "unassigned",
     campaignType,
   });
 
+  const permissionResult = await validateCampaignCreationPermissions(siteId);
+  if (!permissionResult.success) {
+    return { success: false, error: permissionResult.error };
+  }
+  const { user } = permissionResult.data;
+
   try {
-    // 1. Verificación de permisos (solo si se provee un siteId)
-    if (siteId) {
-      const permissionCheck = await requireSitePermission(siteId, [
-        "owner",
-        "admin",
-        "member",
-      ]);
-      if (!permissionCheck.success) {
-        logger.warn(
-          `[SEGURIDAD] Usuario ${user.id} sin permisos para crear campaña en sitio ${siteId}.`
-        );
-        return {
-          success: false,
-          error: "CampaignsPage.errors.permission_denied",
-        };
-      }
-    }
-
-    // 2. Lógica de creación
-    const name = `Nueva Campaña (${campaignType})`;
-    const slug = `${campaignType
-      .toLowerCase()
-      .replace(/\s+/g, "-")}-${Date.now()}`;
-
-    const supabase = createClient();
-    const { data: newCampaign, error } = await supabase
-      .from("campaigns")
-      .insert({
-        name,
-        slug,
-        site_id: siteId || null,
-        created_by: user.id,
-        content: {
-          id: "",
-          name,
-          site_id: siteId || null,
-          theme: { globalFont: "Inter", globalColors: {} },
-          blocks: [],
-        },
-      })
-      .select("id")
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    // 3. Auditoría y Revalidación
-    await createAuditLog("campaign.created_from_template", {
+    const campaignPayload = generateCampaignPayload({
       userId: user.id,
-      targetEntityId: newCampaign.id,
-      metadata: { name, siteId: siteId || "unassigned", campaignType },
+      campaignType,
+      siteId,
     });
 
-    if (siteId) {
-      revalidatePath(`/dashboard/sites/${siteId}/campaigns`);
-    }
-    revalidatePath("/dashboard", "layout"); // Revalida el dashboard para "Recent Activity"
+    const newCampaign =
+      await campaignsData.management.insertCampaignRecord(campaignPayload);
 
-    logger.info("Campaña creada con éxito y caché revalidada.", {
-      campaignId: newCampaign.id,
+    await handlePostCreationEffects({
+      newCampaignId: newCampaign.id,
+      userId: user.id,
+      payload: {
+        name: campaignPayload.name,
+        siteId,
+        campaignType,
+      },
     });
 
     return { success: true, data: { id: newCampaign.id } };
@@ -111,26 +80,12 @@ export async function createCampaignFromTemplateAction(
       error as Error,
       { userId: user.id, siteId, campaignType }
     );
-    logger.error(
-      `Error inesperado en createCampaignFromTemplateAction. Log ID: ${errorId}`
-    );
-    return { success: false, error: "CampaignsPage.errors.unexpected" };
+
+    return {
+      success: false,
+      error: "CampaignsPage.errors.unexpected",
+      data: { errorId },
+    };
   }
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Lógica de Creación Soberana**: ((Implementada)) La acción ahora maneja correctamente un `siteId` opcional, permitiendo crear campañas que no están vinculadas a un sitio. Este es el pilar de la nueva arquitectura de "Acceso Directo".
- * 2. **Seguridad Condicional**: ((Implementada)) La verificación de permisos del sitio solo se ejecuta si se proporciona un `siteId`, optimizando la ejecución y adhiriéndose a la lógica de negocio.
- * 3. **Full Observabilidad y Resiliencia**: ((Implementada)) Se ha añadido `try/catch` para errores inesperados con registro persistente, y se han mejorado los logs existentes.
- *
- * @subsection Melhorias Futuras
- * 1. **Plantillas Reales**: ((Vigente)) En lugar de un `content` vacío, esta acción podría leer una estructura de plantilla real desde una tabla `campaign_templates` basada en el `campaignType` para una creación más rica.
- * 2. **Contrato de Error I18n**: ((Implementada)) La acción devuelve claves de i18n para los mensajes de error.
- *
- * =====================================================================
- */
 // src/lib/actions/campaigns/create-from-template.action.ts

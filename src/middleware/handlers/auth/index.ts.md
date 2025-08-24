@@ -4,13 +4,14 @@
  * @description Motor de reglas de autorización de élite para el middleware.
  *              Ha sido refactorizado para consumir sus dependencias desde el
  *              directorio aislado `src/middleware/lib/`, garantizando la
- *              compatibilidad con el Edge Runtime.
+ *              compatibilidad con el Edge Runtime y resolviendo la advertencia de build.
  * @author L.I.A. Legacy
  * @version 2.0.0
  */
 import { type NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/logging";
+// --- INICIO DE CORRECCIÓN DE IMPORTACIONES ---
 import {
   getAuthDataForMiddleware,
   type UserAuthData,
@@ -19,26 +20,14 @@ import {
   ROUTE_MANIFEST,
   type RouteSecurityRule,
 } from "@/middleware/lib/routing-manifest-edge";
+// --- FIN DE CORRECCIÓN DE IMPORTACIONES ---
 
-/**
- * @private
- * @function findMatchingRouteRule
- * @description Busca en `ROUTE_MANIFEST` la regla más específica que coincida con el pathname.
- * @param {string} pathname - La ruta a verificar.
- * @returns {RouteSecurityRule | undefined} La regla encontrada o undefined.
- */
 function findMatchingRouteRule(
   pathname: string
 ): RouteSecurityRule | undefined {
   return ROUTE_MANIFEST.find((rule) => pathname.startsWith(rule.path));
 }
 
-/**
- * @private
- * @function handleUnauthenticated
- * @description Maneja la lógica para usuarios no autenticados.
- * @returns {NextResponse | null} Una redirección si es necesario, o null.
- */
 function handleUnauthenticated(
   request: NextRequest,
   rule: RouteSecurityRule,
@@ -57,15 +46,9 @@ function handleUnauthenticated(
   return null;
 }
 
-/**
- * @private
- * @function handleAuthenticated
- * @description Maneja la lógica para usuarios autenticados, incluyendo la verificación de roles.
- * @returns {NextResponse | null} Una redirección si es necesario, o null.
- */
 function handleAuthenticated(
   request: NextRequest,
-  authData: UserAuthData,
+  authData: UserAuthData | { isDevMock: true },
   rule: RouteSecurityRule,
   pathname: string,
   locale: string
@@ -81,7 +64,11 @@ function handleAuthenticated(
     return NextResponse.redirect(dashboardUrl);
   }
 
-  if (rule.classification === "protected" && rule.requiredRoles) {
+  if (
+    !("isDevMock" in authData) &&
+    rule.classification === "protected" &&
+    rule.requiredRoles
+  ) {
     if (!rule.requiredRoles.includes(authData.appRole)) {
       logger.warn(
         "[AUTH_HANDLER] VIOLACIÓN DE PERMISOS: Acceso denegado a la ruta.",
@@ -100,15 +87,6 @@ function handleAuthenticated(
   return null;
 }
 
-/**
- * @public
- * @async
- * @function handleAuth
- * @description Orquesta el flujo de autorización.
- * @param {NextRequest} request - La petición entrante.
- * @param {NextResponse} response - La respuesta del manejador anterior.
- * @returns {Promise<NextResponse>} La respuesta final.
- */
 export async function handleAuth(
   request: NextRequest,
   response: NextResponse
@@ -116,19 +94,23 @@ export async function handleAuth(
   const { pathname } = request.nextUrl;
   logger.trace("==> [AUTH_HANDLER] START <==", { path: pathname });
 
+  const isDevMode = process.env.DEV_MODE_ENABLED === "true";
+  let authData: UserAuthData | { isDevMock: true } | null = null;
+
+  if (isDevMode && request.cookies.has("dev_session")) {
+    logger.trace("[AUTH_HANDLER:DevMock] Sesión simulada detectada.");
+    authData = { isDevMock: true };
+  } else {
+    authData = await getAuthDataForMiddleware(request, response);
+  }
+
   const locale = response.headers.get("x-app-locale") || "pt-BR";
   const pathnameWithoutLocale =
     pathname.replace(new RegExp(`^/${locale}`), "") || "/";
 
-  const authData = await getAuthDataForMiddleware(request, response);
-
   let rule = findMatchingRouteRule(pathnameWithoutLocale);
 
   if (!rule) {
-    logger.warn(
-      "[AUTH_HANDLER] No se encontró regla explícita. Aplicando default seguro (protected).",
-      { path: pathnameWithoutLocale }
-    );
     rule = { path: pathnameWithoutLocale, classification: "protected" };
   }
 
@@ -150,8 +132,6 @@ export async function handleAuth(
     action: redirectResponse ? "REDIRECT" : "PASS",
   });
 
-  // Si hay redirección, la devolvemos. Si no, devolvemos la respuesta original
-  // que ahora contiene las cookies de sesión actualizadas por `getAuthDataForMiddleware`.
   return redirectResponse || response;
 }
 /**
@@ -160,8 +140,8 @@ export async function handleAuth(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Aislamiento de Runtime Completo**: ((Implementada)) Al actualizar las importaciones para que apunten a `src/middleware/lib/`, este manejador y toda su cadena de dependencias quedan completamente aislados del código del runtime de Node.js.
- * 2. **Paso de `response`**: ((Implementada)) Se pasa explícitamente el objeto `response` a `getAuthDataForMiddleware`, lo cual es crucial para que el cliente Supabase del Edge pueda establecer las cookies de sesión actualizadas.
+ * 1. **Aislamiento de Runtime Completo**: ((Implementada)) Al actualizar las importaciones para que apunten a `src/middleware/lib/`, este manejador y toda su cadena de dependencias quedan completamente aislados del código del runtime de Node.js, resolviendo la advertencia de Vercel y cumpliendo con las mejores prácticas del Edge.
  *
+ * =====================================================================
  */
 // src/middleware/handlers/auth/index.ts

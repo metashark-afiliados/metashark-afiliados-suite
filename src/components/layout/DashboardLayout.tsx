@@ -1,71 +1,110 @@
 // src/components/layout/DashboardLayout.tsx
 /**
  * @file DashboardLayout.tsx
- * @description Ensamblador de UI de élite. Su única responsabilidad es orquestar
- *              la obtención de datos y la composición de los aparatos atómicos que
- *              conforman el layout del dashboard.
+ * @description Ensamblador de UI de élite, versión 15.0. Consolida toda la
+ *              lógica de la cabecera, eliminando redundancias y alineándose
+ *              con la visión final de la UI.
  * @author Raz Podestá
- * @version 12.0.0
+ * @version 15.0.0
  */
+"use client";
+
 import React from "react";
-import { redirect } from "next/navigation";
+import { ChevronLeft, Menu, Search } from "lucide-react";
+import { useTypedTranslations } from "@/lib/i18n/hooks";
 
-import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
-import { logger } from "@/lib/logging";
-import { DashboardContextProviders } from "./DashboardContextProviders";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
+import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
+import { InvitationBell } from "@/components/dashboard/InvitationBell";
 import { DashboardSidebar } from "./DashboardSidebar";
-import { getLayoutData } from "./dashboard.loader";
-import { GlobalOverlays } from "./GlobalOverlays";
+import { PrimarySidebar } from "./sidebar/PrimarySidebar";
 
-/**
- * @public
- * @component DashboardLayout
- * @description Orquesta la estructura, obtención de datos y proveedores de contexto
- *              para toda la sección autenticada de la aplicación.
- * @param {{ children: React.ReactNode }} props
- * @returns {Promise<React.ReactElement>}
- * @author Raz Podestá
- * @version 12.0.0
- */
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
-}): Promise<React.ReactElement> {
-  logger.trace("[DashboardLayout] Ensamblando layout...");
-  const layoutData = await getLayoutData();
-
-  if (!layoutData) {
-    return redirect("/auth/login?next=/dashboard");
-  }
+}): React.ReactElement {
+  const { isSidebarCollapsed, toggleSidebar } = useDashboardUIStore();
+  const t = useTypedTranslations("components.layout.DashboardHeader");
 
   return (
-    <DashboardContextProviders value={layoutData}>
-      <div className="flex min-h-screen w-full bg-muted/40">
-        <DashboardSidebar />
+    <div className="flex min-h-screen w-full bg-muted/40">
+      <PrimarySidebar />
+
+      <div className="flex flex-1 pl-20">
+        <aside
+          className={cn(
+            "hidden md:flex flex-col transition-all duration-300 ease-in-out bg-card",
+            isSidebarCollapsed ? "w-0" : "w-64 border-r"
+          )}
+        >
+          {!isSidebarCollapsed && <DashboardSidebar />}
+        </aside>
+
         <div className="flex flex-1 flex-col">
-          <main className="flex-1 gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-            <ErrorBoundary>{children}</ErrorBoundary>
-          </main>
+          {/* --- INICIO DE HEADER CONSOLIDADO --- */}
+          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-card px-4 sm:px-6">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 hidden md:flex"
+              onClick={toggleSidebar}
+              aria-label="Toggle sidebar"
+            >
+              <ChevronLeft
+                className={cn(
+                  "h-4 w-4 transition-transform",
+                  isSidebarCollapsed && "rotate-180"
+                )}
+              />
+            </Button>
+
+            <span className="font-semibold text-lg flex-1">
+              {isSidebarCollapsed ? "" : "Início"}
+            </span>
+
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="relative md:grow-0">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-muted-foreground pl-8 font-normal"
+                >
+                  {t("search_placeholder")}
+                  <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
+                    <span className="text-xs">{t("search_command")}</span>
+                  </kbd>
+                </Button>
+              </div>
+              <LanguageSwitcher />
+              <ThemeSwitcher />
+              <InvitationBell />
+            </div>
+
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="shrink-0 md:hidden"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="flex flex-col bg-card p-0">
+                <DashboardSidebar />
+              </SheetContent>
+            </Sheet>
+          </header>
+          {/* --- FIN DE HEADER CONSOLIDADO --- */}
+
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
         </div>
-        <GlobalOverlays />
       </div>
-    </DashboardContextProviders>
+    </div>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical**: ((Implementada)) El layout ha sido deconstruido en aparatos atómicos con responsabilidades únicas, cumpliendo la directiva al más alto nivel. El `DashboardLayout` ahora es un ensamblador puro.
- * 2. **Visión Holística 360°**: ((Implementada)) La nueva estructura cohesiva demuestra una visión completa del flujo de datos, desde la obtención en el `loader` hasta la provisión en los `ContextProviders` y el consumo en los `GlobalOverlays` y `children`.
- *
- * @subsection Melhorias Futuras
- * 1. **Layouts Anidados Dinámicos**: ((Vigente)) Para futuras secciones del dashboard con estructuras diferentes (ej. un layout de ancho completo para un editor), se podría implementar una lógica para que `getLayoutData` también devuelva un `layoutType` que este componente usaría para renderizar condicionalmente diferentes estructuras de `div`.
- *
- * =====================================================================
- */
-// src/components/layout/DashboardLayout.tsx

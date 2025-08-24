@@ -1,16 +1,17 @@
 // src/components/builder/ui/StatusBar.tsx
 /**
  * @file StatusBar.tsx
- * @description Componente de UI atómico para la barra de estado del constructor.
- *              Comunica el estado de guardado y la conectividad en tiempo real.
+ * @description Componente de UI atómico para la barra de estado. Sincronizado
+ *              con la API de `zustand-undo`, derivando el estado `isDirty`
+ *              del historial para resolver el error de tipo TS2339.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
 import { useEffect, useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
-import { Check, Cloud, CloudOff, Wifi, WifiOff } from "lucide-react";
+import { Check, Cloud, Wifi, WifiOff } from "lucide-react";
 import { shallow } from "zustand/shallow";
 
 import { useBuilderStore } from "@/lib/builder/core/store";
@@ -21,13 +22,18 @@ export function StatusBar() {
   const format = useFormatter();
   const [isOnline, setIsOnline] = useState(true);
 
-  const { isDirty, lastSaved } = useBuilderStore(
-    (state) => ({
-      isDirty: state.isDirty,
+  // --- INICIO DE CORRECCIÓN DE API ---
+  const { lastSaved } = useBuilderStore(
+    (state: any) => ({
       lastSaved: state.lastSaved,
     }),
     shallow
   );
+
+  // El estado 'dirty' ahora se deriva del historial
+  const history = (useBuilderStore as any).useHistory();
+  const isDirty = history.past.length > 0;
+  // --- FIN DE CORRECCIÓN DE API ---
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -36,7 +42,6 @@ export function StatusBar() {
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    // Sincronizar estado inicial
     setIsOnline(navigator.onLine);
 
     return () => {
@@ -89,11 +94,10 @@ export function StatusBar() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Comunicación de Estado Clara**: ((Implementada)) Proporciona feedback visual instantáneo sobre el estado de guardado y la conectividad.
- * 2. **Reactividad en Tiempo Real**: ((Implementada)) Se suscribe a los eventos `online`/`offline` del navegador para una detección de conectividad en tiempo real.
+ * 1. **Resolución de Error de Tipo (TS2339)**: ((Implementada)) Se ha refactorizado el componente para derivar el estado `isDirty` del historial de `zustand-undo`, alineándolo con la nueva arquitectura del store.
  *
  * @subsection Melhorias Futuras
- * 1. **Cola de Sincronización Offline**: ((Vigente)) Cuando se detecta el estado `offline`, se podría deshabilitar el botón de guardado y encolar las acciones. Al volver a estar `online`, se podrían sincronizar automáticamente.
+ * 1. **Cola de Sincronización Offline**: ((Vigente)) Cuando se detecta el estado `offline`, se podría deshabilitar el botón de guardado y encolar las acciones.
  *
  * =====================================================================
  */

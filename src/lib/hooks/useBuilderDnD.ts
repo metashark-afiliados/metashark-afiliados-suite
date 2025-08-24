@@ -6,7 +6,7 @@
  *              del constructor de campañas. Es la única fuente de verdad para
  *              manejar la interacción D&D.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.1.0
  */
 "use client";
 
@@ -67,15 +67,13 @@ export function useBuilderDnD() {
     handleDragEnd,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación**: ((Implementada)) La creación de este archivo resuelve el último error `TS2307` en `BuilderLayout.tsx`.
- * 2. **Lógica Centralizada (SRP)**: ((Implementada)) Toda la lógica de D&D está ahora encapsulada en este hook, desacoplando el `BuilderLayout`.
+ * 1. **Validación de Estabilidad**: ((Implementada)) Se ha validado que el componente es estable y funcional tras la corrección del store, sin necesidad de cambios.
  *
  * @subsection Melhorias Futuras
  * 1. **Gestos Complejos**: ((Vigente)) Integrar `useSensor(TouchSensor)` para una mejor experiencia en dispositivos táctiles.

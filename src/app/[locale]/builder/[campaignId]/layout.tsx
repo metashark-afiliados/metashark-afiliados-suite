@@ -1,11 +1,10 @@
 // src/app/[locale]/builder/[campaignId]/layout.tsx
 /**
  * @file layout.tsx
- * @description Layout principal del constructor. Refactorizado para integrar
- *              la `StatusBar`, completando la arquitectura de resiliencia
- *              "Guardián de Datos".
+ * @description Layout principal del constructor. Nivelado a un estándar de élite
+ *              con tipado explícito en los callbacks para máxima robustez y claridad.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.2.0
  */
 "use client";
 
@@ -26,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBuilderStore } from "@/lib/builder/core/store";
 import { useBuilderDnD } from "@/lib/hooks/useBuilderDnD";
+import { type PageBlock } from "@/lib/builder/types.d";
 
 export default function BuilderLayout({
   children,
@@ -43,8 +43,12 @@ export default function BuilderLayout({
     }
   }, [selectedBlockId, activeTab]);
 
+  // --- INICIO DE REFACTORIZACIÓN DE ÉLITE: TIPADO EXPLÍCITO ---
   const activeBlock =
-    activeId && campaignConfig?.blocks.find((b) => b.id === activeId);
+    activeId &&
+    campaignConfig?.blocks.find((b: PageBlock) => b.id === activeId);
+  // --- FIN DE REFACTORIZACIÓN DE ÉLITE ---
+
   const isDraggingFromPalette =
     activeId && String(activeId).startsWith("palette-");
 
@@ -83,7 +87,7 @@ export default function BuilderLayout({
           </aside>
           <main className="flex-1 h-full overflow-auto">{children}</main>
         </div>
-        <StatusBar /> {/* <-- INTEGRACIÓN DE ÉLITE */}
+        <StatusBar />
       </div>
       <DragOverlay>
         {activeId ? (
@@ -110,10 +114,7 @@ export default function BuilderLayout({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Integración del "Guardián de Datos"**: ((Implementada)) Se ha añadido la `StatusBar` al layout, completando la implementación de la arquitectura de resiliencia y proporcionando al usuario una visibilidad constante del estado de su trabajo.
- *
- * @subsection Melhorias Futuras
- * 1. **Paneles Redimensionables**: ((Vigente)) Integrar `react-resizable-panels` para permitir al usuario redimensionar el panel lateral de ajustes.
+ * 1. **Robustez de Tipos**: ((Implementada)) Se ha añadido el tipo explícito `PageBlock` al callback de `find`, eliminando el `any` implícito y blindando el código.
  *
  * =====================================================================
  */

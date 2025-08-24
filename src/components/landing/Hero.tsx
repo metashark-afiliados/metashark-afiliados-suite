@@ -1,12 +1,11 @@
 // src/components/landing/Hero.tsx
 /**
  * @file src/components/landing/Hero.tsx
- * @description Componente de presentación puro para la sección "Hero" de la landing page.
- *              Ha sido nivelado para incluir observabilidad en las interacciones
- *              de los botones de llamada a la acción (CTA) y alineado con la
- *              directiva de rebranding de "ConvertiKit".
+ * @description Componente de presentación puro para la sección "Hero".
+ *              Sincronizado con la SSoT de enrutamiento v7.0.0, apuntando
+ *              a la ruta de login canónica `/login`.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
 "use client";
 
@@ -67,11 +66,13 @@ export function Hero({
           variants={FADE_IN_ANIMATION_VARIANTS}
           className="mt-8 flex flex-col justify-center gap-4 sm:flex-row"
         >
+          {/* --- INICIO DE CORRECCIÓN DE RUTA --- */}
           <Button asChild size="lg" onClick={() => handleCTAClick("Primary")}>
-            <Link href="/auth/login">
+            <Link href="/login">
               {ctaPrimaryText} <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
+          {/* --- FIN DE CORRECCIÓN DE RUTA --- */}
           <Button
             asChild
             variant="outline"
@@ -85,15 +86,13 @@ export function Hero({
     </section>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Full Observabilidad**: ((Implementada)) Se ha añadido un `onClick` handler a los botones CTA que invoca a `clientLogger.info`. Esto proporciona visibilidad sobre la interacción más importante de la landing page.
- * 2. **Rebranding**: ((Implementada)) La autoría y los comentarios han sido actualizados a "Raz Podestá" y "ConvertiKit".
+ * 1. **Resolución de Error de Tipo (TS2322)**: ((Implementada)) Se ha actualizado el `href` a `/login`, alineando el componente con el manifiesto de rutas `navigation.ts` y resolviendo el error de compilación.
  *
  * @subsection Melhorias Futuras
  * 1. **Botones de CTA Dinámicos**: ((Vigente)) La prop `ctaButtons` (un array de objetos) sigue siendo la mejora de élite para una máxima flexibilidad.

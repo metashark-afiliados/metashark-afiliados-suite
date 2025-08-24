@@ -2,10 +2,10 @@
 /**
  * @file playwright.config.ts
  * @description Configuración canónica para la suite de pruebas E2E con Playwright.
- *              Nivelada para incluir pruebas cross-browser, garantizando una
- *              experiencia de usuario consistente en las plataformas principales.
+ *              Nivelada para aumentar el timeout del servidor web, garantizando
+ *              un arranque fiable del entorno de desarrollo antes de ejecutar las pruebas.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 2.1.0
  */
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
@@ -28,7 +28,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     trace: "on-first-retry",
-    storageState: "./tests/e2e/storageState.json", // Usar el estado de sesión guardado
+    storageState: "./tests/e2e/storageState.json",
   },
   projects: [
     {
@@ -50,6 +50,9 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     stdout: "ignore",
     stderr: "pipe",
+    // --- INICIO DE CORRECCIÓN DE TIMEOUT ---
+    timeout: 120 * 1000, // Aumentado a 120 segundos (2 minutos)
+    // --- FIN DE CORRECCIÓN DE TIMEOUT ---
   },
 });
 
@@ -59,11 +62,10 @@ export default defineConfig({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Pruebas Cross-Browser**: ((Implementada)) Se han añadido proyectos para Firefox y WebKit, garantizando que las pruebas E2E se ejecuten en los tres motores de renderizado principales.
- * 2. **Persistencia de Sesión Activada**: ((Implementada)) La configuración `use.storageState` está ahora activa, permitiendo que el `global-setup` acelere la suite de pruebas.
+ * 1. **Estabilidad del Entorno E2E**: ((Implementada)) Se ha aumentado el `timeout` del servidor web a 120 segundos, resolviendo el error `Timed out waiting 60000ms` y haciendo que la suite de pruebas E2E sea robusta ante compilaciones iniciales lentas.
  *
  * @subsection Melhorias Futuras
- * 1. **Perfiles Móviles**: ((Vigente)) Añadir proyectos para dispositivos móviles (`devices['Pixel 5']`, `devices['iPhone 12']`) para validar la experiencia responsiva.
+ * 1. **Health Check Endpoint**: ((Vigente)) Para una solución de élite superior, se podría crear un endpoint de "health check" en la aplicación (`/api/health`) y configurar `webServer.url` para que apunte a él. Esto haría que Playwright espere a que la aplicación esté realmente lista para responder, en lugar de depender de un tiempo fijo.
  *
  * =====================================================================
  */

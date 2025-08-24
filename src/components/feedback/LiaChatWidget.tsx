@@ -1,11 +1,10 @@
 // src/components/feedback/LiaChatWidget.tsx
 /**
- * @file src/components/feedback/LiaChatWidget.tsx
- * @description Botón de acción flotante que actúa como ensamblador para la
- *              interfaz de chat modal. Gestiona el estado de visibilidad del
- *              diálogo y compone el componente `LiaChatInterface`.
+ * @file LiaChatWidget.tsx
+ * @description Botón de acción flotante. Refactorizado para tener un estilo
+ *              visual más prominente y alineado con la nueva directiva de diseño.
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 4.0.0
  */
 "use client";
 
@@ -18,13 +17,6 @@ import { logger } from "@/lib/logging";
 
 import { LiaChatInterface } from "./LiaChatInterface";
 
-/**
- * @public
- * @component LiaChatWidget
- * @description Renderiza un botón flotante y gestiona la apertura y cierre del
- *              modal de la interfaz de chat con L.I.A.
- * @returns {React.ReactElement}
- */
 export function LiaChatWidget(): React.ReactElement {
   const t = useTranslations("LiaChatWidget");
   const [isChatOpen, setIsChatOpen] = React.useState(false);
@@ -37,32 +29,29 @@ export function LiaChatWidget(): React.ReactElement {
   return (
     <>
       <div className="fixed bottom-6 right-6 z-50">
+        {/* --- INICIO DE REFACTORIZACIÓN VISUAL --- */}
         <Button
           size="lg"
-          className="rounded-full h-14 w-14 shadow-lg bg-card border border-border/60 text-foreground hover:bg-muted"
+          className="rounded-full h-16 w-16 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-transform hover:scale-110"
           onClick={handleOpenChat}
           aria-label={t("aria_label")}
         >
-          <Bot className="h-7 w-7" />
+          <Bot className="h-8 w-8" />
           <span className="sr-only">{t("aria_label")}</span>
         </Button>
+        {/* --- FIN DE REFACTORIZACIÓN VISUAL --- */}
       </div>
       <LiaChatInterface isOpen={isChatOpen} onOpenChange={setIsChatOpen} />
     </>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Estado Persistente**: ((Vigente)) El estado `isChatOpen` podría ser gestionado por un store de Zustand si otros componentes necesitaran abrir o cerrar el chat programáticamente.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Ensamblaje Funcional**: ((Implementada)) El widget ahora gestiona el estado del modal y compone la `LiaChatInterface`, creando una funcionalidad completa (aunque con lógica de chat de placeholder).
- * 2. **Principio de Responsabilidad Única (SRP)**: ((Implementada)) El `LiaChatWidget` se enfoca en ser el disparador, mientras que `LiaChatInterface` contiene la UI del chat, manteniendo una separación clara de responsabilidades.
+ * 1. **Estilo Visual Prominente**: ((Implementada)) El botón ahora utiliza el color `primary`, es más grande y tiene un efecto de `hover` más notorio, cumpliendo con la directiva visual.
  *
  * =====================================================================
  */

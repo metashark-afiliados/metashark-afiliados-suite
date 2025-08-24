@@ -4,246 +4,179 @@
     "more_button_label": "More Tools",
     "services": [
       {
-        "id": "create-campaign",
-        "label": "New Campaign",
+        "id": "new-design",
+        "label": "New Design",
         "iconName": "FilePlus",
         "href": "/builder/new?type=campaign",
-        "colorClass": "bg-blue-500/20 text-blue-400"
+        "colorClass": "bg-blue-500",
+        "textColor": "text-white"
       },
       {
-        "id": "create-landing",
+        "id": "landing-page",
         "label": "Landing Page",
         "iconName": "LayoutTemplate",
         "href": "/builder/new?type=landing",
-        "colorClass": "bg-green-500/20 text-green-400"
+        "colorClass": "bg-green-500",
+        "textColor": "text-white"
       },
       {
-        "id": "create-bridge",
-        "label": "Bridge Page",
-        "iconName": "ArrowRightLeft",
-        "href": "/builder/new?type=bridge",
-        "colorClass": "bg-purple-500/20 text-purple-400"
+        "id": "doc",
+        "label": "Doc",
+        "iconName": "FileText",
+        "href": "#",
+        "colorClass": "bg-sky-500",
+        "textColor": "text-white"
       },
       {
-        "id": "create-review",
-        "label": "Review Page",
-        "iconName": "Star",
-        "href": "/builder/new?type=review",
-        "colorClass": "bg-yellow-500/20 text-yellow-400"
+        "id": "whiteboard",
+        "label": "Whiteboard",
+        "iconName": "Presentation",
+        "href": "#",
+        "colorClass": "bg-indigo-500",
+        "textColor": "text-white"
       },
       {
-        "id": "create-images",
-        "label": "AI Images",
-        "iconName": "Image",
-        "href": "/dashboard/tools/ai-images",
-        "colorClass": "bg-pink-500/20 text-pink-400"
+        "id": "presentation",
+        "label": "Presentation",
+        "iconName": "Videotape",
+        "href": "#",
+        "colorClass": "bg-purple-500",
+        "textColor": "text-white"
       },
       {
-        "id": "analyze-landing",
-        "label": "Analyze Page",
-        "iconName": "ScanSearch",
-        "href": "/dashboard/tools/analyzer",
-        "colorClass": "bg-cyan-500/20 text-cyan-400"
+        "id": "social-media",
+        "label": "Social Media",
+        "iconName": "Share2",
+        "href": "#",
+        "colorClass": "bg-rose-500",
+        "textColor": "text-white"
       },
       {
-        "id": "create-copy",
-        "label": "AI Copy",
-        "iconName": "PenTool",
-        "href": "/dashboard/tools/ai-copywriter",
-        "colorClass": "bg-orange-500/20 text-orange-400"
+        "id": "video",
+        "label": "Video",
+        "iconName": "Video",
+        "href": "#",
+        "colorClass": "bg-orange-500",
+        "textColor": "text-white"
       },
       {
-        "id": "create-site",
-        "label": "New Site",
-        "iconName": "Globe",
-        "href": "/dashboard/sites?action=create",
-        "colorClass": "bg-red-500/20 text-red-400"
+        "id": "placeholder1",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
       },
       {
-        "id": "create-quiz",
-        "label": "Quiz",
-        "iconName": "Lightbulb",
-        "href": "/builder/new?type=quiz",
-        "colorClass": "bg-teal-500/20 text-teal-400"
+        "id": "placeholder2",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
       },
       {
-        "id": "branding-kit",
-        "label": "Brand Kit",
-        "iconName": "Palette",
-        "href": "/dashboard/settings/branding",
-        "colorClass": "bg-indigo-500/20 text-indigo-400"
+        "id": "placeholder3",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
       },
       {
-        "id": "view-metrics",
-        "label": "Metrics",
-        "iconName": "ChartBarBig",
-        "href": "/dashboard/analytics",
-        "colorClass": "bg-lime-500/20 text-lime-400"
+        "id": "placeholder4",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder5",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder6",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder7",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder8",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder9",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder10",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder11",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder12",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder13",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
+      },
+      {
+        "id": "placeholder14",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "href": "#",
+        "colorClass": "bg-slate-500",
+        "textColor": "text-white"
       }
     ]
   },
   "es-ES": {
-    "more_button_label": "Más Herramientas",
-    "services": [
-      {
-        "id": "create-campaign",
-        "label": "Nueva Campaña",
-        "iconName": "FilePlus",
-        "href": "/builder/new?type=campaign",
-        "colorClass": "bg-blue-500/20 text-blue-400"
-      },
-      {
-        "id": "create-landing",
-        "label": "Landing Page",
-        "iconName": "LayoutTemplate",
-        "href": "/builder/new?type=landing",
-        "colorClass": "bg-green-500/20 text-green-400"
-      },
-      {
-        "id": "create-bridge",
-        "label": "Bridge Page",
-        "iconName": "ArrowRightLeft",
-        "href": "/builder/new?type=bridge",
-        "colorClass": "bg-purple-500/20 text-purple-400"
-      },
-      {
-        "id": "create-review",
-        "label": "Review Page",
-        "iconName": "Star",
-        "href": "/builder/new?type=review",
-        "colorClass": "bg-yellow-500/20 text-yellow-400"
-      },
-      {
-        "id": "create-images",
-        "label": "Imágenes IA",
-        "iconName": "Image",
-        "href": "/dashboard/tools/ai-images",
-        "colorClass": "bg-pink-500/20 text-pink-400"
-      },
-      {
-        "id": "analyze-landing",
-        "label": "Analizar Página",
-        "iconName": "ScanSearch",
-        "href": "/dashboard/tools/analyzer",
-        "colorClass": "bg-cyan-500/20 text-cyan-400"
-      },
-      {
-        "id": "create-copy",
-        "label": "Copy IA",
-        "iconName": "PenTool",
-        "href": "/dashboard/tools/ai-copywriter",
-        "colorClass": "bg-orange-500/20 text-orange-400"
-      },
-      {
-        "id": "create-site",
-        "label": "Nuevo Sitio",
-        "iconName": "Globe",
-        "href": "/dashboard/sites?action=create",
-        "colorClass": "bg-red-500/20 text-red-400"
-      },
-      {
-        "id": "create-quiz",
-        "label": "Quiz",
-        "iconName": "Lightbulb",
-        "href": "/builder/new?type=quiz",
-        "colorClass": "bg-teal-500/20 text-teal-400"
-      },
-      {
-        "id": "branding-kit",
-        "label": "Kit de Marca",
-        "iconName": "Palette",
-        "href": "/dashboard/settings/branding",
-        "colorClass": "bg-indigo-500/20 text-indigo-400"
-      },
-      {
-        "id": "view-metrics",
-        "label": "Métricas",
-        "iconName": "ChartBarBig",
-        "href": "/dashboard/analytics",
-        "colorClass": "bg-lime-500/20 text-lime-400"
-      }
-    ]
+    "services": []
   },
   "pt-BR": {
-    "more_button_label": "Mais Ferramentas",
-    "services": [
-      {
-        "id": "create-campaign",
-        "label": "Nova Campanha",
-        "iconName": "FilePlus",
-        "href": "/builder/new?type=campaign",
-        "colorClass": "bg-blue-500/20 text-blue-400"
-      },
-      {
-        "id": "create-landing",
-        "label": "Landing Page",
-        "iconName": "LayoutTemplate",
-        "href": "/builder/new?type=landing",
-        "colorClass": "bg-green-500/20 text-green-400"
-      },
-      {
-        "id": "create-bridge",
-        "label": "Bridge Page",
-        "iconName": "ArrowRightLeft",
-        "href": "/builder/new?type=bridge",
-        "colorClass": "bg-purple-500/20 text-purple-400"
-      },
-      {
-        "id": "create-review",
-        "label": "Review Page",
-        "iconName": "Star",
-        "href": "/builder/new?type=review",
-        "colorClass": "bg-yellow-500/20 text-yellow-400"
-      },
-      {
-        "id": "create-images",
-        "label": "Imagens IA",
-        "iconName": "Image",
-        "href": "/dashboard/tools/ai-images",
-        "colorClass": "bg-pink-500/20 text-pink-400"
-      },
-      {
-        "id": "analyze-landing",
-        "label": "Analisar Página",
-        "iconName": "ScanSearch",
-        "href": "/dashboard/tools/analyzer",
-        "colorClass": "bg-cyan-500/20 text-cyan-400"
-      },
-      {
-        "id": "create-copy",
-        "label": "Copy IA",
-        "iconName": "PenTool",
-        "href": "/dashboard/tools/ai-copywriter",
-        "colorClass": "bg-orange-500/20 text-orange-400"
-      },
-      {
-        "id": "create-site",
-        "label": "Novo Site",
-        "iconName": "Globe",
-        "href": "/dashboard/sites?action=create",
-        "colorClass": "bg-red-500/20 text-red-400"
-      },
-      {
-        "id": "create-quiz",
-        "label": "Quiz",
-        "iconName": "Lightbulb",
-        "href": "/builder/new?type=quiz",
-        "colorClass": "bg-teal-500/20 text-teal-400"
-      },
-      {
-        "id": "branding-kit",
-        "label": "Kit de Marca",
-        "iconName": "Palette",
-        "href": "/dashboard/settings/branding",
-        "colorClass": "bg-indigo-500/20 text-indigo-400"
-      },
-      {
-        "id": "view-metrics",
-        "label": "Métricas",
-        "iconName": "ChartBarBig",
-        "href": "/dashboard/analytics",
-        "colorClass": "bg-lime-500/20 text-lime-400"
-      }
-    ]
+    "services": []
   }
 }

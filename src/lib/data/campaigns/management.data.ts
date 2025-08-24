@@ -1,10 +1,11 @@
 // src/lib/data/campaigns/management.data.ts
 /**
  * @file src/lib/data/campaigns/management.data.ts
- * @description Aparato de datos atómico. Ha sido nivelado para soportar
- *              Inyección de Dependencias.
+ * @description Aparato de datos atómico. Responsable de las operaciones de lectura
+ *              y escritura para la gestión de campañas. Nivelado para incluir una
+ *              función de inserción atómica.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.0.0
  */
 "use server";
 
@@ -13,12 +14,23 @@ import { type SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
 import { createClient as createServerClient } from "@/lib/supabase/server";
+import { type TablesInsert } from "@/lib/types/database";
 
 import { type CampaignMetadata } from "./types";
 
 type Database = import("@/lib/types/database").Database;
 type Supabase = SupabaseClient<Database, "public">;
 
+/**
+ * @public
+ * @async
+ * @function getCampaignsMetadataBySiteId
+ * @description Obtiene los metadatos paginados y filtrados de las campañas de un sitio.
+ * @param {string} siteId - El ID del sitio.
+ * @param {object} options - Opciones de paginación y filtro.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para DI.
+ * @returns {Promise<{ campaigns: CampaignMetadata[]; totalCount: number }>}
+ */
 export async function getCampaignsMetadataBySiteId(
   siteId: string,
   options: {
@@ -88,6 +100,16 @@ export async function getCampaignsMetadataBySiteId(
   )();
 }
 
+/**
+ * @public
+ * @async
+ * @function getRecentCampaignsByWorkspaceId
+ * @description Obtiene las campañas modificadas más recientemente dentro de un workspace.
+ * @param {string} workspaceId - El ID del workspace.
+ * @param {number} [limit=4] - El número de campañas a obtener.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para DI.
+ * @returns {Promise<import("@/lib/types/database").Tables<"campaigns">[]>}
+ */
 export async function getRecentCampaignsByWorkspaceId(
   workspaceId: string,
   limit: number = 4,
@@ -139,12 +161,52 @@ export async function getRecentCampaignsByWorkspaceId(
 }
 
 /**
+ * @public
+ * @async
+ * @function insertCampaignRecord
+ * @description Inserta un nuevo registro de campaña en la base de datos.
+ * @param {TablesInsert<"campaigns">} campaignPayload - El objeto de datos a insertar.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para DI.
+ * @returns {Promise<{ id: string }>} El ID de la campaña recién creada.
+ * @throws {Error} Si la inserción en la base de datos falla.
+ */
+export async function insertCampaignRecord(
+  campaignPayload: TablesInsert<"campaigns">,
+  supabaseClient?: Supabase
+): Promise<{ id: string }> {
+  const supabase = supabaseClient || createServerClient();
+  const { data: newCampaign, error } = await supabase
+    .from("campaigns")
+    .insert(campaignPayload)
+    .select("id")
+    .single();
+
+  if (error || !newCampaign) {
+    logger.error("[DataLayer:Campaigns] Fallo al insertar nuevo registro.", {
+      error,
+    });
+    throw new Error("Fallo en la inserción de la base de datos de campaña.");
+  }
+
+  logger.trace(
+    "[DataLayer:Campaigns] Nuevo registro de campaña insertado con éxito.",
+    { campaignId: newCampaign.id }
+  );
+  return newCampaign;
+}
+
+/**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Inyección de Dependencias**: ((Implementada)) Las funciones ahora aceptan `supabaseClient`, permitiendo su uso seguro en contextos cacheados.
+ * 1. **Atomicidad de Acceso a Datos (SRP)**: ((Implementada)) Se ha añadido la función `insertCampaignRecord`, que encapsula la operación de escritura en la base de datos. Esto desacopla la Server Action de la implementación específica de Supabase, mejorando la mantenibilidad.
+ * 2. **Inyección de Dependencias**: ((Vigente)) Todas las funciones aceptan un `supabaseClient` opcional, lo que las hace testeables y reutilizables.
+ * 3. **Documentación TSDoc de Élite**: ((Implementada)) Se ha añadido documentación verbosa a la nueva función.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Transacciones RPC**: ((Vigente)) Para operaciones más complejas que impliquen múltiples escrituras (ej. crear campaña y actualizar contador de sitios), se deberían usar funciones RPC de PostgreSQL para garantizar la atomicidad transaccional a nivel de base de datos.
  *
  * =====================================================================
  */

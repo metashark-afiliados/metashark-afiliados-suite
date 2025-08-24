@@ -1,12 +1,10 @@
 // src/components/layout/sidebar/SidebarLogo.tsx
 /**
  * @file src/components/layout/sidebar/SidebarLogo.tsx
- * @description Aparato de UI atómico y puro para renderizar el logo y el nombre
- *              de la marca en la barra lateral. Es completamente agnóstico al
- *              contenido, consumiendo sus textos desde la capa de internacionalización.
- *              ¡IMPORTANTE!: Refactorizado para Rebranding Completo.
+ * @description Aparato de UI atómico y puro para renderizar el logo.
+ *              Sincronizado para consumir el namespace de i18n canónico.
  * @author Raz Podestá
- * @version 2.0.1
+ * @version 2.1.0
  */
 "use client";
 
@@ -17,7 +15,9 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/lib/navigation";
 
 export function SidebarLogo(): React.ReactElement {
-  const t = useTranslations("DashboardSidebar");
+  // --- INICIO DE CORRECCIÓN DE I18N ---
+  const t = useTranslations("components.layout.DashboardSidebar");
+  // --- FIN DE CORRECCIÓN DE I18N ---
 
   return (
     <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
@@ -30,29 +30,21 @@ export function SidebarLogo(): React.ReactElement {
           src="/images/logo.png"
           width={32}
           height={32}
-          // --- INICIO DE REFACTORIZACIÓN: Rebranding ---
-          alt={t("logo_alt_text")} // Consumir del i18n
-          // --- FIN DE REFACTORIZACIÓN ---
+          alt={t("logo_alt_text")}
           priority
         />
-        {/* --- INICIO DE REFACTORIZACIÓN: Rebranding --- */}
-        <span>{t("brand_name")}</span> {/* Consumir del i18n */}
-        {/* --- FIN DE REFACTORIZACIÓN --- */}
+        <span>{t("brand_name")}</span>
       </Link>
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Rebranding Completo**: ((Implementada)) Se ha actualizado el `alt` del logo de la imagen y el texto del `span` a consumir de las claves de i18n (`logo_alt_text`, `brand_name`), asegurando la coherencia de marca con el `REBRANDING_MANIFESTO.md`.
- *
- * @subsection Melhorias Futuras
- * 1. **Logo Dinámico por Workspace**: ((Vigente)) Podría aceptar un `logoUrl` opcional desde el contexto.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` al namespace canónico, resolviendo el error de renderizado del nombre de la marca.
  *
  * =====================================================================
  */
