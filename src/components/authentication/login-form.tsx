@@ -1,43 +1,41 @@
 // src/components/authentication/login-form.tsx
 /**
  * @file login-form.tsx
- * @description Componente de cliente soberano para el formulario de inicio de sesión.
- *              Sincronizado para consumir los namespaces de i18n canónicos.
+ * @description Componente de cliente para el formulario de inicio de sesión.
+ *              MODO DE DESARROLLO AISLADO: La lógica de envío ha sido
+ *              reemplazada por una redirección directa al dashboard para
+ *              acelerar la depuración funcional.
  * @author Raz Podestá
- * @version 3.1.0
+ * @version 4.0.0 (Dev Shortcut)
  */
 "use client";
 
 import Image from "next/image";
-import React, { useTransition } from "react";
+import React from "react";
 import { useTranslations } from "next-intl";
-import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react";
 
-import { signInWithEmailAction } from "@/lib/actions/auth.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "@/lib/navigation";
 import { OAuthButtonGroup } from "./OAuthButtonGroup";
 
 /**
  * @public
  * @component LoginForm
- * @description Renderiza el formulario de inicio de sesión, gestionando su estado y la invocación de la Server Action.
+ * @description Renderiza el formulario de inicio de sesión. En modo de desarrollo,
+ *              redirige al dashboard al hacer submit.
  * @returns {React.ReactElement} El componente de formulario renderizado.
  */
 export function LoginForm(): React.ReactElement {
   const t = useTranslations("pages.LoginPage");
   const tSupabase = useTranslations("components.auth.SupabaseAuthUI");
-  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
-  const handleLogin = (formData: FormData) => {
-    startTransition(async () => {
-      const result = await signInWithEmailAction(null, formData);
-      if (result && !result.success) {
-        toast.error(t(result.error as any));
-      }
-    });
+  const handleDevLogin = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // Bypass directo al dashboard
+    router.push("/dashboard");
   };
 
   return (
@@ -60,7 +58,7 @@ export function LoginForm(): React.ReactElement {
         {t("title")}
       </div>
 
-      <form action={handleLogin} className="w-full space-y-4">
+      <form onSubmit={handleDevLogin} className="w-full space-y-4">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <Label htmlFor="email">{tSupabase("email_label")}</Label>
           <Input
@@ -68,8 +66,7 @@ export function LoginForm(): React.ReactElement {
             id="email"
             name="email"
             autoComplete="username"
-            disabled={isPending}
-            required
+            defaultValue="dev@convertikit.com" // Placeholder para conveniencia
           />
         </div>
         <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -79,26 +76,27 @@ export function LoginForm(): React.ReactElement {
             id="password"
             name="password"
             autoComplete="current-password"
-            disabled={isPending}
-            required
+            defaultValue="password" // Placeholder para conveniencia
           />
         </div>
-        <Button type={"submit"} disabled={isPending} className={"w-full"}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isPending ? t("signInButton_pending") : t("signInButton")}
+        <Button type={"submit"} className={"w-full"}>
+          {t("signInButton")}
         </Button>
       </form>
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de i18n**: ((Implementada)) Se ha corregido el namespace para `tSupabase`, resolviendo futuros errores `MISSING_MESSAGE`.
+ * 1. **Shortcut de Desarrollo**: ((Implementada)) El formulario ahora implementa un bypass de autenticación del lado del cliente, redirigiendo directamente al dashboard para agilizar la depuración, según la directiva.
+ * 2. **Simplificación de Código**: ((Implementada)) Se ha eliminado la lógica de `useTransition` y `react-hot-toast` que era específica para la Server Action, haciendo el componente más ligero para esta fase de desarrollo.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Restauración de Lógica de Producción**: ((Vigente)) Este aparato deberá ser revertido a su versión anterior (que invoca `signInWithEmailAction`) antes del despliegue a producción. Se recomienda mantener la versión anterior en un archivo `login-form.tsx.bak` para facilitar la restauración.
  *
  * =====================================================================
  */

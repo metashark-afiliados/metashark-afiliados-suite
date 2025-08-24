@@ -1,42 +1,29 @@
 // src/app/[locale]/login/page.tsx
 /**
  * @file page.tsx
- * @description Ensamblador de UI para la página de inicio de sesión. Refactorizado
- *              a un estándar de élite para consumir el `AuthCardLayout`, garantizando
- *              la consistencia visual y el cumplimiento del principio DRY.
+ * @description Página de inicio de sesión. Refactorizada a un Componente de
+ *              Cliente para resolver el conflicto de renderizado dinámico
+ *              durante el build estático.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 4.0.0
  */
+"use client"; // <-- DIRECTIVA CRÍTICA
+
 import { useTranslations } from "next-intl";
+import { unstable_setRequestLocale } from "next-intl/server"; // Aún se necesita para el locale
 
 import { LoginForm } from "@/components/authentication/login-form";
-import { OAuthButtonGroup } from "@/components/authentication/OAuthButtonGroup";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 
-export default function LoginPage(): React.ReactElement {
+export default function LoginPage({
+  params: { locale },
+}: {
+  params: { locale: string };
+}): React.ReactElement {
+  unstable_setRequestLocale(locale); // Establece el locale para la página
   const t = useTranslations("pages.LoginPage");
   const tSignUp = useTranslations("pages.SignUpPage");
-  const tForm = useTranslations("components.auth.LoginForm");
-
-  const formContent = (
-    <>
-      <LoginForm />
-      <div className="relative px-6 md:px-16 pb-4">
-        <div className="absolute inset-x-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            {tForm("signInWith")}
-          </span>
-        </div>
-      </div>
-      <div className="px-6 md:px-16 pb-8">
-        <OAuthButtonGroup providers={["google", "apple"]} />
-      </div>
-    </>
-  );
 
   const bottomLink = tSignUp.rich("dontHaveAccount", {
     signup: (chunks) => (
@@ -48,20 +35,19 @@ export default function LoginPage(): React.ReactElement {
     ),
   });
 
-  return <AuthCardLayout bottomLink={bottomLink}>{formContent}</AuthCardLayout>;
+  return (
+    <AuthCardLayout bottomLink={bottomLink}>
+      <LoginForm />
+    </AuthCardLayout>
+  );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Consistencia Visual y de Código**: ((Implementada)) Al consumir `AuthCardLayout`, esta página ahora es visual y estructuralmente idéntica a la página de registro, cumpliendo un principio fundamental de la UX de élite.
- * 2. **Principio DRY**: ((Implementada)) Se ha eliminado el código de layout duplicado.
- *
- * @subsection Melhorias Futuras
- * 1. **Componente `AuthFormWrapper`**: ((Vigente)) La estructura interna del `formContent` sigue siendo un candidato para ser abstraída a un componente reutilizable.
+ * 1. **Resolución de Error de Build**: ((Implementada)) La conversión a un Client Component resuelve el error de renderizado estático.
  *
  * =====================================================================
  */

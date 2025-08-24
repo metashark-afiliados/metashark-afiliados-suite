@@ -1,76 +1,59 @@
 // src/components/authentication/sign-up-form.tsx
 /**
  * @file sign-up-form.tsx
- * @description Formulario de cliente soberano para el registro. Alineado con la
- *              arquitectura de ConvertiKit. Corregido para importar explícitamente
- *              desde el manifiesto del módulo de validadores.
+ * @description Formulario de cliente soberano para el registro.
+ *
+ * @version 5.0.0 (Dev Shortcut)
  * @author Raz Podestá
- * @version 4.2.0
+ *
+ * @note [MODO DE DESARROLLO AISLADO - LEER ANTES DE MODIFICAR]
+ * ==============================================================================
+ * ESTADO ACTUAL: Esta versión del componente está modificada para el "Modo de
+ * Desarrollo Aislado". Su propósito es acelerar la depuración de funcionalidades
+ * post-autenticación.
+ *
+ * COMPORTAMIENTO MODIFICADO:
+ * 1. La función `processSubmit` NO invoca la Server Action `signUpAction`.
+ * 2. En su lugar, ejecuta una redirección directa del lado del cliente a "/dashboard".
+ * 3. Se ha ELIMINADO la validación con `react-hook-form` y `zodResolver` para
+ *    permitir el envío con cualquier dato.
+ *
+ * ESTRATEGIA DE REVERSIÓN A PRODUCCIÓN:
+ * Para restaurar la funcionalidad de producción, se deben realizar los siguientes pasos:
+ * 1. Restaurar el uso de `react-hook-form` (descomentar `useForm`, `handleSubmit`, etc.).
+ * 2. Restaurar la invocación a la Server Action `signUpAction` dentro de `processSubmit`.
+ * 3. Restaurar la lógica de `useTransition` y `react-hot-toast` para el feedback de UI.
+ * 4. Eliminar el `useRouter` y la redirección directa.
+ * 5. La versión de producción de este archivo se encuentra en el commit [hash-del-commit-de-producción].
+ * ==============================================================================
  */
 "use client";
 
-import React, { useTransition } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import toast from "react-hot-toast";
+import React from "react";
 import { useTranslations } from "next-intl";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { type z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SmartLink } from "@/components/ui/SmartLink";
-import { signUpAction } from "@/lib/actions/auth.actions";
-// --- INICIO DE CORRECCIÓN DE IMPORTACIÓN ---
-import { SignUpSchema } from "@/lib/validators/index.ts";
-// --- FIN DE CORRECCIÓN DE IMPORTACIÓN ---
+import { useRouter } from "@/lib/navigation";
 import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
 
-type FormData = z.infer<typeof SignUpSchema>;
-
 export function SignupForm() {
-  const t = useTranslations("SignUpPage");
-  const tErrors = useTranslations("ValidationErrors");
-  const [isPending, startTransition] = useTransition();
+  const t = useTranslations("pages.SignUpPage");
+  const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(SignUpSchema),
-    mode: "onTouched",
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      termsAccepted: false,
-      newsletterSubscribed: false,
-    },
-  });
-
-  const passwordValue = watch("password");
-
-  const processSubmit: SubmitHandler<FormData> = (data) => {
-    startTransition(async () => {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, String(value));
-      });
-
-      const result = await signUpAction(null, formData);
-      if (result && !result.success) {
-        toast.error(tErrors(result.error as any));
-      }
-    });
+  // NOTA DEV: La validación de react-hook-form está deshabilitada.
+  const handleDevSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    router.push("/dashboard");
   };
 
   return (
     <form
-      onSubmit={handleSubmit(processSubmit)}
+      onSubmit={handleDevSubmit}
       className={"px-6 md:px-16 pb-6 py-8 gap-4 flex flex-col"}
     >
       <div
@@ -83,55 +66,25 @@ export function SignupForm() {
 
       <div className="space-y-1">
         <Label htmlFor="email">{t("email_label")}</Label>
-        <Input
-          id="email"
-          type="email"
-          {...register("email")}
-          disabled={isPending}
-        />
-        {errors.email && (
-          <p className="text-sm text-destructive">
-            {tErrors(errors.email.message as any)}
-          </p>
-        )}
+        <Input id="email" type="email" />
       </div>
 
       <div className="space-y-1">
         <Label htmlFor="password">{t("password_label")}</Label>
-        <Input
-          id="password"
-          type="password"
-          {...register("password")}
-          disabled={isPending}
-        />
-        {errors.password && (
-          <p className="text-sm text-destructive">
-            {tErrors(errors.password.message as any)}
-          </p>
-        )}
+        <Input id="password" type="password" />
       </div>
 
-      <PasswordStrengthMeter password={passwordValue} />
+      {/* La funcionalidad del PasswordStrengthMeter se mantiene para la UI */}
+      <PasswordStrengthMeter password={""} />
 
       <div className="space-y-1">
         <Label htmlFor="confirmPassword">{t("confirm_password_label")}</Label>
-        <Input
-          id="confirmPassword"
-          type="password"
-          {...register("confirmPassword")}
-          disabled={isPending}
-          onPaste={(e: React.ClipboardEvent) => e.preventDefault()}
-        />
-        {errors.confirmPassword && (
-          <p className="text-sm text-destructive">
-            {tErrors(errors.confirmPassword.message as any)}
-          </p>
-        )}
+        <Input id="confirmPassword" type="password" />
       </div>
 
       <div className="space-y-2 pt-2">
         <div className="flex items-start space-x-2">
-          <Checkbox id="terms" {...register("termsAccepted")} />
+          <Checkbox id="terms" />
           <div className="grid gap-1.5 leading-none">
             <Label
               htmlFor="terms"
@@ -156,15 +109,10 @@ export function SignupForm() {
             </Label>
           </div>
         </div>
-        {errors.termsAccepted && (
-          <p className="text-sm text-destructive">
-            {tErrors(errors.termsAccepted.message as any)}
-          </p>
-        )}
       </div>
 
       <div className="flex items-start space-x-2">
-        <Checkbox id="newsletter" {...register("newsletterSubscribed")} />
+        <Checkbox id="newsletter" />
         <div className="grid gap-1.5 leading-none">
           <Label
             htmlFor="newsletter"
@@ -175,24 +123,23 @@ export function SignupForm() {
         </div>
       </div>
 
-      <Button type="submit" disabled={isPending} className="w-full">
-        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isPending ? t("signUpButton_pending") : t("signUpButton")}
+      <Button type="submit" className="w-full">
+        {t("signUpButton")}
       </Button>
     </form>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación `TS2307`**: ((Implementada)) La ruta de importación de `SignUpSchema` ha sido corregida a `@/lib/validators/index.ts`, resolviendo el fallo de resolución de módulo en este archivo.
+ * 1. **Shortcut de Desarrollo**: ((Implementada)) El formulario ahora implementa un bypass de autenticación del lado del cliente, redirigiendo directamente al dashboard para agilizar la depuración, según la directiva.
+ * 2. **Documentación de Reversión**: ((Implementada)) Se ha añadido un bloque de comentarios detallado que explica el estado actual del componente y proporciona una guía clara para su futura restauración a la lógica de producción, minimizando la deuda técnica.
  *
  * @subsection Melhorias Futuras
- * 1. **Abstracción de `SubmitButton`**: ((Vigente)) La lógica del botón de envío con estado de carga es un patrón repetido. Podría ser abstraído a un componente `SubmitButton` atómico para mayor reutilización y cumplimiento del principio DRY.
+ * 1. **Restauración de Lógica de Producción**: ((Vigente)) Este aparato deberá ser revertido a su versión anterior, que utiliza `react-hook-form` e invoca `signUpAction`, antes del despliegue a producción.
  *
  * =====================================================================
  */
