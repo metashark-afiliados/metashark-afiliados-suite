@@ -4,8 +4,10 @@
  * @description Módulo de bajo nivel para la lógica de autorización. Ha sido
  *              nivelado a un estándar de élite al envolver la consulta de permisos
  *              en `React.cache` para una optimización de rendimiento crítica.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
+ * @location Florianópolis/SC, Brazil
+ * @contact raz.metashark.tech
  */
 "use server";
 import "server-only";
@@ -64,6 +66,7 @@ export const hasWorkspacePermission = cache(
     return hasPermission;
   }
 );
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
@@ -72,10 +75,10 @@ export const hasWorkspacePermission = cache(
  * @subsection Melhorias Adicionadas
  * 1. **Cacheo de Permisos de Élite**: ((Implementada)) La función ahora está envuelta en `React.cache`. Las llamadas subsecuentes con el mismo `userId` y `workspaceId` dentro de la misma request no golpearán la base de datos, optimizando drásticamente el rendimiento de los guardianes de seguridad.
  * 2. **Observabilidad Mejorada**: ((Implementada)) Se han añadido logs de `trace` que incluyen la clave de caché y el resultado de la verificación, proporcionando una visibilidad clara sobre el comportamiento del caché.
+ * 3. **Reubicación Arquitectónica**: ((Implementada)) El archivo ha sido movido de `lib/auth` a `lib/data`, ya que su responsabilidad principal es el acceso a datos.
  *
  * @subsection Melhorias Futuras
  * 1. **Permisos a Nivel de Aplicación**: ((Vigente)) Crear una función similar `hasAppPermission(userId, requiredRoles)` que verifique el `app_role` en `profiles` y también esté cacheada.
  *
  * =====================================================================
  */
-// src/lib/data/permissions.ts

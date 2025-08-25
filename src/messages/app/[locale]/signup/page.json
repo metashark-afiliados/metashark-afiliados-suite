@@ -15,7 +15,9 @@
     "strength_good": "Strength: <strong>Good</strong>",
     "strength_strong": "Strength: <strong>Strong</strong>",
     "newsletter_label": "Subscribe to our newsletter for tips and updates.",
-    "alreadyHaveAccount": "Already have an account? <strong>Sign in</strong>"
+    "alreadyHaveAccount": "Already have an account? <strong>Sign in</strong>",
+    "signInWith": "Or continue with",
+    "signInWithProvider": "Continue with {provider}"
   },
   "es-ES": {
     "metadataTitle": "Crear Cuenta",
@@ -32,7 +34,9 @@
     "strength_good": "Fortaleza: <strong>Buena</strong>",
     "strength_strong": "Fortaleza: <strong>Fuerte</strong>",
     "newsletter_label": "Suscríbete a nuestro boletín para recibir consejos y actualizaciones.",
-    "alreadyHaveAccount": "¿Ya tienes una cuenta? <strong>Inicia sesión</strong>"
+    "alreadyHaveAccount": "¿Ya tienes una cuenta? <strong>Inicia sesión</strong>",
+    "signInWith": "O continuar con",
+    "signInWithProvider": "Continuar con {provider}"
   },
   "pt-BR": {
     "metadataTitle": "Criar Conta",
@@ -49,7 +53,8 @@
     "strength_good": "Força: <strong>Boa</strong>",
     "strength_strong": "Força: <strong>Forte</strong>",
     "newsletter_label": "Inscreva-se na nossa newsletter para receber dicas e atualizações.",
-    "alreadyHaveAccount": "Já tem uma conta? <strong>Entrar</strong>"
+    "alreadyHaveAccount": "Já tem uma conta? <strong>Entrar</strong>",
+    "signInWith": "Ou continue com",
+    "signInWithProvider": "Continuar com {provider}"
   }
 }
-

@@ -2,9 +2,9 @@
 /**
  * @file SignUpPage.schema.ts
  * @description Define el contrato de datos para el namespace 'app.[locale].signup.page'.
- *              Sincronizado para incluir la clave del enlace inferior.
+ *              Sincronizado para incluir el ciclo de vida completo de OAuth.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 4.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -26,7 +26,9 @@ export const SignUpPageSchema = z.object({
   strength_good: z.string(),
   strength_strong: z.string(),
   newsletter_label: z.string(),
-  alreadyHaveAccount: z.string(), // Clave para el enlace "Already have an account? Sign in"
+  alreadyHaveAccount: z.string(),
+  signInWith: z.string(),
+  signInWithProvider: z.string(),
 });
 
 /**
@@ -35,8 +37,7 @@ export const SignUpPageSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato**: ((Implementada)) Se ha reintroducido la clave `alreadyHaveAccount`, asegurando que la página de registro tenga todas las traducciones que necesita sin depender de otros namespaces.
+ * 1. **Sincronización de Contrato Completo**: ((Implementada)) Se han añadido las claves `alreadyHaveAccount`, `signInWith` y `signInWithProvider`, asegurando que la página de registro sea un módulo 100% autocontenido.
  *
  * =====================================================================
  */
-// src/lib/validators/i18n/SignUpPage.schema.ts

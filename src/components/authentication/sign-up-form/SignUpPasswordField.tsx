@@ -2,9 +2,11 @@
 /**
  * @file SignUpPasswordField.tsx
  * @description Aparato de UI atómico y de presentación puro. Encapsula el
- *              campo de entrada de contraseña y el medidor de fortaleza.
- * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
- * @version 1.0.1
+ *              campo de entrada de contraseña y el medidor de fortaleza. Ha sido
+ *              refactorizado para consumir el namespace de i18n canónico y
+ *              para integrarse con el sistema de feedback visual de errores.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -43,10 +45,8 @@ export function SignUpPasswordField({
   isPending,
   passwordValue,
 }: SignUpPasswordFieldProps): React.ReactElement {
-  const t = useTranslations("pages.SignUpPage");
-  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const t = useTranslations("app.[locale].signup.page");
   const tErrors = useTranslations("shared.ValidationErrors");
-  // --- FIN DE REFACTORIZACIÓN ---
 
   return (
     <div className="space-y-1">
@@ -58,6 +58,7 @@ export function SignUpPasswordField({
         disabled={isPending}
         aria-invalid={!!errors.password}
         {...register("password")}
+        hasError={!!errors.password}
       />
       <PasswordStrengthMeter password={passwordValue} />
       {errors.password && (
@@ -68,13 +69,15 @@ export function SignUpPasswordField({
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para los mensajes de error, apuntando al namespace canónico `"shared.ValidationErrors"`. Esto resuelve la causa raíz del error de build para este componente.
+ * 2. **Feedback Visual de Error**: ((Implementada)) Se ha añadido la prop `hasError={!!errors.password}` al componente `Input`, integrándolo con el sistema de estilos de validación de élite.
  *
  * @subsection Melhorias Futuras
  * 1. **Toggle de Visibilidad**: ((Vigente)) Añadir un icono de "ojo" dentro del `Input` que permita al usuario alternar la visibilidad de la contraseña, una mejora de UX estándar en la industria.

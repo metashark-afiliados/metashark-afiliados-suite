@@ -2,9 +2,10 @@
 /**
  * @file SignUpLegalCheckboxes.tsx
  * @description Aparato de UI atómico y de presentación puro. Encapsula los
- *              checkboxes de consentimiento legal y de marketing.
- * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
- * @version 1.0.1
+ *              checkboxes de consentimiento legal y de marketing. Ha sido
+ *              refactorizado para consumir el namespace de i18n canónico.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -40,10 +41,8 @@ export function SignUpLegalCheckboxes({
   errors,
   isPending,
 }: SignUpLegalCheckboxesProps): React.ReactElement {
-  const t = useTranslations("pages.SignUpPage");
-  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const t = useTranslations("app.[locale].signup.page");
   const tErrors = useTranslations("shared.ValidationErrors");
-  // --- FIN DE REFACTORIZACIÓN ---
 
   return (
     <div className="space-y-4 pt-2">
@@ -110,16 +109,17 @@ export function SignUpLegalCheckboxes({
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para los mensajes de error, apuntando al namespace canónico `"shared.ValidationErrors"`. Esto resuelve la causa raíz del error de build para este componente.
  *
  * @subsection Melhorias Futuras
- * 1. **Encapsulamiento de Lógica de Enlaces**: ((Vigente)) La construcción de los `SmartLink` dentro de `t.rich` es funcional, pero si la lógica de generación de URLs para `/terms` y `/privacy` se vuelve más compleja, podría abstraerse a un helper para mantener el JSX más limpio.
+ * 1. **Feedback Visual de Error**: ((Vigente)) El texto del `Label` para los términos podría volverse rojo si `errors.termsAccepted` existe, proporcionando un feedback visual más claro.
  *
  * =====================================================================
  */

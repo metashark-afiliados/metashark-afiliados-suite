@@ -3,7 +3,7 @@
  * @file page.tsx
  * @description Orquestador de UI para la página de inicio de sesión. Refactorizado
  *              para ser completamente autónomo en su consumo de i18n, eliminando
- *              dependencias cruzadas y resolviendo errores de Vercel.
+ *              dependencias cruzadas y resolviendo errores críticos de build en Vercel.
  * @author Raz Podestá - MetaShark Tech
  * @version 5.0.0
  * @date 2025-08-25
@@ -20,8 +20,10 @@ import {
 } from "@/components/authentication/login-form";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
+import { clientLogger } from "@/lib/logging";
 
 export default function LoginPage(): React.ReactElement {
+  clientLogger.trace("[LoginPage] Renderizando orquestador de UI.");
   const t = useTranslations("app.[locale].login.page");
 
   const bottomLink = t.rich("dontHaveAccount", {
@@ -58,12 +60,11 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la llamada a `useTranslations` del namespace de `signup` y se ha corregido la clave en `t.rich` a `dontHaveAccount`, resolviendo los errores de Vercel.
- * 2. **Autonomía de Módulo (LEGO)**: ((Implementada)) El componente ahora depende exclusivamente de su propio namespace, adhiriéndose estrictamente a la arquitectura IMAS y convirtiéndose en una pieza de LEGO autocontenida.
+ * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para que apunte al namespace canónico y completo. Se ha eliminado la dependencia cruzada con el namespace de `signup`, resolviendo los errores de build de Vercel.
+ * 2. **Autonomía de Módulo (Filosofía LEGO)**: ((Implementada)) El componente ahora depende exclusivamente de su propio namespace de i18n (`app.[locale].login.page`), adhiriéndose estrictamente a la arquitectura IMAS y convirtiéndose en una pieza de LEGO 100% autocontenida.
  *
  * @subsection Melhorias Futuras
- * 1. **Componente de Formulario Puro**: ((Vigente)) Para una pureza de élite, el componente `LoginForm` aún podría ser refactorizado para recibir todos sus textos de error como props, en lugar de que el `useEffect` interno mapee claves de error.
+ * 1. **Componente de Formulario Puro**: ((Vigente)) Para una pureza de élite, el componente `LoginForm` podría ser refactorizado para recibir todos sus textos de error como props, en lugar de que el `useEffect` interno mapee claves de error. Esto lo haría completamente agnóstico a la capa de i18n.
  *
  * =====================================================================
  */
-// src/app/[locale]/login/page.tsx

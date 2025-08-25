@@ -1,13 +1,13 @@
 // src/lib/hooks/useHandleErrors.ts
 /**
- * @file src/lib/hooks/useHandleErrors.ts
+ * @file useHandleErrors.ts
  * @description Hook Soberano que encapsula la lógica de manejo de errores del lado del cliente.
  *              Este aparato centraliza el feedback al usuario mediante `toast` y el registro
  *              persistente en el servidor mediante `createPersistentErrorLog`.
- *              Ha sido refactorizado para utilizar el "guardián de tipo" `isActionError`,
- *              resolviendo los errores de tipado de forma robusta.
+ *              Ha sido refactorizado para utilizar el namespace de i18n canónico,
+ *              resolviendo un error crítico de build `MISSING_MESSAGE`.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.5
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -17,11 +17,11 @@
 import { useCallback } from "react";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
-import { ZodError, type ZodIssue } from "zod";
+import { ZodError } from "zod";
 
 import { createPersistentErrorLog } from "@/lib/actions/_helpers/error-log.helper";
 import { clientLogger } from "@/lib/logging";
-import { type ActionResult, isActionError } from "@/lib/validators";
+import { isActionError } from "@/lib/validators";
 
 /**
  * @public
@@ -34,9 +34,7 @@ import { type ActionResult, isActionError } from "@/lib/validators";
  *          Un objeto que contiene la función para manejar errores.
  */
 export function useHandleErrors() {
-  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
   const tValidationErrors = useTranslations("shared.ValidationErrors");
-  // --- FIN DE REFACTORIZACIÓN ---
 
   const handleError = useCallback(
     async (error: unknown, context?: Record<string, any>) => {
@@ -126,11 +124,11 @@ export function useHandleErrors() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el hook con la arquitectura IMAS y los schemas de Zod.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es la corrección de élite que resuelve la causa raíz del error de build `MISSING_MESSAGE`, alineando el hook con la arquitectura IMAS y los schemas de Zod.
  *
  * @subsection Melhorias Futuras
- * 1. **Contexto de Usuario en `createPersistentErrorLog`**: ((Vigente)) El `handleError` podría ser mejorado para obtener el `userId` y el `locale` del contexto global (ej. `DashboardContext`) y pasarlos a `createPersistentErrorLog` como metadatos, enriqueciendo los logs del backend.
- * 2. **Tipado Estricto de Claves de `ValidationErrors`**: ((Vigente)) El tipo `error` en `ActionResult` es actualmente `string`. Podría ser refinado para ser `keyof typeof ValidationErrorsSchema` o un `z.enum` de todas las claves de error de i18n válidas. Esto permitiría al `isActionError` hacer una comprobación más estricta sobre el contenido del `error`.
+ * 1. **Contexto de Usuario en Logs**: ((Vigente)) El `handleError` podría mejorarse para obtener el `userId` y el `locale` del `DashboardContext` y pasarlos a `createPersistentErrorLog` como metadatos, enriqueciendo los logs del backend.
+ * 2. **Tipado Estricto de Claves de Error**: ((Vigente)) El tipo `error` en `ActionResult` es actualmente `string`. Podría refinarse para ser `keyof typeof ValidationErrorsSchema` o un `z.enum` de todas las claves de error de i18n válidas, permitiendo una comprobación más estricta.
  * 3. **Botón de Acción en Toast**: ((Vigente)) Para ciertos errores (ej. "Error de red"), el `toast` podría incluir un botón "Reintentar" o "Contactar Soporte", que ejecute un callback pasado al `handleError`.
  *
  * =====================================================================

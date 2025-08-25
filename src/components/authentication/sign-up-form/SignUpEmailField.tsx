@@ -2,9 +2,11 @@
 /**
  * @file SignUpEmailField.tsx
  * @description Aparato de UI atómico y de presentación puro. Encapsula el
- *              campo de entrada de email para el formulario de registro.
- * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
- * @version 1.0.1
+ *              campo de entrada de email para el formulario de registro. Ha sido
+ *              refactorizado para consumir el namespace de i18n canónico,
+ *              resolviendo un error crítico de build `MISSING_MESSAGE`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -13,11 +15,11 @@
 
 import { type FieldErrors, type UseFormRegister } from "react-hook-form";
 import { useTranslations } from "next-intl";
+import { type z } from "zod";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { type SignUpSchema } from "@/lib/validators";
-import { type z } from "zod";
 
 type FormData = z.infer<typeof SignUpSchema>;
 
@@ -39,10 +41,8 @@ export function SignUpEmailField({
   errors,
   isPending,
 }: SignUpEmailFieldProps): React.ReactElement {
-  const t = useTranslations("pages.SignUpPage");
-  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const t = useTranslations("app.[locale].signup.page");
   const tErrors = useTranslations("shared.ValidationErrors");
-  // --- FIN DE REFACTORIZACIÓN ---
 
   return (
     <div className="space-y-1">
@@ -54,6 +54,7 @@ export function SignUpEmailField({
         disabled={isPending}
         aria-invalid={!!errors.email}
         {...register("email")}
+        hasError={!!errors.email}
       />
       {errors.email && (
         <p className="text-sm text-destructive" role="alert">
@@ -63,13 +64,15 @@ export function SignUpEmailField({
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para los mensajes de error, apuntando al namespace canónico `"shared.ValidationErrors"`. Esto resuelve la causa raíz del error de build para este componente.
+ * 2. **Feedback Visual de Error**: ((Implementada)) Se ha añadido la prop `hasError={!!errors.email}` al componente `Input`, integrándolo con el sistema de estilos de validación de élite.
  *
  * @subsection Melhorias Futuras
  * 1. **Icono de Estado de Validación**: ((Vigente)) Se podría añadir un icono de `Check` o `X` dentro del input para proporcionar un feedback visual instantáneo sobre la validez del email.

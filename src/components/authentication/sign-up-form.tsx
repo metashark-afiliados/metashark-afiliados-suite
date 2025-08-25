@@ -2,10 +2,11 @@
 /**
  * @file sign-up-form.tsx
  * @description Orquestador de UI soberano para el formulario de registro.
- *              Refactorizado para actuar como un orquestador de i18n para sus
- *              componentes hijos, resolviendo un error de compilación.
+ *              Refactorizado a un estándar de élite para ser un componente de
+ *              presentación más puro, recibiendo textos de OAuth vía props y
+ *              resolviendo dependencias cruzadas de i18n.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 4.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -48,8 +49,16 @@ function SubmitButton() {
   );
 }
 
-export function SignupForm() {
-  const tLogin = useTranslations("app.[locale].login.page");
+export interface SignupFormProps {
+  texts: {
+    oauth: {
+      signInWith: string;
+      signInWithProvider: string;
+    };
+  };
+}
+
+export function SignupForm({ texts }: SignupFormProps) {
   const tErrors = useTranslations("shared.ValidationErrors");
   const [state, formAction] = useFormState(signUpAction, {
     success: false,
@@ -90,7 +99,7 @@ export function SignupForm() {
   const isPending = useFormStatus().pending || isSubmitting;
 
   const oauthButtonGroupTexts: OAuthButtonGroupProps["texts"] = {
-    signInWithProvider: tLogin("signInWithProvider"),
+    signInWithProvider: texts.oauth.signInWithProvider,
   };
 
   return (
@@ -123,7 +132,7 @@ export function SignupForm() {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
-            {tLogin("signInWith")}
+            {texts.oauth.signInWith}
           </span>
         </div>
       </div>
@@ -141,12 +150,11 @@ export function SignupForm() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación (TS2741)**: ((Implementada)) El componente ahora obtiene las traducciones del namespace consolidado y las pasa como prop a `OAuthButtonGroup`, cumpliendo el nuevo contrato y resolviendo el error.
- * 2. **Cohesión de i18n**: ((Implementada)) Se ha consolidado el consumo de textos de OAuth, eliminando la dispersión de la lógica de i18n.
+ * 1. **Resolución de Dependencia Cruzada**: ((Implementada)) Se ha eliminado la llamada `useTranslations("app.[locale].login.page")`. El componente ahora es puro con respecto a los textos de OAuth, recibiéndolos a través de `props`. Esto resuelve la causa raíz del error `FORMATTING_ERROR`.
+ * 2. **Adhesión a la "Filosofía LEGO"**: ((Implementada)) Al no tener dependencias de i18n externas, este componente se convierte en una "pieza de LEGO" más robusta y reutilizable.
  *
  * @subsection Melhorias Futuras
- * 1. **Componente Puro**: ((Vigente)) Para una pureza de élite, este componente podría ser refactorizado para recibir todos sus textos y la función `t` a través de props, al igual que se hizo con `LoginForm`.
+ * 1. **Componente 100% Puro**: ((Vigente)) Para una pureza de élite, todas las llamadas a `useTranslations` (incluyendo `tErrors`) podrían ser eliminadas y sus textos requeridos pasados a través de `props`, convirtiéndolo en un componente de presentación 100% puro.
  *
  * =====================================================================
  */
-// src/components/authentication/sign-up-form.tsx
