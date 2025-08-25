@@ -1,21 +1,27 @@
-// src/components/dashboard/landing/components/dashboard-team-members-card.tsx
 /**
  * @file dashboard-team-members-card.tsx
  * @description Componente de UI que renderiza una tarjeta mostrando los miembros
- *              del equipo del workspace activo.
- * @author Raz Podestá (adaptado de paddle-nextjs-starter-kit)
- * @version 1.0.0
+ *              del equipo. Ha sido refactorizado a un estándar de élite:
+ *              ahora es full internacionalizado y está conectado al sistema
+ *              de estado global para invocar el diálogo de invitación.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { Plus } from "lucide-react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Usaremos nuestro Avatar
+import { useWorkspaceDialogStore } from "@/lib/hooks/useWorkspaceDialogStore";
+import { clientLogger } from "@/lib/logging";
 
-// Datos de placeholder, análogos al proyecto de referencia
+// Datos de placeholder, a ser reemplazados por datos del `useDashboard` hook.
 const teamMembers = [
   {
     name: "Raz Podestá",
@@ -32,27 +38,41 @@ const teamMembers = [
   },
 ];
 
-export function DashboardTeamMembersCard() {
+/**
+ * @public
+ * @component DashboardTeamMembersCard
+ * @description Renderiza la tarjeta de miembros del equipo en el Hub Creativo.
+ * @returns {React.ReactElement}
+ */
+export function DashboardTeamMembersCard(): React.ReactElement {
+  const t = useTranslations("components.dashboard.DashboardTeamMembersCard");
+  const openInviteDialog = useWorkspaceDialogStore((state) => state.open);
+
+  const handleInviteClick = () => {
+    clientLogger.info(
+      "[DashboardTeamMembersCard] El usuario inició el flujo para invitar a un miembro."
+    );
+    openInviteDialog("invite");
+  };
+
   return (
     <Card className={"bg-background/50 backdrop-blur-[24px] border-border p-6"}>
       <CardHeader className="p-0 space-y-0">
         <CardTitle className="flex justify-between gap-2 items-center pb-6 border-border border-b">
           <div className={"flex flex-col gap-2"}>
-            <span className={"text-xl font-medium"}>Team members</span>
+            <span className={"text-xl font-medium"}>{t("title")}</span>
             <span className={"text-base leading-4 text-muted-foreground"}>
-              Invite your team members to collaborate
+              {t("description")}
             </span>
           </div>
           <Button
-            asChild={true}
             size={"sm"}
             variant={"outline"}
             className={"text-sm rounded-sm border-border"}
+            onClick={handleInviteClick}
+            aria-label={t("invite_button_aria")}
           >
-            {/* Este enlace debería abrir el modal de invitar miembro */}
-            <Link href={"#"}>
-              <Plus size={16} className={"text-muted-foreground"} />
-            </Link>
+            <Plus size={16} className={"text-muted-foreground"} />
           </Button>
         </CardTitle>
       </CardHeader>
@@ -82,18 +102,20 @@ export function DashboardTeamMembersCard() {
     </Card>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Colaboración**: ((Implementada)) Introduce la visualización de miembros del equipo en el dashboard, reforzando las capacidades multi-tenant de la aplicación.
- * 2. **Adaptación a Nuestro Ecosistema**: ((Implementada)) El componente utiliza nuestro `Avatar` de Shadcn/UI y datos adaptados a nuestro proyecto.
+ * 1. **Full Internacionalización**: ((Implementada)) Todo el texto codificado ha sido extraído y ahora se consume desde la capa de i18n, cumpliendo con el protocolo.
+ * 2. **Integración con Estado Global**: ((Implementada)) El botón de "Invitar" ahora está conectado al `useWorkspaceDialogStore` y abre correctamente el modal de invitación.
+ * 3. **Full Observabilidad**: ((Implementada)) Se ha añadido `clientLogger` para registrar la interacción del usuario con el botón de invitar.
  *
  * @subsection Melhorias Futuras
- * 1. **Datos Dinámicos**: ((Vigente)) Este componente debe ser refactorizado para obtener la lista de `teamMembers` desde el `useDashboard` hook, consultando la propiedad `workspace_members` del contexto.
- * 2. **Integración con Modal de Invitación**: ((Vigente)) El botón `+` debe ser conectado para invocar `useWorkspaceDialogStore.getState().open('invite')` y abrir el modal de invitación.
+ * 1. **Conexión a Datos Dinámicos**: ((Vigente)) ((PRIORIDAD ALTA)) Este componente debe ser refactorizado para consumir la lista de miembros del `useDashboard` hook. Esto requerirá una modificación en el `dashboard.loader.ts` para que obtenga los `workspace_members` del workspace activo y los inyecte en el contexto.
+ * 2. **Gestión de Roles**: ((Vigente)) Una vez que los datos sean dinámicos, se debería mostrar el rol de cada miembro (`owner`, `admin`, `member`) junto a su nombre.
  *
  * =====================================================================
  */
