@@ -1,11 +1,10 @@
+// src/components/layout/sidebar/PrimarySidebar.tsx
 /**
  * @file PrimarySidebar.tsx
- * @description Orquestador de UI para la barra de navegación primaria.
- *              Ha sido refactorizado a un estándar de élite para consumir el
- *              namespace de i18n completo y canónico, resolviendo un error
- *              crítico de `MISSING_MESSAGE` durante el build en Vercel.
+ * @description Orquestador de UI para la barra de navegación primaria. Refactorizado
+ *              a un componente de presentación puro, agnóstico a la lógica de i18n.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
+ * @version 3.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -13,7 +12,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { type useTranslations } from "next-intl";
 import { Settings } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,17 +26,16 @@ import { primaryNavLinks } from "./primary-sidebar.config";
 import { PrimarySidebarButton } from "./PrimarySidebarButton";
 import { UserProfileWidget } from "./UserProfileWidget";
 
-export function PrimarySidebar() {
-  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
-  // Se consume el namespace completo y canónico según la SSoT (i18n.ts),
-  // resolviendo el error `MISSING_MESSAGE`.
-  const t = useTranslations("components.layout.DashboardSidebar");
-  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
+interface PrimarySidebarProps {
+  t: ReturnType<typeof useTranslations>;
+}
+
+export function PrimarySidebar({ t }: PrimarySidebarProps) {
   const pathname = usePathname();
   const { user } = useDashboard();
   const { isProfileWidgetOpen, setProfileWidgetOpen } = useDashboardUIStore();
 
-  clientLogger.trace("[PrimarySidebar] Renderizando orquestador de UI.");
+  clientLogger.trace("[PrimarySidebar] Renderizando orquestador de UI puro.");
 
   const userInitials = (user?.user_metadata?.full_name || user?.email || "U")
     .split(" ")
@@ -81,7 +79,7 @@ export function PrimarySidebar() {
               variant="ghost"
               className="h-12 w-12 rounded-full p-0"
               onClick={() => setProfileWidgetOpen(true)}
-              aria-label="Abrir perfil de usuario"
+              aria-label={t("userMenu_open_aria_label")}
             >
               <Avatar className="h-10 w-10">
                 <AvatarImage src={user?.user_metadata?.avatar_url} />
@@ -92,7 +90,7 @@ export function PrimarySidebar() {
         </nav>
       </aside>
       <div className="fixed bottom-4 left-24 z-20">
-        {isProfileWidgetOpen && <UserProfileWidget />}
+        {isProfileWidgetOpen && <UserProfileWidget t={t} />}
       </div>
     </>
   );
@@ -104,10 +102,13 @@ export function PrimarySidebar() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para que utilice el namespace completo y canónico, resolviendo el error de build en Vercel.
+ * 1. **Componente de Presentación Puro**: ((Implementada)) Se ha eliminado la llamada a `useTranslations`. El componente ahora es 100% agnóstico a la lógica de i18n y es controlado por su padre, cumpliendo con la "Filosofía LEGO".
+ * 2. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Al no cargar su propio namespace, este componente ya no puede ser la fuente de un error `MISSING_MESSAGE`.
+ * 3. **Propagación de `t`**: ((Implementada)) La función de traducción `t` se propaga a los componentes hijos que la necesitan, como `UserProfileWidget`.
  *
  * @subsection Melhorias Futuras
- * 1. **Navegación Robusta**: ((Vigente)) La lógica `pathname.startsWith(href)` para determinar el estado activo es funcional pero puede ser frágil. Una solución de élite sería usar el `useSelectedLayoutSegment` de Next.js para una comparación más precisa.
+ * 1. **Contrato de Props Explícito para `t`**: ((Vigente)) La prop `t` podría ser tipada de forma más estricta utilizando el tipo inferido del `DashboardSidebarSchema` de Zod para una seguridad de tipos de élite.
  *
  * =====================================================================
  */
+// src/components/layout/sidebar/PrimarySidebar.tsx

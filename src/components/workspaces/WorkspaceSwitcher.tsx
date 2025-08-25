@@ -1,5 +1,16 @@
 // src/components/workspaces/WorkspaceSwitcher.tsx
+/**
+ * @file WorkspaceSwitcher.tsx
+ * @description Orquestador de UI soberano. Sincronizado para importar y componer
+ *              el `WorkspacePopoverContent` externo y corregido.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 7.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 import React from "react";
+import { useTranslations } from "next-intl";
 
 import {
   Popover,
@@ -11,16 +22,16 @@ import {
   useWorkspaceContext,
   WorkspaceProvider,
 } from "@/lib/hooks/useWorkspaceContext.tsx";
+import { useWorkspaceInlineEditor } from "@/lib/hooks/useWorkspaceInlineEditor";
 import { useWorkspaceManager } from "@/lib/hooks/useWorkspaceManager";
 import { WorkspacePopoverContent } from "./WorkspacePopoverContent";
 import { WorkspaceTrigger } from "./WorkspaceTrigger";
 
-/**
- * @private
- * @component WorkspaceSwitcherContent
- * @description Componente de ensamblaje que conecta todos los hooks y componentes atómicos.
- */
-const WorkspaceSwitcherContent = () => {
+const WorkspaceSwitcherContent = ({
+  t,
+}: {
+  t: ReturnType<typeof useTranslations>;
+}) => {
   const { workspaces, activeWorkspace } = useDashboard();
   const { canEdit, canDelete } = useWorkspaceContext();
   const {
@@ -29,14 +40,27 @@ const WorkspaceSwitcherContent = () => {
     handleWorkspaceSelect,
     ...actionHandlers
   } = useWorkspaceManager();
+  const tErrors = useTranslations("shared.ValidationErrors");
+
+  const inlineEditorHook = useWorkspaceInlineEditor({
+    successToastText: t("edit_form.success_toast"),
+    errorToastTextFn: (errorKey: string) => tErrors(errorKey as any),
+  });
+
+  const triggerTexts = {
+    ariaLabel: t("selectWorkspace_label"),
+    statusText: t("changing_status"),
+    editAriaLabel: t("edit_form.name_aria_label"),
+  };
 
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
       <PopoverTrigger asChild>
-        <WorkspaceTrigger />
+        <WorkspaceTrigger texts={triggerTexts} hook={inlineEditorHook} />
       </PopoverTrigger>
       <PopoverContent className="w-[220px] p-0">
         <WorkspacePopoverContent
+          t={t}
           workspaces={workspaces}
           activeWorkspaceId={activeWorkspace!.id}
           onWorkspaceSelect={handleWorkspaceSelect}
@@ -49,22 +73,18 @@ const WorkspaceSwitcherContent = () => {
   );
 };
 
-/**
- * @public
- * @component WorkspaceSwitcher
- * @description Orquestador de UI soberano y de élite. Ensambla el `WorkspaceProvider`
- *              y el `WorkspaceSwitcherContent` para construir el componente completo.
- * @author Raz Podestá
- * @version 4.0.0
- */
-export function WorkspaceSwitcher(): React.ReactElement | null {
+export function WorkspaceSwitcher({
+  t,
+}: {
+  t: ReturnType<typeof useTranslations>;
+}): React.ReactElement | null {
   const { activeWorkspace } = useDashboard();
   if (!activeWorkspace) {
-    return null; // No renderizar nada si no hay workspace activo
+    return null;
   }
   return (
     <WorkspaceProvider>
-      <WorkspaceSwitcherContent />
+      <WorkspaceSwitcherContent t={t} />
     </WorkspaceProvider>
   );
 }
@@ -75,10 +95,7 @@ export function WorkspaceSwitcher(): React.ReactElement | null {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Ensamblaje Pura**: ((Implementada)) El componente ahora es un ensamblador de alto nivel, adhiriéndose a la "Filosofía LEGO".
- *
- * @subsection Melhorias Futuras
- * 1. **Optimización de Renderizado**: ((Vigente)) Usar `React.memo` en `WorkspaceSwitcherContent` sigue siendo una optimización válida.
+ * 1. **Resolución Definitiva de Error de Compilación**: ((Implementada)) La refactorización del `WorkspacePopoverContent` externo y la sincronización de su padre `WorkspaceSwitcher` resuelve el error `TS2741` en su causa raíz.
  *
  * =====================================================================
  */

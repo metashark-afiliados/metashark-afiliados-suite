@@ -1,12 +1,10 @@
 // src/components/layout/sidebar/UserProfileWidget.tsx
 /**
  * @file UserProfileWidget.tsx
- * @description Aparato de UI atómico y desacoplado. Renderiza el perfil
- *              del usuario de forma flotante y gestiona su propia visibilidad
- *              a través del `useDashboardUIStore`. Es una pieza clave de la
- *              nueva arquitectura de layout "Workspace Creativo".
+ * @description Aparato de UI atómico y puro. Renderiza el perfil del usuario
+ *              de forma flotante y es 100% agnóstico a la lógica de i18n.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -15,6 +13,7 @@
 
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
+import { type useTranslations } from "next-intl";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -22,11 +21,15 @@ import { useDashboard } from "@/lib/context/DashboardContext";
 import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
 import { clientLogger } from "@/lib/logging";
 
-export function UserProfileWidget() {
+interface UserProfileWidgetProps {
+  t: ReturnType<typeof useTranslations>;
+}
+
+export function UserProfileWidget({ t }: UserProfileWidgetProps) {
   const { user } = useDashboard();
   const { setProfileWidgetOpen } = useDashboardUIStore();
 
-  clientLogger.trace("[UserProfileWidget] Renderizando widget de perfil.");
+  clientLogger.trace("[UserProfileWidget] Renderizando widget de perfil puro.");
 
   const userInitials = (user?.user_metadata?.full_name || user?.email || "U")
     .split(" ")
@@ -45,7 +48,9 @@ export function UserProfileWidget() {
       <Avatar className="h-10 w-10">
         <AvatarImage
           src={user?.user_metadata?.avatar_url}
-          alt={`Avatar de ${user?.user_metadata?.full_name}`}
+          alt={t("userMenu_avatar_alt", {
+            username: user?.user_metadata?.full_name,
+          })}
         />
         <AvatarFallback>{userInitials}</AvatarFallback>
       </Avatar>
@@ -60,25 +65,25 @@ export function UserProfileWidget() {
         size="icon"
         className="h-7 w-7 ml-auto flex-shrink-0"
         onClick={() => setProfileWidgetOpen(false)}
-        aria-label="Cerrar widget de perfil"
+        aria-label={t("userMenu_close_widget_aria_label")}
       >
         <X className="h-4 w-4" />
       </Button>
     </motion.div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de UI Desacoplado**: ((Implementada)) Este aparato aísla la UI del perfil de usuario, controlando su estado a través de un store global, lo que permite una mayor flexibilidad en el layout.
- * 2. **Animación de Élite**: ((Implementada)) Utiliza `framer-motion` para una animación de entrada/salida fluida, mejorando la calidad percibida de la interfaz.
+ * 1. **Resolución de Error de Compilación (TS2322)**: ((Implementada)) El componente ahora acepta la prop `t`, sincronizando su contrato con el de su padre (`PrimarySidebar`) y resolviendo el error de compilación.
+ * 2. **Componente de Presentación Puro**: ((Implementada)) Se ha eliminado la llamada interna a `useTranslations`. El componente ahora es completamente agnóstico al contenido, lo que mejora su reutilización y testabilidad.
  *
  * @subsection Melhorias Futuras
- * 1. **Internacionalización de ARIA Label**: ((Vigente)) El `aria-label` del botón de cierre está codificado. Debería consumir un namespace de i18n para una accesibilidad completa.
- * 2. **Acciones Rápidas**: ((Vigente)) Se podría añadir un menú contextual (`DropdownMenu`) al hacer clic en el widget para acciones rápidas como "Ver Perfil" o "Cerrar Sesión".
+ * 1. **Acciones Rápidas**: ((Vigente)) Se podría añadir un menú contextual (`DropdownMenu`) al hacer clic en el widget para acciones rápidas como "Ver Perfil" o "Cerrar Sesión", recibiendo los textos y callbacks como props.
  *
  * =====================================================================
  */

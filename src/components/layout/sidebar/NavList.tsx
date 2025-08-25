@@ -1,10 +1,13 @@
 // src/components/layout/sidebar/NavList.tsx
 /**
  * @file src/components/layout/sidebar/NavList.tsx
- * @description Aparato de UI atómico que renderiza la lista de navegación principal.
- *              Sincronizado para usar `useTypedTranslations` con el namespace canónico.
- * @author Raz Podestá
- * @version 3.1.0
+ * @description Aparato de UI atómico. Refactorizado para ser un presentador
+ *              puro, recibiendo la función `t` vía props.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -18,9 +21,9 @@ import {
   Sparkles,
   Palette,
 } from "lucide-react";
+import { type useTranslations } from "next-intl";
 
 import { useDashboard } from "@/lib/context/DashboardContext";
-import { useTypedTranslations } from "@/lib/i18n/hooks"; // <-- USAR HOOK TIPADO
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
@@ -60,11 +63,12 @@ const NavListSkeleton = () => (
   </nav>
 );
 
-export function NavList(): React.ReactElement {
+interface NavListProps {
+  t: ReturnType<typeof useTranslations>;
+}
+
+export function NavList({ t }: NavListProps): React.ReactElement {
   const { user } = useDashboard();
-  // --- INICIO DE CORRECCIÓN DE I18N ---
-  const t = useTypedTranslations("components.layout.DashboardSidebar");
-  // --- FIN DE CORRECCIÓN DE I18N ---
 
   if (!user) {
     return <NavListSkeleton />;

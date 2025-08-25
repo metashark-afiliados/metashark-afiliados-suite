@@ -1,11 +1,10 @@
 // src/lib/hooks/useWorkspaceInlineEditor.ts
 /**
  * @file useWorkspaceInlineEditor.ts
- * @description Hook soberano que encapsula la lógica completa para la edición en línea
- *              del nombre del workspace. Gestiona el estado de edición, el valor del input,
- *              la invocación de la server action y el feedback al usuario.
- * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
- * @version 2.0.1
+ * @description Hook Soberano de lógica pura para la edición en línea.
+ *              Es 100% agnóstico a la i18n, recibiendo textos vía argumentos.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -14,25 +13,19 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
 
 import { workspaces as workspaceActions } from "@/lib/actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
-import { clientLogger } from "@/lib/logging";
 
-/**
- * @public
- * @function useWorkspaceInlineEditor
- * @description Hook soberano que encapsula la lógica completa para la edición en línea
- *              del nombre del workspace. Gestiona el estado de edición, el valor del input,
- *              la invocación de la server action y el feedback al usuario.
- * @returns Un objeto con el estado y los manejadores necesarios para el componente `WorkspaceTrigger`.
- */
-export function useWorkspaceInlineEditor() {
-  const t = useTranslations("WorkspaceSwitcher");
-  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
-  const tErrors = useTranslations("shared.ValidationErrors");
-  // --- FIN DE REFACTORIZACIÓN ---
+interface UseWorkspaceInlineEditorProps {
+  successToastText: string;
+  errorToastTextFn: (errorKey: string) => string;
+}
+
+export function useWorkspaceInlineEditor({
+  successToastText,
+  errorToastTextFn,
+}: UseWorkspaceInlineEditorProps) {
   const { activeWorkspace, activeWorkspaceRole } = useDashboard();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -58,14 +51,15 @@ export function useWorkspaceInlineEditor() {
   }, [isEditing]);
 
   const handleSaveName = useCallback(() => {
-    if (!activeWorkspace || inputValue.trim() === activeWorkspaceName) {
+    if (
+      !activeWorkspace ||
+      inputValue.trim() === "" ||
+      inputValue.trim() === activeWorkspaceName
+    ) {
       setIsEditing(false);
+      setInputValue(activeWorkspaceName);
       return;
     }
-
-    clientLogger.trace(
-      `[WorkspaceInlineEditor] Guardando nuevo nombre para workspace: ${activeWorkspace.id}`
-    );
 
     startApiTransition(async () => {
       const result = await workspaceActions.updateWorkspaceNameAction(
@@ -74,16 +68,20 @@ export function useWorkspaceInlineEditor() {
       );
 
       if (result.success) {
-        toast.success(t("edit_form.success_toast"));
+        toast.success(successToastText);
       } else {
-        toast.error(
-          tErrors(result.error as any, { defaultValue: result.error })
-        );
+        toast.error(errorToastTextFn(result.error));
         setInputValue(activeWorkspaceName);
       }
       setIsEditing(false);
     });
-  }, [activeWorkspace, inputValue, activeWorkspaceName, t, tErrors]);
+  }, [
+    activeWorkspace,
+    inputValue,
+    activeWorkspaceName,
+    successToastText,
+    errorToastTextFn,
+  ]);
 
   return {
     isEditing,
@@ -97,16 +95,4 @@ export function useWorkspaceInlineEditor() {
     activeWorkspaceName,
   };
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el hook con la arquitectura IMAS y los schemas de Zod.
- *
- * @subsection Melhorias Futuras
- * 1. **Prevención de Guardado Innecesario**: ((Vigente)) La lógica ya previene la llamada a la API si el nombre no ha cambiado, pero se podría añadir un feedback visual sutil al usuario en `handleSaveName` para indicar que no se realizaron cambios.
- *
- * =====================================================================
- */
+// src/lib/hooks/useWorkspaceInlineEditor.ts

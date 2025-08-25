@@ -1,62 +1,68 @@
 // src/components/workspaces/WorkspacePopoverContent.tsx
+/**
+ * @file WorkspacePopoverContent.tsx
+ * @description Componente de ensamblaje de élite. Compone los aparatos atómicos
+ *              `WorkspaceList` y `WorkspaceActions` y les inyecta sus textos
+ *              traducidos.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 import React from "react";
+import { type useTranslations } from "next-intl";
 
 import { Command, CommandSeparator } from "@/components/ui/command";
 import { type Workspace } from "@/lib/data/workspaces";
+import { useDashboard } from "@/lib/context/DashboardContext";
+import { useWorkspaceContext } from "@/lib/hooks/useWorkspaceContext.tsx";
+import { useWorkspaceManager } from "@/lib/hooks/useWorkspaceManager";
 import {
   WorkspaceActions,
   type WorkspaceActionsProps,
 } from "./WorkspaceActions";
 import { WorkspaceList } from "./WorkspaceList";
 
-/**
- * @public
- * @interface WorkspacePopoverContentProps
- * @description Contrato de props para el componente.
- */
-export interface WorkspacePopoverContentProps extends WorkspaceActionsProps {
+export interface WorkspacePopoverContentProps
+  extends Omit<WorkspaceActionsProps, "texts"> {
   workspaces: Workspace[];
   activeWorkspaceId: string | null;
   onWorkspaceSelect: (workspaceId: string) => void;
+  t: ReturnType<typeof useTranslations>;
 }
 
-/**
- * @public
- * @component WorkspacePopoverContent
- * @description Componente de ensamblaje de élite. Su única responsabilidad
- *              es componer los aparatos atómicos `WorkspaceList` y
- *              `WorkspaceActions` para construir el contenido completo del popover.
- * @author Raz Podestá
- * @version 1.0.0
- */
 export function WorkspacePopoverContent({
   workspaces,
   activeWorkspaceId,
   onWorkspaceSelect,
+  t,
   ...actionProps
 }: WorkspacePopoverContentProps) {
+  const listTexts = {
+    searchPlaceholder: t("search_placeholder"),
+    emptyResults: t("empty_results"),
+  };
+
+  const actionTexts = {
+    create: t("createWorkspace_button"),
+    invite: t("inviteMember_button"),
+    rename: t("renameWorkspace_button"),
+    settings: t("workspaceSettings_button"),
+    delete: t("deleteWorkspace_button"),
+  };
+
   return (
     <Command>
       <WorkspaceList
         workspaces={workspaces}
         activeWorkspaceId={activeWorkspaceId}
         onWorkspaceSelect={onWorkspaceSelect}
+        texts={listTexts}
       />
       <CommandSeparator />
-      <WorkspaceActions {...actionProps} />
+      <WorkspaceActions texts={actionTexts} {...actionProps} />
     </Command>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Ensamblaje (LEGO)**: ((Implementada)) Componente ensamblador puro que compone átomos, mejorando la legibilidad.
- * 2. **Principio de Responsabilidad Única (SRP)**: ((Implementada)) Su única responsabilidad es la composición del contenido del popover.
- *
- * =====================================================================
- */
 // src/components/workspaces/WorkspacePopoverContent.tsx

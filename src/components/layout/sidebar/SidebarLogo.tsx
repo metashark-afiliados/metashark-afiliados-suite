@@ -1,24 +1,27 @@
 // src/components/layout/sidebar/SidebarLogo.tsx
 /**
  * @file src/components/layout/sidebar/SidebarLogo.tsx
- * @description Aparato de UI atómico y puro para renderizar el logo.
- *              Sincronizado para consumir el namespace de i18n canónico.
- * @author Raz Podestá
- * @version 2.1.0
+ * @description Aparato de UI atómico y puro. Refactorizado para ser agnóstico
+ *              a la lógica de i18n, recibiendo `t` como prop.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import React from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { type useTranslations } from "next-intl";
 
 import { Link } from "@/lib/navigation";
 
-export function SidebarLogo(): React.ReactElement {
-  // --- INICIO DE CORRECCIÓN DE I18N ---
-  const t = useTranslations("components.layout.DashboardSidebar");
-  // --- FIN DE CORRECCIÓN DE I18N ---
+interface SidebarLogoProps {
+  t: ReturnType<typeof useTranslations>;
+}
 
+export function SidebarLogo({ t }: SidebarLogoProps): React.ReactElement {
   return (
     <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
       <Link
@@ -38,13 +41,14 @@ export function SidebarLogo(): React.ReactElement {
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` al namespace canónico, resolviendo el error de renderizado del nombre de la marca.
+ * 1. **Componente Puro**: ((Implementada)) Se ha eliminado `useTranslations`. El componente es ahora un presentador puro.
  *
  * =====================================================================
  */

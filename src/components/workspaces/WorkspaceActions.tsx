@@ -1,12 +1,12 @@
 // src/components/workspaces/WorkspaceActions.tsx
 /**
  * @file WorkspaceActions.tsx
- * @description Componente de presentación 100% puro que renderiza las acciones de
- *              gestión de un workspace. Es completamente agnóstico al estado,
- *              recibiendo los flags de permisos y los callbacks a través de props.
- *              Ha sido validado contra la nueva arquitectura de i18n.
- * @author Raz Podestá
- * @version 2.1.0
+ * @description Componente de presentación 100% puro.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -18,9 +18,15 @@ import {
   CommandItem,
   CommandSeparator,
 } from "@/components/ui/command";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
 
 export interface WorkspaceActionsProps {
+  texts: {
+    create: string;
+    invite: string;
+    rename: string;
+    settings: string;
+    delete: string;
+  };
   canEdit: boolean;
   canDelete: boolean;
   onSelectCreate: () => void;
@@ -31,6 +37,7 @@ export interface WorkspaceActionsProps {
 }
 
 export function WorkspaceActions({
+  texts,
   canEdit,
   canDelete,
   onSelectCreate,
@@ -39,27 +46,25 @@ export function WorkspaceActions({
   onSelectSettings,
   onSelectDelete,
 }: WorkspaceActionsProps): React.ReactElement {
-  const t = useTypedTranslations("components.workspaces.WorkspaceSwitcher");
-
   return (
     <CommandGroup>
       <CommandItem onSelect={onSelectCreate} className="cursor-pointer">
         <PlusCircle className="mr-2 h-5 w-5" />
-        {t("createWorkspace_button")}
+        {texts.create}
       </CommandItem>
       {canEdit && (
         <>
           <CommandItem onSelect={onSelectInvite} className="cursor-pointer">
             <UserPlus className="mr-2 h-5 w-5" />
-            {t("inviteMember_button")}
+            {texts.invite}
           </CommandItem>
           <CommandItem onSelect={onSelectRename} className="cursor-pointer">
             <FileEdit className="mr-2 h-5 w-5" />
-            {t("renameWorkspace_button")}
+            {texts.rename}
           </CommandItem>
           <CommandItem onSelect={onSelectSettings} className="cursor-pointer">
             <Settings className="mr-2 h-5 w-5" />
-            {t("workspaceSettings_button")}
+            {texts.settings}
           </CommandItem>
         </>
       )}
@@ -71,25 +76,11 @@ export function WorkspaceActions({
             className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
           >
             <Trash2 className="mr-2 h-5 w-5" />
-            {t("deleteWorkspace_button")}
+            {texts.delete}
           </CommandItem>
         </>
       )}
     </CommandGroup>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de i18n**: ((Implementada)) Se ha validado que el componente consume el namespace canónico `"components.workspaces.WorkspaceSwitcher"`, alineándose con la infraestructura de i18n refactorizada y resolviendo el error de tipo `TS2345`.
- * 2. **Componente Puro y Desacoplado**: ((Vigente)) El componente es 100% controlado por props, lo que aumenta su reutilización y testabilidad.
- *
- * @subsection Melhorias Futuras
- * 1. **Renderizado Declarativo**: ((Vigente)) La lista de acciones podría ser definida como un array de objetos de configuración y renderizada a través de un `.map()` para un código más declarativo y fácil de extender.
- *
- * =====================================================================
- */
 // src/components/workspaces/WorkspaceActions.tsx
