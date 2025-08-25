@@ -73,8 +73,8 @@ export default getRequestConfig(async ({ locale }) => {
 
         if (localeMessages) {
           // Aplanar el objeto del namespace y fusionarlo en el acumulador.
-          // Ej: { "title": "..." } en el namespace "components.Header"
-          // se convierte en { "components.Header.title": "..." }
+          // Ej: { "title": "..." } en el namespace "components.layout.DashboardSidebar"
+          // se convierte en { "components.layout.DashboardSidebar.title": "..." }
           Object.assign(acc, flattenMessages(localeMessages, namespace));
         } else {
           logger.warn(
