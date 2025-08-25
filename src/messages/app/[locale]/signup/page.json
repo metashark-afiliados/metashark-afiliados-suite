@@ -14,7 +14,8 @@
     "strength_fair": "Strength: <strong>Fair</strong>",
     "strength_good": "Strength: <strong>Good</strong>",
     "strength_strong": "Strength: <strong>Strong</strong>",
-    "newsletter_label": "Subscribe to our newsletter for tips and updates."
+    "newsletter_label": "Subscribe to our newsletter for tips and updates.",
+    "alreadyHaveAccount": "Already have an account? <strong>Sign in</strong>"
   },
   "es-ES": {
     "metadataTitle": "Crear Cuenta",
@@ -30,7 +31,8 @@
     "strength_fair": "Fortaleza: <strong>Regular</strong>",
     "strength_good": "Fortaleza: <strong>Buena</strong>",
     "strength_strong": "Fortaleza: <strong>Fuerte</strong>",
-    "newsletter_label": "Suscríbete a nuestro boletín para recibir consejos y actualizaciones."
+    "newsletter_label": "Suscríbete a nuestro boletín para recibir consejos y actualizaciones.",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta? <strong>Inicia sesión</strong>"
   },
   "pt-BR": {
     "metadataTitle": "Criar Conta",
@@ -46,6 +48,8 @@
     "strength_fair": "Força: <strong>Razoável</strong>",
     "strength_good": "Força: <strong>Boa</strong>",
     "strength_strong": "Força: <strong>Forte</strong>",
-    "newsletter_label": "Inscreva-se na nossa newsletter para receber dicas e atualizações."
+    "newsletter_label": "Inscreva-se na nossa newsletter para receber dicas e atualizações.",
+    "alreadyHaveAccount": "Já tem uma conta? <strong>Entrar</strong>"
   }
 }
+

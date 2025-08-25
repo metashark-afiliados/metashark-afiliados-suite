@@ -1,11 +1,11 @@
 // src/app/[locale]/login/page.tsx
 /**
  * @file page.tsx
- * @description Orquestador de UI para la página de inicio de sesión. Corregido
- *              para eliminar dependencias de i18n redundantes y alinear la
- *              llamada a `t.rich` con la SSoT.
+ * @description Orquestador de UI para la página de inicio de sesión. Refactorizado
+ *              para ser completamente autónomo en su consumo de i18n y corregir
+ *              errores de formato.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.1.0
+ * @version 3.2.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -24,7 +24,7 @@ import { SmartLink } from "@/components/ui/SmartLink";
 export default function LoginPage(): React.ReactElement {
   const t = useTranslations("app.[locale].login.page");
 
-  const bottomLink = t.rich("alreadyHaveAccount", {
+  const bottomLink = t.rich("dontHaveAccount", {
     strong: (chunks) => (
       <SmartLink
         href="/signup"
@@ -58,8 +58,8 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Errores `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la llamada a `useTranslations` para el namespace de `signup` y se ha corregido la clave en `t.rich`, resolviendo los errores de i18n.
- * 2. **Cohesión de i18n**: ((Implementada)) El componente ahora depende de un único namespace, adhiriéndose a la arquitectura IMAS.
+ * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la llamada a `useTranslations` del namespace incorrecto y se ha corregido la clave en `t.rich`, resolviendo los errores de Vercel.
+ * 2. **Cohesión Arquitectónica (SSoT)**: ((Implementada)) El componente ahora depende exclusivamente de su propio namespace, adhiriéndose estrictamente a la arquitectura IMAS.
  *
  * =====================================================================
  */

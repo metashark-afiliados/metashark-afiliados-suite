@@ -2,10 +2,9 @@
 /**
  * @file SignUpPage.schema.ts
  * @description Define el contrato de datos para el namespace 'app.[locale].signup.page'.
- *              Ha sido depurado para eliminar claves que han sido migradas a la SSoT
- *              de la página de login, mejorando la cohesión.
+ *              Sincronizado para incluir la clave del enlace inferior.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
+ * @version 3.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -27,6 +26,7 @@ export const SignUpPageSchema = z.object({
   strength_good: z.string(),
   strength_strong: z.string(),
   newsletter_label: z.string(),
+  alreadyHaveAccount: z.string(), // Clave para el enlace "Already have an account? Sign in"
 });
 
 /**
@@ -35,10 +35,7 @@ export const SignUpPageSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Cohesión de Contrato (SRP)**: ((Implementada)) Se ha eliminado la clave `dontHaveAccount`. Este schema ahora se adhiere estrictamente al Principio de Responsabilidad Única, definiendo únicamente los textos para la vista de registro.
- *
- * @subsection Melhorias Futuras
- * 1. **Revisión de Claves**: ((Vigente)) Las claves `terms_label` y otras relacionadas con el formulario podrían ser migradas a un namespace de componente compartido (`SignUpForm.schema.ts`) si se decidiera refactorizar el formulario de registro a un componente de presentación puro.
+ * 1. **Sincronización de Contrato**: ((Implementada)) Se ha reintroducido la clave `alreadyHaveAccount`, asegurando que la página de registro tenga todas las traducciones que necesita sin depender de otros namespaces.
  *
  * =====================================================================
  */
