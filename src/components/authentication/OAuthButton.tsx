@@ -1,16 +1,17 @@
 // src/components/authentication/OAuthButton.tsx
 /**
  * @file src/components/authentication/OAuthButton.tsx
- * @description Componente de UI atómico para la autenticación OAuth. Migrado al
- *              directorio canónico `/authentication`. Sincronizado para consumir
- *              los namespaces de i18n canónicos.
- * @author Raz Podestá
- * @version 3.0.0
+ * @description Componente de UI atómico y puro. Refactorizado para ser 100%
+ *              agnóstico al contenido, recibiendo su texto a través de props.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import React, { useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { type Provider } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
 
@@ -50,7 +51,7 @@ const AppleIcon = () => (
   </svg>
 );
 
-const providerDetails: Record<
+export const providerDetails: Record<
   string,
   { icon: React.ElementType; name: string }
 > = {
@@ -58,12 +59,15 @@ const providerDetails: Record<
   apple: { icon: AppleIcon, name: "Apple" },
 };
 
+export interface OAuthButtonProps {
+  provider: Provider;
+  text: string;
+}
+
 export function OAuthButton({
   provider,
-}: {
-  provider: Provider;
-}): React.ReactElement {
-  const t = useTranslations("components.auth.OAuthButton");
+  text,
+}: OAuthButtonProps): React.ReactElement {
   const [isPending, startTransition] = useTransition();
   const details = providerDetails[provider];
 
@@ -72,7 +76,7 @@ export function OAuthButton({
     return <></>;
   }
 
-  const { icon: Icon, name } = details;
+  const { icon: Icon } = details;
 
   const handleOAuthSignIn = () => {
     startTransition(() => {
@@ -90,23 +94,8 @@ export function OAuthButton({
       disabled={isPending}
     >
       {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Icon />}
-      {t("signInWithProvider", { provider: name })}
+      {text}
     </Button>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Migración a Directorio Canónico**: ((Implementada)) El componente ha sido movido a `src/components/authentication`, consolidando la SSoT.
- * 2. **Sincronización de i18n**: ((Implementada)) La llamada a `useTranslations` ahora utiliza el namespace canónico, garantizando que el texto se renderice correctamente.
- *
- * @subsection Melhorias Futuras
- * 1. **Registro de Proveedores Dinámico**: ((Vigente)) El objeto `providerDetails` podría ser inyectado a través de un contexto o props para permitir añadir nuevos proveedores sin modificar el código del componente.
- *
- * =====================================================================
- */
 // src/components/authentication/OAuthButton.tsx

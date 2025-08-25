@@ -2,10 +2,10 @@
 /**
  * @file login-form.tsx
  * @description Componente de cliente soberano para el formulario de inicio de sesión.
- *              Implementa la arquitectura de página dedicada utilizando
- *              useFormState para una integración directa y robusta con Server Actions.
+ *              Refactorizado a un componente de presentación puro que recibe todos
+ *              sus textos a través de props.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.1.0
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -15,7 +15,6 @@
 import React from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 
 import { signInWithEmailAction } from "@/lib/actions/auth.actions";
@@ -25,19 +24,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OAuthButtonGroup } from "./OAuthButtonGroup";
 
-function SubmitButton() {
+interface SubmitButtonProps {
+  texts: {
+    signInButton: string;
+    signInButton_pending: string;
+  };
+}
+
+function SubmitButton({ texts }: SubmitButtonProps) {
   const { pending } = useFormStatus();
-  const t = useTranslations("pages.LoginPage");
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {pending ? t("signInButton_pending") : t("signInButton")}
+      {pending ? texts.signInButton_pending : texts.signInButton}
     </Button>
   );
 }
 
-export function LoginForm(): React.ReactElement {
-  const t = useTranslations("pages.LoginPage");
+export interface LoginFormTexts {
+  email_label: string;
+  password_label: string;
+  forgot_password_link: string;
+  signInButton: string;
+  signInButton_pending: string;
+  signInWith: string;
+  signInWithProvider: string;
+  error_invalid_credentials: string;
+}
+
+export interface LoginFormProps {
+  texts: LoginFormTexts;
+}
+
+export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
   const [state, formAction] = useFormState(signInWithEmailAction, {
     success: false,
     error: "",
@@ -45,14 +64,17 @@ export function LoginForm(): React.ReactElement {
 
   React.useEffect(() => {
     if (!state.success && state.error) {
-      toast.error(t(state.error as any));
+      // Usa el objeto de textos para obtener el mensaje de error.
+      const errorMessage =
+        texts[state.error as keyof LoginFormTexts] || state.error;
+      toast.error(errorMessage);
     }
-  }, [state, t]);
+  }, [state, texts]);
 
   return (
     <form action={formAction} className="grid gap-4">
       <div className="grid gap-2">
-        <Label htmlFor="email">{t("email_label")}</Label>
+        <Label htmlFor="email">{texts.email_label}</Label>
         <Input
           id="email"
           name="email"
@@ -63,34 +85,32 @@ export function LoginForm(): React.ReactElement {
       </div>
       <div className="grid gap-2">
         <div className="flex items-center">
-          <Label htmlFor="password">{t("password_label")}</Label>
+          <Label htmlFor="password">{texts.password_label}</Label>
           <Link
             href="/forgot-password"
             className="ml-auto inline-block text-sm underline"
           >
-            {t("forgot_password_link")}
+            {texts.forgot_password_link}
           </Link>
         </div>
         <Input id="password" name="password" type="password" required />
       </div>
-      <SubmitButton />
-      <OAuthButtonGroup providers={["google", "apple"]} />
+      <SubmitButton texts={texts} />
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            {texts.signInWith}
+          </span>
+        </div>
+      </div>
+      <OAuthButtonGroup
+        providers={["google", "apple"]}
+        texts={{ signInWithProvider: texts.signInWithProvider }}
+      />
     </form>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Corrección de Sintaxis Crítica**: ((Implementada)) Se ha corregido el error de sintaxis en la desestructuración de `useTransition` y se han añadido todas las importaciones necesarias, resolviendo la cascada de errores de compilación.
- * 2. **Arquitectura de Formulario Soberano**: ((Vigente)) El componente ahora tiene control total sobre su estado, validación y envío.
- *
- * @subsection Melhorias Futuras
- * 1. **Validación en Cliente con `react-hook-form`**: ((Vigente)) Añadir `react-hook-form` para una validación en tiempo real en el cliente antes del envío.
- *
- * =====================================================================
- */
 // src/components/authentication/login-form.tsx

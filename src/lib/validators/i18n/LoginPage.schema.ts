@@ -1,10 +1,14 @@
 // src/lib/validators/i18n/LoginPage.schema.ts
 /**
  * @file LoginPage.schema.ts
- * @description Define el contrato de datos para el namespace 'LoginPage',
- *              utilizado en la página de inicio de sesión dedicada.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Define el contrato de datos consolidado y SSoT para el namespace
+ *              'app.[locale].login.page', unificando todos los textos necesarios
+ *              para la vista de inicio de sesión.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.1.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
@@ -12,20 +16,28 @@ export const LoginPageSchema = z.object({
   metadataTitle: z.string(),
   title: z.string(),
   subtitle: z.string(),
+  email_label: z.string(),
+  password_label: z.string(),
+  forgot_password_link: z.string(),
   signInButton: z.string(),
   signInButton_pending: z.string(),
+  signInWith: z.string(),
+  signInWithProvider: z.string().describe("Ej: 'Continuar con {provider}'"),
   alreadyHaveAccount: z.string(),
   error_invalid_credentials: z.string(),
   error_oauth_failed: z.string(),
   error_oauth_provider_missing: z.string(),
+  error_profile_creation_failed: z.string(),
 });
 
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
+ *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato Atómico**: ((Implementada)) Se ha creado el schema faltante, un paso crítico para la integridad del sistema i18n.
+ * 1. **Completitud de Contrato**: ((Implementada)) Se ha añadido la clave `signInWithProvider`, completando el contrato necesario para que la vista de login sea completamente agnóstica a la i18n.
+ *
  * =====================================================================
  */
 // src/lib/validators/i18n/LoginPage.schema.ts

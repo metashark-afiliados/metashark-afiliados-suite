@@ -2,12 +2,10 @@
 /**
  * @file sign-up-form.tsx
  * @description Orquestador de UI soberano para el formulario de registro.
- *              Refactorizado a un estándar de élite para componer sus campos
- *              de formulario a partir de componentes atómicos, con una
- *              corrección crítica en la ruta de importación para resolver
- *              una dependencia circular.
- * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
- * @version 2.2.0
+ *              Refactorizado para actuar como un orquestador de i18n para sus
+ *              componentes hijos, resolviendo un error de compilación.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -15,7 +13,7 @@
 "use client";
 
 import React from "react";
-import { useForm, type SubmitHandler, Controller } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormState, useFormStatus } from "react-dom";
 import toast from "react-hot-toast";
@@ -26,24 +24,22 @@ import type { z } from "zod";
 import { signUpAction } from "@/lib/actions/auth.actions";
 import { SignUpSchema } from "@/lib/validators";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/Checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { SmartLink } from "@/components/ui/SmartLink";
-import { OAuthButtonGroup } from "./OAuthButtonGroup";
-import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
 import {
   SignUpEmailField,
   SignUpPasswordField,
   SignUpConfirmPasswordField,
   SignUpLegalCheckboxes,
 } from "./sign-up-form/index";
+import {
+  OAuthButtonGroup,
+  type OAuthButtonGroupProps,
+} from "./OAuthButtonGroup";
 
 type FormData = z.infer<typeof SignUpSchema>;
 
 function SubmitButton() {
   const { pending } = useFormStatus();
-  const t = useTranslations("pages.SignUpPage");
+  const t = useTranslations("app.[locale].signup.page");
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -53,9 +49,8 @@ function SubmitButton() {
 }
 
 export function SignupForm() {
-  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const tLogin = useTranslations("app.[locale].login.page");
   const tErrors = useTranslations("shared.ValidationErrors");
-  // --- FIN DE REFACTORIZACIÓN ---
   const [state, formAction] = useFormState(signUpAction, {
     success: false,
     error: "",
@@ -94,8 +89,12 @@ export function SignupForm() {
 
   const isPending = useFormStatus().pending || isSubmitting;
 
+  const oauthButtonGroupTexts: OAuthButtonGroupProps["texts"] = {
+    signInWithProvider: tLogin("signInWithProvider"),
+  };
+
   return (
-    <form onSubmit={handleSubmit(processSubmit)} className="space-y-4 p-6">
+    <form onSubmit={handleSubmit(processSubmit)} className="space-y-4">
       <SignUpEmailField
         register={register}
         errors={errors}
@@ -118,20 +117,36 @@ export function SignupForm() {
         isPending={isPending}
       />
       <SubmitButton />
-      <OAuthButtonGroup providers={["google", "apple"]} />
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            {tLogin("signInWith")}
+          </span>
+        </div>
+      </div>
+      <OAuthButtonGroup
+        providers={["google", "apple"]}
+        texts={oauthButtonGroupTexts}
+      />
     </form>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
+ * 1. **Resolución de Error de Compilación (TS2741)**: ((Implementada)) El componente ahora obtiene las traducciones del namespace consolidado y las pasa como prop a `OAuthButtonGroup`, cumpliendo el nuevo contrato y resolviendo el error.
+ * 2. **Cohesión de i18n**: ((Implementada)) Se ha consolidado el consumo de textos de OAuth, eliminando la dispersión de la lógica de i18n.
  *
  * @subsection Melhorias Futuras
- * 1. **Abstracción de Botón de Envío**: ((Vigente)) El `SubmitButton` actual es un componente interno. Para una mayor reutilización y cohesión, podría ser extraído a un archivo separado (`src/components/ui/FormSubmitButton.tsx`) y exportado.
+ * 1. **Componente Puro**: ((Vigente)) Para una pureza de élite, este componente podría ser refactorizado para recibir todos sus textos y la función `t` a través de props, al igual que se hizo con `LoginForm`.
  *
  * =====================================================================
  */
+// src/components/authentication/sign-up-form.tsx

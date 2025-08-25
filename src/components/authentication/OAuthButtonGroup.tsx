@@ -1,45 +1,47 @@
 // src/components/authentication/OAuthButtonGroup.tsx
 /**
  * @file OAuthButtonGroup.tsx
- * @description Componente de ensamblaje de UI. Renderiza un grupo de botones
- *              para los proveedores OAuth especificados. Actualizado para
- *              importar su dependencia atómica desde el directorio canónico.
- * @author Raz Podestá
- * @version 2.0.0
+ * @description Componente de ensamblaje de UI. Refactorizado para ser un
+ *              componente puro que recibe su texto a través de props y lo
+ *              propaga a sus hijos.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { type Provider } from "@supabase/supabase-js";
-// --- INICIO DE CORRECCIÓN DE RUTA DE IMPORTACIÓN ---
-import { OAuthButton } from "./OAuthButton";
-// --- FIN DE CORRECCIÓN DE RUTA DE IMPORTACIÓN ---
+import {
+  OAuthButton,
+  providerDetails,
+} from "@/components/authentication/OAuthButton";
 
-interface OAuthButtonGroupProps {
+export interface OAuthButtonGroupProps {
   providers: Provider[];
+  texts: {
+    signInWithProvider: string; // Template string: "Continue with {provider}"
+  };
 }
 
-export function OAuthButtonGroup({ providers }: OAuthButtonGroupProps) {
+export function OAuthButtonGroup({ providers, texts }: OAuthButtonGroupProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-      {providers.map((provider) => (
-        <OAuthButton key={provider} provider={provider} />
-      ))}
+      {providers.map((provider) => {
+        const details = providerDetails[provider];
+        if (!details) return null;
+
+        const buttonText = texts.signInWithProvider.replace(
+          "{provider}",
+          details.name
+        );
+
+        return (
+          <OAuthButton key={provider} provider={provider} text={buttonText} />
+        );
+      })}
     </div>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia**: ((Implementada)) Se ha corregido la ruta de importación de `OAuthButton` para que apunte a la nueva ubicación canónica, resolviendo el segundo y último error de compilación `TS2307`.
- * 2. **Layout Responsivo Mejorado**: ((Implementada)) Se ha actualizado la clase de la cuadrícula a `grid-cols-1 sm:grid-cols-2` para una mejor presentación en dispositivos móviles, mostrando los botones uno encima del otro.
- *
- * @subsection Melhorias Futuras
- * 1. **Manejo de Proveedores Desconocidos**: ((Vigente)) Añadir una comprobación para asegurar que cada `provider` en el array tiene una entrada correspondiente en el `providerDetails` de `OAuthButton.tsx` para evitar renderizar botones vacíos.
- *
- * =====================================================================
- */
 // src/components/authentication/OAuthButtonGroup.tsx

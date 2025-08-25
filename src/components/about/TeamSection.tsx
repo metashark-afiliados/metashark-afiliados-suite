@@ -1,6 +1,15 @@
 // src/components/about/TeamSection.tsx
-"use client";
-
+/**
+ * @file TeamSection.tsx
+ * @description Orquestador de UI que ensambla las tarjetas de miembros del equipo.
+ *              Como Server Component por defecto, renderiza su estructura y compone
+ *              otros Server Components (`TeamMemberCard`) para un rendimiento óptimo.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 import { Users } from "lucide-react";
 
 import { TeamMemberCard, type TeamMember } from "./TeamMemberCard";
@@ -14,9 +23,7 @@ interface TeamSectionProps {
 /**
  * @public
  * @component TeamSection
- * @description Orquestador de UI que ensambla las tarjetas de miembros del equipo.
- *              Ha sido refactorizado para ser un Client Component explícito,
- *              resolviendo una violación de reglas de React Server Components.
+ * @description Renderiza la sección del equipo, componiendo las tarjetas de los miembros.
  * @param {TeamSectionProps} props - Propiedades para configurar la sección.
  * @returns {React.ReactElement}
  */
@@ -53,10 +60,10 @@ export function TeamSection({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Blocker de Build**: ((Implementada)) La adición de `"use client"` completa la cadena de Client Components (`about-page-client` -> `TeamSection` -> `TeamMemberCard`), resolviendo de forma definitiva el blocker de despliegue relacionado con la página "About".
+ * 1. **Alineación con Arquitectura RSC**: ((Implementada)) Se ha eliminado la directiva `"use client"` innecesaria, completando la refactorización de todo el ecosistema `/about`. Este componente ahora es renderizado en el servidor por defecto.
  *
  * @subsection Melhorias Futuras
- * 1. **Animación de Entrada Escalonada**: ((Vigente)) Reintroducir `framer-motion` para aplicar una animación de entrada escalonada (`staggerChildren`) a las tarjetas de los miembros del equipo.
+ * 1. **Animación Delegada**: ((Vigente)) Para animar las tarjetas, el componente padre (`about-page-client.tsx`) debería envolver este componente en un tag `<motion.div>` y pasar variantes para una animación escalonada de los hijos.
  *
  * =====================================================================
  */

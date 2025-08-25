@@ -1,6 +1,15 @@
 // src/components/about/MissionSection.tsx
-"use client";
-
+/**
+ * @file MissionSection.tsx
+ * @description Componente de presentación puro para la sección de la misión. Al no
+ *              utilizar hooks de cliente, se renderiza como un Server Component por
+ *              defecto, optimizando el rendimiento.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 import { Target } from "lucide-react";
 
 interface MissionSectionProps {
@@ -11,9 +20,7 @@ interface MissionSectionProps {
 /**
  * @public
  * @component MissionSection
- * @description Renderiza la sección de la misión de la empresa. Ha sido refactorizado
- *              para ser un Client Component explícito, resolviendo una violación de
- *              reglas de React Server Components que impedía el build.
+ * @description Renderiza la sección de la misión de la empresa.
  * @param {MissionSectionProps} props - Propiedades para configurar la sección.
  * @returns {React.ReactElement}
  */
@@ -44,10 +51,10 @@ export function MissionSection({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha añadido la directiva `"use client"`, declarando explícitamente este aparato como un Client Component. Esto resuelve la violación de reglas de RSC, ya que ahora puede ser importado y renderizado legalmente por su padre, `about-page-client.tsx`.
+ * 1. **Alineación con Arquitectura RSC**: ((Implementada)) Se ha eliminado la directiva `"use client"` innecesaria. El componente ahora es un Server Component puro por defecto, adhiriéndose a las mejores prácticas de Next.js para un rendimiento óptimo.
  *
  * @subsection Melhorias Futuras
- * 1. **Animación de Entrada**: ((Vigente)) Reintroducir `framer-motion` para animar la entrada de esta sección cuando se haga visible en el viewport, mejorando el dinamismo de la página.
+ * 1. **Animación Delegada**: ((Vigente)) Para añadir animaciones, este componente debería ser importado y envuelto en un tag `<motion.div>` dentro de su componente padre de cliente (`about-page-client.tsx`), manteniendo este aparato puro y desacoplado de la lógica de animación.
  *
  * =====================================================================
  */

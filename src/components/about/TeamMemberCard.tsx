@@ -1,6 +1,14 @@
 // src/components/about/TeamMemberCard.tsx
-"use client";
-
+/**
+ * @file TeamMemberCard.tsx
+ * @description Componente de presentación puro para una tarjeta de miembro de equipo.
+ *              Como Server Component por defecto, optimiza el envío de JS al cliente.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 import Image from "next/image";
 import { Linkedin, Twitter } from "lucide-react";
 
@@ -32,9 +40,7 @@ interface TeamMemberCardProps {
 /**
  * @public
  * @component TeamMemberCard
- * @description Renderiza una tarjeta para un miembro del equipo. Ha sido refactorizado
- *              para ser un Client Component explícito, resolviendo una violación
- *              de reglas de React Server Components que impedía el build.
+ * @description Renderiza una tarjeta para un miembro del equipo.
  * @param {TeamMemberCardProps} props - Propiedades para configurar la tarjeta.
  * @returns {React.ReactElement}
  */
@@ -95,10 +101,10 @@ export function TeamMemberCard({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha añadido la directiva `"use client"`. Esto lo declara como un Client Component, permitiendo que `TeamSection.tsx` (que también será un Client Component) lo importe y renderice correctamente.
+ * 1. **Alineación con Arquitectura RSC**: ((Implementada)) Se ha eliminado la directiva `"use client"` innecesaria. El componente ahora es un Server Component puro por defecto, lo que reduce la carga de JavaScript en el cliente.
  *
  * @subsection Melhorias Futuras
- * 1. **Animación de Entrada**: ((Vigente)) Reintroducir `framer-motion` para animar la entrada de la tarjeta.
+ * 1. **Animación Delegada**: ((Vigente)) Para añadir animaciones de entrada, este componente debe ser envuelto en un tag `<motion.div>` dentro de su componente padre de cliente (`TeamSection.tsx`), manteniendo este aparato puro.
  *
  * =====================================================================
  */

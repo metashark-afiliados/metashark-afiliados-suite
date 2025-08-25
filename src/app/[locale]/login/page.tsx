@@ -1,11 +1,11 @@
+// src/app/[locale]/login/page.tsx
 /**
  * @file page.tsx
- * @description Página de inicio de sesión. Ha sido refactorizada a un estándar
- *              de élite para consumir los namespaces de i18n completos y canónicos,
- *              resolviendo un error crítico de `MISSING_MESSAGE` durante el build
- *              en Vercel.
+ * @description Orquestador de UI para la página de inicio de sesión. Su única
+ *              responsabilidad es obtener todas las traducciones necesarias y
+ *              pasarlas como props a sus componentes hijos puros.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
+ * @version 3.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -14,7 +14,10 @@
 
 import { useTranslations } from "next-intl";
 
-import { LoginForm } from "@/components/authentication/login-form";
+import {
+  LoginForm,
+  type LoginFormTexts,
+} from "@/components/authentication/login-form";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 
@@ -26,12 +29,8 @@ import { SmartLink } from "@/components/ui/SmartLink";
  * @returns {React.ReactElement}
  */
 export default function LoginPage(): React.ReactElement {
-  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
-  // Se consumen los namespaces completos y canónicos según la SSoT (i18n.ts),
-  // resolviendo el error `MISSING_MESSAGE` que bloqueaba el build.
   const t = useTranslations("app.[locale].login.page");
   const tSignUp = useTranslations("app.[locale].signup.page");
-  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
   const bottomLink = tSignUp.rich("dontHaveAccount", {
     signup: (chunks) => (
@@ -43,9 +42,20 @@ export default function LoginPage(): React.ReactElement {
     ),
   });
 
+  const loginFormTexts: LoginFormTexts = {
+    email_label: t("email_label"),
+    password_label: t("password_label"),
+    forgot_password_link: t("forgot_password_link"),
+    signInButton: t("signInButton"),
+    signInButton_pending: t("signInButton_pending"),
+    signInWith: t("signInWith"),
+    signInWithProvider: t("signInWithProvider"),
+    error_invalid_credentials: t("error_invalid_credentials"),
+  };
+
   return (
     <AuthCardLayout bottomLink={bottomLink}>
-      <LoginForm />
+      <LoginForm texts={loginFormTexts} />
     </AuthCardLayout>
   );
 }
@@ -56,10 +66,12 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Blocker de Build**: ((Implementada)) Se han corregido las llamadas a `useTranslations` con los namespaces canónicos, resolviendo las múltiples instancias del error `MISSING_MESSAGE` asociadas a esta página y reportadas en el log de Vercel.
+ * 1. **Resolución de Error de Compilación (TS2741)**: ((Implementada)) El componente ahora construye el objeto `loginFormTexts` y lo pasa como prop a `LoginForm`, cumpliendo con el nuevo contrato de API y resolviendo el error de compilación.
+ * 2. **Arquitectura de Orquestador Puro**: ((Implementada)) Este componente ahora actúa como un orquestador de i18n puro, adhiriéndose a la "Filosofía LEGO".
  *
  * @subsection Melhorias Futuras
- * 1. **Metadatos Dinámicos**: ((Vigente)) Convertir a un Server Component para poder usar la función `generateMetadata` y establecer el título de la página de forma dinámica y traducida, mejorando el SEO y la UX.
+ * 1. **Consolidación Final de i18n**: ((Vigente)) La dependencia de `useTranslations("app.[locale].signup.page")` debe ser eliminada una vez que la clave `dontHaveAccount` sea migrada a `login/page.json`, completando la consolidación de la SSoT.
  *
  * =====================================================================
  */
+// src/app/[locale]/login/page.tsx
