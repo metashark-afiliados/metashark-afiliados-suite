@@ -2,10 +2,11 @@
 /**
  * @file useDashboardTranslations.ts
  * @description Hook soberano y SSoT para la obtención de traducciones en el
- *              ecosistema del Dashboard. Enriquecido para incluir el namespace
- *              de errores de validación.
+ *              ecosistema del Dashboard. Centraliza la carga de todos los
+ *              namespaces compartidos para garantizar la consistencia y
+ *              resolver errores de `MISSING_MESSAGE` de forma sistémica.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
+ * @version 1.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -46,11 +47,11 @@ export function useDashboardTranslations() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución Sistémica de `MISSING_MESSAGE`**: ((Implementada)) Se ha añadido la carga del namespace `shared.ValidationErrors`. Esto resuelve la causa raíz de los errores de `MISSING_MESSAGE` que ocurrían en componentes y hooks que dependen de este namespace para mostrar mensajes de error (ej. `useHandleErrors`, `useWorkspaceInlineEditor`).
+ * 1. **Centralización de Dependencias (SSoT)**: ((Implementada)) Este hook se convierte en la Única Fuente de Verdad para las traducciones del dashboard, mejorando la mantenibilidad y el SRP.
+ * 2. **Resolución Sistémica de `MISSING_MESSAGE`**: ((Implementada)) Al cargar el namespace `shared.ValidationErrors` aquí, se resuelve la causa raíz de los errores de build que se originaban en los hooks `useHandleErrors` y `useWorkspaceInlineEditor`.
  *
  * @subsection Melhorias Futuras
- * 1. **Tipado con Zod**: ((Vigente)) El tipo de retorno de este hook podría ser validado por un schema de Zod que componga los schemas individuales de cada namespace, proporcionando una seguridad de tipos aún mayor en tiempo de compilación.
+ * 1. **Tipado con Zod**: ((Vigente)) El tipo de retorno de este hook podría ser validado por un schema de Zod que componga los schemas individuales de cada namespace, proporcionando una seguridad de tipos de élite en tiempo de compilación.
  *
  * =====================================================================
  */
-// src/lib/hooks/useDashboardTranslations.ts

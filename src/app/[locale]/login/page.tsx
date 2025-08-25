@@ -2,10 +2,11 @@
 /**
  * @file page.tsx
  * @description Orquestador de UI para la página de inicio de sesión. Refactorizado
- *              para ser completamente autónomo en su consumo de i18n, eliminando
- *              dependencias cruzadas y resolviendo errores críticos de build en Vercel.
+ *              a un estándar de élite para ser completamente autónomo en su consumo de i18n,
+ *              proveyendo todas las props de texto requeridas a sus componentes hijos
+ *              y resolviendo errores críticos de build en Vercel.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
+ * @version 6.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -60,11 +61,11 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para que apunte al namespace canónico y completo. Se ha eliminado la dependencia cruzada con el namespace de `signup`, resolviendo los errores de build de Vercel.
- * 2. **Autonomía de Módulo (Filosofía LEGO)**: ((Implementada)) El componente ahora depende exclusivamente de su propio namespace de i18n (`app.[locale].login.page`), adhiriéndose estrictamente a la arquitectura IMAS y convirtiéndose en una pieza de LEGO 100% autocontenida.
+ * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la dependencia cruzada con el namespace de `signup`, y ahora se carga el namespace soberano que contiene todas las claves necesarias, resolviendo los errores de Vercel.
+ * 2. **Autonomía de Módulo (Filosofía LEGO)**: ((Implementada)) El componente ahora depende exclusivamente de su propio namespace de i18n, adhiriéndose estrictamente al Manifiesto IMAS y convirtiéndose en una "pieza de LEGO" 100% autocontenida.
  *
  * @subsection Melhorias Futuras
- * 1. **Componente de Formulario Puro**: ((Vigente)) Para una pureza de élite, el componente `LoginForm` podría ser refactorizado para recibir todos sus textos de error como props, en lugar de que el `useEffect` interno mapee claves de error. Esto lo haría completamente agnóstico a la capa de i18n.
+ * 1. **Componente de Formulario 100% Puro**: ((Vigente)) Para una pureza de élite, el componente `LoginForm` podría ser refactorizado para recibir todos sus textos de error como props.
  *
  * =====================================================================
  */

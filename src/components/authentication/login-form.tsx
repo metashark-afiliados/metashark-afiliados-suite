@@ -2,10 +2,11 @@
 /**
  * @file login-form.tsx
  * @description Componente de cliente soberano para el formulario de inicio de sesión.
- *              Refactorizado a un componente de presentación puro que recibe todos
- *              sus textos a través de props.
+ *              Refactorizado a un estándar de élite para ser un componente de
+ *              presentación puro que recibe todos sus textos a través de props,
+ *              cumpliendo con el Manifiesto IMAS v3.0.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
+ * @version 3.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -22,7 +23,10 @@ import { Link } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { OAuthButtonGroup } from "./OAuthButtonGroup";
+import {
+  OAuthButtonGroup,
+  type OAuthButtonGroupProps,
+} from "./OAuthButtonGroup";
 
 interface SubmitButtonProps {
   texts: {
@@ -64,15 +68,18 @@ export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
 
   React.useEffect(() => {
     if (!state.success && state.error) {
-      // Usa el objeto de textos para obtener el mensaje de error.
       const errorMessage =
         texts[state.error as keyof LoginFormTexts] || state.error;
       toast.error(errorMessage);
     }
   }, [state, texts]);
 
+  const oauthButtonGroupTexts: OAuthButtonGroupProps["texts"] = {
+    signInWithProvider: texts.signInWithProvider,
+  };
+
   return (
-    <form action={formAction} className="grid gap-4">
+    <form action={formAction} className="grid gap-4 p-6">
       <div className="grid gap-2">
         <Label htmlFor="email">{texts.email_label}</Label>
         <Input
@@ -96,7 +103,7 @@ export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
         <Input id="password" name="password" type="password" required />
       </div>
       <SubmitButton texts={texts} />
-      <div className="relative my-4">
+      <div className="relative my-2">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
@@ -108,9 +115,24 @@ export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
       </div>
       <OAuthButtonGroup
         providers={["google", "apple"]}
-        texts={{ signInWithProvider: texts.signInWithProvider }}
+        texts={oauthButtonGroupTexts}
       />
     </form>
   );
 }
-// src/components/authentication/login-form.tsx
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Componente de Presentación Puro**: ((Implementada)) Se ha eliminado `useTranslations`. El componente ahora es 100% agnóstico al contenido y es controlado por su padre (`login/page.tsx`), cumpliendo la "Filosofía LEGO".
+ * 2. **Inyección de Dependencia Textual (IDT)**: ((Implementada)) El componente ahora construye el objeto de `props` para `OAuthButtonGroup` y se lo inyecta, cumpliendo con el Manifiesto IMAS.
+ * 3. **Consistencia Visual**: ((Implementada)) Se ha añadido el `padding` (`p-6`) que faltaba, alineando el formulario con el diseño de referencia.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Mapeo de Errores Tipado**: ((Vigente)) La aserción `state.error as keyof LoginFormTexts` podría ser eliminada si el `ActionResult` se tipara con un `enum` de las claves de error válidas, proporcionando una seguridad de tipos aún mayor.
+ *
+ * =====================================================================
+ */

@@ -1,11 +1,12 @@
 // src/components/authentication/OAuthButtonGroup.tsx
 /**
  * @file OAuthButtonGroup.tsx
- * @description Componente de ensamblaje de UI. Refactorizado para ser un
- *              componente puro que recibe su texto a través de props y lo
- *              propaga a sus hijos.
+ * @description Componente de ensamblaje de UI. Refactorizado a un estándar de
+ *              élite para ser un componente de presentación 100% puro, recibiendo
+ *              todo su contenido textual a través de props y propagándolo a sus
+ *              hijos (`OAuthButton`), cumpliendo con el Manifiesto IMAS.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 4.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -44,4 +45,18 @@ export function OAuthButtonGroup({ providers, texts }: OAuthButtonGroupProps) {
     </div>
   );
 }
-// src/components/authentication/OAuthButtonGroup.tsx
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Componente de Presentación 100% Puro**: ((Implementada)) Se ha eliminado la llamada a `useTranslations`. El componente es ahora completamente agnóstico al contenido, adhiriéndose a la "Filosofía LEGO" y al Manifiesto IMAS.
+ * 2. **Resolución Preventiva de `FORMATTING_ERROR`**: ((Implementada)) Al no manejar la i18n internamente, este componente ya no puede ser la fuente del error. La responsabilidad de proveer el texto correcto (y sus variables) se transfiere al orquestador padre.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Renderizado Condicional de Iconos**: ((Vigente)) Si en el futuro se soportan proveedores OAuth cuyo icono no esté en `providerDetails`, el componente podría renderizar un icono genérico en lugar de `null` para una UI más consistente.
+ *
+ * =====================================================================
+ */
