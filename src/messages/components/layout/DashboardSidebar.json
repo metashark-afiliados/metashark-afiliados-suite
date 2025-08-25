@@ -7,6 +7,9 @@
     "logo_alt_text": "ConvertiKit Logo",
     "logo_aria_label": "Go to dashboard homepage",
     "create_button": "Create",
+    "search_placeholder": "Search...",
+    "search_command": "⌘K",
+    "toggle_sidebar_aria_label": "Toggle secondary sidebar",
     "nav_home": "Home",
     "nav_projects": "Projects",
     "nav_templates": "Templates",
@@ -19,7 +22,10 @@
     "devConsole": "Dev Console",
     "userMenu_accountSettings": "Account Settings",
     "userMenu_support": "Support",
-    "userMenu_signOut": "Sign Out"
+    "userMenu_signOut": "Sign Out",
+    "userMenu_avatar_alt": "Avatar for {username}",
+    "userMenu_open_aria_label": "Open user profile menu",
+    "userMenu_close_widget_aria_label": "Close user profile widget"
   },
   "es-ES": {
     "app_title": "ConvertiKit",
@@ -28,6 +34,9 @@
     "logo_alt_text": "Logo de ConvertiKit",
     "logo_aria_label": "Ir a la página principal del dashboard",
     "create_button": "Crear",
+    "search_placeholder": "Buscar...",
+    "search_command": "⌘K",
+    "toggle_sidebar_aria_label": "Alternar barra lateral secundaria",
     "nav_home": "Inicio",
     "nav_projects": "Proyectos",
     "nav_templates": "Plantillas",
@@ -40,7 +49,10 @@
     "devConsole": "Dev Console",
     "userMenu_accountSettings": "Ajustes de Cuenta",
     "userMenu_support": "Soporte",
-    "userMenu_signOut": "Cerrar Sesión"
+    "userMenu_signOut": "Cerrar Sesión",
+    "userMenu_avatar_alt": "Avatar de {username}",
+    "userMenu_open_aria_label": "Abrir menú de perfil de usuario",
+    "userMenu_close_widget_aria_label": "Cerrar widget de perfil de usuario"
   },
   "pt-BR": {
     "app_title": "ConvertiKit",
@@ -49,6 +61,9 @@
     "logo_alt_text": "Logo da ConvertiKit",
     "logo_aria_label": "Ir para a página principal do painel",
     "create_button": "Criar",
+    "search_placeholder": "Buscar...",
+    "search_command": "⌘K",
+    "toggle_sidebar_aria_label": "Alternar barra lateral secundária",
     "nav_home": "Início",
     "nav_projects": "Projetos",
     "nav_templates": "Modelos",
@@ -61,6 +76,10 @@
     "devConsole": "Console Dev",
     "userMenu_accountSettings": "Configurações da Conta",
     "userMenu_support": "Suporte",
-    "userMenu_signOut": "Sair"
+    "userMenu_signOut": "Sair",
+    "userMenu_avatar_alt": "Avatar de {username}",
+    "userMenu_open_aria_label": "Abrir menu de perfil do usuário",
+    "userMenu_close_widget_aria_label": "Fechar widget de perfil do usuário"
   }
 }
+

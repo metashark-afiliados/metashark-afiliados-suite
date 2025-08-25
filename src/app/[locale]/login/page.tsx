@@ -1,11 +1,11 @@
 // src/app/[locale]/login/page.tsx
 /**
  * @file page.tsx
- * @description Orquestador de UI para la página de inicio de sesión. Su única
- *              responsabilidad es obtener todas las traducciones necesarias y
- *              pasarlas como props a sus componentes hijos puros.
+ * @description Orquestador de UI para la página de inicio de sesión. Corregido
+ *              para eliminar dependencias de i18n redundantes y alinear la
+ *              llamada a `t.rich` con la SSoT.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 3.1.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -21,19 +21,11 @@ import {
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 
-/**
- * @public
- * @page LoginPage
- * @description Ensambla el `AuthCardLayout` y el `LoginForm` para construir la
- *              vista de inicio de sesión completa.
- * @returns {React.ReactElement}
- */
 export default function LoginPage(): React.ReactElement {
   const t = useTranslations("app.[locale].login.page");
-  const tSignUp = useTranslations("app.[locale].signup.page");
 
-  const bottomLink = tSignUp.rich("dontHaveAccount", {
-    signup: (chunks) => (
+  const bottomLink = t.rich("alreadyHaveAccount", {
+    strong: (chunks) => (
       <SmartLink
         href="/signup"
         label={chunks}
@@ -66,11 +58,8 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación (TS2741)**: ((Implementada)) El componente ahora construye el objeto `loginFormTexts` y lo pasa como prop a `LoginForm`, cumpliendo con el nuevo contrato de API y resolviendo el error de compilación.
- * 2. **Arquitectura de Orquestador Puro**: ((Implementada)) Este componente ahora actúa como un orquestador de i18n puro, adhiriéndose a la "Filosofía LEGO".
- *
- * @subsection Melhorias Futuras
- * 1. **Consolidación Final de i18n**: ((Vigente)) La dependencia de `useTranslations("app.[locale].signup.page")` debe ser eliminada una vez que la clave `dontHaveAccount` sea migrada a `login/page.json`, completando la consolidación de la SSoT.
+ * 1. **Resolución de Errores `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la llamada a `useTranslations` para el namespace de `signup` y se ha corregido la clave en `t.rich`, resolviendo los errores de i18n.
+ * 2. **Cohesión de i18n**: ((Implementada)) El componente ahora depende de un único namespace, adhiriéndose a la arquitectura IMAS.
  *
  * =====================================================================
  */
