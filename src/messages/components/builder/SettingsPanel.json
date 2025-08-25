@@ -10,10 +10,25 @@
       "title": "No Settings",
       "description": "There are no editable settings for the <strong>{blockType}</strong> block."
     },
-    "unsupported_property_type": "Unsupported property type: {type}",
     "tabs": {
       "content": "Content",
       "style": "Style"
+    },
+    "properties": {
+      "logoText_label": "Logo Text",
+      "ctaText_label": "CTA Button Text",
+      "title_label": "Title",
+      "subtitle_label": "Subtitle",
+      "features_label": "Features",
+      "icon_label": "Icon",
+      "description_label": "Description",
+      "backgroundColor_label": "Background Color",
+      "textColor_label": "Text Color",
+      "paddingTop_label": "Padding Top",
+      "paddingBottom_label": "Padding Bottom",
+      "item_label": "Item #{index}",
+      "removeItem_button": "Remove Item",
+      "addItem_button": "Add Item"
     }
   },
   "es-ES": {
@@ -26,10 +41,25 @@
       "title": "Sin Ajustes",
       "description": "No hay ajustes editables para el bloque <strong>{blockType}</strong>."
     },
-    "unsupported_property_type": "Tipo de propiedad no soportado: {type}",
     "tabs": {
       "content": "Contenido",
       "style": "Estilo"
+    },
+    "properties": {
+      "logoText_label": "Texto del Logo",
+      "ctaText_label": "Texto del Botón CTA",
+      "title_label": "Título",
+      "subtitle_label": "Subtítulo",
+      "features_label": "Características",
+      "icon_label": "Icono",
+      "description_label": "Descripción",
+      "backgroundColor_label": "Color de Fondo",
+      "textColor_label": "Color del Texto",
+      "paddingTop_label": "Padding Superior",
+      "paddingBottom_label": "Padding Inferior",
+      "item_label": "Ítem #{index}",
+      "removeItem_button": "Eliminar Ítem",
+      "addItem_button": "Añadir Ítem"
     }
   },
   "pt-BR": {
@@ -42,10 +72,25 @@
       "title": "Sem Configurações",
       "description": "Não há configurações editáveis para o bloco <strong>{blockType}</strong>."
     },
-    "unsupported_property_type": "Tipo de propriedade não suportado: {type}",
     "tabs": {
       "content": "Conteúdo",
       "style": "Estilo"
+    },
+    "properties": {
+      "logoText_label": "Texto do Logo",
+      "ctaText_label": "Texto do Botão CTA",
+      "title_label": "Título",
+      "subtitle_label": "Subtítulo",
+      "features_label": "Características",
+      "icon_label": "Ícone",
+      "description_label": "Descrição",
+      "backgroundColor_label": "Cor de Fundo",
+      "textColor_label": "Cor do Texto",
+      "paddingTop_label": "Padding Superior",
+      "paddingBottom_label": "Padding Inferior",
+      "item_label": "Item #{index}",
+      "removeItem_button": "Remover Item",
+      "addItem_button": "Adicionar Item"
     }
   }
 }

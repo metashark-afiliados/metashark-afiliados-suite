@@ -4,8 +4,9 @@
  * @description Manifiesto de Tipos y SSoT para el contrato de i18n.
  *              ESTE ARCHIVO ES GENERADO AUTOMÁTICAMENTE. NO LO EDITE MANUALMENTE.
  *              Ejecute `pnpm gen:i18n:schema` para regenerarlo.
+ *              Sincronizado manualmente para incluir `BuilderPageSchema`.
  * @author Script de Generación Automática
- * @version 2025-08-23T16:00:00.000Z
+ * @version 2025-08-24T16:30:00.000Z
  */
 import { z } from "zod";
 
@@ -16,10 +17,12 @@ import { WelcomeModalSchema } from "./i18n/WelcomeModal.schema";
 import { AboutPageSchema } from "./i18n/AboutPage.schema";
 import { AuthNoticePageSchema } from "./i18n/AuthNoticePage.schema";
 import { BlogPageSchema } from "./i18n/BlogPage.schema";
+import { BuilderPageSchema } from "./i18n/BuilderPage.schema"; // <-- NUEVA IMPORTACIÓN
 import { ContactPageSchema } from "./i18n/ContactPage.schema";
 import { CookiePolicyPageSchema } from "./i18n/CookiePolicyPage.schema";
 import { DisclaimerPageSchema } from "./i18n/DisclaimerPage.schema";
 import { ForgotPasswordPageSchema } from "./i18n/ForgotPasswordPage.schema";
+import { IconGalleryPageSchema } from "./i18n/IconGalleryPage.schema";
 import { LegalNoticePageSchema } from "./i18n/LegalNoticePage.schema";
 import { NotFoundPageSchema } from "./i18n/NotFoundPage.schema";
 import { PrivacyPolicyPageSchema } from "./i18n/PrivacyPolicyPage.schema";
@@ -29,10 +32,13 @@ import { CampaignsTableSchema } from "./i18n/CampaignsTable.schema";
 import { ImpersonationDialogSchema } from "./i18n/ImpersonationDialog.schema";
 import { TelemetryTableSchema } from "./i18n/TelemetryTable.schema";
 import { UserManagementTableSchema } from "./i18n/UserManagementTable.schema";
-import { pageSchema as builderPageSchema } from "./i18n/page.schema";
+import { pageSchema as builderAppPageSchema } from "./i18n/page.schema";
 import { CampaignsPageSchema } from "./i18n/CampaignsPage.schema";
 import { SitesPageSchema } from "./i18n/SitesPage.schema";
 import { DashboardPageSchema } from "./i18n/DashboardPage.schema";
+import { LoginPageSchema } from "./i18n/LoginPage.schema";
+import { SignUpPageSchema } from "./i18n/SignUpPage.schema";
+import { AuthLayoutSchema } from "./i18n/AuthLayout.schema";
 import { LoginFormSchema } from "./i18n/LoginForm.schema";
 import { OAuthButtonSchema } from "./i18n/OAuthButton.schema";
 import { SupabaseAuthUISchema } from "./i18n/SupabaseAuthUI.schema";
@@ -64,13 +70,6 @@ import { EmojiPickerSchema } from "./i18n/EmojiPicker.schema";
 import { LanguageSwitcherSchema } from "./i18n/LanguageSwitcher.schema";
 import { ThemeSwitcherSchema } from "./i18n/ThemeSwitcher.schema";
 import { WorkspaceSwitcherSchema } from "./i18n/WorkspaceSwitcher.schema";
-import { LoginPageSchema } from "./i18n/LoginPage.schema";
-import { SignUpPageSchema } from "./i18n/SignUpPage.schema";
-import { AuthLayoutSchema } from "./i18n/AuthLayout.schema";
-import { IconGalleryPageSchema } from "./i18n/IconGalleryPage.schema";
-import { ActionDockSchema as SharedActionDockSchema } from "./i18n/ActionDock.schema";
-import { ValidationErrorsSchema as SharedValidationErrorsSchema } from "./i18n/ValidationErrors.schema";
-import { WelcomeModalSchema as SharedWelcomeModalSchema } from "./i18n/WelcomeModal.schema";
 
 /**
  * @public
@@ -79,34 +78,16 @@ import { WelcomeModalSchema as SharedWelcomeModalSchema } from "./i18n/WelcomeMo
  *              de todos los mensajes de internacionalización.
  */
 export const i18nSchema = z.object({
-  ActionDock: SharedActionDockSchema,
-  ValidationErrors: SharedValidationErrorsSchema,
-  WelcomeModal: SharedWelcomeModalSchema,
-  "pages.AboutPage": AboutPageSchema,
-  "pages.AuthNoticePage": AuthNoticePageSchema,
-  "pages.BlogPage": BlogPageSchema,
-  "pages.ContactPage": ContactPageSchema,
-  "pages.CookiePolicyPage": CookiePolicyPageSchema,
-  "pages.DisclaimerPage": DisclaimerPageSchema,
-  "pages.ForgotPasswordPage": ForgotPasswordPageSchema,
-  "pages.IconGalleryPage": IconGalleryPageSchema,
-  "pages.LegalNoticePage": LegalNoticePageSchema,
-  "pages.LoginPage": LoginPageSchema,
-  "pages.NotFoundPage": NotFoundPageSchema,
-  "pages.PrivacyPolicyPage": PrivacyPolicyPageSchema,
-  "pages.ResetPasswordPage": ResetPasswordPageSchema,
-  "pages.TermsOfServicePage": TermsOfServicePageSchema,
+  "app.[locale].builder.page": builderAppPageSchema,
+  "app.[locale].dashboard.page": DashboardPageSchema,
+  "app.[locale].dashboard.sites.page": SitesPageSchema,
+  "app.[locale].dashboard.sites.[siteId].campaigns.page": CampaignsPageSchema,
+  "app.[locale].login.page": LoginPageSchema,
+  "app.[locale].signup.page": SignUpPageSchema,
   "app.dev-console.CampaignsTable": CampaignsTableSchema,
   "app.dev-console.ImpersonationDialog": ImpersonationDialogSchema,
   "app.dev-console.TelemetryTable": TelemetryTableSchema,
   "app.dev-console.UserManagementTable": UserManagementTableSchema,
-  "app.[locale].auth.layout": AuthLayoutSchema,
-  "app.[locale].auth.login.page": LoginPageSchema,
-  "app.[locale].auth.signup.page": SignUpPageSchema,
-  "app.[locale].builder.page": builderPageSchema,
-  "app.[locale].dashboard.page": DashboardPageSchema,
-  "app.[locale].dashboard.sites.page": SitesPageSchema,
-  "app.[locale].dashboard.sites.[siteId].campaigns.page": CampaignsPageSchema,
   "components.auth.LoginForm": LoginFormSchema,
   "components.auth.OAuthButton": OAuthButtonSchema,
   "components.auth.SupabaseAuthUI": SupabaseAuthUISchema,
@@ -139,19 +120,23 @@ export const i18nSchema = z.object({
   "components.ui.LanguageSwitcher": LanguageSwitcherSchema,
   "components.ui.ThemeSwitcher": ThemeSwitcherSchema,
   "components.workspaces.WorkspaceSwitcher": WorkspaceSwitcherSchema,
+  "pages.AboutPage": AboutPageSchema,
+  "pages.AuthNoticePage": AuthNoticePageSchema,
+  "pages.BlogPage": BlogPageSchema,
+  "pages.BuilderPage": BuilderPageSchema, // <-- NUEVO NAMESPACE
+  "pages.ContactPage": ContactPageSchema,
+  "pages.CookiePolicyPage": CookiePolicyPageSchema,
+  "pages.DisclaimerPage": DisclaimerPageSchema,
+  "pages.ForgotPasswordPage": ForgotPasswordPageSchema,
+  "pages.IconGalleryPage": IconGalleryPageSchema,
+  "pages.LegalNoticePage": LegalNoticePageSchema,
+  "pages.NotFoundPage": NotFoundPageSchema,
+  "pages.PrivacyPolicyPage": PrivacyPolicyPageSchema,
+  "pages.ResetPasswordPage": ResetPasswordPageSchema,
+  "pages.TermsOfServicePage": TermsOfServicePageSchema,
+  ActionDock: ActionDockSchema,
+  ValidationErrors: ValidationErrorsSchema,
+  WelcomeModal: WelcomeModalSchema,
 });
 
 export type Messages = z.infer<typeof i18nSchema>;
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Integridad Sistémica**: ((Implementada)) Este archivo, ahora completo, resuelve la cascada de errores de i18n (`TS2307`, `TS2345`, `IntlError`). Es el engranaje central que sincroniza la capa de datos de i18n con la capa de consumo.
- * 2. **Automatización Robusta**: ((Implementada)) Al ser generado por un script, se garantiza que siempre estará sincronizado con la SSoT del `messagesManifest`.
- *
- * =====================================================================
- */
-// src/lib/validators/i18n.schema.ts

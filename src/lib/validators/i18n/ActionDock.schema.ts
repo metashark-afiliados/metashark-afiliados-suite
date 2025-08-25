@@ -2,9 +2,9 @@
 /**
  * @file ActionDock.schema.ts
  * @description Define el contrato de datos para el namespace 'ActionDock'.
- *              Blindado para validar `iconName` contra la SSoT de iconos.
+ *              Blindado para validar `iconName` y la nueva propiedad `type`.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 4.0.0
  */
 import { z } from "zod";
 import { LucideIconNameSchema } from "@/config/lucide-icon-names";
@@ -16,14 +16,14 @@ export const ActionDockSchema = z.object({
       label: z.string(),
       iconName: LucideIconNameSchema.describe(
         "Nombre del icono de lucide-react en PascalCase."
-      ), // <-- BLINDAJE
-      href: z.string().describe("La ruta de navegación para la acción."),
+      ),
+      type: z.string().describe("El tipo de creación a iniciar."),
       colorClass: z
         .string()
-        .describe("Clase de Tailwind para el color de fondo del icono."),
+        .describe("Clase de Tailwind para el color del icono."),
       textColor: z
         .string()
-        .describe("Clase de Tailwind para el color del icono."),
+        .describe("Clase de Tailwind para el color del texto del icono."),
     })
   ),
   more_button_label: z.string(),
@@ -34,7 +34,10 @@ export const ActionDockSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato Blindado y Sincronizado**: ((Implementada)) El schema ahora valida `iconName` contra la SSoT `LucideIconNameSchema` y refleja la nueva estructura de datos sin `ICONS` map, completando la re-arquitectura.
+ * 1. **Contrato Sincronizado**: ((Implementada)) El schema ahora refleja la nueva SSoT de datos del manifiesto `ActionDock.json`, incluyendo la propiedad `type` y eliminando `href`. Esto completa la refactorización a nivel de contrato.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Enum para `type`**: ((Vigente)) El campo `type` podría ser validado contra un `z.enum` de los tipos de creación permitidos para una seguridad de tipos aún mayor.
  *
  * =====================================================================
  */

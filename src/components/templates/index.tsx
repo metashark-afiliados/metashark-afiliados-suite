@@ -3,13 +3,15 @@
  * @file index.tsx
  * @description Manifiesto de Mapeo Declarativo. Este aparato es la Única Fuente
  *              de Verdad que mapea identificadores de bloque a sus componentes
- *              React. Ha sido actualizado para utilizar las implementaciones
- *              reales de los componentes, eliminando los placeholders.
+ *              React. Sincronizado para incluir la plantilla `Features1`.
  * @author Raz Podestá
  * @version 3.0.0
  */
 import React from "react";
 
+// --- INICIO DE SINCRONIZACIÓN ---
+import { Features1 } from "@/templates/Features/Features1";
+// --- FIN DE SINCRONIZACIÓN ---
 import { Header1 } from "@/templates/Headers/Header1";
 import { Hero1 } from "@/templates/Heros/Hero1";
 
@@ -30,6 +32,7 @@ type BlockComponent = React.ComponentType<Record<string, any>>;
 export const blockRegistry: Record<string, BlockComponent> = {
   Header1: Header1 as BlockComponent,
   Hero1: Hero1 as BlockComponent,
+  Features1: Features1 as BlockComponent, // <-- NUEVO REGISTRO
 };
 
 /**
@@ -38,11 +41,10 @@ export const blockRegistry: Record<string, BlockComponent> = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Integración Funcional**: ((Implementada)) El registro ahora apunta a los componentes de bloque reales, haciendo que el constructor sea visualmente funcional por primera vez.
- * 2. **Cero Regresiones**: ((Implementada)) La estructura del registro se mantiene, asegurando la compatibilidad con los consumidores (`Canvas`, `BlocksPalette`).
+ * 1. **Expansión de Capacidad de Renderizado**: ((Implementada)) El `Canvas` ahora es capaz de renderizar el bloque `Features1`, expandiendo el "vocabulario" visual del constructor.
  *
  * @subsection Melhorias Futuras
- * 1. **Descubrimiento Automático de Bloques**: ((Vigente)) Un script de build podría leer el directorio `src/templates` y generar este registro automáticamente, eliminando la necesidad de mantenimiento manual a medida que se añadan nuevos bloques.
+ * 1. **Descubrimiento Automático de Bloques**: ((Vigente)) Un script de build podría leer el directorio `src/templates` y generar este registro automáticamente, eliminando la necesidad de mantenimiento manual.
  *
  * =====================================================================
  */

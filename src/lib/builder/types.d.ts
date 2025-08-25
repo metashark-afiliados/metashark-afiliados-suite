@@ -1,13 +1,17 @@
 // src/lib/builder/types.d.ts
 /**
  * @file src/lib/builder/types.d.ts
- * @description Contrato de datos canónico para el sistema del constructor. Ha sido
- *              refactorizado para incluir `site_id` nullable en la configuración de la campaña,
- *              resolviendo la desincronización arquitectónica y permitiendo campañas "huérfanas".
- * @author Raz Podestá
- * @version 2.0.0
+ * @description Contrato de datos canónico para el sistema del constructor.
+ *              Sincronizado para exportar `FeatureItem` y expandir `BlockPropertyType`,
+ *              resolviendo la desincronización de contratos.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
+import { type LucideIconName } from "@/config/lucide-icon-names";
 
 export const BlockStylesSchema = z.object({
   backgroundColor: z.string().optional(),
@@ -30,16 +34,10 @@ export const CampaignThemeSchema = z.object({
   globalColors: z.record(z.string()),
 });
 
-/**
- * @public
- * @constant CampaignConfigSchema
- * @description El esquema raíz que representa la configuración completa de una campaña.
- *              Incluye `site_id` como nullable para soportar campañas "huérfanas".
- */
 export const CampaignConfigSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  site_id: z.string().uuid().nullable(), // <-- ARQUITECTURA v12.0
+  site_id: z.string().uuid().nullable(),
   theme: CampaignThemeSchema,
   blocks: z.array(PageBlockSchema),
 });
@@ -56,6 +54,13 @@ export type PageBlock<T = Record<string, any>> = {
 export type CampaignTheme = z.infer<typeof CampaignThemeSchema>;
 export type CampaignConfig = z.infer<typeof CampaignConfigSchema>;
 
+// --- INICIO DE REFACTORIZACIÓN DE ÉLITE ---
+/**
+ * @public
+ * @typedef BlockPropertyType
+ * @description Define la unión de todos los tipos de control de UI válidos
+ *              que el `SettingsPanel` puede renderizar.
+ */
 export type BlockPropertyType =
   | "text"
   | "textarea"
@@ -63,7 +68,21 @@ export type BlockPropertyType =
   | "color"
   | "number"
   | "select"
-  | "image";
+  | "image"
+  | "icon" // <-- SINCRONIZADO
+  | "array"; // <-- SINCRONIZADO
+
+/**
+ * @public
+ * @interface FeatureItem
+ * @description Define el contrato de datos para una única característica.
+ */
+export interface FeatureItem {
+  icon: LucideIconName;
+  title: string;
+  description: string;
+}
+// --- FIN DE REFACTORIZACIÓN DE ÉLITE ---
 
 export interface SelectOption {
   value: string;
@@ -76,6 +95,11 @@ export interface EditablePropertyDefinition {
   defaultValue?: any;
   placeholder?: string;
   options?: SelectOption[];
+  /**
+   * @description Si `type` es 'array', este schema define la estructura
+   *              de cada item en el array.
+   */
+  itemSchema?: BlockPropertiesSchema;
 }
 
 export type BlockPropertiesSchema = Record<string, EditablePropertyDefinition>;
@@ -91,10 +115,11 @@ export interface BlockEditableDefinition {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato Arquitectónico**: ((Implementada)) Se ha modificado `site_id` a `z.string().uuid().nullable()`. Este cambio fundamental alinea el contrato de datos con la nueva lógica de negocio, permitiendo la existencia de campañas no asignadas.
+ * 1. **Sincronización de Contratos**: ((Implementada)) Se ha añadido `array` y `icon` a `BlockPropertyType` y se ha exportado `FeatureItem`. Esto resuelve la causa raíz de los errores `TS2322` y `TS2305`.
+ * 2. **Soporte para Tipos de Array**: ((Implementada)) Se ha añadido la propiedad opcional `itemSchema` a `EditablePropertyDefinition`, estableciendo el contrato para que el `SettingsPanel` pueda renderizar editores para listas de objetos complejos.
  *
  * @subsection Melhorias Futuras
- * 1. **Versionado de Esquema**: ((Vigente)) Añadir un campo `version: z.number()` a `CampaignConfigSchema` para facilitar futuras migraciones de datos de `content` si la estructura del bloque cambia.
+ * 1. **Tipos de Control Avanzados**: ((Vigente)) El `BlockPropertyType` puede ser expandido con más tipos como `slider`, `toggle-group` o `date-picker` para habilitar controles de UI de edición más ricos y específicos.
  *
  * =====================================================================
  */

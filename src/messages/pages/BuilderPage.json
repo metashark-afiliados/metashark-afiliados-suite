@@ -1,0 +1,58 @@
+
+{
+  "en-US": {
+    "PrimaryToolBar": {
+      "design": "Design",
+      "elements": "Elements",
+      "text": "Text",
+      "brand": "Brand",
+      "uploads": "Uploads",
+      "tools": "Apps"
+    },
+    "BlockLibrary": {
+      "title": "Add Content",
+      "category_layout": "Layouts",
+      "category_content": "Content",
+      "category_media": "Media",
+      "category_forms": "Forms",
+      "category_footers": "Footers"
+    }
+  },
+  "es-ES": {
+    "PrimaryToolBar": {
+      "design": "Diseño",
+      "elements": "Elementos",
+      "text": "Texto",
+      "brand": "Marca",
+      "uploads": "Subidos",
+      "tools": "Apps"
+    },
+    "BlockLibrary": {
+      "title": "Añadir Contenido",
+      "category_layout": "Diseños",
+      "category_content": "Contenido",
+      "category_media": "Multimedia",
+      "category_forms": "Formularios",
+      "category_footers": "Pies de página"
+    }
+  },
+  "pt-BR": {
+    "PrimaryToolBar": {
+      "design": "Design",
+      "elements": "Elementos",
+      "text": "Texto",
+      "brand": "Marca",
+      "uploads": "Uploads",
+      "tools": "Apps"
+    },
+    "BlockLibrary": {
+      "title": "Adicionar Conteúdo",
+      "category_layout": "Layouts",
+      "category_content": "Conteúdo",
+      "category_media": "Mídia",
+      "category_forms": "Formulários",
+      "category_footers": "Rodapés"
+    }
+  }
+}
+

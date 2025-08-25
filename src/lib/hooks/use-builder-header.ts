@@ -1,10 +1,11 @@
 // src/lib/hooks/use-builder-header.ts
 /**
  * @file use-builder-header.ts
- * @description Hook Soberano para el `BuilderHeader`. Refactorizado para
- *              alinearse con la API canónica de `zustand-undo` (`useHistory`).
- * @author Raz Podestá
- * @version 5.0.0
+ * @description Hook Soberano. Sincronizado para consumir la Store API a través
+ *              del nuevo hook `useBuilderStoreApi`, resolviendo el error de tipo TS2339.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 6.1.0
+ * @date 2025-08-24
  */
 "use client";
 
@@ -12,14 +13,19 @@ import { useCallback, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import { shallow } from "zustand/shallow";
+import { useStore } from "zustand";
 
-import { updateCampaignContentAction } from "@/lib/actions/builder.actions";
-import { useBuilderStore } from "@/lib/builder/core/store";
-import { type DevicePreview } from "@/lib/builder/core/uiSlice";
+import { updateCreationContentAction } from "@/lib/actions/creations";
+import {
+  useBuilderStore,
+  useBuilderStoreApi,
+} from "@/lib/hooks/use-builder-store";
+import { logger } from "@/lib/logging";
 
 export function useBuilderHeader() {
   const t = useTranslations("components.builder.BuilderHeader");
   const [isPending, startTransition] = useTransition();
+  const storeApi = useBuilderStoreApi(); // <-- Se obtiene la Store API completa
 
   const {
     isSaving,
@@ -29,7 +35,7 @@ export function useBuilderHeader() {
     setDevicePreview,
     campaignConfig,
   } = useBuilderStore(
-    (state: any) => ({
+    (state) => ({
       isSaving: state.isSaving,
       setIsSaving: state.setIsSaving,
       setAsSaved: state.setAsSaved,
@@ -40,8 +46,11 @@ export function useBuilderHeader() {
     shallow
   );
 
-  const history = (useBuilderStore as any).useHistory();
-  const isDirty = history.past.length > 0;
+  // Se consume el estado del historial reactivamente desde la API de zundo
+  const { pastStates, futureStates, undo, redo, clear } = useStore(
+    storeApi.temporal
+  );
+  const isDirty = pastStates.length > 0;
 
   const handleSave = useCallback(() => {
     if (!campaignConfig) {
@@ -50,20 +59,20 @@ export function useBuilderHeader() {
     }
     setIsSaving(true);
     startTransition(async () => {
-      const result = await updateCampaignContentAction(
+      const result = await updateCreationContentAction(
         campaignConfig.id,
         campaignConfig
       );
       if (result.success) {
         toast.success(t("SaveButton.save_success"));
         setAsSaved();
-        history.clear();
+        clear();
       } else {
-        toast.error(result.error || t("SaveButton.save_error_default"));
+        toast.error(t("SaveButton.save_error_default"));
       }
       setIsSaving(false);
     });
-  }, [campaignConfig, setIsSaving, t, setAsSaved, history]);
+  }, [campaignConfig, setIsSaving, t, setAsSaved, clear]);
 
   return {
     isSaving,
@@ -71,12 +80,11 @@ export function useBuilderHeader() {
     isPending,
     devicePreview,
     setDevicePreview,
-    undo: history.undo,
-    redo: history.redo,
-    isUndoDisabled: history.past.length === 0,
-    isRedoDisabled: history.future.length === 0,
+    undo,
+    redo,
+    isUndoDisabled: pastStates.length === 0,
+    isRedoDisabled: futureStates.length === 0,
     handleSave,
     t,
   };
 }
-// src/lib/hooks/use-builder-header.ts

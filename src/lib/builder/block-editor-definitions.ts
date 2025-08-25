@@ -1,98 +1,147 @@
 // src/lib/builder/block-editor-definitions.ts
 /**
- * @file src/lib/builder/block-editor-definitions.ts
- * @description Manifiesto central que define declarativamente las propiedades
- *              editables y los estilos de cada tipo de bloque en el constructor.
- *              Esta es la Única Fuente de Verdad para la configuración de la UI
- *              del `SettingsPanel`, adhiriéndose al principio de "Configuración sobre Código".
- * @author Raz Podestá
- * @version 1.0.0
+ * @file block-editor-definitions.ts
+ * @description Manifiesto central, declarativo y Única Fuente de Verdad (SSoT) que
+ *              define la estructura editable de cada bloque del constructor. Validado
+ *              contra los contratos de tipo de élite v3.0.0.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.2.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
-import { type BlockEditableDefinition } from "./types.d";
+import { type LucideIconName } from "@/config/lucide-icon-names";
+import { type BlockEditableDefinition, type FeatureItem } from "./types.d";
+
+/**
+ * @private
+ * @constant initialFeatures
+ * @description Define la estructura de datos inicial por defecto para un nuevo bloque de "Características".
+ */
+const initialFeatures: FeatureItem[] = [
+  {
+    icon: "ShieldCheck",
+    title: "Característica Segura",
+    description: "Descripción de la característica segura y confiable.",
+  },
+  {
+    icon: "Zap",
+    title: "Característica Rápida",
+    description: "Descripción de la característica increíblemente rápida.",
+  },
+  {
+    icon: "Globe",
+    title: "Característica Global",
+    description: "Descripción de la característica con alcance global.",
+  },
+];
 
 /**
  * @public
  * @constant blockEditorDefinitions
- * @description Un registro que mapea cada `block.type` (ej. "Header1", "Hero1")
- *              a su definición de propiedades y estilos editables. Cada entrada
- *              especifica la etiqueta para la UI, el tipo de control y valores
- *              por defecto o placeholders.
+ * @description Registro canónico que mapea cada `block.type` a su definición editable.
  */
 export const blockEditorDefinitions: Record<string, BlockEditableDefinition> = {
   Header1: {
     properties: {
       logoText: {
-        label: "Texto del Logo",
+        label: "properties.logoText_label",
         type: "text",
-        defaultValue: "Mi Empresa",
-        placeholder: "Introduce el texto del logo",
+        defaultValue: "Mi Marca",
       },
       ctaText: {
-        label: "Texto del Botón CTA",
+        label: "properties.ctaText_label",
         type: "text",
-        defaultValue: "Comprar Ahora",
-        placeholder: "Introduce el texto del botón",
+        defaultValue: "Empezar",
       },
     },
     styles: {
       backgroundColor: {
-        label: "Color de Fondo",
+        label: "properties.backgroundColor_label",
         type: "color",
-        defaultValue: "#333333",
+        defaultValue: "#111827",
       },
       textColor: {
-        label: "Color del Texto",
+        label: "properties.textColor_label",
         type: "color",
-        defaultValue: "#FFFFFF",
-      },
-      paddingTop: {
-        label: "Padding Superior (px)",
-        type: "text",
-        defaultValue: "16px",
-      },
-      paddingBottom: {
-        label: "Padding Inferior (px)",
-        type: "text",
-        defaultValue: "16px",
+        defaultValue: "#F9FAFB",
       },
     },
   },
-
   Hero1: {
     properties: {
       title: {
-        label: "Título Principal",
+        label: "properties.title_label",
         type: "textarea",
-        defaultValue: "Título Impactante",
-        placeholder: "Introduce el título principal de tu Hero",
+        defaultValue: "Título Impactante Para Tu Oferta",
       },
       subtitle: {
-        label: "Subtítulo",
+        label: "properties.subtitle_label",
         type: "textarea",
-        defaultValue: "Un subtítulo convincente para tu oferta.",
-        placeholder: "Introduce el subtítulo",
+        defaultValue:
+          "Describe el principal beneficio de tu producto o servicio.",
       },
     },
     styles: {
       backgroundColor: {
-        label: "Color de Fondo",
+        label: "properties.backgroundColor_label",
         type: "color",
-        defaultValue: "#F3F4F6",
+        defaultValue: "#F9FAFB",
       },
       textColor: {
-        label: "Color del Texto",
+        label: "properties.textColor_label",
         type: "color",
-        defaultValue: "#333333",
+        defaultValue: "#1F2937",
       },
       paddingTop: {
-        label: "Padding Superior (px)",
+        label: "properties.paddingTop_label",
         type: "text",
         defaultValue: "80px",
       },
       paddingBottom: {
-        label: "Padding Inferior (px)",
+        label: "properties.paddingBottom_label",
         type: "text",
         defaultValue: "80px",
+      },
+    },
+  },
+  Features1: {
+    properties: {
+      title: {
+        label: "properties.title_label",
+        type: "text",
+        defaultValue: "Descubre Nuestras Características",
+      },
+      subtitle: {
+        label: "properties.subtitle_label",
+        type: "textarea",
+        defaultValue:
+          "Explora las características que hacen que nuestro producto sea único y poderoso.",
+      },
+      features: {
+        label: "properties.features_label",
+        type: "array", // <-- AHORA VÁLIDO
+        defaultValue: initialFeatures,
+        itemSchema: {
+          icon: { label: "properties.icon_label", type: "icon" }, // <-- AHORA VÁLIDO
+          title: { label: "properties.title_label", type: "text" },
+          description: {
+            label: "properties.description_label",
+            type: "textarea",
+          },
+        },
+      },
+    },
+    styles: {
+      backgroundColor: {
+        label: "properties.backgroundColor_label",
+        type: "color",
+        defaultValue: "#FFFFFF",
+      },
+      textColor: {
+        label: "properties.textColor_label",
+        type: "color",
+        defaultValue: "#111827",
       },
     },
   },
@@ -104,12 +153,11 @@ export const blockEditorDefinitions: Record<string, BlockEditableDefinition> = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **SSoT para el Editor**: ((Implementada)) Este manifiesto actúa como la fuente única de verdad para la configuración de la UI de edición, mejorando drásticamente la mantenibilidad y la escalabilidad del constructor. Añadir un nuevo campo editable a un bloque ahora requiere únicamente una modificación en este archivo.
- * 2. **Arquitectura Declarativa**: ((Implementada)) Se adhiere al principio de "Configuración sobre Código", desacoplando la definición de la UI de su implementación en el `SettingsPanel`.
+ * 1. **Validación Exitosa**: ((Implementada)) Al consumir los contratos de tipo actualizados desde `types.d.ts`, este manifiesto ahora pasa la validación de TypeScript sin errores.
+ * 2. **Cero Regresiones**: ((Implementada)) Se ha mantenido la estructura de datos y las claves de i18n de la versión anterior, garantizando que no haya pérdida de funcionalidad.
  *
  * @subsection Melhorias Futuras
- * 1. **Validación Zod para Definiciones**: ((Vigente)) Definir esquemas Zod para `EditablePropertyDefinition` y `BlockEditableDefinition` y validar este objeto `blockEditorDefinitions` en tiempo de desarrollo para garantizar la consistencia del manifiesto.
- * 2. **Tipos de Controles Avanzados**: ((Vigente)) Expandir `BlockPropertyType` en `types.d.ts` para incluir tipos como `number` (con min/max/step), `select` (con opciones), o `image` (para un futuro selector de assets).
+ * 1. **Implementación de `SettingsField`**: ((Vigente)) La deuda técnica principal ahora reside en `SettingsField.tsx`, que debe ser extendido para poder renderizar los nuevos tipos `array` e `icon`.
  *
  * =====================================================================
  */

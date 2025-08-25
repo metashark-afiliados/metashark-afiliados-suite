@@ -2,9 +2,9 @@
 /**
  * @file _supabase.generated.ts
  * @description Manifiesto de tipos de base de datos canónico y ensamblado.
- *              Actualizado para incluir la tabla `feature_modules`.
+ *              Actualizado para incluir la nueva tabla `creations`.
  * @author Raz Podestá
- * @version 2025-08-15T19:30:00.000Z
+ * @version 2025-08-24T15:00:00.000Z
  */
 import { type Enums } from "./enums";
 import { type Functions } from "./functions";
@@ -20,9 +20,10 @@ export type Database = {
       brand_kits: Tables.BrandKits;
       campaigns: Tables.Campaigns;
       coupons: Tables.Coupons;
+      creations: Tables.Creations; // <-- NUEVA TABLA
       custom_blocks: Tables.CustomBlocks;
       customers: Tables.Customers;
-      feature_modules: Tables.FeatureModules; // <-- SINCRONIZADO
+      feature_modules: Tables.FeatureModules;
       invitations: Tables.Invitations;
       notifications: Tables.Notifications;
       prices: Tables.Prices;
@@ -53,4 +54,3 @@ export type Database = {
     };
   };
 };
-// src/lib/types/database/_supabase.generated.ts
