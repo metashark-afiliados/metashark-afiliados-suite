@@ -3,8 +3,8 @@
  * @file SignUpLegalCheckboxes.tsx
  * @description Aparato de UI atómico y de presentación puro. Encapsula los
  *              checkboxes de consentimiento legal y de marketing.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
+ * @version 1.0.1
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -41,7 +41,9 @@ export function SignUpLegalCheckboxes({
   isPending,
 }: SignUpLegalCheckboxesProps): React.ReactElement {
   const t = useTranslations("pages.SignUpPage");
-  const tErrors = useTranslations("ValidationErrors");
+  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const tErrors = useTranslations("shared.ValidationErrors");
+  // --- FIN DE REFACTORIZACIÓN ---
 
   return (
     <div className="space-y-4 pt-2">
@@ -114,9 +116,10 @@ export function SignUpLegalCheckboxes({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Encapsulamiento de Lógica Compleja**: ((Implementada)) Abstrae el uso del `Controller` de `react-hook-form`, que es necesario para componentes de UI controlados, simplificando el formulario padre.
- * 2. **Composición de `t.rich`**: ((Implementada)) Demuestra la composición de `SmartLink` dentro de `t.rich`, una implementación de élite de i18n.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Encapsulamiento de Lógica de Enlaces**: ((Vigente)) La construcción de los `SmartLink` dentro de `t.rich` es funcional, pero si la lógica de generación de URLs para `/terms` y `/privacy` se vuelve más compleja, podría abstraerse a un helper para mantener el JSX más limpio.
  *
  * =====================================================================
  */
-// src/components/authentication/sign-up-form/SignUpLegalCheckboxes.tsx

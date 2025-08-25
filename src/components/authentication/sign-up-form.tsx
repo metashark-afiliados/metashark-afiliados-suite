@@ -6,8 +6,8 @@
  *              de formulario a partir de componentes atómicos, con una
  *              corrección crítica en la ruta de importación para resolver
  *              una dependencia circular.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
+ * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
+ * @version 2.2.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -32,14 +32,12 @@ import { Label } from "@/components/ui/label";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { OAuthButtonGroup } from "./OAuthButtonGroup";
 import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
-// --- INICIO DE CORRECCIÓN DE IMPORTACIÓN ---
 import {
   SignUpEmailField,
   SignUpPasswordField,
   SignUpConfirmPasswordField,
   SignUpLegalCheckboxes,
 } from "./sign-up-form/index";
-// --- FIN DE CORRECCIÓN DE IMPORTACIÓN ---
 
 type FormData = z.infer<typeof SignUpSchema>;
 
@@ -55,7 +53,9 @@ function SubmitButton() {
 }
 
 export function SignupForm() {
-  const tErrors = useTranslations("ValidationErrors");
+  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const tErrors = useTranslations("shared.ValidationErrors");
+  // --- FIN DE REFACTORIZACIÓN ---
   const [state, formAction] = useFormState(signUpAction, {
     success: false,
     error: "",
@@ -128,9 +128,10 @@ export function SignupForm() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia Circular**: ((Implementada)) Se ha corregido la ruta de importación para que apunte explícitamente a `./sign-up-form/index`, resolviendo la ambigüedad y el error de compilación.
- * 2. **Arquitectura de Ensamblaje (LEGO)**: ((Vigente)) El formulario ahora es un orquestador puro que compone sus campos a partir de componentes atómicos.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Abstracción de Botón de Envío**: ((Vigente)) El `SubmitButton` actual es un componente interno. Para una mayor reutilización y cohesión, podría ser extraído a un archivo separado (`src/components/ui/FormSubmitButton.tsx`) y exportado.
  *
  * =====================================================================
  */
-// src/components/authentication/sign-up-form.tsx

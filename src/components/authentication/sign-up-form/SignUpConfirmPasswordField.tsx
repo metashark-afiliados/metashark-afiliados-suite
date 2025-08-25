@@ -1,11 +1,11 @@
-// src/components/authentication/sign--up-form/SignUpConfirmPasswordField.tsx
+// src/components/authentication/sign-up-form/SignUpConfirmPasswordField.tsx
 /**
  * @file SignUpConfirmPasswordField.tsx
  * @description Aparato de UI atómico y de presentación puro. Encapsula el
  *              campo de confirmación de contraseña, incluyendo la lógica para
  *              prevenir el pegado de texto.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
+ * @version 1.0.1
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -41,7 +41,9 @@ export function SignUpConfirmPasswordField({
   isPending,
 }: SignUpConfirmPasswordFieldProps): React.ReactElement {
   const t = useTranslations("pages.SignUpPage");
-  const tErrors = useTranslations("ValidationErrors");
+  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const tErrors = useTranslations("shared.ValidationErrors");
+  // --- FIN DE REFACTORIZACIÓN ---
 
   return (
     <div className="space-y-1">
@@ -69,11 +71,10 @@ export function SignUpConfirmPasswordField({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Encapsulamiento de Regla de Negocio**: ((Implementada)) La lógica `onPaste={(e) => e.preventDefault()}` está ahora contenida dentro de este componente atómico, asegurando que la regla se aplique consistentemente.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
  *
  * @subsection Melhorias Futuras
  * 1. **Feedback Visual en Tiempo Real**: ((Vigente)) Se podría añadir un icono de estado que se vuelva verde cuando el valor de este campo coincida con el campo de contraseña, proporcionando un feedback de UX instantáneo.
  *
  * =====================================================================
  */
-// src/components/authentication/sign-up-form/SignUpConfirmPasswordField.tsx

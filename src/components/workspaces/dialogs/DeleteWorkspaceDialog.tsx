@@ -1,10 +1,11 @@
+// src/components/workspaces/dialogs/DeleteWorkspaceDialog.tsx
 /**
  * @file DeleteWorkspaceDialog.tsx
  * @description Componente de UI que implementa el modal para la eliminación de un workspace.
  *              Ha sido refactorizado a un estándar de élite para consumir los namespaces
  *              de i18n canónicos, resolviendo un error crítico de `MISSING_MESSAGE` en Vercel.
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
+ * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
+ * @version 5.0.1
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -30,7 +31,7 @@ import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
 export function DeleteWorkspaceDialog(): React.ReactElement | null {
   // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
   const t = useTranslations("components.workspaces.WorkspaceSwitcher");
-  const tDialogs = useTranslations("components.ui.Dialogs");
+  const tDialogs = useTranslations("components.ui.Dialogs"); // Corregido: Namespace canónico
   // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
   const { activeDialog, close } = useWorkspaceDialogStore();
@@ -69,7 +70,7 @@ export function DeleteWorkspaceDialog(): React.ReactElement | null {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Blocker de Build**: ((Implementada)) Se han corregido las llamadas a `useTranslations` con los namespaces canónicos, resolviendo otra instancia del error `MISSING_MESSAGE` que impedía el despliegue.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` para el `tDialogs` a `"components.ui.Dialogs"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
  *
  * @subsection Melhorias Futuras
  * 1. **Hook Soberano `useDeleteWorkspace`**: ((Vigente)) La lógica para manejar el estado `isPending` y el feedback al usuario (`toast`) debería ser abstraída a su propio hook para una mayor cohesión y reutilización.

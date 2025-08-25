@@ -3,8 +3,8 @@
  * @file SignUpPasswordField.tsx
  * @description Aparato de UI atómico y de presentación puro. Encapsula el
  *              campo de entrada de contraseña y el medidor de fortaleza.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
+ * @version 1.0.1
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -44,7 +44,9 @@ export function SignUpPasswordField({
   passwordValue,
 }: SignUpPasswordFieldProps): React.ReactElement {
   const t = useTranslations("pages.SignUpPage");
-  const tErrors = useTranslations("ValidationErrors");
+  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const tErrors = useTranslations("shared.ValidationErrors");
+  // --- FIN DE REFACTORIZACIÓN ---
 
   return (
     <div className="space-y-1">
@@ -72,11 +74,10 @@ export function SignUpPasswordField({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Cohesión de Componentes**: ((Implementada)) Agrupa lógicamente el `Input` de contraseña con su `PasswordStrengthMeter`, creando un componente atómico más inteligente y cohesivo.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
  *
  * @subsection Melhorias Futuras
  * 1. **Toggle de Visibilidad**: ((Vigente)) Añadir un icono de "ojo" dentro del `Input` que permita al usuario alternar la visibilidad de la contraseña, una mejora de UX estándar en la industria.
  *
  * =====================================================================
  */
-// src/components/authentication/sign-up-form/SignUpPasswordField.tsx

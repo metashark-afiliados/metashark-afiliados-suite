@@ -3,8 +3,8 @@
  * @file SignUpEmailField.tsx
  * @description Aparato de UI atómico y de presentación puro. Encapsula el
  *              campo de entrada de email para el formulario de registro.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
+ * @version 1.0.1
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -40,7 +40,9 @@ export function SignUpEmailField({
   isPending,
 }: SignUpEmailFieldProps): React.ReactElement {
   const t = useTranslations("pages.SignUpPage");
-  const tErrors = useTranslations("ValidationErrors");
+  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const tErrors = useTranslations("shared.ValidationErrors");
+  // --- FIN DE REFACTORIZACIÓN ---
 
   return (
     <div className="space-y-1">
@@ -67,12 +69,10 @@ export function SignUpEmailField({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este componente tiene la única responsabilidad de renderizar el campo de email, cumpliendo con la "Filosofía LEGO".
- * 2. **Componente Puro y Controlado**: ((Implementada)) Es 100% agnóstico a la lógica de negocio, recibiendo todo su estado y manejadores a través de props.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el componente con la arquitectura IMAS y los schemas de Zod.
  *
  * @subsection Melhorias Futuras
  * 1. **Icono de Estado de Validación**: ((Vigente)) Se podría añadir un icono de `Check` o `X` dentro del input para proporcionar un feedback visual instantáneo sobre la validez del email.
  *
  * =====================================================================
  */
-// src/components/authentication/sign-up-form/SignUpEmailField.tsx

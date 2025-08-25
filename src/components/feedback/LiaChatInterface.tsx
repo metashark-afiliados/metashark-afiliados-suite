@@ -4,8 +4,11 @@
  * @description Aparato de UI atómico que renderiza la interfaz de chat modal completa.
  *              Inspirado en la estética de "Manus", proporciona un entorno de
  *              interacción enfocado para el asistente de IA, L.I.A.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
+ * @version 1.0.1
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -52,7 +55,9 @@ export function LiaChatInterface({
   isOpen,
   onOpenChange,
 }: LiaChatInterfaceProps): React.ReactElement {
-  const t = useTranslations("LiaChatWidget");
+  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const t = useTranslations("components.feedback.LiaChatWidget");
+  // --- FIN DE REFACTORIZACIÓN ---
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -119,16 +124,13 @@ export function LiaChatInterface({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
+ * @subsection Melhorias Adicionadas
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha corregido la llamada a `useTranslations` con el namespace canónico `components.feedback.LiaChatWidget`, resolviendo la instancia del error `MISSING_MESSAGE` que impedía el despliegue en Vercel.
+ *
  * @subsection Melhorias Futuras
  * 1. **Gestión de Estado de Chat**: ((Vigente)) Implementar un estado (`useState`) para gestionar el array de mensajes y renderizarlos dinámicamente en `CardContent`.
  * 2. **Integración con API de IA**: ((Vigente)) Conectar el `handleSubmit` a una Server Action que se comunique con un servicio de IA (ej. Vercel AI SDK) para obtener respuestas.
  * 3. **Streaming de Respuestas**: ((Vigente)) Implementar la renderización de la respuesta de la IA palabra por palabra para una UX superior.
  *
- * @subsection Melhorias Adicionadas
- * 1. **Interfaz de Chat Funcional (Placeholder)**: ((Implementada)) Se ha creado la estructura completa de la UI de chat, proporcionando la base para la funcionalidad real.
- * 2. **Estética Inspirada en "Manus"**: ((Implementada)) El diseño sigue los principios de "Calma Enfocada", utilizando componentes como `Card` y `Dialog` para crear una experiencia de usuario limpia.
- * 3. **Full Internacionalización y Observabilidad**: ((Implementada)) Todos los textos se consumen de `next-intl` y la interacción principal del usuario se registra con `logger`.
- *
  * =====================================================================
  */
-// src/components/feedback/LiaChatInterface.tsx

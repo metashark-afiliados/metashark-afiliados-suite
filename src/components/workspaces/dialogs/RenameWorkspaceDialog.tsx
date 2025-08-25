@@ -1,11 +1,12 @@
+// src/components/workspaces/dialogs/RenameWorkspaceDialog.tsx
 /**
  * @file RenameWorkspaceDialog.tsx
  * @description Aparato de UI atómico que encapsula el modal para renombrar
  *              un workspace. Ha sido refactorizado a un estándar de élite para
  *              consumir los namespaces de i18n canónicos, resolviendo errores
  *              críticos de `MISSING_MESSAGE` en el build de Vercel.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
+ * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
+ * @version 2.1.1
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -86,6 +87,7 @@ export function RenameWorkspaceDialog(): React.ReactElement | null {
         toast.error(
           tErrors(result.error as any, { defaultValue: result.error })
         );
+        reset({ name: activeWorkspace.name }); // Rollback UI optimistic state on error
       }
     });
   };
@@ -112,7 +114,7 @@ export function RenameWorkspaceDialog(): React.ReactElement | null {
               disabled={isLoading}
             />
             {errors.name && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-destructive" role="alert">
                 {tErrors(errors.name.message as any)}
               </p>
             )}
@@ -135,7 +137,9 @@ export function RenameWorkspaceDialog(): React.ReactElement | null {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Blocker de Build**: ((Implementada)) Se han corregido las llamadas a `useTranslations` con los namespaces canónicos, resolviendo las instancias de `MISSING_MESSAGE` para `WorkspaceSwitcher` y `ValidationErrors` que se originaban en este componente.
+ * 1. **Sincronización de Contrato de i18n**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para el `tErrors` a `"shared.ValidationErrors"`, alineando este componente con la arquitectura IMAS y los schemas de Zod. (Esta fue una corrección ya prevista y ejecutada en pasos previos).
+ * 2. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) La adición de las claves de `rename_dialog` al archivo `src/messages/components/workspaces/WorkspaceSwitcher.json` en el paso anterior ha resuelto las instancias de `MISSING_MESSAGE` para este componente.
+ * 3. **Rollback de UI Optimista en Error**: ((Implementada)) Se ha añadido `reset({ name: activeWorkspace.name });` en el bloque de error de `processSubmit`. Esto asegura que si la Server Action falla, el campo de entrada revierta a su valor original, mejorando la coherencia de la UI.
  *
  * @subsection Melhorias Futuras
  * 1. **Hook Soberano `useRenameWorkspace`**: ((Vigente)) La lógica del formulario, la transición y el feedback de `toast` podrían ser abstraídos a su propio hook `useRenameWorkspaceForm` para una mayor cohesión y para convertir este componente en un presentador puro.
