@@ -1,11 +1,13 @@
-// src/components/feedback/LiaChatWidget.tsx
 /**
- * @file src/components/feedback/LiaChatWidget.tsx
- * @description Botón de acción flotante que actúa como ensamblador para la
- *              interfaz de chat modal. Gestiona el estado de visibilidad del
- *              diálogo y compone el componente `LiaChatInterface`.
- * @author L.I.A. Legacy
- * @version 3.0.0
+ * @file LiaChatWidget.tsx
+ * @description Botón de acción flotante. Ha sido refactorizado a un estándar
+ *              de élite para consumir el store de Zustand `useLiaChatStore` y el
+ *              namespace de i18n canónico, resolviendo un error de build en Vercel.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -14,6 +16,7 @@ import { useTranslations } from "next-intl";
 import { Bot } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useLiaChatStore } from "@/lib/hooks/useLiaChatStore";
 import { logger } from "@/lib/logging";
 
 import { LiaChatInterface } from "./LiaChatInterface";
@@ -21,17 +24,22 @@ import { LiaChatInterface } from "./LiaChatInterface";
 /**
  * @public
  * @component LiaChatWidget
- * @description Renderiza un botón flotante y gestiona la apertura y cierre del
- *              modal de la interfaz de chat con L.I.A.
+ * @description Renderiza el botón de acción flotante para el chat de L.I.A. y
+ *              orquesta la visibilidad del modal de la interfaz de chat.
  * @returns {React.ReactElement}
  */
 export function LiaChatWidget(): React.ReactElement {
-  const t = useTranslations("LiaChatWidget");
-  const [isChatOpen, setIsChatOpen] = React.useState(false);
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
+  const t = useTranslations("components.feedback.LiaChatWidget");
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
+
+  // --- INICIO DE MEJORA ARQUITECTÓNICA (Estado Global) ---
+  const { isOpen, openChat, closeChat } = useLiaChatStore();
+  // --- FIN DE MEJORA ARQUITECTÓNICA ---
 
   const handleOpenChat = () => {
     logger.info("[LiaChatWidget] El usuario ha abierto la interfaz de chat.");
-    setIsChatOpen(true);
+    openChat();
   };
 
   return (
@@ -39,15 +47,15 @@ export function LiaChatWidget(): React.ReactElement {
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           size="lg"
-          className="rounded-full h-14 w-14 shadow-lg bg-card border border-border/60 text-foreground hover:bg-muted"
+          className="rounded-full h-16 w-16 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-transform hover:scale-110"
           onClick={handleOpenChat}
           aria-label={t("aria_label")}
         >
-          <Bot className="h-7 w-7" />
+          <Bot className="h-8 w-8" />
           <span className="sr-only">{t("aria_label")}</span>
         </Button>
       </div>
-      <LiaChatInterface isOpen={isChatOpen} onOpenChange={setIsChatOpen} />
+      <LiaChatInterface isOpen={isOpen} onOpenChange={closeChat} />
     </>
   );
 }
@@ -57,13 +65,12 @@ export function LiaChatWidget(): React.ReactElement {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Estado Persistente**: ((Vigente)) El estado `isChatOpen` podría ser gestionado por un store de Zustand si otros componentes necesitaran abrir o cerrar el chat programáticamente.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Ensamblaje Funcional**: ((Implementada)) El widget ahora gestiona el estado del modal y compone la `LiaChatInterface`, creando una funcionalidad completa (aunque con lógica de chat de placeholder).
- * 2. **Principio de Responsabilidad Única (SRP)**: ((Implementada)) El `LiaChatWidget` se enfoca en ser el disparador, mientras que `LiaChatInterface` contiene la UI del chat, manteniendo una separación clara de responsabilidades.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha corregido la llamada a `useTranslations` con el namespace canónico, resolviendo otra instancia del error `MISSING_MESSAGE`.
+ * 2. **Gestión de Estado de Élite**: ((Implementada)) Se ha reemplazado el `useState` local por el store global `useLiaChatStore`. Esto desacopla completamente el estado de la UI del componente, permitiendo que otros aparatos (como la paleta de comandos) puedan abrir el chat programáticamente.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Animación de Entrada**: ((Vigente)) El botón del widget podría tener una animación de entrada sutil (`framer-motion`) cuando la página carga, para atraer la atención del usuario sin ser intrusivo.
  *
  * =====================================================================
  */
-// src/components/feedback/LiaChatWidget.tsx

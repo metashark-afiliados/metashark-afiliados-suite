@@ -1,11 +1,11 @@
 // tests/mocks/next-intl.mock.ts
 /**
- * @file tests/mocks/next-intl.mock.ts
- * @description Mock de `next-intl` de élite, definitivo y de máxima fidelidad.
- *              Refactorizado para incluir lógica de interpolación de valores,
- *              aumentando la robustez y realismo del entorno de pruebas.
+ * @file next-intl.mock.ts
+ * @description Mock de `next-intl` de élite. Refactorizado para simular las
+ *              APIs de servidor (`unstable_setRequestLocale`, `getTranslations`),
+ *              resolviendo errores de entorno de pruebas en Server Components.
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 4.0.0
  */
 import { vi } from "vitest";
 import { getCachedTestMessagesForMock } from "@tests/utils/render";
@@ -28,7 +28,6 @@ function createTranslateFunction(
         message = message.replace(`{${valKey}}`, String(values[valKey]));
       });
     }
-
     return typeof message === "string" ? message : `[i18n Object: ${fullKey}]`;
   };
 
@@ -38,26 +37,36 @@ function createTranslateFunction(
     const fullKey = namespace ? `${namespace}.${key}` : key;
     return getNestedValue(messages, fullKey) || {};
   };
-
   return t;
 }
 
 export const setupNextIntlMock = () => {
+  // --- MOCK PARA APIS DE CLIENTE ---
   vi.mock("next-intl", async (importOriginal) => {
     const actual = await importOriginal<typeof import("next-intl")>();
-    const mockUseTranslations = (namespace?: string) => {
-      const messages = getCachedTestMessagesForMock() || {};
-      return createTranslateFunction(messages, namespace);
-    };
     return {
       ...actual,
-      useTranslations: mockUseTranslations,
+      useTranslations: (namespace?: string) => {
+        const messages = getCachedTestMessagesForMock() || {};
+        return createTranslateFunction(messages, namespace);
+      },
       useFormatter: () => ({
         dateTime: (d: Date) => d.toISOString(),
         relativeTime: (d: Date) => `[relative] ${d.toISOString()}`,
       }),
     };
   });
+
+  // --- MOCK PARA APIS DE SERVIDOR ---
+  vi.mock("next-intl/server", () => ({
+    unstable_setRequestLocale: vi.fn(),
+    getTranslations: (namespace?: string | { namespace?: string }) => {
+      const ns =
+        typeof namespace === "object" ? namespace.namespace : namespace;
+      const messages = getCachedTestMessagesForMock() || {};
+      return Promise.resolve(createTranslateFunction(messages, ns));
+    },
+  }));
 
   vi.mock("@/lib/i18n/hooks", () => ({
     useTypedTranslations: vi.fn().mockImplementation((namespace: string) => {
@@ -66,13 +75,3 @@ export const setupNextIntlMock = () => {
     }),
   }));
 };
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Simulación de Interpolación**: ((Implementada)) El mock de `useTranslations` ahora realiza un reemplazo básico de placeholders (ej. `{year}`), haciendo que el entorno de pruebas sea significativamente más fiel al comportamiento de producción y permitiendo aserciones más intuitivas.
- *
- * =====================================================================
- */

@@ -1,17 +1,15 @@
 // src/components/layout/sidebar/NavList.tsx
 /**
  * @file src/components/layout/sidebar/NavList.tsx
- * @description Aparato de UI atómico que renderiza la lista de navegación principal
- *              del dashboard. Su contrato de props usa un tipo `href` agnóstico
- *              para resolver conflictos de tipos con `next-intl`.
+ * @description Aparato de UI atómico que renderiza la lista de navegación principal.
+ *              Sincronizado para usar `useTypedTranslations` con el namespace canónico.
  * @author Raz Podestá
- * @version 2.1.0
+ * @version 3.1.0
  */
 "use client";
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
 import {
   Globe,
   LayoutDashboard,
@@ -22,6 +20,7 @@ import {
 } from "lucide-react";
 
 import { useDashboard } from "@/lib/context/DashboardContext";
+import { useTypedTranslations } from "@/lib/i18n/hooks"; // <-- USAR HOOK TIPADO
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
@@ -63,7 +62,9 @@ const NavListSkeleton = () => (
 
 export function NavList(): React.ReactElement {
   const { user } = useDashboard();
-  const t = useTranslations("DashboardSidebar");
+  // --- INICIO DE CORRECCIÓN DE I18N ---
+  const t = useTypedTranslations("components.layout.DashboardSidebar");
+  // --- FIN DE CORRECCIÓN DE I18N ---
 
   if (!user) {
     return <NavListSkeleton />;
@@ -81,11 +82,10 @@ export function NavList(): React.ReactElement {
   ];
 
   if (userRole === "developer") {
-    // --- INICIO DE MODIFICACIÓN ---
     mainNavLinks.push(
       {
         href: "/dashboard/resources/icons",
-        label: t("iconLibrary"), // Nueva clave i18n
+        label: t("iconLibrary"),
         icon: Palette,
       },
       {
@@ -94,7 +94,6 @@ export function NavList(): React.ReactElement {
         icon: ShieldCheck,
       }
     );
-    // --- FIN DE MODIFICACIÓN ---
   }
 
   return (
@@ -107,3 +106,4 @@ export function NavList(): React.ReactElement {
     </nav>
   );
 }
+// src/components/layout/sidebar/NavList.tsx

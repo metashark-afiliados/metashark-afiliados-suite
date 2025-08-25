@@ -2,12 +2,13 @@
 /**
  * @file campaignStructureSlice.ts
  * @description Slice de Zustand atómico. Su única responsabilidad es gestionar
- *              las mutaciones ESTRUCTURALES del array de bloques de la campaña
- *              (añadir, eliminar, mover, duplicar), consumiendo la factoría
- *              `initializeNewBlock` para la creación de nuevos bloques.
+ *              las mutaciones ESTRUCTURALES del array de bloques de la campaña.
+ *              Declarado como módulo de cliente por su dependencia de `@dnd-kit`.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
+"use client";
+
 import { arrayMove } from "@dnd-kit/sortable";
 import { type StateCreator } from "zustand";
 
@@ -15,11 +16,6 @@ import { initializeNewBlock } from "@/lib/builder/block-initializer.helper";
 import { type CampaignConfig } from "@/lib/builder/types.d";
 import { logger } from "@/lib/logging";
 
-/**
- * @public
- * @interface CampaignStructureSlice
- * @description Define el contrato de estado y acciones para este slice.
- */
 export interface CampaignStructureSlice {
   campaignConfig: CampaignConfig | null;
   setCampaignConfig: (config: CampaignConfig | null) => void;
@@ -33,20 +29,13 @@ export interface CampaignStructureSlice {
   duplicateBlock: (blockId: string) => void;
 }
 
-/**
- * @public
- * @function createCampaignStructureSlice
- * @description Factoría que crea el slice de Zustand para la manipulación estructural de la campaña.
- * @param {StateCreator} set - La función `set` de Zustand para actualizar el estado.
- * @returns {CampaignStructureSlice} El objeto del slice.
- */
 export const createCampaignStructureSlice: StateCreator<
   CampaignStructureSlice,
   [],
   [],
   CampaignStructureSlice
 > = (set) => ({
-  campaignConfig: null, // Será sobreescrito por el store principal que lo ensamble.
+  campaignConfig: null,
 
   setCampaignConfig: (config) => {
     logger.trace(
@@ -66,7 +55,7 @@ export const createCampaignStructureSlice: StateCreator<
       if (!state.campaignConfig) return {};
 
       const newBlock = initializeNewBlock(blockType, initialProvidedProps);
-      if (!newBlock) return {}; // La factoría maneja el log de error.
+      if (!newBlock) return {};
 
       const newConfig = {
         ...state.campaignConfig,
@@ -138,14 +127,13 @@ export const createCampaignStructureSlice: StateCreator<
       );
       if (!blockToDuplicate || blockIndex === -1) return {};
 
-      // Delega la creación del nuevo bloque a la factoría.
       const newBlock = initializeNewBlock(
         blockToDuplicate.type,
         blockToDuplicate.props
       );
       if (!newBlock) return {};
 
-      newBlock.styles = { ...blockToDuplicate.styles }; // Conserva los estilos.
+      newBlock.styles = { ...blockToDuplicate.styles };
 
       const newBlocks = [...state.campaignConfig.blocks];
       newBlocks.splice(blockIndex + 1, 0, newBlock);
@@ -160,12 +148,7 @@ export const createCampaignStructureSlice: StateCreator<
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Cohesión y SRP Mejorados**: ((Implementada)) El slice ahora se enfoca exclusivamente en la mutación del array de bloques, delegando la lógica de creación al nuevo helper `initializeNewBlock`.
- * 2. **Cero Regresiones**: ((Implementada)) Se ha preservado toda la funcionalidad de manipulación de bloques del snapshot original.
- * 3. **Full Observabilidad**: ((Implementada)) Todas las acciones estructurales son registradas con `logger.trace`, proporcionando una visibilidad completa del flujo de estado.
- *
- * @subsection Melhorias Futuras
- * 1. **Integración con Immer**: ((Vigente)) El uso de `immer` sigue siendo la mejora de élite para simplificar la lógica de actualización inmutable, especialmente en la acción `duplicateBlock`.
+ * 1. **Resolución de `TypeError`**: ((Implementada)) Se ha añadido la directiva `"use client"`, continuando con la resolución del fallo de renderizado del servidor.
  *
  * =====================================================================
  */

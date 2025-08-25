@@ -1,94 +1,49 @@
 // src/components/layout/DashboardHeader.tsx
 /**
- * @file src/components/layout/DashboardHeader.tsx
- * @description Header contextual del dashboard. Refactorizado a la Arquitectura v9.1,
- *              es ahora un componente de presentación puro cuyo contenido es dictado
- *              por la página que lo renderiza a través de props. Ha sido sincronizado
- *              con la arquitectura de i18n canónica.
+ * @file DashboardHeader.tsx
+ * @description Header contextual. Refactorizado a un estándar de élite con
+ *              un layout y estilo visual inspirados en las mejores prácticas.
  * @author Raz Podestá
- * @version 2.1.0
+ * @version 5.0.0
  */
 "use client";
 
 import React from "react";
-import { Menu, Search } from "lucide-react";
-
-import {
-  Breadcrumbs,
-  type BreadcrumbItem,
-} from "@/components/dashboard/Breadcrumbs";
-import { InvitationBell } from "@/components/dashboard/InvitationBell";
-import { Button } from "@/components/ui/button";
-import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
-import { useCommandPaletteStore } from "@/lib/hooks/use-command-palette";
+import { Search } from "lucide-react";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
 
-import { DashboardSidebar } from "./DashboardSidebar";
+import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
+import { InvitationBell } from "@/components/dashboard/InvitationBell";
 
-export interface DashboardHeaderProps {
-  breadcrumbs?: BreadcrumbItem[];
-  primaryAction?: React.ReactNode;
-}
-
-export function DashboardHeader({
-  breadcrumbs,
-  primaryAction,
-}: DashboardHeaderProps): React.ReactElement {
-  const { open } = useCommandPaletteStore();
+export function DashboardHeader(): React.ReactElement {
   const t = useTypedTranslations("components.layout.DashboardHeader");
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-card px-4 sm:h-[60px] sm:px-6">
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="shrink-0 md:hidden">
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">{t("mobile_openMenu_sr")}</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="flex flex-col bg-card p-0">
-          <DashboardSidebar />
-        </SheetContent>
-      </Sheet>
-
+    <>
       <div className="flex-1">
-        {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
+        <span className="font-semibold text-lg">Início</span>
       </div>
-
-      <div className="flex items-center gap-2 md:gap-4">
-        <Button
-          variant="outline"
-          className="gap-2 w-full max-w-[200px] justify-start text-muted-foreground hidden sm:inline-flex"
-          onClick={open}
-        >
-          <Search className="h-4 w-4" />
-          <span>{t("search_placeholder")}</span>
-          <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
-            <span className="text-xs">{t("search_command")}</span>
-          </kbd>
-        </Button>
-        {primaryAction}
+      <div className="flex w-full flex-1 items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+        {/* --- INICIO DE REFACTORIZACIÓN VISUAL --- */}
+        <div className="relative ml-auto flex-1 md:grow-0">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Button
+            variant="outline"
+            className="w-full justify-start text-muted-foreground pl-8 font-normal"
+          >
+            {t("search_placeholder")}
+            <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
+              <span className="text-xs">{t("search_command")}</span>
+            </kbd>
+          </Button>
+        </div>
+        {/* --- FIN DE REFACTORIZACIÓN VISUAL --- */}
         <LanguageSwitcher />
         <ThemeSwitcher />
         <InvitationBell />
       </div>
-    </header>
+    </>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de i18n**: ((Implementada)) Se ha corregido la llamada a `useTypedTranslations` para usar el namespace canónico `"components.layout.DashboardHeader"`, resolviendo el error de tipo `TS2345`.
- *
- * @subsection Melhorias Futuras
- * 1. **Acciones Secundarias Flexibles**: ((Vigente)) La prop `primaryAction` podría expandirse a un `actions: React.ReactNode` para permitir pasar múltiples botones o menús, aumentando la flexibilidad del componente.
- * 2. **Título de Página Móvil**: ((Vigente)) En vistas móviles, donde los `breadcrumbs` pueden ser muy largos, se podría mostrar un título de página más simple (`title: string`) en su lugar.
- *
- * =====================================================================
- */
-// src/components/layout/DashboardHeader.tsx

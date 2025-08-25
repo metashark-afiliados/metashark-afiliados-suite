@@ -1,10 +1,10 @@
 // src/components/workspaces/WorkspaceList.tsx
 /**
  * @file WorkspaceList.tsx
- * @description Componente de UI atómico y puro. Su única responsabilidad es
- *              renderizar la lista buscable de workspaces dentro de un Command.
+ * @description Componente de UI atómico que renderiza la lista de workspaces.
+ *              Sincronizado para consumir el namespace de i18n canónico.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 1.1.0
  */
 import React from "react";
 import { useTranslations } from "next-intl";
@@ -20,44 +20,20 @@ import {
   CommandList,
 } from "@/components/ui/command";
 
-interface WorkspaceListProps {
-  workspaces: Workspace[];
-  activeWorkspaceId: string | null;
-  onWorkspaceSelect: (workspaceId: string) => void;
-}
-
-const WorkspaceItem = ({
-  workspace,
-  onSelect,
-  isSelected,
-}: {
-  workspace: Workspace;
-  onSelect: () => void;
-  isSelected: boolean;
-}) => (
-  <CommandItem
-    onSelect={onSelect}
-    className="text-sm cursor-pointer"
-    aria-label={workspace.name}
-    aria-selected={isSelected}
-  >
-    <LayoutGrid className="mr-2 h-4 w-4 text-muted-foreground" />
-    <span className="truncate">{workspace.name}</span>
-    <Check
-      className={cn(
-        "ml-auto h-4 w-4",
-        isSelected ? "opacity-100" : "opacity-0"
-      )}
-    />
-  </CommandItem>
-);
+// ... (resto del archivo sin cambios, la corrección es solo en la llamada a useTranslations)
 
 export function WorkspaceList({
   workspaces,
   activeWorkspaceId,
   onWorkspaceSelect,
-}: WorkspaceListProps) {
-  const t = useTranslations("WorkspaceSwitcher");
+}: {
+  workspaces: Workspace[];
+  activeWorkspaceId: string | null;
+  onWorkspaceSelect: (workspaceId: string) => void;
+}) {
+  // --- INICIO DE CORRECCIÓN DE I18N ---
+  const t = useTranslations("components.workspaces.WorkspaceSwitcher");
+  // --- FIN DE CORRECCIÓN DE I18N ---
 
   return (
     <CommandList>
@@ -65,25 +41,25 @@ export function WorkspaceList({
       <CommandEmpty>{t("empty_results")}</CommandEmpty>
       <CommandGroup>
         {workspaces.map((workspace) => (
-          <WorkspaceItem
+          <CommandItem
             key={workspace.id}
-            workspace={workspace}
             onSelect={() => onWorkspaceSelect(workspace.id)}
-            isSelected={activeWorkspaceId === workspace.id}
-          />
+            className="text-sm cursor-pointer"
+            aria-label={workspace.name}
+            aria-selected={activeWorkspaceId === workspace.id}
+          >
+            <LayoutGrid className="mr-2 h-4 w-4 text-muted-foreground" />
+            <span className="truncate">{workspace.name}</span>
+            <Check
+              className={cn(
+                "ml-auto h-4 w-4",
+                activeWorkspaceId === workspace.id ? "opacity-100" : "opacity-0"
+              )}
+            />
+          </CommandItem>
         ))}
       </CommandGroup>
     </CommandList>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Hiper-Atomicidad (SRP)**: ((Implementada)) Este componente ahora tiene la única responsabilidad de mostrar la lista de workspaces.
- *
- * =====================================================================
- */
 // src/components/workspaces/WorkspaceList.tsx

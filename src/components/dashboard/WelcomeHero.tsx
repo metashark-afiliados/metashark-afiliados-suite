@@ -1,12 +1,10 @@
 // src/components/dashboard/WelcomeHero.tsx
 /**
- * @file src/components/dashboard/WelcomeHero.tsx
- * @description Componente de UI "Hero" del dashboard. Refactorizado a la
- *              arquitectura "Hub Creativo" v12.0, ahora es un componente
- *              de presentación puro, enfocado en dar la bienvenida al usuario
- *              y proporcionar una herramienta de búsqueda central.
+ * @file WelcomeHero.tsx
+ * @description Componente de UI "Hero" del dashboard. Refactorizado a un
+ *              estándar de élite inspirado en Canva para la v13.0.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 4.0.0
  */
 "use client";
 
@@ -21,19 +19,12 @@ export interface WelcomeHeroProps {
   searchPlaceholder: string;
 }
 
-/**
- * @public
- * @component WelcomeHero
- * @description Renderiza la sección de bienvenida y búsqueda del dashboard.
- * @param {WelcomeHeroProps} props - Propiedades para configurar el componente.
- * @returns {React.ReactElement}
- */
 export function WelcomeHero({
   username,
   searchPlaceholder,
 }: WelcomeHeroProps): React.ReactElement {
-  const t = useTranslations("DashboardPage.welcomeHero");
-  const title = t("title", { username });
+  const t = useTranslations("app.[locale].dashboard.page.welcomeHero");
+  const firstName = username.split(" ")[0];
 
   const FADE_UP = {
     hidden: { opacity: 0, y: 10 },
@@ -45,18 +36,27 @@ export function WelcomeHero({
       initial="hidden"
       animate="show"
       variants={FADE_UP}
-      className="relative flex flex-col items-center justify-center text-center p-8 md:pt-16 md:pb-12 rounded-lg overflow-hidden"
+      // --- INICIO DE REFACTORIZACIÓN VISUAL ---
+      className="relative flex flex-col items-center justify-center text-center p-4 pt-8 pb-6 rounded-lg overflow-hidden"
+      // --- FIN DE REFACTORIZACIÓN VISUAL ---
     >
       <div
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(ellipse at 50% -20%, hsl(var(--color-primary)/0.15), transparent 60%)",
+            "radial-gradient(ellipse at 50% -20%, hsl(var(--primary)/0.15), transparent 60%)",
         }}
       />
-      <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-        {title}
+      {/* --- INICIO DE REFACTORIZACIÓN VISUAL --- */}
+      <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
+        {t.rich("title_rich", {
+          firstName: firstName,
+          italic: (chunks) => (
+            <i className="text-primary not-italic">{chunks}</i>
+          ),
+        })}
       </h1>
+      {/* --- FIN DE REFACTORIZACIÓN VISUAL --- */}
 
       <Tabs defaultValue="templates" className="mt-6">
         <TabsList>
@@ -66,31 +66,28 @@ export function WelcomeHero({
         </TabsList>
       </Tabs>
 
-      <div className="relative mt-8 w-full max-w-2xl">
+      {/* --- INICIO DE REFACTORIZACIÓN VISUAL --- */}
+      <div className="relative mt-6 w-full max-w-lg">
         <SearchInput
           placeholder={searchPlaceholder}
           value=""
           onChange={() => {}}
           clearAriaLabel="Clear search"
-          className="h-14 text-lg pl-12"
+          className="h-12 text-base rounded-full pl-12"
         />
       </div>
+      {/* --- FIN DE REFACTORIZACIÓN VISUAL --- */}
     </motion.section>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad y SRP**: ((Implementada)) Se ha eliminado el `ActionDock` de este componente. `WelcomeHero` ahora tiene la única responsabilidad de dar la bienvenida y proporcionar la búsqueda principal, adhiriéndose a la "Filosofía LEGO".
- * 2. **Componente Puro**: ((Implementada)) El componente es ahora 100% de presentación y agnóstico al estado, recibiendo todo su contenido a través de props.
- *
- * @subsection Melhorias Futuras
- * 1. **Funcionalidad de Búsqueda**: ((Vigente)) Conectar el `SearchInput` a un hook que realice una búsqueda global en plantillas, campañas y sitios del usuario.
- * 2. **Funcionalidad de Pestañas (Tabs)**: ((Vigente)) Implementar la lógica para que las pestañas filtren el contenido mostrado debajo (ej. mostrar una galería de plantillas o diseños del usuario).
+ * 1. **Alineación Visual con Canva**: ((Implementada)) Se ha ajustado la tipografía, el espaciado y el estilo de la barra de búsqueda para un mayor alineamiento con el diseño de referencia.
+ * 2. **Personalización Mejorada**: ((Implementada)) El saludo ahora es más personal y estilizado, utilizando solo el primer nombre en itálica.
  *
  * =====================================================================
  */

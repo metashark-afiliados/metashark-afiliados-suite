@@ -2,10 +2,10 @@
 /**
  * @file src/lib/actions/auth.actions.ts
  * @description SSoT de Server Actions para el ciclo de vida de autenticación.
- *              Ha sido blindado para garantizar la seguridad de tipos al
- *              registrar errores, resolviendo una regresión crítica.
+ *              Corregido para importar explícitamente desde el manifiesto
+ *              del módulo de validadores.
  * @author Raz Podestá
- * @version 10.1.0
+ * @version 10.1.1
  */
 "use server";
 import "server-only";
@@ -18,12 +18,14 @@ import { ZodError } from "zod";
 import { createPersistentErrorLog } from "@/lib/actions/_helpers";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
+// --- INICIO DE CORRECCIÓN DE IMPORTACIÓN ---
 import {
   type ActionResult,
   EmailSchema,
   PasswordSchema,
   SignUpSchema,
-} from "@/lib/validators";
+} from "@/lib/validators/index.ts";
+// --- FIN DE CORRECCIÓN DE IMPORTACIÓN ---
 
 export async function signInWithEmailAction(
   prevState: any,
@@ -93,13 +95,11 @@ export async function signUpAction(
       return { success: false, error: firstError.message };
     }
 
-    // --- INICIO DE BLINDAJE DE TIPO ---
     const emailForLog =
       typeof rawData.email === "string" ? rawData.email : "invalid_email_type";
     await createPersistentErrorLog("signUpAction", error as Error, {
       email: emailForLog,
     });
-    // --- FIN DE BLINDAJE DE TIPO ---
 
     return { success: false, error: "ValidationErrors.error_unexpected" };
   }
@@ -138,16 +138,17 @@ export async function signInWithOAuthAction(formData: FormData): Promise<void> {
 
   return redirect(data.url);
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Blindaje de Seguridad de Tipos**: ((Implementada)) Se ha añadido una sanitización explícita del `email` antes de pasarlo al `createPersistentErrorLog`. Esto resuelve el error de compilación `TS2345` y previene que un tipo `File` pueda ser enviado al logger.
+ * 1. **Resolución de Error de Compilación `TS2307`**: ((Implementada)) La ruta de importación de los schemas y el tipo `ActionResult` ha sido corregida a `@/lib/validators/index.ts`.
  *
  * @subsection Melhorias Futuras
- * 1. **Helper `sanitizeFormData`**: ((Vigente)) La lógica de sanitización (`typeof rawData.email === 'string' ? ...`) es un patrón que podría abstraerse a un helper reutilizable para otras acciones que manejen `FormData`.
+ * 1. **Helper `sanitizeFormData`**: ((Vigente)) La lógica de sanitización (`typeof rawData.email === 'string' ? ...`) es un patrón que podría abstraerse a un helper reutilizable.
  *
  * =====================================================================
  */

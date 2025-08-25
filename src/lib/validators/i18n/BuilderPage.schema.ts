@@ -1,80 +1,34 @@
 // src/lib/validators/i18n/BuilderPage.schema.ts
 /**
  * @file BuilderPage.schema.ts
- * @description Define el contrato de datos para el namespace 'BuilderPage'.
- * @author Raz Podestá
- * @version 1.0.0
+ * @description Define el contrato de datos para el namespace 'pages.BuilderPage'.
+ *              Sincronizado con la nueva semántica del constructor, validando
+ *              la estructura para la `PrimaryToolBar` y la `BlockLibrary`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
 export const BuilderPageSchema = z.object({
-  Header: z.object({
-    back_to_dashboard: z.string(),
-    back_to_dashboard_aria: z.string(),
-    preview_button: z.string(),
-    preview_aria: z.string(),
-    History: z.object({
-      undo_tooltip: z.string(),
-      undo_aria: z.string(),
-      redo_tooltip: z.string(),
-      redo_aria: z.string(),
-    }),
-    DevicePreview: z.object({
-      desktop_tooltip: z.string(),
-      tablet_tooltip: z.string(),
-      mobile_tooltip: z.string(),
-    }),
-    SaveButton: z.object({
-      save_changes: z.string(),
-      save_aria: z.string(),
-      saving: z.string(),
-      saved: z.string(),
-      save_success: z.string(),
-      save_error_no_config: z.string(),
-      save_error_default: z.string(),
-    }),
+  PrimaryToolBar: z.object({
+    add_content: z.string(), // Anteriormente 'design'
+    elements: z.string(),
+    text: z.string(),
+    brand: z.string(),
+    uploads: z.string(),
+    tools: z.string(),
   }),
-  Palette: z.object({
+  BlockLibrary: z.object({
     title: z.string(),
-    unknown_block_preview: z.string(),
-    block_name_Header1: z.string(),
-    block_name_Hero1: z.string(),
-  }),
-  SettingsPanel: z.object({
-    editing_block_title: z.string(),
-    empty_panel: z.object({ title: z.string(), description: z.string() }),
-    no_settings_for_block: z.object({
-      title: z.string(),
-      description: z.string(),
-    }),
-    unsupported_property_type: z.string(),
-    tabs: z.object({ content: z.string(), style: z.string() }),
-    properties: z.object({
-      logoText: z.string(),
-      ctaText: z.string(),
-      title: z.string(),
-      subtitle: z.string(),
-      backgroundColor: z.string(),
-      textColor: z.string(),
-      paddingTop: z.string(),
-      paddingBottom: z.string(),
-      marginTop: z.string(),
-      marginBottom: z.string(),
-    }),
-  }),
-  Canvas: z.object({
-    loading_config: z.string(),
-    empty_canvas: z.object({ title: z.string(), description: z.string() }),
-    unknown_block_error: z.string(),
-  }),
-  BlockActions: z.object({
-    block_aria_label: z.string(),
-    drag_handle_aria: z.string(),
-    options_menu_aria: z.string(),
-    move_up: z.string(),
-    move_down: z.string(),
-    duplicate: z.string(),
-    delete: z.string(),
+    category_templates: z.string(),
+    category_headers: z.string(),
+    category_heros: z.string(),
+    category_features: z.string(),
+    category_testimonials: z.string(),
+    category_footers: z.string(),
   }),
 });
 
@@ -82,8 +36,15 @@ export const BuilderPageSchema = z.object({
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
+ *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad**: ((Implementada)) Schema aislado para su namespace.
+ * 1. **Sincronización Semántica**: ((Implementada)) El schema Zod ahora valida la nueva estructura de claves semánticas (`add_content`, `category_*`), garantizando la integridad del contrato de i18n para la nueva UX del constructor.
+ * 2. **Principio DRY**: ((Implementada)) Se ha eliminado la definición duplicada del objeto `Header`, ya que su SSoT canónica ahora reside en `BuilderHeader.schema.ts`, reduciendo la deuda técnica.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Composición de Schemas**: ((Vigente)) Para una adhesión de élite al principio DRY, este schema podría ser refactorizado para importar y componer otros schemas atómicos (ej. `PrimaryToolBar.schema.ts`, `BlockLibrary.schema.ts`) en lugar de redefinir sus claves internamente.
+ * 2. **Generación Automática**: ((Vigente)) Un script podría leer el manifiesto de categorías (`block-categories.config.ts`) y generar dinámicamente las claves `category_*` para este schema, previniendo desincronizaciones futuras.
+ *
  * =====================================================================
  */
 // src/lib/validators/i18n/BuilderPage.schema.ts

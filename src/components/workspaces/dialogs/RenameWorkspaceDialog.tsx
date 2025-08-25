@@ -1,20 +1,24 @@
-// src/components/workspaces/dialogs/RenameWorkspaceDialog.tsx
 /**
  * @file RenameWorkspaceDialog.tsx
  * @description Aparato de UI atómico que encapsula el modal para renombrar
- *              un workspace. Consume el store de diálogos para su visibilidad.
- * @author Raz Podestá
- * @version 1.0.0
+ *              un workspace. Ha sido refactorizado a un estándar de élite para
+ *              consumir los namespaces de i18n canónicos, resolviendo errores
+ *              críticos de `MISSING_MESSAGE` en el build de Vercel.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.1.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
-import { useTranslations } from "next-intl";
 import React from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import { type z } from "zod";
 import { Loader2 } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { workspaces as workspaceActions } from "@/lib/actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
@@ -24,18 +28,27 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 type FormData = z.infer<typeof UpdateWorkspaceNameSchema>;
 
-export function RenameWorkspaceDialog() {
-  const t = useTranslations("WorkspaceSwitcher");
-  const tErrors = useTranslations("ValidationErrors");
+/**
+ * @public
+ * @component RenameWorkspaceDialog
+ * @description Renderiza el diálogo modal para renombrar el workspace activo.
+ * @returns {React.ReactElement | null} El componente de diálogo, o null si no hay workspace activo.
+ */
+export function RenameWorkspaceDialog(): React.ReactElement | null {
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
+  const t = useTranslations("components.workspaces.WorkspaceSwitcher");
+  const tErrors = useTranslations("shared.ValidationErrors");
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
+
   const { activeDialog, close } = useWorkspaceDialogStore();
   const { activeWorkspace } = useDashboard();
   const [isPending, startTransition] = React.useTransition();
@@ -122,8 +135,10 @@ export function RenameWorkspaceDialog() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Edición Atómico**: ((Implementada)) Este nuevo aparato desacopla la lógica de renombrar del `WorkspaceTrigger`, completando la refactorización.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se han corregido las llamadas a `useTranslations` con los namespaces canónicos, resolviendo las instancias de `MISSING_MESSAGE` para `WorkspaceSwitcher` y `ValidationErrors` que se originaban en este componente.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Hook Soberano `useRenameWorkspace`**: ((Vigente)) La lógica del formulario, la transición y el feedback de `toast` podrían ser abstraídos a su propio hook `useRenameWorkspaceForm` para una mayor cohesión y para convertir este componente en un presentador puro.
  *
  * =====================================================================
  */
-// src/components/workspaces/dialogs/RenameWorkspaceDialog.tsx

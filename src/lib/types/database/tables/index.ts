@@ -2,9 +2,9 @@
 /**
  * @file index.ts
  * @description Archivo barril para la exportación modular de todos los tipos de tabla.
- *              Actualizado para incluir la entidad `feature_modules` y eliminar la obsoleta `feature_flags`.
+ *              Actualizado para incluir la nueva entidad `creations`.
  * @author Raz Podestá
- * @version 3.2.0
+ * @version 4.0.0
  */
 export * from "./achievements";
 export * from "./affiliate_products";
@@ -13,6 +13,7 @@ export * from "./audit_logs";
 export * from "./brand_kits";
 export * from "./campaigns";
 export * from "./coupons";
+export * from "./creations"; // <-- NUEVA EXPORTACIÓN
 export * from "./custom_blocks";
 export * from "./customers";
 export * from "./feature_modules";
@@ -35,13 +36,3 @@ export * from "./user_tokens";
 export * from "./visitor_logs";
 export * from "./workspace_members";
 export * from "./workspaces";
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Esquema**: ((Implementada)) Se ha actualizado el manifiesto para reflejar la SSoT correcta de las tablas, eliminando `feature_flags` y añadiendo `feature_modules`.
- * =====================================================================
- */
-// src/lib/types/database/tables/index.ts

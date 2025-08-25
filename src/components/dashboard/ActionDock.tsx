@@ -1,54 +1,82 @@
 // src/components/dashboard/ActionDock.tsx
 /**
- * @file src/components/dashboard/ActionDock.tsx
- * @description Orquestador de UI para el "Dock de Acciones". Su única
- *              responsabilidad es consumir los datos de i18n y ensamblar
- *              los componentes atómicos `ActionDockButton`.
- * @author Raz Podestá
- * @version 4.0.0
+ * @file ActionDock.tsx
+ * @description Orquestador de UI de élite para el "Hub Creativo". Refactorizado
+ *              para renderizar las acciones en una cuadrícula 3x7 y con una
+ *              animación escalonada de `framer-motion` mejorada.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 9.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
-import { motion } from "framer-motion";
-import { MoreHorizontal } from "lucide-react";
+import { useFormState } from "react-dom";
+import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import React from "react";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { createCreationAction } from "@/lib/actions/creations";
+import { useRouter } from "@/lib/navigation";
+import { logger } from "@/lib/logging";
 import {
   ActionDockButton,
   type ActionDockButtonProps,
-} from "./ActionDockButton";
+} from "@/components/dashboard/ActionDockButton";
 
-/**
- * @public
- * @component ActionDock
- * @description Renderiza una serie de botones de acción rápida para las
- *              funcionalidades principales de la aplicación.
- * @returns {React.ReactElement}
- */
 export function ActionDock(): React.ReactElement {
-  const t = useTranslations("ActionDock");
-  const services: ActionDockButtonProps[] = t.raw("services");
+  const t = useTranslations("shared.ActionDock");
+  const tErrors = useTranslations("ValidationErrors");
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const FADE_UP = {
-    hidden: { opacity: 0, y: 10 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
+  const [state, formAction] = useFormState(createCreationAction, {
+    success: false,
+    error: "",
+  });
+
+  useEffect(() => {
+    if (state.success && state.data?.id) {
+      toast.success(
+        tErrors("success_creation_toast", { defaultValue: "Creation started!" })
+      );
+      router.push({
+        pathname: "/builder/[creationId]",
+        params: { creationId: state.data.id },
+      });
+    } else if (!state.success && state.error) {
+      toast.error(tErrors(state.error as any, { defaultValue: state.error }));
+    }
+  }, [state, router, tErrors]);
+
+  const services = t.raw("services");
+  if (!Array.isArray(services)) {
+    logger.error(
+      "[ActionDock] TypeError: La clave 'services' de i18n no devolvió un array.",
+      { receivedValue: services, type: typeof services }
+    );
+    return (
+      <div className="text-destructive text-center p-4 border border-dashed border-destructive rounded-md">
+        Error al cargar los servicios. Verifique la configuración de i18n.
+      </div>
+    );
+  }
 
   const STAGGER_CONTAINER = {
-    hidden: {},
+    hidden: { opacity: 0 },
     show: {
+      opacity: 1,
       transition: {
         staggerChildren: 0.05,
       },
     },
+  };
+
+  const FADE_UP = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300 } },
   };
 
   return (
@@ -56,56 +84,37 @@ export function ActionDock(): React.ReactElement {
       variants={STAGGER_CONTAINER}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.2 }}
-      className="flex flex-col items-center justify-center gap-6"
+      viewport={{ once: true, amount: 0.1 }}
+      className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-x-4 gap-y-6"
     >
-      <div className="flex items-center justify-center flex-wrap gap-4 md:gap-8">
-        {services.slice(0, 7).map((service) => (
-          <ActionDockButton key={service.id} {...service} />
-        ))}
-      </div>
-      <div className="flex items-center justify-center flex-wrap gap-4 md:gap-8">
-        {services.slice(7).map((service) => (
-          <ActionDockButton key={service.id} {...service} />
-        ))}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <motion.div variants={FADE_UP}>
-                <Button
-                  variant="ghost"
-                  className="flex flex-col items-center justify-center h-auto p-0 gap-2 group w-20"
-                  aria-label={t("more_button_label")}
-                >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted transition-all group-hover:scale-110">
-                    <MoreHorizontal className="h-7 w-7 text-muted-foreground" />
-                  </div>
-                  <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground text-center">
-                    {t("more_button_label")}
-                  </span>
-                </Button>
-              </motion.div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{t("more_button_label")}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+      {services.map((service, index) => (
+        <motion.div key={service.id} variants={FADE_UP}>
+          <form action={formAction} ref={formRef}>
+            <input type="hidden" name="name" value={service.label} />
+            <ActionDockButton
+              {...(service as ActionDockButtonProps)}
+              isEven={index % 2 === 0}
+            />
+          </form>
+        </motion.div>
+      ))}
     </motion.div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Ensamblaje (LEGO)**: ((Implementada)) El `ActionDock` ahora es un orquestador puro que compone el nuevo átomo `ActionDockButton`, mejorando la legibilidad, mantenibilidad y adhiriéndose a la "Filosofía LEGO".
- * 2. **Contrato de Datos Estricto**: ((Implementada)) Se utiliza el tipo `ActionDockButtonProps` para asegurar que los datos consumidos de `t.raw("services")` tengan la forma correcta, mejorando la seguridad de tipos.
+ * 1. **Layout de Cuadrícula 3x7**: ((Implementada)) El layout ha sido refactorizado a una cuadrícula CSS (`grid grid-cols-7`), alineándose con el blueprint del "Hub Creativo" y mejorando la densidad de información.
+ * 2. **Animación Escalonada de Élite**: ((Implementada)) Se ha corregido y mejorado la implementación de `framer-motion` para aplicar una verdadera animación escalonada, donde cada botón aparece individualmente, proporcionando una experiencia visual superior.
+ * 3. **Layout Responsivo**: ((Implementada)) La cuadrícula ahora es responsiva (`grid-cols-3 sm:grid-cols-4 md:grid-cols-7`), asegurando una visualización óptima en todos los tamaños de pantalla.
  *
  * @subsection Melhorias Futuras
- * 1. **Renderizado Dinámico Basado en Permisos**: ((Vigente)) Este orquestador podría ser mejorado para consumir el `useDashboard` hook, obtener los módulos a los que el usuario tiene acceso, y renderizar dinámicamente solo los `ActionDockButton` permitidos.
+ * 1. **Botón "Ver Más"**: ((Vigente)) Para mantener la UI limpia, se podría mostrar inicialmente solo una fila (7 items) y un botón "Ver Más" que expanda la cuadrícula para revelar las demás opciones.
+ * 2. **Personalización del Dock**: ((Vigente)) Una mejora de élite sería permitir a los usuarios reordenar los botones del `ActionDock` mediante D&D y guardar su layout preferido en la tabla `profiles`.
  *
  * =====================================================================
  */

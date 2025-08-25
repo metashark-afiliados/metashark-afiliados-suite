@@ -1,8 +1,16 @@
-// src/components/workspaces/dialogs/DeleteWorkspaceDialog.tsx
+/**
+ * @file DeleteWorkspaceDialog.tsx
+ * @description Componente de UI que implementa el modal para la eliminación de un workspace.
+ *              Ha sido refactorizado a un estándar de élite para consumir los namespaces
+ *              de i18n canónicos, resolviendo un error crítico de `MISSING_MESSAGE` en Vercel.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 "use client";
 
-import { useState, useTransition } from "react";
-import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { ShieldAlert } from "lucide-react";
 
@@ -13,24 +21,22 @@ import { Dialog } from "@/components/ui/dialog";
 import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
 
 /**
- * @file DeleteWorkspaceDialog.tsx
- * @description Componente de UI que implementa el modal para la eliminación de un workspace.
- *              Refactorizado para ser un consumidor de élite del `ConfirmationDialogContent` v3.0.0.
- * @author Raz Podestá
- * @version 4.0.0
+ * @public
+ * @component DeleteWorkspaceDialog
+ * @description Renderiza el diálogo modal para la eliminación de un workspace.
+ *              Gestiona su propia visibilidad consumiendo el `useWorkspaceDialogStore`.
+ * @returns {React.ReactElement | null} El componente de diálogo, o null si no hay workspace activo.
  */
 export function DeleteWorkspaceDialog(): React.ReactElement | null {
-  const t = useTranslations("WorkspaceSwitcher");
-  const tDialogs = useTranslations("Dialogs");
-  const tErrors = useTranslations("ValidationErrors");
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
+  const t = useTranslations("components.workspaces.WorkspaceSwitcher");
+  const tDialogs = useTranslations("components.ui.Dialogs");
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
+
   const { activeDialog, close } = useWorkspaceDialogStore();
   const { activeWorkspace } = useDashboard();
 
   if (!activeWorkspace) return null;
-
-  const handleDelete = (formData: FormData) => {
-    // La Server Action se invoca desde el `ConfirmationDialogContent` a través de su prop `onConfirm`
-  };
 
   return (
     <Dialog open={activeDialog === "delete"} onOpenChange={close}>
@@ -63,11 +69,10 @@ export function DeleteWorkspaceDialog(): React.ReactElement | null {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica**: ((Implementada)) El componente ahora es un consumidor canónico del `ConfirmationDialogContent` refactorizado.
- * 2. **Simplificación y Cohesión**: ((Implementada)) Se ha eliminado el JSX para el body y footer, resultando en un componente más limpio y declarativo.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se han corregido las llamadas a `useTranslations` con los namespaces canónicos, resolviendo otra instancia del error `MISSING_MESSAGE` que impedía el despliegue.
  *
  * @subsection Melhorias Futuras
- * 1. **Hook Soberano `useDeleteWorkspace`**: ((Vigente)) La lógica de `isPending` y `toast` debería ser extraída a su propio hook.
+ * 1. **Hook Soberano `useDeleteWorkspace`**: ((Vigente)) La lógica para manejar el estado `isPending` y el feedback al usuario (`toast`) debería ser abstraída a su propio hook para una mayor cohesión y reutilización.
  *
  * =====================================================================
  */

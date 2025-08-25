@@ -1,14 +1,17 @@
-// tests/mocks/data/database-state.ts
 /**
  * @file database-state.ts
  * @description Manifiesto de Datos y SSoT para la DB simulada.
- *              Sincronizado para reflejar la estructura cruda de la base de
- *              datos (`icon_name`), actuando como una fuente de verdad de alta fidelidad.
- * @author L.I.A. Legacy
- * @version 5.0.0
+ *              Ha sido refactorizado a un estándar de élite para reflejar
+ *              la nueva arquitectura de "Creations", separando el contenido
+ *              del metadato de la campaña y resolviendo errores de tipo.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 6.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
-import { type User } from "@supabase/supabase-js";
 import { type Json, type Tables } from "@/lib/types/database";
+import { type User } from "@supabase/supabase-js";
 
 export const DEV_USER: User = {
   id: "dev-user-001",
@@ -30,6 +33,18 @@ export const DEV_WORKSPACE: Tables<"workspaces"> = {
   current_site_count: 1,
   created_at: new Date().toISOString(),
   updated_at: null,
+};
+
+// --- INICIO DE REFACTORIZACIÓN ARQUITECTÓNICA ---
+
+const DEV_CREATION: Tables<"creations"> = {
+  id: "creation-001",
+  created_by: DEV_USER.id,
+  workspace_id: DEV_WORKSPACE.id,
+  name: "Landing Page V1",
+  content: { theme: "dark" } as Json,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
 };
 
 export const db = {
@@ -72,19 +87,21 @@ export const db = {
       updated_at: new Date().toISOString(),
     },
   ] as Tables<"sites">[],
+  creations: [DEV_CREATION] as Tables<"creations">[],
   campaigns: [
     {
       id: "camp-001",
+      creation_id: DEV_CREATION.id, // Vinculado a la creación
       site_id: "site-001",
       name: "Landing Page V1",
       slug: "landing-v1",
       status: "published",
-      content: { theme: "dark" } as Json,
       affiliate_url: "https://aff.link/1",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
   ] as Tables<"campaigns">[],
+  // ... (resto de las tablas sin cambios)
   invitations: [] as Tables<"invitations">[],
   visitor_logs: [] as Tables<"visitor_logs">[],
   feature_modules: [
@@ -101,6 +118,21 @@ export const db = {
     },
   ] as Tables<"feature_modules">[],
 };
+// --- FIN DE REFACTORIZACIÓN ARQUITECTÓNICA ---
 
 export const MOCKED_USER = DEV_USER;
-// tests/mocks/data/database-state.ts
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Alineación de Modelo de Datos (TS2352)**: ((Implementada)) El mock ahora refleja la nueva arquitectura de datos, separando `creations` de `campaigns` y resolviendo el error de tipo.
+ * 2. **Integridad Referencial Simulada**: ((Implementada)) La campaña simulada ahora tiene una `creation_id` que la vincula a la creación simulada, manteniendo la coherencia del modelo.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Factorías de Datos de Prueba**: ((Vigente)) Para pruebas más complejas, este estado estático podría ser reemplazado o complementado por factorías (ej. `createMockCampaign`) que permitan generar datos de prueba dinámicos.
+ *
+ * =====================================================================
+ */

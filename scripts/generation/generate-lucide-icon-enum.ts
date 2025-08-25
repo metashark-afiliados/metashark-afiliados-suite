@@ -2,9 +2,10 @@
 /**
  * @file generate-lucide-icon-enum.ts
  * @description Script de automatización de élite para la DX. Lee la SSoT
- *              de iconos de lucide-react y genera un schema de Zod.
+ *              de iconos de lucide-react y genera un schema de Zod y un tipo
+ *              de TypeScript para los nombres de iconos.
  * @author L.I.A. Legacy
- * @version 1.1.0 (Regex Fix)
+ * @version 2.0.0
  */
 import fs from "fs";
 import path from "path";
@@ -19,11 +20,6 @@ const OUTPUT_FILE = path.resolve(
   "src/config/lucide-icon-names.ts"
 );
 
-/**
- * Convierte una cadena de kebab-case a PascalCase.
- * @param str - La cadena en kebab-case.
- * @returns La cadena en PascalCase.
- */
 function kebabToPascal(str: string): string {
   return str
     .split("-")
@@ -39,22 +35,16 @@ function main() {
   try {
     if (!fs.existsSync(LUCIDE_MANIFEST_PATH)) {
       throw new Error(
-        `No se encontró el manifiesto de Lucide en la ruta esperada: ${LUCIDE_MANIFEST_PATH}`
+        `No se encontró el manifiesto de Lucide en: ${LUCIDE_MANIFEST_PATH}`
       );
     }
 
     const manifestContent = fs.readFileSync(LUCIDE_MANIFEST_PATH, "utf-8");
-
-    // --- CORRECCIÓN CRÍTICA DE PARSEO ---
-    // La expresión regular ahora busca claves envueltas en comillas DOBLES.
     const iconKeysMatches = manifestContent.matchAll(/"([^"]+)":/g);
     const iconKeys = Array.from(iconKeysMatches, (m) => m[1]);
-    // --- FIN DE CORRECCIÓN ---
 
     if (iconKeys.length === 0) {
-      throw new Error(
-        "No se encontraron claves de iconos en el manifiesto de Lucide."
-      );
+      throw new Error("No se encontraron claves de iconos en el manifiesto.");
     }
 
     const pascalCaseIconNames = iconKeys.map(kebabToPascal);
@@ -70,16 +60,22 @@ function main() {
  */
 import { z } from 'zod';
 
-export const lucideIconNames = ${JSON.stringify(pascalCaseIconNames, null, 2)} as const;
+export const lucideIconNames = ${JSON.stringify(
+      pascalCaseIconNames,
+      null,
+      2
+    )} as const;
 
 export const LucideIconNameSchema = z.enum(lucideIconNames);
+
+export type LucideIconName = z.infer<typeof LucideIconNameSchema>;
 `;
 
     fs.writeFileSync(OUTPUT_FILE, fileContent, "utf-8");
 
     console.log(
       chalk.green(
-        `✅ Zod Enum generado con éxito en ${chalk.yellow(
+        `✅ Zod Enum y Tipo generados con éxito en ${chalk.yellow(
           "src/config/lucide-icon-names.ts"
         )}`
       )

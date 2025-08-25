@@ -1,4 +1,17 @@
-// src/components/workspaces/dialogs/CreateWorkspaceDialog.tsx
+/**
+ * @file CreateWorkspaceDialog.tsx
+ * @description Componente de UI atómico que encapsula el modal para crear un
+ *              nuevo workspace. Ha sido refactorizado a un estándar de élite
+ *              para consumir el namespace de i18n canónico, resolviendo un
+ *              error crítico de `MISSING_MESSAGE` en Vercel.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
+"use client";
+
 import { useTranslations } from "next-intl";
 
 import {
@@ -13,13 +26,17 @@ import { CreateWorkspaceForm } from "../CreateWorkspaceForm";
 /**
  * @public
  * @component CreateWorkspaceDialog
- * @description Componente de UI atómico que encapsula el modal para crear un
- *              nuevo workspace. Consume `useWorkspaceDialogStore` para gestionar
- *              su propia visibilidad de forma desacoplada.
+ * @description Renderiza el diálogo modal para la creación de workspaces.
+ *              Gestiona su propia visibilidad consumiendo el `useWorkspaceDialogStore`.
  * @returns {React.ReactElement} El componente de diálogo.
  */
-export function CreateWorkspaceDialog() {
-  const t = useTranslations("WorkspaceSwitcher");
+export function CreateWorkspaceDialog(): React.ReactElement {
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
+  // Se consume el namespace completo y canónico según la SSoT (i18n.ts),
+  // resolviendo el error `MISSING_MESSAGE` que bloqueaba el build.
+  const t = useTranslations("components.workspaces.WorkspaceSwitcher");
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
+
   const { activeDialog, close } = useWorkspaceDialogStore();
 
   const isOpen = activeDialog === "create";
@@ -41,12 +58,10 @@ export function CreateWorkspaceDialog() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Atómico y Autocontenido**: ((Implementada)) Este componente ahora gestiona su propia visibilidad suscribiéndose al store, adhiriéndose a la "Filosofía LEGO".
- * 2. **Composición Pura**: ((Implementada)) Actúa como un ensamblador puro que compone el `CreateWorkspaceForm`.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se ha corregido la llamada a `useTranslations` con el namespace canónico, resolviendo uno de los errores `MISSING_MESSAGE` que impedían el despliegue en Vercel.
  *
  * @subsection Melhorias Futuras
- * 1. **Transiciones de Contenido**: ((Vigente)) Si el formulario de creación se hiciera multi-paso, se podría usar `framer-motion` para animar la transición entre pasos dentro del `DialogContent`.
+ * 1. **Contenido Dinámico del Header**: ((Vigente)) El título del diálogo podría ser más contextual, por ejemplo, mostrando un título diferente si el usuario es redirigido desde un flujo de onboarding. Esto se puede lograr pasando props a través del `useWorkspaceDialogStore`.
  *
  * =====================================================================
  */
-// src/components/workspaces/dialogs/CreateWorkspaceDialog.tsx

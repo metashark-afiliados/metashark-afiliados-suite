@@ -4,81 +4,172 @@
     "more_button_label": "More Tools",
     "services": [
       {
-        "id": "create-campaign",
-        "label": "New Campaign",
-        "iconName": "FilePlus",
-        "href": "/builder/new?type=campaign",
-        "colorClass": "bg-blue-500/20 text-blue-400"
-      },
-      {
-        "id": "create-landing",
+        "id": "landing-page",
         "label": "Landing Page",
         "iconName": "LayoutTemplate",
-        "href": "/builder/new?type=landing",
-        "colorClass": "bg-green-500/20 text-green-400"
+        "type": "landing-page",
+        "colorClass": "text-green-500",
+        "textColor": "text-green-400"
       },
       {
-        "id": "create-bridge",
-        "label": "Bridge Page",
-        "iconName": "ArrowRightLeft",
-        "href": "/builder/new?type=bridge",
-        "colorClass": "bg-purple-500/20 text-purple-400"
+        "id": "doc",
+        "label": "Doc",
+        "iconName": "FileText",
+        "type": "doc",
+        "colorClass": "text-sky-500",
+        "textColor": "text-sky-400"
       },
       {
-        "id": "create-review",
-        "label": "Review Page",
-        "iconName": "Star",
-        "href": "/builder/new?type=review",
-        "colorClass": "bg-yellow-500/20 text-yellow-400"
+        "id": "whiteboard",
+        "label": "Whiteboard",
+        "iconName": "Presentation",
+        "type": "whiteboard",
+        "colorClass": "text-indigo-500",
+        "textColor": "text-indigo-400"
       },
       {
-        "id": "create-images",
-        "label": "AI Images",
-        "iconName": "Image",
-        "href": "/dashboard/tools/ai-images",
-        "colorClass": "bg-pink-500/20 text-pink-400"
+        "id": "presentation",
+        "label": "Presentation",
+        "iconName": "Videotape",
+        "type": "presentation",
+        "colorClass": "text-purple-500",
+        "textColor": "text-purple-400"
       },
       {
-        "id": "analyze-landing",
-        "label": "Analyze Page",
-        "iconName": "ScanSearch",
-        "href": "/dashboard/tools/analyzer",
-        "colorClass": "bg-cyan-500/20 text-cyan-400"
+        "id": "social-media",
+        "label": "Social Media",
+        "iconName": "Share2",
+        "type": "social-media",
+        "colorClass": "text-rose-500",
+        "textColor": "text-rose-400"
       },
       {
-        "id": "create-copy",
-        "label": "AI Copy",
-        "iconName": "PenTool",
-        "href": "/dashboard/tools/ai-copywriter",
-        "colorClass": "bg-orange-500/20 text-orange-400"
+        "id": "video",
+        "label": "Video",
+        "iconName": "Video",
+        "type": "video",
+        "colorClass": "text-orange-500",
+        "textColor": "text-orange-400"
       },
       {
-        "id": "create-site",
-        "label": "New Site",
+        "id": "website",
+        "label": "Website",
         "iconName": "Globe",
-        "href": "/dashboard/sites?action=create",
-        "colorClass": "bg-red-500/20 text-red-400"
+        "type": "website",
+        "colorClass": "text-blue-500",
+        "textColor": "text-blue-400"
       },
       {
-        "id": "create-quiz",
-        "label": "Quiz",
-        "iconName": "Lightbulb",
-        "href": "/builder/new?type=quiz",
-        "colorClass": "bg-teal-500/20 text-teal-400"
+        "id": "photo-editor",
+        "label": "Photo Editor",
+        "iconName": "Image",
+        "type": "photo-editor",
+        "colorClass": "text-teal-500",
+        "textColor": "text-teal-400"
       },
       {
-        "id": "branding-kit",
-        "label": "Brand Kit",
-        "iconName": "Palette",
-        "href": "/dashboard/settings/branding",
-        "colorClass": "bg-indigo-500/20 text-indigo-400"
+        "id": "flyer",
+        "label": "Flyer",
+        "iconName": "Sheet",
+        "type": "flyer",
+        "colorClass": "text-pink-500",
+        "textColor": "text-pink-400"
       },
       {
-        "id": "view-metrics",
-        "label": "Metrics",
-        "iconName": "ChartBarBig",
-        "href": "/dashboard/analytics",
-        "colorClass": "bg-lime-500/20 text-lime-400"
+        "id": "logo",
+        "label": "Logo",
+        "iconName": "Gem",
+        "type": "logo",
+        "colorClass": "text-amber-500",
+        "textColor": "text-amber-400"
+      },
+      {
+        "id": "poster",
+        "label": "Poster",
+        "iconName": "RectangleVertical",
+        "type": "poster",
+        "colorClass": "text-fuchsia-500",
+        "textColor": "text-fuchsia-400"
+      },
+      {
+        "id": "resume",
+        "label": "Resume",
+        "iconName": "Contact",
+        "type": "resume",
+        "colorClass": "text-cyan-500",
+        "textColor": "text-cyan-400"
+      },
+      {
+        "id": "instagram-post",
+        "label": "Instagram Post",
+        "iconName": "Instagram",
+        "type": "instagram-post",
+        "colorClass": "text-violet-500",
+        "textColor": "text-violet-400"
+      },
+      {
+        "id": "facebook-post",
+        "label": "Facebook Post",
+        "iconName": "Facebook",
+        "type": "facebook-post",
+        "colorClass": "text-blue-600",
+        "textColor": "text-blue-500"
+      },
+      {
+        "id": "placeholder1",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder2",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder3",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder4",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder5",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder6",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder7",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
       }
     ]
   },
@@ -86,81 +177,172 @@
     "more_button_label": "Más Herramientas",
     "services": [
       {
-        "id": "create-campaign",
-        "label": "Nueva Campaña",
-        "iconName": "FilePlus",
-        "href": "/builder/new?type=campaign",
-        "colorClass": "bg-blue-500/20 text-blue-400"
-      },
-      {
-        "id": "create-landing",
+        "id": "landing-page",
         "label": "Landing Page",
         "iconName": "LayoutTemplate",
-        "href": "/builder/new?type=landing",
-        "colorClass": "bg-green-500/20 text-green-400"
+        "type": "landing-page",
+        "colorClass": "text-green-500",
+        "textColor": "text-green-400"
       },
       {
-        "id": "create-bridge",
-        "label": "Bridge Page",
-        "iconName": "ArrowRightLeft",
-        "href": "/builder/new?type=bridge",
-        "colorClass": "bg-purple-500/20 text-purple-400"
+        "id": "doc",
+        "label": "Documento",
+        "iconName": "FileText",
+        "type": "doc",
+        "colorClass": "text-sky-500",
+        "textColor": "text-sky-400"
       },
       {
-        "id": "create-review",
-        "label": "Review Page",
-        "iconName": "Star",
-        "href": "/builder/new?type=review",
-        "colorClass": "bg-yellow-500/20 text-yellow-400"
+        "id": "whiteboard",
+        "label": "Pizarra",
+        "iconName": "Presentation",
+        "type": "whiteboard",
+        "colorClass": "text-indigo-500",
+        "textColor": "text-indigo-400"
       },
       {
-        "id": "create-images",
-        "label": "Imágenes IA",
-        "iconName": "Image",
-        "href": "/dashboard/tools/ai-images",
-        "colorClass": "bg-pink-500/20 text-pink-400"
+        "id": "presentation",
+        "label": "Presentación",
+        "iconName": "Videotape",
+        "type": "presentation",
+        "colorClass": "text-purple-500",
+        "textColor": "text-purple-400"
       },
       {
-        "id": "analyze-landing",
-        "label": "Analizar Página",
-        "iconName": "ScanSearch",
-        "href": "/dashboard/tools/analyzer",
-        "colorClass": "bg-cyan-500/20 text-cyan-400"
+        "id": "social-media",
+        "label": "Redes Sociales",
+        "iconName": "Share2",
+        "type": "social-media",
+        "colorClass": "text-rose-500",
+        "textColor": "text-rose-400"
       },
       {
-        "id": "create-copy",
-        "label": "Copy IA",
-        "iconName": "PenTool",
-        "href": "/dashboard/tools/ai-copywriter",
-        "colorClass": "bg-orange-500/20 text-orange-400"
+        "id": "video",
+        "label": "Video",
+        "iconName": "Video",
+        "type": "video",
+        "colorClass": "text-orange-500",
+        "textColor": "text-orange-400"
       },
       {
-        "id": "create-site",
-        "label": "Nuevo Sitio",
+        "id": "website",
+        "label": "Sitio Web",
         "iconName": "Globe",
-        "href": "/dashboard/sites?action=create",
-        "colorClass": "bg-red-500/20 text-red-400"
+        "type": "website",
+        "colorClass": "text-blue-500",
+        "textColor": "text-blue-400"
       },
       {
-        "id": "create-quiz",
-        "label": "Quiz",
-        "iconName": "Lightbulb",
-        "href": "/builder/new?type=quiz",
-        "colorClass": "bg-teal-500/20 text-teal-400"
+        "id": "photo-editor",
+        "label": "Editor de Fotos",
+        "iconName": "Image",
+        "type": "photo-editor",
+        "colorClass": "text-teal-500",
+        "textColor": "text-teal-400"
       },
       {
-        "id": "branding-kit",
-        "label": "Kit de Marca",
-        "iconName": "Palette",
-        "href": "/dashboard/settings/branding",
-        "colorClass": "bg-indigo-500/20 text-indigo-400"
+        "id": "flyer",
+        "label": "Flyer",
+        "iconName": "Sheet",
+        "type": "flyer",
+        "colorClass": "text-pink-500",
+        "textColor": "text-pink-400"
       },
       {
-        "id": "view-metrics",
-        "label": "Métricas",
-        "iconName": "ChartBarBig",
-        "href": "/dashboard/analytics",
-        "colorClass": "bg-lime-500/20 text-lime-400"
+        "id": "logo",
+        "label": "Logo",
+        "iconName": "Gem",
+        "type": "logo",
+        "colorClass": "text-amber-500",
+        "textColor": "text-amber-400"
+      },
+      {
+        "id": "poster",
+        "label": "Póster",
+        "iconName": "RectangleVertical",
+        "type": "poster",
+        "colorClass": "text-fuchsia-500",
+        "textColor": "text-fuchsia-400"
+      },
+      {
+        "id": "resume",
+        "label": "CV",
+        "iconName": "Contact",
+        "type": "resume",
+        "colorClass": "text-cyan-500",
+        "textColor": "text-cyan-400"
+      },
+      {
+        "id": "instagram-post",
+        "label": "Post Instagram",
+        "iconName": "Instagram",
+        "type": "instagram-post",
+        "colorClass": "text-violet-500",
+        "textColor": "text-violet-400"
+      },
+      {
+        "id": "facebook-post",
+        "label": "Post Facebook",
+        "iconName": "Facebook",
+        "type": "facebook-post",
+        "colorClass": "text-blue-600",
+        "textColor": "text-blue-500"
+      },
+      {
+        "id": "placeholder1",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder2",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder3",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder4",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder5",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder6",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder7",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
       }
     ]
   },
@@ -168,81 +350,172 @@
     "more_button_label": "Mais Ferramentas",
     "services": [
       {
-        "id": "create-campaign",
-        "label": "Nova Campanha",
-        "iconName": "FilePlus",
-        "href": "/builder/new?type=campaign",
-        "colorClass": "bg-blue-500/20 text-blue-400"
-      },
-      {
-        "id": "create-landing",
+        "id": "landing-page",
         "label": "Landing Page",
         "iconName": "LayoutTemplate",
-        "href": "/builder/new?type=landing",
-        "colorClass": "bg-green-500/20 text-green-400"
+        "type": "landing-page",
+        "colorClass": "text-green-500",
+        "textColor": "text-green-400"
       },
       {
-        "id": "create-bridge",
-        "label": "Bridge Page",
-        "iconName": "ArrowRightLeft",
-        "href": "/builder/new?type=bridge",
-        "colorClass": "bg-purple-500/20 text-purple-400"
+        "id": "doc",
+        "label": "Documento",
+        "iconName": "FileText",
+        "type": "doc",
+        "colorClass": "text-sky-500",
+        "textColor": "text-sky-400"
       },
       {
-        "id": "create-review",
-        "label": "Review Page",
-        "iconName": "Star",
-        "href": "/builder/new?type=review",
-        "colorClass": "bg-yellow-500/20 text-yellow-400"
+        "id": "whiteboard",
+        "label": "Quadro Branco",
+        "iconName": "Presentation",
+        "type": "whiteboard",
+        "colorClass": "text-indigo-500",
+        "textColor": "text-indigo-400"
       },
       {
-        "id": "create-images",
-        "label": "Imagens IA",
-        "iconName": "Image",
-        "href": "/dashboard/tools/ai-images",
-        "colorClass": "bg-pink-500/20 text-pink-400"
+        "id": "presentation",
+        "label": "Apresentação",
+        "iconName": "Videotape",
+        "type": "presentation",
+        "colorClass": "text-purple-500",
+        "textColor": "text-purple-400"
       },
       {
-        "id": "analyze-landing",
-        "label": "Analisar Página",
-        "iconName": "ScanSearch",
-        "href": "/dashboard/tools/analyzer",
-        "colorClass": "bg-cyan-500/20 text-cyan-400"
+        "id": "social-media",
+        "label": "Redes Sociais",
+        "iconName": "Share2",
+        "type": "social-media",
+        "colorClass": "text-rose-500",
+        "textColor": "text-rose-400"
       },
       {
-        "id": "create-copy",
-        "label": "Copy IA",
-        "iconName": "PenTool",
-        "href": "/dashboard/tools/ai-copywriter",
-        "colorClass": "bg-orange-500/20 text-orange-400"
+        "id": "video",
+        "label": "Vídeo",
+        "iconName": "Video",
+        "type": "video",
+        "colorClass": "text-orange-500",
+        "textColor": "text-orange-400"
       },
       {
-        "id": "create-site",
-        "label": "Novo Site",
+        "id": "website",
+        "label": "Site",
         "iconName": "Globe",
-        "href": "/dashboard/sites?action=create",
-        "colorClass": "bg-red-500/20 text-red-400"
+        "type": "website",
+        "colorClass": "text-blue-500",
+        "textColor": "text-blue-400"
       },
       {
-        "id": "create-quiz",
-        "label": "Quiz",
-        "iconName": "Lightbulb",
-        "href": "/builder/new?type=quiz",
-        "colorClass": "bg-teal-500/20 text-teal-400"
+        "id": "photo-editor",
+        "label": "Editor de Fotos",
+        "iconName": "Image",
+        "type": "photo-editor",
+        "colorClass": "text-teal-500",
+        "textColor": "text-teal-400"
       },
       {
-        "id": "branding-kit",
-        "label": "Kit de Marca",
-        "iconName": "Palette",
-        "href": "/dashboard/settings/branding",
-        "colorClass": "bg-indigo-500/20 text-indigo-400"
+        "id": "flyer",
+        "label": "Folheto",
+        "iconName": "Sheet",
+        "type": "flyer",
+        "colorClass": "text-pink-500",
+        "textColor": "text-pink-400"
       },
       {
-        "id": "view-metrics",
-        "label": "Métricas",
-        "iconName": "ChartBarBig",
-        "href": "/dashboard/analytics",
-        "colorClass": "bg-lime-500/20 text-lime-400"
+        "id": "logo",
+        "label": "Logotipo",
+        "iconName": "Gem",
+        "type": "logo",
+        "colorClass": "text-amber-500",
+        "textColor": "text-amber-400"
+      },
+      {
+        "id": "poster",
+        "label": "Pôster",
+        "iconName": "RectangleVertical",
+        "type": "poster",
+        "colorClass": "text-fuchsia-500",
+        "textColor": "text-fuchsia-400"
+      },
+      {
+        "id": "resume",
+        "label": "Currículo",
+        "iconName": "Contact",
+        "type": "resume",
+        "colorClass": "text-cyan-500",
+        "textColor": "text-cyan-400"
+      },
+      {
+        "id": "instagram-post",
+        "label": "Post Instagram",
+        "iconName": "Instagram",
+        "type": "instagram-post",
+        "colorClass": "text-violet-500",
+        "textColor": "text-violet-400"
+      },
+      {
+        "id": "facebook-post",
+        "label": "Post Facebook",
+        "iconName": "Facebook",
+        "type": "facebook-post",
+        "colorClass": "text-blue-600",
+        "textColor": "text-blue-500"
+      },
+      {
+        "id": "placeholder1",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder2",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder3",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder4",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder5",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder6",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
+      },
+      {
+        "id": "placeholder7",
+        "label": "Placeholder",
+        "iconName": "Circle",
+        "type": "placeholder",
+        "colorClass": "text-slate-500",
+        "textColor": "text-slate-400"
       }
     ]
   }

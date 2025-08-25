@@ -1,48 +1,61 @@
 /**
  * @file campaigns.ts
  * @description Define el contrato de datos atómico para la tabla `campaigns`.
- *              Nivelado a un estándar de élite para incluir la columna `status`.
- * @author Raz Podestá
- * @version 2.0.0
+ *              Ha sido refactorizado a un estándar de élite para alinear su
+ *              contrato con la lógica de negocio de "Creaciones Soberanas",
+ *              permitiendo que `site_id` sea nulo.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
-import { type Json } from "../_shared";
 import { type Enums } from "../enums";
 
 export type Campaigns = {
   Row: {
-    content: Json | null;
-    created_at: string;
     id: string;
+    creation_id: string;
+    // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
+    site_id: string | null;
+    // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
     name: string;
-    site_id: string;
-    slug: string | null;
-    updated_at: string | null;
-    affiliate_url: string | null;
+    slug: string;
     status: Enums["campaign_status"];
+    affiliate_url: string | null;
+    created_at: string;
+    updated_at: string | null;
   };
   Insert: {
-    content?: Json | null;
-    created_at?: string;
     id?: string;
+    creation_id: string;
+    // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
+    site_id: string | null;
+    // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
     name: string;
-    site_id: string;
-    slug?: string | null;
-    updated_at?: string | null;
-    affiliate_url?: string | null;
+    slug: string;
     status?: Enums["campaign_status"];
+    affiliate_url?: string | null;
+    created_at?: string;
+    updated_at?: string | null;
   };
   Update: {
-    content?: Json | null;
-    created_at?: string;
     id?: string;
     name?: string;
-    site_id?: string;
-    slug?: string | null;
-    updated_at?: string | null;
-    affiliate_url?: string | null;
+    slug?: string;
     status?: Enums["campaign_status"];
+    affiliate_url?: string | null;
+    updated_at?: string | null;
+    // La actualización de site_id se maneja a través de una acción específica
   };
   Relationships: [
+    {
+      foreignKeyName: "campaigns_creation_id_fkey";
+      columns: ["creation_id"];
+      isOneToOne: false;
+      referencedRelation: "creations";
+      referencedColumns: ["id"];
+    },
     {
       foreignKeyName: "campaigns_site_id_fkey";
       columns: ["site_id"];
@@ -59,10 +72,10 @@ export type Campaigns = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Gestión de Estado**: ((Implementada)) El contrato de datos ahora incluye el campo `status`, sincronizándolo con el esquema de la base de datos. Con la corrección en `enums.ts`, este tipo es ahora válido.
+ * 1. **Alineación Arquitectónica (TS2322)**: ((Implementada)) Se ha modificado `site_id` para que sea `string | null` en los tipos `Row` e `Insert`. Esto alinea el contrato de datos con la lógica de negocio que permite la existencia de campañas soberanas (no asignadas a un sitio), resolviendo la causa raíz del error de tipo en los helpers y actions.
  *
  * @subsection Melhorias Futuras
- * 1. **Tipado Fuerte para `content`**: ((Vigente)) Reemplazar el tipo `Json` con un tipo inferido de un `CampaignConfigSchema` de Zod.
+ * 1. **Relación con `created_by`**: ((Vigente)) Para una integridad referencial completa, se debería añadir la relación `created_by` a la tabla `profiles` en la sección `Relationships`.
  *
  * =====================================================================
  */

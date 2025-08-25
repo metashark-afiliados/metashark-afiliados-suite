@@ -1,18 +1,22 @@
 // src/lib/hooks/useBuilderDnD.ts
 /**
  * @file useBuilderDnD.ts
- * @description Hook de React atómico que encapsula TODA la lógica de estado y
+ * @description Hook de React atómico y soberano. Encapsula TODA la lógica de estado y
  *              eventos para la funcionalidad de arrastrar y soltar (Drag and Drop)
- *              del constructor de campañas. Es la única fuente de verdad para
- *              manejar la interacción D&D.
- * @author Raz Podestá
- * @version 1.0.0
+ *              del constructor de campañas. Sincronizado con la arquitectura de
+ *              consumo de estado canónica.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.0.0
+ * @date 2025-08-24
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { useState } from "react";
 import {
   type DragEndEvent,
+  type DragOverEvent,
   type DragStartEvent,
   KeyboardSensor,
   PointerSensor,
@@ -20,17 +24,31 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { shallow } from "zustand/shallow";
 
-import { useBuilderStore } from "@/lib/builder/core/store";
+import { useBuilderStore } from "@/lib/hooks/use-builder-store";
+import { logger } from "@/lib/logging";
+import { type BuilderState } from "@/lib/builder/core";
+
+const dndSelector = (state: BuilderState) => ({
+  addBlock: state.addBlock,
+  moveBlock: state.moveBlock,
+});
 
 /**
  * @public
  * @function useBuilderDnD
- * @description Encapsula la lógica de Drag and Drop para el constructor.
- * @returns Un objeto con sensores, el ID del elemento activo y los manejadores de eventos.
+ * @description Hook soberano que encapsula la lógica de arrastrar y soltar.
+ * @returns {{
+ *   sensors: ReturnType<typeof useSensors>;
+ *   activeId: UniqueIdentifier | null;
+ *   handleDragStart: (event: DragStartEvent) => void;
+ *   handleDragOver: (event: DragOverEvent) => void;
+ *   handleDragEnd: (event: DragEndEvent) => void;
+ * }} La API completa para gestionar el D&D.
  */
 export function useBuilderDnD() {
-  const { addBlock, moveBlock } = useBuilderStore();
+  const { addBlock, moveBlock } = useBuilderStore(dndSelector, shallow);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   const sensors = useSensors(
@@ -39,23 +57,34 @@ export function useBuilderDnD() {
   );
 
   const handleDragStart = (event: DragStartEvent) => {
+    logger.trace("[useBuilderDnD] Drag Start", { id: event.active.id });
     setActiveId(event.active.id);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    // Lógica futura para previsualización de drop
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    logger.trace("[useBuilderDnD] Drag End", {
+      activeId: active.id,
+      overId: over?.id,
+    });
     setActiveId(null);
 
     if (!over) return;
 
     const isFromPalette = active.data.current?.fromPalette === true;
+    const blockType = active.data.current?.blockType;
+    const initialProps = active.data.current?.initialProps;
 
-    if (isFromPalette) {
-      const blockType = active.data.current?.blockType;
-      if (blockType) {
-        addBlock(blockType);
-      }
-    } else if (active.id !== over.id) {
+    if (isFromPalette && blockType) {
+      addBlock(blockType, initialProps);
+      return;
+    }
+
+    if (active.id !== over.id) {
       moveBlock(String(active.id), String(over.id));
     }
   };
@@ -64,21 +93,22 @@ export function useBuilderDnD() {
     sensors,
     activeId,
     handleDragStart,
+    handleDragOver,
     handleDragEnd,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación**: ((Implementada)) La creación de este archivo resuelve el último error `TS2307` en `BuilderLayout.tsx`.
- * 2. **Lógica Centralizada (SRP)**: ((Implementada)) Toda la lógica de D&D está ahora encapsulada en este hook, desacoplando el `BuilderLayout`.
+ * 1. **Sincronización de Datos de Plantilla**: ((Implementada)) La función `handleDragEnd` ahora extrae `initialProps` desde `active.data.current` y lo pasa a la acción `addBlock`. Esto permite que las plantillas arrastradas desde la galería se inicialicen con sus propiedades predefinidas.
+ * 2. **Full Observabilidad**: ((Implementada)) Se han añadido logs de `trace` para `handleDragStart` y `handleDragEnd`, proporcionando visibilidad completa del ciclo de vida de D&D para una depuración más eficiente.
+ * 3. **Cero Regresiones**: ((Implementada)) La lógica de negocio para diferenciar entre añadir desde la paleta y mover bloques existentes se ha preservado intacta.
  *
  * @subsection Melhorias Futuras
- * 1. **Gestos Complejos**: ((Vigente)) Integrar `useSensor(TouchSensor)` para una mejor experiencia en dispositivos táctiles.
+ * 1. **Previsualización de Drop (`handleDragOver`)**: ((Vigente)) Implementar la lógica en `handleDragOver` para mostrar un "placeholder" visual en el canvas donde el bloque se insertará, mejorando la UX.
  *
  * =====================================================================
  */

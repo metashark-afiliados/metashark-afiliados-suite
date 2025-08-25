@@ -2,18 +2,25 @@
 /**
  * @file BuilderHeader.tsx
  * @description Orquestador de UI hiper-atómico para la cabecera del constructor.
- *              Validado para la API de `zustand-undo` v1.0.1. No requiere cambios
- *              gracias a la abstracción del hook `useBuilderHeader`.
+ *              Sincronizado para consumir la API de historial completa del hook
+ *              `useBuilderHeader` y pasarla a los componentes de UI atómicos.
  * @author Raz Podestá
- * @version 5.1.1
+ * @version 2.0.0
  */
 "use client";
 
 import React from "react";
 
 import { useBuilderHeader } from "@/lib/hooks/use-builder-header";
+import { logger } from "@/lib/logging";
 import { HeaderActions, HeaderControls, HeaderNavigation } from "./header";
 
+/**
+ * @public
+ * @component BuilderHeader
+ * @description Renderiza la cabecera completa del constructor.
+ * @returns {React.ReactElement}
+ */
 export function BuilderHeader(): React.ReactElement {
   const {
     isSaving,
@@ -30,6 +37,12 @@ export function BuilderHeader(): React.ReactElement {
   } = useBuilderHeader();
 
   const isLoading = isSaving || isPending;
+  logger.trace("[BuilderHeader] Renderizando cabecera.", {
+    isDirty,
+    isLoading,
+    canUndo: !isUndoDisabled,
+    canRedo: !isRedoDisabled,
+  });
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b bg-card px-6 relative">
@@ -51,14 +64,17 @@ export function BuilderHeader(): React.ReactElement {
     </header>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Estabilidad Arquitectónica**: ((Implementada)) La ausencia de cambios en este componente valida la robustez del patrón "Hook, Ensamblador", que aísla la UI de los cambios en la lógica de estado.
+ * 1. **Conexión de Funcionalidad Completa**: ((Implementada)) El orquestador ahora pasa correctamente las funciones `undo`, `redo` y los estados `isUndoDisabled`/`isRedoDisabled` al componente `HeaderControls`, habilitando completamente la funcionalidad de historial en la UI.
+ * 2. **Observabilidad Mejorada**: ((Implementada)) El log de `trace` ha sido enriquecido para incluir el estado de `canUndo` y `canRedo`, proporcionando una visibilidad más granular del estado del historial en cada renderizado.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Título de la Creación Editable**: ((Vigente)) El `HeaderNavigation` podría ser extendido para mostrar el `campaignConfig.name` y permitir la edición en línea.
  *
  * =====================================================================
  */

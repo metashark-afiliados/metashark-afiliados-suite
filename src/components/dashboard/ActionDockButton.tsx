@@ -1,17 +1,19 @@
 // src/components/dashboard/ActionDockButton.tsx
 /**
  * @file ActionDockButton.tsx
- * @description Aparato de UI atómico y de presentación puro. Renderiza un
- *              único botón de acción para el `ActionDock`, encapsulando
- *              la lógica de Tooltip, animación y enlace.
+ * @description Aparato de UI atómico y de presentación puro. Ha sido
+ *              re-arquitecturado a un botón de formulario que envía el 'type'
+ *              de creación. Su contrato de props ha sido sincronizado para
+ *              incluir 'id', resolviendo el error de tipo TS2339.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 5.2.0
  */
 "use client";
 
 import { motion } from "framer-motion";
-import { type LucideIcon } from "lucide-react";
 
+import { type LucideIconName } from "@/config/lucide-icon-names";
+import { Button } from "@/components/ui/button";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import {
   Tooltip,
@@ -19,62 +21,95 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
 /**
  * @public
  * @interface ActionDockButtonProps
- * @description Contrato de props para el componente.
+ * @description Contrato de props para el componente. Es la SSoT para la forma
+ *              de los datos de servicio consumidos desde `ActionDock.json`.
  */
 export interface ActionDockButtonProps {
+  /**
+   * Identificador único del servicio, utilizado como `key` en React.
+   */
   id: string;
+  /**
+   * Texto visible para el usuario y `aria-label`.
+   */
   label: string;
-  iconName: string | LucideIcon;
-  href: any; // any para compatibilidad con next-intl
+  /**
+   * Nombre del icono de `lucide-react` a renderizar.
+   */
+  iconName: LucideIconName;
+  /**
+   * El tipo de creación a iniciar (ej. "landing-page").
+   */
+  type: string;
+  /**
+   * Clase de Tailwind para el color del icono.
+   */
   colorClass: string;
+  /**
+   * Clase de Tailwind para el color del texto del icono (no utilizado actualmente).
+   */
+  textColor: string;
+  /**
+   * Inyectado por el orquestador para aplicar estilos alternos.
+   */
+  isEven?: boolean;
 }
 
 /**
  * @public
  * @component ActionDockButton
- * @description Renderiza un botón de acción individual del dock.
+ * @description Renderiza un botón de acción dentro de un formulario.
  * @param {ActionDockButtonProps} props - Propiedades para configurar el botón.
  * @returns {React.ReactElement}
  */
 export function ActionDockButton({
-  id,
   label,
   iconName,
-  href,
+  type,
   colorClass,
+  textColor,
+  isEven,
 }: ActionDockButtonProps): React.ReactElement {
   const FADE_UP = {
     hidden: { opacity: 0, y: 10 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
+  const alternateBgClass = isEven ? "dark:bg-slate-800" : "dark:bg-slate-900";
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <motion.div variants={FADE_UP}>
-            <Link
-              href={href}
-              className="flex flex-col items-center gap-2 group w-20"
+          <motion.div variants={FADE_UP} className="flex flex-col items-center">
+            <input type="hidden" name="type" value={type} />
+            <Button
+              type="submit"
+              variant="ghost"
+              className="flex flex-col items-center gap-2 group w-20 h-auto p-0"
+              aria-label={label}
             >
               <div
                 className={cn(
-                  "flex h-16 w-16 items-center justify-center rounded-2xl transition-all group-hover:scale-110",
-                  colorClass
+                  "flex h-16 w-16 items-center justify-center rounded-2xl transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-lg",
+                  "shadow-md",
+                  alternateBgClass
                 )}
               >
-                <DynamicIcon name={iconName as string} className="h-7 w-7" />
+                <DynamicIcon
+                  name={iconName}
+                  className={cn("h-8 w-8", colorClass)} // textColor es redundante si colorClass afecta al texto
+                />
               </div>
-              <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground text-center">
+              <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
                 {label}
               </span>
-            </Link>
+            </Button>
           </motion.div>
         </TooltipTrigger>
         <TooltipContent>
@@ -84,18 +119,16 @@ export function ActionDockButton({
     </TooltipProvider>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato encapsula perfectamente la lógica de renderizado de un único botón, mejorando la cohesión y adhiriéndose a la "Filosofía LEGO".
- * 2. **Componente Puro y Controlado**: ((Implementada)) Es 100% agnóstico al contenido, recibiendo todos sus datos y comportamiento a través de props.
+ * 1. **Resolución de Error de Compilación (TS2339)**: ((Implementada)) Se ha añadido la propiedad `id: string` a la interfaz `ActionDockButtonProps`, sincronizando el contrato de TypeScript con la estructura de datos de `ActionDock.json`.
  *
  * @subsection Melhorias Futuras
- * 1. **Manejo de Clics**: ((Vigente)) Se podría añadir una prop `onClick` opcional para manejar acciones que no son de navegación (ej. abrir un modal) sin necesidad de un `href`.
+ * 1. **Simplificación de Props de Estilo**: ((Vigente)) Las props `colorClass` y `textColor` son redundantes. Se podrían unificar en una única prop `colorClass` que se aplique tanto al fondo como al color del icono/texto para simplificar el manifiesto `ActionDock.json`.
  *
  * =====================================================================
  */

@@ -3,8 +3,8 @@
  * @file BlocksPalette.tsx
  * @description Orquestador de UI que muestra la lista de bloques de construcción
  *              disponibles. Es un componente declarativo que se auto-configura
- *              leyendo el manifiesto `blockEditorDefinitions`. Ha sido refactorizado
- *              para una internacionalización completa y observabilidad.
+ *              leyendo el manifiesto `blockEditorDefinitions`. Es la SSoT para
+ *              la interfaz de "Añadir Bloques".
  * @author Raz Podestá
  * @version 1.0.0
  */
@@ -24,7 +24,7 @@ import { logger } from "@/lib/logging";
  * @public
  * @component PaletteItemPreview
  * @description Renderiza una previsualización de un bloque cuando está siendo arrastrado
- *              desde la paleta. Es utilizado por el `DragOverlay` en el layout.
+ *              desde la paleta. Es utilizado por el `DragOverlay` en el `BuilderLayout`.
  * @param {object} props - Propiedades del componente.
  * @param {string} props.blockType - El tipo de bloque a previsualizar.
  * @returns {React.ReactElement}
@@ -122,20 +122,16 @@ export function BlocksPalette(): React.ReactElement {
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Full Internacionalización**: ((Implementada)) Todos los textos visibles, incluyendo el título, nombres de bloques y fallbacks, ahora se consumen desde la capa de i18n.
- * 2. **Full Observabilidad**: ((Implementada)) Se han añadido logs de `trace` para monitorear el renderizado de la paleta y de las previsualizaciones de arrastre.
- * 3. **Consumo de Factoría**: ((Implementada)) La previsualización ahora utiliza el helper `initializeNewBlock` para obtener los datos por defecto, adhiriéndose al principio DRY.
+ * 1. **Arquitectura Declarativa**: ((Implementada)) El componente es 100% declarativo; su contenido se deriva automáticamente del manifiesto `blockEditorDefinitions`.
  *
  * @subsection Melhorias Futuras
- * 1. **Categorización de Bloques**: ((Vigente)) Organizar los bloques en categorías (ej. "Encabezados", "Héroes") utilizando un componente `<Accordion>` para mejorar la usabilidad a medida que la biblioteca de bloques crezca.
- * 2. **Búsqueda de Bloques**: ((Vigente)) Añadir un campo de búsqueda en la parte superior de la paleta para permitir a los usuarios filtrar rápidamente los bloques disponibles.
+ * 1. **Categorización y Búsqueda**: ((Vigente)) Añadir un `Accordion` para agrupar bloques y un `SearchInput` para filtrarlos.
  *
  * =====================================================================
  */

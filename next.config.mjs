@@ -1,11 +1,11 @@
 // next.config.mjs
 /**
  * @file next.config.mjs
- * @description Manifiesto de configuración de Next.js. Este aparato es la Única
- *              Fuente de Verdad para la configuración del framework. Se ha corregido
- *              un error de sintaxis crítico (coma faltante) que impedía la compilación.
+ * @description Manifiesto de configuración de Next.js. Ha sido refactorizado para
+ *              incluir la directiva CSP `worker-src`, resolviendo un fallo crítico
+ *              con la integración de Sentry Replay.
  * @author L.I.A. Legacy
- * @version 8.0.1
+ * @version 8.1.0
  */
 import createNextIntlPlugin from "next-intl/plugin";
 import { withSentryConfig } from "@sentry/nextjs";
@@ -15,12 +15,21 @@ const withNextIntl = createNextIntlPlugin("./src/i18n.ts");
 const cspDirectives = {
   "default-src": ["'self'"],
   "script-src": ["'self'", "'unsafe-eval'", "'unsafe-inline'"],
+  // --- INICIO DE CORRECCIÓN DE CSP ---
+  "worker-src": ["'self'", "blob:"],
+  // --- FIN DE CORRECCIÓN DE CSP ---
   "style-src": ["'self'", "'unsafe-inline'"],
-  "img-src": ["'self'", "data:", "https://avatars.githubusercontent.com"],
+  "img-src": [
+    "'self'",
+    "data:",
+    "https://avatars.githubusercontent.com",
+    "https://api.dicebear.com",
+  ],
   "font-src": ["'self'"],
   "connect-src": [
     "'self'",
     `https://${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("://")[1]}`,
+    `wss://${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("://")[1]}`,
     "https://*.sentry.io",
   ],
   "frame-src": ["'self'"],
@@ -49,7 +58,6 @@ const nextConfig = {
       },
     ];
   },
-
   images: {
     remotePatterns: [
       {
@@ -58,9 +66,12 @@ const nextConfig = {
         port: "",
         pathname: "/u/**",
       },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+      },
     ],
   },
-  // <-- Coma agregada aquí para cumplir con la sintaxis del objeto
 };
 
 const sentryWebpackPluginOptions = {
@@ -87,12 +98,12 @@ export default finalConfig;
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Gestión Dinámica de CSP**: ((Vigente)) Mover la generación de las cabeceras CSP al middleware para una gestión más centralizada y flexible.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Corrección de Sintaxis (TS1005)**: ((Implementada)) Se ha añadido la coma faltante en el objeto `nextConfig`, resolviendo el error de compilación.
- * 2. **Configuración de Sentry Mantenida**: ((Implementada)) La integración con Sentry y `next-intl` se ha mantenido y encadenado correctamente.
+ * 1. **Resolución de Fallo de Sentry Replay**: ((Implementada)) Se ha añadido la directiva `worker-src 'self' 'blob:'` a la CSP. Esto resuelve la causa raíz del error, permitiendo que la funcionalidad de Sentry Replay opere correctamente.
+ * 2. **Blindaje de Seguridad**: ((Implementada)) La política ahora es más explícita y segura. También se han añadido `wss://...` a `connect-src` y `api.dicebear.com` a `img-src` para prevenir futuros errores de CSP.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Gestión Dinámica de CSP**: ((Vigente)) Mover la generación de las cabeceras CSP al middleware para una gestión más centralizada y flexible, especialmente si se necesitan directivas diferentes para rutas específicas.
  *
  * =====================================================================
  */

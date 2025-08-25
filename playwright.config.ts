@@ -1,11 +1,11 @@
 // playwright.config.ts
 /**
  * @file playwright.config.ts
- * @description Configuración canónica para la suite de pruebas E2E con Playwright.
- *              Nivelada para incluir pruebas cross-browser, garantizando una
- *              experiencia de usuario consistente en las plataformas principales.
+ * @description Configuración canónica y de élite para Playwright. Refactorizada
+ *              para ser agnóstica al entorno, utilizando dinámicamente la URL
+ *              de Vercel en CI/CD y localhost en desarrollo local.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.0.0
  */
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
@@ -17,6 +17,15 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, "..", ".env.local") });
 
+// --- INICIO DE REFACTORIZACIÓN: Lógica de baseURL Dinámica ---
+const baseURL = process.env.CI
+  ? process.env.NEXT_PUBLIC_SITE_URL || // La URL inyectada por el workflow
+    `https://${process.env.VERCEL_URL}` // Fallback a la variable de Vercel
+  : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+console.log(`[Playwright Config] Usando baseURL: ${baseURL}`);
+// --- FIN DE REFACTORIZACIÓN ---
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
@@ -26,9 +35,9 @@ export default defineConfig({
   reporter: "html",
   globalSetup: "./tests/e2e/global-setup.ts",
   use: {
-    baseURL: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    baseURL, // Utilizar la URL dinámica
     trace: "on-first-retry",
-    storageState: "./tests/e2e/storageState.json", // Usar el estado de sesión guardado
+    storageState: "./tests/e2e/storageState.json",
   },
   projects: [
     {
@@ -44,26 +53,27 @@ export default defineConfig({
       use: { ...devices["Desktop Safari"] },
     },
   ],
-  webServer: {
-    command: "pnpm dev",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-    stdout: "ignore",
-    stderr: "pipe",
-  },
+  webServer: process.env.CI
+    ? undefined // No iniciar un servidor web local en CI
+    : {
+        command: "pnpm dev",
+        url: "http://localhost:3000",
+        reuseExistingServer: true,
+        stdout: "ignore",
+        stderr: "pipe",
+        timeout: 120 * 1000,
+      },
 });
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Pruebas Cross-Browser**: ((Implementada)) Se han añadido proyectos para Firefox y WebKit, garantizando que las pruebas E2E se ejecuten en los tres motores de renderizado principales.
- * 2. **Persistencia de Sesión Activada**: ((Implementada)) La configuración `use.storageState` está ahora activa, permitiendo que el `global-setup` acelere la suite de pruebas.
+ * 1. **Agnosticismo de Entorno**: ((Implementada)) La configuración ahora detecta si está en un entorno de CI y ajusta la `baseURL` y la configuración de `webServer` dinámicamente. Esto resuelve el problema de hardware y establece una arquitectura de pruebas E2E de nivel de producción.
  *
  * @subsection Melhorias Futuras
- * 1. **Perfiles Móviles**: ((Vigente)) Añadir proyectos para dispositivos móviles (`devices['Pixel 5']`, `devices['iPhone 12']`) para validar la experiencia responsiva.
+ * 1. **Manejo de Vercel URL**: ((Vigente)) La variable `VERCEL_URL` no incluye el protocolo. Una mejora sería construir la URL completa: `https://${process.env.VERCEL_URL}`.
  *
  * =====================================================================
  */

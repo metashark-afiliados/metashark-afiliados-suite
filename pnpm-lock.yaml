@@ -143,12 +143,15 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.25.76
+      zundo:
+        specifier: ^2.3.0
+        version: 2.3.0(zustand@4.5.7(@types/react@18.3.23)(react@18.3.1))
       zustand:
         specifier: ^4.5.4
         version: 4.5.7(@types/react@18.3.23)(react@18.3.1)
-      zustand-undo:
-        specifier: ^1.0.1
-        version: 1.0.1(@types/react@18.3.23)(react@18.3.1)
+      zustand-sync-tabs:
+        specifier: ^0.2.3
+        version: 0.2.3(zustand@4.5.7(@types/react@18.3.23)(react@18.3.1))
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.3.1
@@ -294,6 +297,9 @@ importers:
       lint-staged:
         specifier: ^15.2.7
         version: 15.5.2
+      microdiff:
+        specifier: ^1.5.0
+        version: 1.5.0
       msw:
         specifier: ^2.10.4
         version: 2.10.5(@types/node@20.19.11)(typescript@5.9.2)
@@ -4282,6 +4288,9 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
 
+  microdiff@1.5.0:
+    resolution: {integrity: sha512-Drq+/THMvDdzRYrK0oxJmOKiC24ayUV8ahrt8l3oRK51PWt6gdtrIGrlIH3pT/lFh1z93FbAcidtsHcWbnRz8Q==}
+
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
@@ -5749,8 +5758,15 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zustand-undo@1.0.1:
-    resolution: {integrity: sha512-0plqBucHB24RdnN9CS1sCh4MSJI5DF2romdZ0KTPW5qrpftj813MhIvdAu9fPpsPt5f0lH1eH6wEZm3YFILK3g==}
+  zundo@2.3.0:
+    resolution: {integrity: sha512-4GXYxXA17SIKYhVbWHdSEU04P697IMyVGXrC2TnzoyohEAWytFNOKqOp5gTGvaW93F/PM5Y0evbGtOPF0PWQwQ==}
+    peerDependencies:
+      zustand: ^4.3.0 || ^5.0.0
+
+  zustand-sync-tabs@0.2.3:
+    resolution: {integrity: sha512-NtA4g0v6bh34jYzbGVgjsfR6rPjlUc9Oj6QAeKWikxV3UIYEhPo9AEbAk/3X0p6H1o/waBKqZ/nLfRuz7OH4rA==}
+    peerDependencies:
+      zustand: '>=3.0.0 <6.0.0'
 
   zustand@4.5.7:
     resolution: {integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==}
@@ -9949,6 +9965,8 @@ snapshots:
 
   merge2@1.4.1: {}
 
+  microdiff@1.5.0: {}
+
   micromatch@4.0.8:
     dependencies:
       braces: 3.0.3
@@ -11534,13 +11552,13 @@ snapshots:
 
   zod@3.25.76: {}
 
-  zustand-undo@1.0.1(@types/react@18.3.23)(react@18.3.1):
+  zundo@2.3.0(zustand@4.5.7(@types/react@18.3.23)(react@18.3.1)):
     dependencies:
       zustand: 4.5.7(@types/react@18.3.23)(react@18.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-      - react
+
+  zustand-sync-tabs@0.2.3(zustand@4.5.7(@types/react@18.3.23)(react@18.3.1)):
+    dependencies:
+      zustand: 4.5.7(@types/react@18.3.23)(react@18.3.1)
 
   zustand@4.5.7(@types/react@18.3.23)(react@18.3.1):
     dependencies:

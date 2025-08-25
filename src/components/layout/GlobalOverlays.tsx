@@ -1,10 +1,21 @@
 // src/components/layout/GlobalOverlays.tsx
+/**
+ * @file GlobalOverlays.tsx
+ * @description Componente de cliente atómico y puro. Su única responsabilidad es
+ *              renderizar todos los componentes de UI globales. Sincronizado
+ *              para implementar la lógica de renderizado condicional del
+ *              `WelcomeModal` para el flujo de "Onboarding Implícito".
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 "use client";
 
 import React from "react";
 
-// --- REFERENCIAS OBSOLETAS ELIMINADAS ---
-// import { AuthDialog } from "@/components/auth/AuthDialog";
+import { TemplateGalleryModal } from "@/components/builder/panels/TemplateGalleryModal";
 import { CommandPalette } from "@/components/feedback/CommandPalette";
 import { LiaChatWidget } from "@/components/feedback/LiaChatWidget";
 import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
@@ -17,26 +28,13 @@ import {
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { clientLogger } from "@/lib/logging";
 
-/**
- * @public
- * @component GlobalOverlays
- * @description Componente de cliente atómico y puro. Su única responsabilidad es
- *              renderizar todos los componentes de UI globales que se superponen
- *              a la interfaz principal. Sincronizado para eliminar el AuthDialog obsoleto.
- * @returns {React.ReactElement} Un fragmento con todos los componentes de overlay.
- * @author Raz Podestá
- * @version 3.0.0
- */
 export function GlobalOverlays() {
   const { profile } = useDashboard() ?? { profile: null };
   clientLogger.trace("[GlobalOverlays] Renderizando orquestador de UI global.");
 
   return (
     <>
-      {/* --- AuthDialog ha sido descomisionado --- */}
-      {/* <AuthDialog /> */}
-
-      {/* --- Diálogos de Gestión de Workspaces (Contexto de Dashboard) --- */}
+      {/* Diálogos de Gestión de Workspaces (Contexto de Dashboard) */}
       {profile && (
         <>
           <CreateWorkspaceDialog />
@@ -46,12 +44,15 @@ export function GlobalOverlays() {
         </>
       )}
 
-      {/* --- Widgets Globales --- */}
+      {/* Widgets y Modales Globales */}
       <LiaChatWidget />
       <CommandPalette />
+      <TemplateGalleryModal />
 
-      {/* --- Flujo de Onboarding (Contexto de Dashboard) --- */}
+      {/* --- INICIO DE IMPLEMENTACIÓN DE ONBOARDING IMPLÍCITO --- */}
+      {/* Flujo de Onboarding (Renderizado Condicional) */}
       {profile && !profile.has_completed_onboarding && <WelcomeModal />}
+      {/* --- FIN DE IMPLEMENTACIÓN DE ONBOARDING IMPLÍCITO --- */}
     </>
   );
 }
@@ -62,7 +63,12 @@ export function GlobalOverlays() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización Arquitectónica**: ((Implementada)) Se ha eliminado la referencia al `AuthDialog` obsoleto, completando el proceso de descomisionamiento y resolviendo el error de compilación.
+ * 1. **Implementación de Onboarding Implícito**: ((Implementada)) El componente ahora renderiza el `WelcomeModal` condicionalmente, completando la implementación del flujo de onboarding y la arquitectura v8.1.
+ * 2. **Desacoplamiento de Lógica**: ((Implementada)) La lógica de renderizado condicional reside en este orquestador, manteniendo los componentes `DashboardLayout` (servidor) y `WelcomeModal` (cliente) puros y desacoplados.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Renderizado Condicional por Ruta**: ((Vigente)) Para una optimización de élite, se podría usar el hook `usePathname` para renderizar ciertos overlays (como el `TemplateGalleryModal`) solo en las rutas donde son necesarios.
  *
  * =====================================================================
  */
+// src/components/layout/GlobalOverlays.tsx

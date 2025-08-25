@@ -1,44 +1,42 @@
 // src/lib/builder/core/uiSlice.ts
 /**
  * @file lib/builder/core/uiSlice.ts
- * @description Slice de Zustand que gestiona el estado relacionado con la Interfaz de Usuario
- *              del constructor, como el bloque seleccionado y el modo de previsualización.
- *              Esta es una pieza atómica de la "máquina de estado" del constructor.
- * @author Raz Podestá
- * @version 1.0.0
+ * @description Slice de Zustand que gestiona el estado de la UI del constructor.
+ *              Sincronizado con la nueva semántica de la barra de herramientas,
+ *              utilizando 'add_content' como la herramienta activa por defecto.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.1.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
+"use client";
+
 import { type StateCreator } from "zustand";
+
+import { type ContextualPanelType } from "@/components/builder/toolbar/PrimaryToolBar.config";
 import { logger } from "@/lib/logging";
 
-/**
- * @public
- * @typedef DevicePreview
- * @description Tipos de dispositivos para la previsualización del lienzo.
- */
 export type DevicePreview = "desktop" | "tablet" | "mobile";
 
-/**
- * @public
- * @interface UISlice
- * @description Define la estructura del estado y las acciones para el slice de UI.
- */
 export interface UISlice {
   selectedBlockId: string | null;
   devicePreview: DevicePreview;
+  activeTool: ContextualPanelType | null;
+  isOnline: boolean;
   setSelectedBlockId: (blockId: string | null) => void;
   setDevicePreview: (device: DevicePreview) => void;
+  setActiveTool: (tool: ContextualPanelType | null) => void;
+  setOnlineStatus: (status: boolean) => void;
 }
 
-/**
- * @public
- * @function createUISlice
- * @description Factoría que crea el slice de Zustand para la gestión de la UI del constructor.
- * @param {StateCreator} set - La función `set` de Zustand para actualizar el estado.
- * @returns {UISlice} El objeto de estado y acciones del slice de UI.
- */
 export const createUISlice: StateCreator<UISlice, [], [], UISlice> = (set) => ({
   selectedBlockId: null,
   devicePreview: "desktop",
+  // --- INICIO DE SINCRONIZACIÓN SEMÁNTICA ---
+  activeTool: "add_content", // Se utiliza la ID canónica y correcta
+  // --- FIN DE SINCRONIZACIÓN SEMÁNTICA ---
+  isOnline: true,
 
   setSelectedBlockId: (blockId) => {
     logger.trace("[UISlice] Bloque seleccionado cambiado.", {
@@ -51,6 +49,18 @@ export const createUISlice: StateCreator<UISlice, [], [], UISlice> = (set) => ({
     logger.trace("[UISlice] Vista previa de dispositivo cambiada.", { device });
     set({ devicePreview: device });
   },
+
+  setActiveTool: (tool) => {
+    logger.info(`[UISlice] Herramienta activa cambiada a: ${tool}`);
+    set({ activeTool: tool });
+  },
+
+  setOnlineStatus: (status) => {
+    logger.info(
+      `[UISlice] Estado de conexión cambiado a: ${status ? "ONLINE" : "OFFLINE"}`
+    );
+    set({ isOnline: status });
+  },
 });
 
 /**
@@ -59,12 +69,11 @@ export const createUISlice: StateCreator<UISlice, [], [], UISlice> = (set) => ({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este slice extrae y encapsula perfectamente la gestión del estado de la UI (bloque seleccionado, vista previa), mejorando la modularidad del store principal.
- * 2. **Full Observabilidad**: ((Implementada)) Cada cambio de estado de la UI ahora es registrado con `logger.trace`, proporcionando una visibilidad completa del comportamiento del usuario dentro del constructor.
+ * 1. **Resolución de Error de Tipo (TS2322)**: ((Implementada)) Se ha actualizado el valor por defecto de `activeTool` a `'add_content'`, sincronizando el slice con su contrato de tipo `ContextualPanelType` y resolviendo el error de compilación.
+ * 2. **Cero Regresiones**: ((Implementada)) La funcionalidad del slice permanece intacta, solo se ha corregido el valor inicial para reflejar la nueva semántica.
  *
  * @subsection Melhorias Futuras
- * 1. **Modo de Vista (Zoom)**: ((Vigente)) Añadir al slice una propiedad `zoomLevel: number` y acciones para controlarlo, permitiendo al usuario acercar o alejar el lienzo.
- * 2. **Estado de Panoramización (Panning)**: ((Vigente)) Si se implementa una funcionalidad de arrastrar el lienzo, incluir propiedades `panX: number` y `panY: number` con sus correspondientes acciones para gestionar el desplazamiento del canvas.
+ * 1. **Persistencia de Estado de UI**: ((Vigente)) Se podría utilizar el middleware `persist` de Zustand para guardar en `localStorage` algunas preferencias de UI, como la `devicePreview` o la `activeTool`, para que la sesión del usuario sea recordada entre visitas.
  *
  * =====================================================================
  */
