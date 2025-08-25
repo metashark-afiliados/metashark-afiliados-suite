@@ -2,10 +2,10 @@
 /**
  * @file useDashboardTranslations.ts
  * @description Hook soberano y SSoT para la obtención de traducciones en el
- *              ecosistema del Dashboard. Sincronizado para incluir el namespace
- *              del nuevo `DashboardHeader` atómico.
+ *              ecosistema del Dashboard. Enriquecido para incluir el namespace
+ *              de errores de validación.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
+ * @version 2.1.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -46,7 +46,10 @@ export function useDashboardTranslations() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Completitud de Contrato**: ((Implementada)) El hook ahora carga y provee las traducciones para el `DashboardHeader`, permitiendo su refactorización a un componente puro.
+ * 1. **Resolución Sistémica de `MISSING_MESSAGE`**: ((Implementada)) Se ha añadido la carga del namespace `shared.ValidationErrors`. Esto resuelve la causa raíz de los errores de `MISSING_MESSAGE` que ocurrían en componentes y hooks que dependen de este namespace para mostrar mensajes de error (ej. `useHandleErrors`, `useWorkspaceInlineEditor`).
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Tipado con Zod**: ((Vigente)) El tipo de retorno de este hook podría ser validado por un schema de Zod que componga los schemas individuales de cada namespace, proporcionando una seguridad de tipos aún mayor en tiempo de compilación.
  *
  * =====================================================================
  */

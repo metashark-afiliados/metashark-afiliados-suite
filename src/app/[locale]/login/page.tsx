@@ -2,10 +2,10 @@
 /**
  * @file page.tsx
  * @description Orquestador de UI para la página de inicio de sesión. Refactorizado
- *              para ser completamente autónomo en su consumo de i18n y corregir
- *              errores de formato.
+ *              para ser completamente autónomo en su consumo de i18n, eliminando
+ *              dependencias cruzadas y resolviendo errores de Vercel.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.2.0
+ * @version 5.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -58,8 +58,11 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la llamada a `useTranslations` del namespace incorrecto y se ha corregido la clave en `t.rich`, resolviendo los errores de Vercel.
- * 2. **Cohesión Arquitectónica (SSoT)**: ((Implementada)) El componente ahora depende exclusivamente de su propio namespace, adhiriéndose estrictamente a la arquitectura IMAS.
+ * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la llamada a `useTranslations` del namespace de `signup` y se ha corregido la clave en `t.rich` a `dontHaveAccount`, resolviendo los errores de Vercel.
+ * 2. **Autonomía de Módulo (LEGO)**: ((Implementada)) El componente ahora depende exclusivamente de su propio namespace, adhiriéndose estrictamente a la arquitectura IMAS y convirtiéndose en una pieza de LEGO autocontenida.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Componente de Formulario Puro**: ((Vigente)) Para una pureza de élite, el componente `LoginForm` aún podría ser refactorizado para recibir todos sus textos de error como props, en lugar de que el `useEffect` interno mapee claves de error.
  *
  * =====================================================================
  */

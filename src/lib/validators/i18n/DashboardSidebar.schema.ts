@@ -2,7 +2,9 @@
 /**
  * @file DashboardSidebar.schema.ts
  * @description Define el contrato de datos para el namespace 'DashboardSidebar'.
- *              Sincronizado con la arquitectura del "Workspace Creativo" v17.
+ *              Sincronizado con la arquitectura del "Workspace Creativo" v17 para
+ *              incluir todas las claves de texto requeridas por los componentes
+ *              de UI puros del layout.
  * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
  * @date 2025-08-25
@@ -52,7 +54,10 @@ export const DashboardSidebarSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato Completo**: ((Implementada)) Se han añadido las claves `userMenu_*` y `toggle_sidebar_aria_label`, resolviendo la causa raíz de los errores de i18n en el build de Vercel.
+ * 1. **Sincronización de Contrato Completo**: ((Implementada)) Se han añadido las claves `userMenu_*` y `toggle_sidebar_aria_label`, resolviendo la causa raíz de los errores de i18n en el build de Vercel. Este contrato ahora satisface todas las dependencias de los componentes de UI del layout.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Consolidación de Claves (DRY)**: ((Vigente)) Las claves de navegación duplicadas (ej. `nav_home` vs `dashboard`) deben ser unificadas en una futura refactorización para adherirse estrictamente al principio DRY y simplificar el archivo de mensajes.
  *
  * =====================================================================
  */

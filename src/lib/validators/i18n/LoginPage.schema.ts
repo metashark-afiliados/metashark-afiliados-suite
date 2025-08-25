@@ -5,7 +5,7 @@
  *              'app.[locale].login.page', unificando todos los textos necesarios
  *              para la vista de inicio de sesión.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
+ * @version 2.2.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -23,7 +23,7 @@ export const LoginPageSchema = z.object({
   signInButton_pending: z.string(),
   signInWith: z.string(),
   signInWithProvider: z.string().describe("Ej: 'Continuar con {provider}'"),
-  alreadyHaveAccount: z.string(),
+  dontHaveAccount: z.string(), // CORRECCIÓN SEMÁNTICA
   error_invalid_credentials: z.string(),
   error_oauth_failed: z.string(),
   error_oauth_provider_missing: z.string(),
@@ -36,7 +36,7 @@ export const LoginPageSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Completitud de Contrato**: ((Implementada)) Se ha añadido la clave `signInWithProvider`, completando el contrato necesario para que la vista de login sea completamente agnóstica a la i18n.
+ * 1. **Corrección Semántica de Contrato**: ((Implementada)) Se ha renombrado la clave `alreadyHaveAccount` a `dontHaveAccount` para alinear el contrato con la intención semántica del texto que representa en la página de login.
  *
  * =====================================================================
  */

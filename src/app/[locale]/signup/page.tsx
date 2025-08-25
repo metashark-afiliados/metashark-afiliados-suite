@@ -1,10 +1,10 @@
 // src/app/[locale]/signup/page.tsx
 /**
  * @file page.tsx
- * @description Página de registro. Refactorizada para alinear su consumo
- *              de i18n con la SSoT consolidada.
+ * @description Página de registro. Refactorizada para ser completamente
+ *              autónoma en su consumo de i18n.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 4.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -21,7 +21,6 @@ import { SmartLink } from "@/components/ui/SmartLink";
 export default function SignupPage(): React.ReactElement {
   clientLogger.trace("[SignupPage] Renderizando página de registro.");
   const t = useTranslations("app.[locale].signup.page");
-  const tLogin = useTranslations("app.[locale].login.page"); // Carga el namespace de login para el enlace inferior
 
   const bottomLink = t.rich("alreadyHaveAccount", {
     strong: (chunks) => (
@@ -46,8 +45,11 @@ export default function SignupPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `FORMATTING_ERROR`**: ((Implementada)) Se ha corregido la llamada a `t.rich` para que utilice la clave `strong` correcta, resolviendo el error de Vercel.
- * 2. **Sincronización con SSoT**: ((Implementada)) El componente ahora carga el namespace de `login` para obtener el texto del enlace inferior, respetando la nueva SSoT.
+ * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la dependencia del namespace de `login` y se ha corregido la llamada a `t.rich`, resolviendo los errores de Vercel.
+ * 2. **Autonomía de Módulo (LEGO)**: ((Implementada)) El componente ahora es 100% autocontenido, cumpliendo con la "Filosofía LEGO".
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Componente `SignupForm` Puro**: ((Vigente)) Similar a `LoginForm`, el `SignupForm` podría ser refactorizado para recibir todos sus textos como props, convirtiéndolo en un componente de presentación 100% puro.
  *
  * =====================================================================
  */
