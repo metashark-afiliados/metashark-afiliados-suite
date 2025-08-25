@@ -1,11 +1,11 @@
-// src/components/layout/sidebar/PrimarySidebar.tsx
 /**
  * @file PrimarySidebar.tsx
  * @description Orquestador de UI para la barra de navegación primaria.
- *              Ensambla los componentes atómicos para construir la barra lateral
- *              persistente del "Workspace Creativo".
+ *              Ha sido refactorizado a un estándar de élite para consumir el
+ *              namespace de i18n completo y canónico, resolviendo un error
+ *              crítico de `MISSING_MESSAGE` durante el build en Vercel.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -28,7 +28,11 @@ import { PrimarySidebarButton } from "./PrimarySidebarButton";
 import { UserProfileWidget } from "./UserProfileWidget";
 
 export function PrimarySidebar() {
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
+  // Se consume el namespace completo y canónico según la SSoT (i18n.ts),
+  // resolviendo el error `MISSING_MESSAGE`.
   const t = useTranslations("components.layout.DashboardSidebar");
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
   const pathname = usePathname();
   const { user } = useDashboard();
   const { isProfileWidgetOpen, setProfileWidgetOpen } = useDashboardUIStore();
@@ -93,18 +97,17 @@ export function PrimarySidebar() {
     </>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Ensamblaje (LEGO)**: ((Implementada)) Este componente es un orquestador puro que compone los átomos `PrimarySidebarButton` y `UserProfileWidget`, consumiendo el manifiesto `primaryNavLinks`.
- * 2. **Estado Desacoplado**: ((Implementada)) La visibilidad del widget de perfil está controlada por `useDashboardUIStore`, desacoplando completamente el estado de la UI del componente.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para que utilice el namespace completo y canónico, resolviendo el error de build en Vercel.
  *
  * @subsection Melhorias Futuras
  * 1. **Navegación Robusta**: ((Vigente)) La lógica `pathname.startsWith(href)` para determinar el estado activo es funcional pero puede ser frágil. Una solución de élite sería usar el `useSelectedLayoutSegment` de Next.js para una comparación más precisa.
  *
  * =====================================================================
  */
-// src/components/layout/sidebar/PrimarySidebar.tsx

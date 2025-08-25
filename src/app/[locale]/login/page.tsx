@@ -1,10 +1,11 @@
-// src/app/[locale]/login/page.tsx
 /**
  * @file page.tsx
- * @description Página de inicio de sesión. Ensambla el `AuthCardLayout` y el
- *              `LoginForm` para construir la vista de inicio de sesión completa.
+ * @description Página de inicio de sesión. Ha sido refactorizada a un estándar
+ *              de élite para consumir los namespaces de i18n completos y canónicos,
+ *              resolviendo un error crítico de `MISSING_MESSAGE` durante el build
+ *              en Vercel.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -17,9 +18,20 @@ import { LoginForm } from "@/components/authentication/login-form";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 
+/**
+ * @public
+ * @page LoginPage
+ * @description Ensambla el `AuthCardLayout` y el `LoginForm` para construir la
+ *              vista de inicio de sesión completa.
+ * @returns {React.ReactElement}
+ */
 export default function LoginPage(): React.ReactElement {
-  const t = useTranslations("pages.LoginPage");
-  const tSignUp = useTranslations("pages.SignUpPage");
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
+  // Se consumen los namespaces completos y canónicos según la SSoT (i18n.ts),
+  // resolviendo el error `MISSING_MESSAGE` que bloqueaba el build.
+  const t = useTranslations("app.[locale].login.page");
+  const tSignUp = useTranslations("app.[locale].signup.page");
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
   const bottomLink = tSignUp.rich("dontHaveAccount", {
     signup: (chunks) => (
@@ -37,18 +49,17 @@ export default function LoginPage(): React.ReactElement {
     </AuthCardLayout>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Página de Autenticación Dedicada**: ((Implementada)) Este nuevo aparato crea la ruta `/login`, completando el primer paso de la migración del flujo de autenticación.
- * 2. **Composición Atómica (LEGO)**: ((Implementada)) Actúa como un ensamblador puro, componiendo los aparatos atómicos `AuthCardLayout` y `LoginForm`.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se han corregido las llamadas a `useTranslations` con los namespaces canónicos, resolviendo las múltiples instancias del error `MISSING_MESSAGE` asociadas a esta página y reportadas en el log de Vercel.
  *
  * @subsection Melhorias Futuras
- * 1. **Metadatos Dinámicos**: ((Vigente)) Convertir a un Server Component para poder usar la función `generateMetadata` y establecer el título de la página de forma dinámica y traducida.
+ * 1. **Metadatos Dinámicos**: ((Vigente)) Convertir a un Server Component para poder usar la función `generateMetadata` y establecer el título de la página de forma dinámica y traducida, mejorando el SEO y la UX.
  *
  * =====================================================================
  */
-// src/app/[locale]/login/page.tsx
