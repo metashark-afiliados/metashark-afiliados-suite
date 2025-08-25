@@ -2,10 +2,14 @@
 /**
  * @file src/components/dashboard/RecentActivity.tsx
  * @description Componente de UI atómico para mostrar la actividad reciente.
- *              Refactorizado a la arquitectura "Hub Creativo" v11.0, ahora
- *              presenta las campañas en un carrusel horizontal.
- * @author Raz Podestá
- * @version 2.0.0
+ *              Refactorizado a la arquitectura "Hub Creativo", ahora
+ *              presenta las campañas en un carrusel horizontal con animaciones
+ *              escalonadas y accesibilidad mejorada.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.1.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -22,6 +26,7 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "@/lib/navigation";
 import { type Tables } from "@/lib/types/database";
+import { logger } from "@/lib/logging";
 
 type Campaign = Tables<"campaigns">;
 
@@ -30,9 +35,16 @@ export interface RecentActivityProps {
 }
 
 export function RecentActivity({ recentCampaigns }: RecentActivityProps) {
-  const t = useTranslations("DashboardPage.RecentActivity");
+  const t = useTranslations("app.[locale].dashboard.page.RecentActivity");
   const format = useFormatter();
   const router = useRouter();
+
+  logger.trace(
+    "[RecentActivity] Renderizando componente de actividad reciente.",
+    {
+      count: recentCampaigns.length,
+    }
+  );
 
   const STAGGER_CONTAINER = {
     hidden: { opacity: 0 },
@@ -50,14 +62,14 @@ export function RecentActivity({ recentCampaigns }: RecentActivityProps) {
   };
 
   if (recentCampaigns.length === 0) {
-    // En el nuevo diseño, si no hay actividad, simplemente no se renderiza la sección.
     return null;
   }
 
   return (
     <motion.section
       initial="hidden"
-      animate="show"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.1 }}
       variants={STAGGER_CONTAINER}
       className="space-y-4"
     >
@@ -76,16 +88,16 @@ export function RecentActivity({ recentCampaigns }: RecentActivityProps) {
                 className="group cursor-pointer hover:border-primary/50 h-full transition-all duration-300 hover:shadow-lg"
                 onClick={() =>
                   router.push({
-                    pathname: "/builder/[campaignId]",
-                    params: { campaignId: campaign.id },
+                    pathname: "/builder/[creationId]",
+                    params: { creationId: campaign.id },
                   })
                 }
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     router.push({
-                      pathname: "/builder/[campaignId]",
-                      params: { campaignId: campaign.id },
+                      pathname: "/builder/[creationId]",
+                      params: { creationId: campaign.id },
                     });
                   }
                 }}
@@ -121,12 +133,14 @@ export function RecentActivity({ recentCampaigns }: RecentActivityProps) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Layout de Carrusel Horizontal**: ((Implementada)) El componente ahora renderiza las tarjetas en un scroll horizontal, alineándose con el blueprint de Canva.
- * 2. **Estilo Visual Mejorado**: ((Implementada)) Se han ajustado los estilos de las tarjetas para un diseño más compacto y visualmente atractivo.
+ * 1. **Layout de Carrusel Horizontal**: ((Implementada)) El componente ahora renderiza las tarjetas en un carrusel con scroll horizontal (`flex overflow-x-auto`), alineándose con el blueprint del "Hub Creativo" de Canva.
+ * 2. **Estado Vacío Limpio**: ((Implementada)) El componente ahora devuelve `null` si no hay campañas recientes, creando una interfaz más limpia y evitando mostrar una sección vacía.
+ * 3. **Accesibilidad (a11y) Mejorada**: ((Implementada)) Las tarjetas ahora son operables por teclado (`onKeyDown`) y tienen un `aria-label` descriptivo.
  *
  * @subsection Melhorias Futuras
- * 1. **Previsualizaciones de Campañas**: ((Vigente)) La tarjeta podría mostrar una miniatura real de la campaña en lugar de un icono placeholder.
+ * 1. **Previsualizaciones de Campañas**: ((Vigente)) La tarjeta podría mostrar una miniatura real de la campaña en lugar de un icono placeholder. Esto requeriría una Server Action para generar y almacenar una captura de pantalla del `content` de la campaña.
+ * 2. **Controles de Scroll**: ((Vigente)) Añadir botones de "Anterior" y "Siguiente" que aparezcan en hover en dispositivos de escritorio para mejorar la navegabilidad del carrusel para usuarios sin trackpad.
  *
  * =====================================================================
  */
-// src/components/dashboard/RecentActivity.tsx
+// src/components/dashboard/RecentActivity.tsx// src/components/dashboard/RecentActivity.tsx

@@ -1,11 +1,13 @@
 // src/lib/navigation.ts
 /**
  * @file src/lib/navigation.ts
- * @description Manifiesto de Enrutamiento y SSoT. Sincronizado para reflejar la
- *              re-arquitectura del constructor a `[creationId]`, resolviendo un
- *              conflicto de enrutamiento de Next.js.
- * @author Raz Podestá
- * @version 8.0.0
+ * @description Manifiesto de Enrutamiento y SSoT. Sincronizado para incluir
+ *              las nuevas rutas del "Workspace Creativo".
+ * @author Raz Podestá - MetaShark Tech
+ * @version 8.1.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import {
   createLocalizedPathnamesNavigation,
@@ -23,13 +25,16 @@ export const pathnames = {
   "/about": "/about",
   "/admin": "/admin",
   "/blog": "/blog",
-  // --- INICIO DE CORRECCIÓN ---
   "/builder/[creationId]": "/builder/[creationId]",
-  // --- FIN DE CORRECCIÓN ---
   "/choose-language": "/choose-language",
   "/contact": "/contact",
   "/cookies": "/cookies",
   "/dashboard": "/dashboard",
+  // --- INICIO DE SINCRONIZACIÓN DE RUTAS ---
+  "/dashboard/projects": "/dashboard/projects",
+  "/dashboard/templates": "/dashboard/templates",
+  "/dashboard/brand": "/dashboard/brand",
+  // --- FIN DE SINCRONIZACIÓN DE RUTAS ---
   "/dashboard/settings": "/dashboard/settings",
   "/dashboard/sites": "/dashboard/sites",
   "/dashboard/sites/[siteId]/campaigns": "/dashboard/sites/[siteId]/campaigns",
@@ -73,7 +78,7 @@ export type Route =
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Arranque**: ((Implementada)) Se ha corregido la definición de la ruta del constructor para que use `[creationId]`, resolviendo el conflicto de enrutamiento que impedía el arranque del servidor.
+ * 1. **Sincronización de SSoT**: ((Implementada)) Se han añadido las nuevas rutas del "Workspace Creativo" al manifiesto, expandiendo el tipo `Route` y resolviendo el error de compilación.
  *
  * =====================================================================
  */

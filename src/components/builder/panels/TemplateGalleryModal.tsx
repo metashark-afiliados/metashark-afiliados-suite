@@ -2,11 +2,10 @@
 /**
  * @file TemplateGalleryModal.tsx
  * @description Orquestador de UI modal para la galería de plantillas.
- *              Consume el `useTemplateGalleryStore` para su visibilidad y contexto,
- *              lee el `TEMPLATE_MANIFEST` para obtener su contenido y ensambla una
- *              cuadrícula de `TemplateCard` para la categoría activa.
+ *              Sincronizado para consumir `useTranslations` y renderizar
+ *              contenido completamente internacionalizado.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -27,15 +26,8 @@ import { useTemplateGalleryStore } from "@/lib/hooks/useTemplateGalleryStore";
 
 import { TemplateCard } from "./TemplateCard";
 
-/**
- * @public
- * @component TemplateGalleryModal
- * @description Renderiza el modal que muestra las plantillas de bloque disponibles
- *              para la categoría seleccionada en la `BlockLibrary`.
- * @returns {React.ReactElement}
- */
 export function TemplateGalleryModal(): React.ReactElement {
-  const t = useTranslations("pages.BuilderPage.TemplateGallery");
+  const t = useTranslations("pages.TemplateGallery");
   const { isOpen, close, activeCategoryId } = useTemplateGalleryStore(
     (state) => ({
       isOpen: state.isOpen,
@@ -50,9 +42,7 @@ export function TemplateGalleryModal(): React.ReactElement {
   }
 
   const templatesForCategory = TEMPLATE_MANIFEST[activeCategoryId] || [];
-  const categoryTitle = t(`category_${activeCategoryId}_title` as any, {
-    defaultValue: activeCategoryId,
-  });
+  const categoryTitle = t(`category_${activeCategoryId}_title` as any);
 
   return (
     <Dialog open={isOpen} onOpenChange={close}>
@@ -64,11 +54,7 @@ export function TemplateGalleryModal(): React.ReactElement {
           {templatesForCategory.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {templatesForCategory.map((template) => (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  label={t(template.i18nKey as any)}
-                />
+                <TemplateCard key={template.id} template={template} />
               ))}
             </div>
           ) : (
@@ -88,12 +74,8 @@ export function TemplateGalleryModal(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Orquestador de UX Central**: ((Implementada)) Este componente es el corazón de la nueva experiencia de selección de bloques, proporcionando una interfaz visual rica para la exploración de plantillas.
- * 2. **Arquitectura de Ensamblaje (LEGO)**: ((Implementada)) Es un orquestador puro que consume un store de estado, un manifiesto de datos y compone un átomo de UI (`TemplateCard`), adhiriéndose a la "Filosofía LEGO".
- *
- * @subsection Melhorias Futuras
- * 1. **Búsqueda y Filtrado Dentro del Modal**: ((Vigente)) Añadir un `SearchInput` en la `DialogHeader` para permitir a los usuarios filtrar las plantillas por nombre o etiquetas (`tags`) dentro de una categoría.
- * 2. **Pestañas de Sub-categorías**: ((Vigente)) Para categorías con muchas plantillas (ej. "Heros"), se podrían añadir `<Tabs>` para filtrar por sub-categorías (ej. "Con formulario", "Con video", "Minimalista").
+ * 1. **Full Internacionalización**: ((Implementada)) El componente ahora consume `useTranslations` para renderizar el título del modal y el estado vacío, completando el blindaje de i18n.
+ * 2. **Simplificación de API**: ((Implementada)) Al refactorizar `TemplateCard` para que sea autónomo en su internacionalización, la prop `label` fue eliminada de aquí, simplificando este orquestador.
  *
  * =====================================================================
  */

@@ -1,23 +1,24 @@
 // src/app/[locale]/signup/page.tsx
 /**
  * @file page.tsx
- * @description Página de registro. Refactorizada para eliminar la llamada
- *              a `unstable_setRequestLocale`, que es incompatible con Client
- *              Components, resolviendo un error crítico de runtime.
- * @author Raz Podestá
- * @version 5.0.0
+ * @description Página de registro. Ensambla el `AuthCardLayout` y el `SignupForm`
+ *              para construir la vista de registro completa, finalizando la
+ *              migración a la arquitectura de páginas dedicadas.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 1.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { useTranslations } from "next-intl";
-// unstable_setRequestLocale ha sido eliminado.
 
 import { SignupForm } from "@/components/authentication/sign-up-form";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 
 export default function SignupPage(): React.ReactElement {
-  // La llamada a unstable_setRequestLocale ha sido eliminada.
   const t = useTranslations("pages.SignUpPage");
   const tLogin = useTranslations("pages.LoginPage");
 
@@ -43,11 +44,8 @@ export default function SignupPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Runtime**: ((Implementada)) Se ha eliminado la llamada a `unstable_setRequestLocale`, resolviendo el fallo de despliegue.
- * 2. **Alineación Arquitectónica**: ((Implementada)) El componente ahora adhiere estrictamente a las reglas de los Client Components.
- *
- * @subsection Melhorias Futuras
- * 1. **Componente `AuthPage` Genérico**: ((Vigente)) Las páginas de Login y Signup comparten una estructura idéntica. Podrían ser abstraídas a un único componente `AuthPage` que reciba el formulario a renderizar como `children`.
+ * 1. **Finalización de Flujo de Autenticación**: ((Implementada)) Este aparato completa la migración del flujo de registro a una página dedicada.
+ * 2. **Composición Atómica (LEGO)**: ((Implementada)) Actúa como un ensamblador puro, componiendo `AuthCardLayout` y `SignupForm`.
  *
  * =====================================================================
  */

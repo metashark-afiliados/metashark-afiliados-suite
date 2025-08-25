@@ -1,10 +1,14 @@
 // src/components/builder/SettingsPanel.tsx
 /**
  * @file SettingsPanel.tsx
- * @description Panel de ajustes dinámico. Sincronizado con la nueva
- *              arquitectura de consumo de estado.
- * @author Raz Podestá
- * @version 3.0.0
+ * @description Panel de ajustes dinámico. Orquesta la visualización de los
+ *              controles de edición para el bloque seleccionado, consumiendo el
+ *              estado del `BuilderStore` y el manifiesto `blockEditorDefinitions`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 1.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -13,11 +17,9 @@ import { useTranslations } from "next-intl";
 import { shallow } from "zustand/shallow";
 
 import { blockEditorDefinitions } from "@/lib/builder/block-editor-definitions";
-// --- INICIO DE CORRECCIÓN DE IMPORTACIONES Y TIPOS ---
 import { type BuilderState } from "@/lib/builder/core";
 import { type PageBlock } from "@/lib/builder/types.d";
 import { useBuilderStore } from "@/lib/hooks/use-builder-store";
-// --- FIN DE CORRECCIÓN DE IMPORTACIONES Y TIPOS ---
 import { logger } from "@/lib/logging";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SettingsGroup } from "./SettingsGroup";
@@ -44,7 +46,6 @@ export function SettingsPanel(): React.ReactElement {
   });
 
   if (!selectedBlock) {
-    // ... (código del estado vacío sin cambios)
     return (
       <div className="p-4 text-center text-muted-foreground">
         <h3 className="font-semibold text-foreground">
@@ -58,7 +59,6 @@ export function SettingsPanel(): React.ReactElement {
   const blockDefinition = blockEditorDefinitions[selectedBlock.type];
 
   if (!blockDefinition) {
-    // ... (código del estado sin ajustes sin cambios)
     return (
       <div className="p-4 text-center text-muted-foreground">
         <h3 className="font-semibold text-foreground">
@@ -110,7 +110,11 @@ export function SettingsPanel(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Errores de Compilación**: ((Implementada)) Se han corregido las importaciones y se ha añadido el tipo `PageBlock` al parámetro `b` en `find`, resolviendo los errores `TS2459` y `TS7006`.
+ * 1. **Panel de Edición Dinámico**: ((Implementada)) Este componente es el cerebro de la edición. Se adapta dinámicamente al bloque seleccionado y orquesta la renderización de sus controles.
+ * 2. **Arquitectura Desacoplada**: ((Implementada)) Consume el estado global, el manifiesto de configuración y compone los `SettingsGroup`, actuando como un orquestador de alto nivel sin lógica de presentación de campos.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Pestaña "Avanzado"**: ((Vigente)) Añadir una tercera pestaña para ajustes avanzados, como IDs de CSS, clases personalizadas o atributos de datos.
  *
  * =====================================================================
  */

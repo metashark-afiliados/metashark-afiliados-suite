@@ -2,7 +2,7 @@
 {
   "en-US": {
     "PrimaryToolBar": {
-      "design": "Design",
+      "add_content": "Add Content",
       "elements": "Elements",
       "text": "Text",
       "brand": "Brand",
@@ -10,17 +10,36 @@
       "tools": "Apps"
     },
     "BlockLibrary": {
-      "title": "Add Content",
-      "category_layout": "Layouts",
-      "category_content": "Content",
-      "category_media": "Media",
-      "category_forms": "Forms",
+      "title": "Content Library",
+      "category_templates": "Landing Pages",
+      "category_headers": "Headers",
+      "category_heros": "Heros",
+      "category_features": "Features",
+      "category_testimonials": "Testimonials",
       "category_footers": "Footers"
+    },
+    "TemplateGallery": {
+      "category_templates_title": "Choose a Starting Point",
+      "category_headers_title": "Choose a Header Layout",
+      "category_heros_title": "Choose a Hero Section",
+      "category_features_title": "Choose a Features Layout",
+      "category_testimonials_title": "Choose a Testimonial Layout",
+      "category_footers_title": "Choose a Footer Layout",
+      "no_templates_placeholder": "No templates available for this category yet.",
+      "template_header_corporate_dark": "Corporate Dark",
+      "template_header_minimal_light": "Minimal Light",
+      "template_header_bold_cta": "Bold CTA",
+      "template_hero_primary_centered": "Centered Primary",
+      "template_hero_image_left": "Image Left",
+      "template_hero_form_right": "Form Right",
+      "template_features_3_col_icons": "3-Column Icons",
+      "template_features_checklist": "Checklist",
+      "template_features_alternating_image": "Alternating Image"
     }
   },
   "es-ES": {
     "PrimaryToolBar": {
-      "design": "Diseño",
+      "add_content": "Añadir Contenido",
       "elements": "Elementos",
       "text": "Texto",
       "brand": "Marca",
@@ -28,17 +47,36 @@
       "tools": "Apps"
     },
     "BlockLibrary": {
-      "title": "Añadir Contenido",
-      "category_layout": "Diseños",
-      "category_content": "Contenido",
-      "category_media": "Multimedia",
-      "category_forms": "Formularios",
-      "category_footers": "Pies de página"
+      "title": "Biblioteca de Contenido",
+      "category_templates": "Plantillas Landing Page",
+      "category_headers": "Cabezales",
+      "category_heros": "Heros",
+      "category_features": "Características",
+      "category_testimonials": "Testimonios",
+      "category_footers": "Pies de Página"
+    },
+    "TemplateGallery": {
+      "category_templates_title": "Elige un Punto de Partida",
+      "category_headers_title": "Elige un Diseño de Cabezal",
+      "category_heros_title": "Elige una Sección Hero",
+      "category_features_title": "Elige un Diseño de Características",
+      "category_testimonials_title": "Elige un Diseño de Testimonios",
+      "category_footers_title": "Elige un Diseño de Pie de Página",
+      "no_templates_placeholder": "Aún no hay plantillas disponibles para esta categoría.",
+      "template_header_corporate_dark": "Corporativo Oscuro",
+      "template_header_minimal_light": "Minimalista Claro",
+      "template_header_bold_cta": "CTA Destacado",
+      "template_hero_primary_centered": "Principal Centrado",
+      "template_hero_image_left": "Imagen Izquierda",
+      "template_hero_form_right": "Formulario Derecha",
+      "template_features_3_col_icons": "3 Columnas con Iconos",
+      "template_features_checklist": "Lista de Verificación",
+      "template_features_alternating_image": "Imagen Alternada"
     }
   },
   "pt-BR": {
     "PrimaryToolBar": {
-      "design": "Design",
+      "add_content": "Adicionar Conteúdo",
       "elements": "Elementos",
       "text": "Texto",
       "brand": "Marca",
@@ -46,13 +84,31 @@
       "tools": "Apps"
     },
     "BlockLibrary": {
-      "title": "Adicionar Conteúdo",
-      "category_layout": "Layouts",
-      "category_content": "Conteúdo",
-      "category_media": "Mídia",
-      "category_forms": "Formulários",
+      "title": "Biblioteca de Conteúdo",
+      "category_templates": "Modelos de Landing Page",
+      "category_headers": "Cabeçalhos",
+      "category_heros": "Heros",
+      "category_features": "Recursos",
+      "category_testimonials": "Depoimentos",
       "category_footers": "Rodapés"
+    },
+    "TemplateGallery": {
+      "category_templates_title": "Escolha um Ponto de Partida",
+      "category_headers_title": "Escolha um Layout de Cabeçalho",
+      "category_heros_title": "Escolha uma Seção Hero",
+      "category_features_title": "Escolha um Layout de Recursos",
+      "category_testimonials_title": "Escolha um Layout de Depoimento",
+      "category_footers_title": "Escolha um Layout de Rodapé",
+      "no_templates_placeholder": "Nenhum modelo disponível para esta categoria ainda.",
+      "template_header_corporate_dark": "Corporativo Escuro",
+      "template_header_minimal_light": "Minimalista Claro",
+      "template_header_bold_cta": "CTA em Destaque",
+      "template_hero_primary_centered": "Principal Centralizado",
+      "template_hero_image_left": "Imagem à Esquerda",
+      "template_hero_form_right": "Formulário à Direita",
+      "template_features_3_col_icons": "3 Colunas com Ícones",
+      "template_features_checklist": "Lista de Verificação",
+      "template_features_alternating_image": "Imagem Alternada"
     }
   }
 }
-

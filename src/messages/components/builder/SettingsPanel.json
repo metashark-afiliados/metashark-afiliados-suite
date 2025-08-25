@@ -28,7 +28,23 @@
       "paddingBottom_label": "Padding Bottom",
       "item_label": "Item #{index}",
       "removeItem_button": "Remove Item",
-      "addItem_button": "Add Item"
+      "addItem_button": "Add Item",
+      "testimonials_label": "Testimonials",
+      "authorImage_label": "Author Image URL",
+      "quote_label": "Quote",
+      "authorName_label": "Author's Name",
+      "authorTitle_label": "Author's Title",
+      "brandName_label": "Brand Name",
+      "slogan_label": "Slogan",
+      "newsletterTitle_label": "Newsletter Title",
+      "newsletterPlaceholder_label": "Newsletter Placeholder",
+      "newsletterButtonText_label": "Newsletter Button Text",
+      "copyrightText_label": "Copyright Text",
+      "productLinks_label": "Product Links",
+      "companyLinks_label": "Company Links",
+      "legalLinks_label": "Legal Links",
+      "linkText_label": "Link Text",
+      "linkHref_label": "Link URL (href)"
     }
   },
   "es-ES": {
@@ -59,7 +75,23 @@
       "paddingBottom_label": "Padding Inferior",
       "item_label": "Ítem #{index}",
       "removeItem_button": "Eliminar Ítem",
-      "addItem_button": "Añadir Ítem"
+      "addItem_button": "Añadir Ítem",
+      "testimonials_label": "Testimonios",
+      "authorImage_label": "URL de Imagen del Autor",
+      "quote_label": "Cita",
+      "authorName_label": "Nombre del Autor",
+      "authorTitle_label": "Cargo del Autor",
+      "brandName_label": "Nombre de la Marca",
+      "slogan_label": "Eslogan",
+      "newsletterTitle_label": "Título del Boletín",
+      "newsletterPlaceholder_label": "Placeholder del Boletín",
+      "newsletterButtonText_label": "Texto del Botón del Boletín",
+      "copyrightText_label": "Texto de Copyright",
+      "productLinks_label": "Enlaces de Producto",
+      "companyLinks_label": "Enlaces de Compañía",
+      "legalLinks_label": "Enlaces Legales",
+      "linkText_label": "Texto del Enlace",
+      "linkHref_label": "URL del Enlace (href)"
     }
   },
   "pt-BR": {
@@ -81,7 +113,7 @@
       "ctaText_label": "Texto do Botão CTA",
       "title_label": "Título",
       "subtitle_label": "Subtítulo",
-      "features_label": "Características",
+      "features_label": "Recursos",
       "icon_label": "Ícone",
       "description_label": "Descrição",
       "backgroundColor_label": "Cor de Fundo",
@@ -90,7 +122,23 @@
       "paddingBottom_label": "Padding Inferior",
       "item_label": "Item #{index}",
       "removeItem_button": "Remover Item",
-      "addItem_button": "Adicionar Item"
+      "addItem_button": "Adicionar Item",
+      "testimonials_label": "Depoimentos",
+      "authorImage_label": "URL da Imagem do Autor",
+      "quote_label": "Citação",
+      "authorName_label": "Nome do Autor",
+      "authorTitle_label": "Cargo do Autor",
+      "brandName_label": "Nome da Marca",
+      "slogan_label": "Slogan",
+      "newsletterTitle_label": "Título da Newsletter",
+      "newsletterPlaceholder_label": "Placeholder da Newsletter",
+      "newsletterButtonText_label": "Texto do Botão da Newsletter",
+      "copyrightText_label": "Texto de Copyright",
+      "productLinks_label": "Links de Produto",
+      "companyLinks_label": "Links da Empresa",
+      "legalLinks_label": "Links Legais",
+      "linkText_label": "Texto do Link",
+      "linkHref_label": "URL do Link (href)"
     }
   }
 }

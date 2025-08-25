@@ -6,7 +6,7 @@
  *              ser renderizado en el Canvas del constructor.
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-24
+ * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -74,9 +74,8 @@ export function Hero1({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Plantilla Funcional**: ((Implementada)) Este es el primer bloque de construcción visual y funcional. Transforma el builder de un concepto a una herramienta tangible.
- * 2. **Edición en Vivo (Inline Editing)**: ((Implementada)) La integración con `EditableText` y el callback `onUpdate` es la implementación canónica de la edición en el `Canvas`, proporcionando una UX de élite.
- * 3. **Observabilidad de Renderizado**: ((Implementada)) Se ha añadido `clientLogger.trace` para monitorear los ciclos de renderizado de cada bloque en el `Canvas` durante el desarrollo.
+ * 1. **Componente de Plantilla Funcional**: ((Implementada)) Este es el segundo bloque de construcción visual y funcional, solidificando la arquitectura del builder.
+ * 2. **Edición en Vivo (Inline Editing)**: ((Implementada)) La integración con `EditableText` es la implementación canónica de la edición en el `Canvas`.
  *
  * @subsection Melhorias Futuras
  * 1. **Botón de CTA Editable**: ((Vigente)) Añadir una prop `ctaText` y renderizar un `<button>` con `EditableText` para permitir la personalización del Call to Action.

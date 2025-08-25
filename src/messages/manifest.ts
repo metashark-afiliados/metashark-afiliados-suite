@@ -2,14 +2,24 @@
 /**
  * @file manifest.ts
  * @description Manifiesto de Importación Dinámica y Única Fuente de Verdad (SSoT)
- *              para el registro de todos los archivos de mensajes de i18n. Ha sido
- *              sincronizado para incluir el nuevo namespace `pages.BuilderPage`,
- *              resolviendo un error crítico de `MISSING_MESSAGE`.
+ *              para el registro de todos los archivos de mensajes de i18n. Este aparato
+ *              es el corazón de la arquitectura de internacionalización IMAS, permitiendo
+ *              la carga dinámica y modular de traducciones.
  * @author L.I.A. Legacy (Generado por script, verificado manualmente)
- * @version 18.0.0
+ * @version 20.0.0
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ * @date 2025-08-25
  */
 import { type ManifestModule } from "./types";
 
+/**
+ * @public
+ * @constant messagesManifest
+ * @description El registro canónico de todos los namespaces de mensajes.
+ *              Cada entrada es una función de importación dinámica que `next-intl`
+ *              utiliza para cargar los mensajes necesarios para un locale específico.
+ */
 export const messagesManifest: Record<string, ManifestModule> = {
   // --- Namespaces a Nivel de App (Rutas Específicas) ---
   "app.dev-console.CampaignsTable": () =>
@@ -20,7 +30,6 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./app/[locale]/dev-console/TelemetryTable.json"),
   "app.dev-console.UserManagementTable": () =>
     import("./app/[locale]/dev-console/UserManagementTable.json"),
-  "app.[locale].builder.page": () => import("./app/[locale]/builder/page.json"),
   "app.[locale].dashboard.page": () =>
     import("./app/[locale]/dashboard/page.json"),
   "app.[locale].dashboard.sites.page": () =>
@@ -94,7 +103,7 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "pages.AboutPage": () => import("./pages/AboutPage.json"),
   "pages.AuthNoticePage": () => import("./pages/AuthNoticePage.json"),
   "pages.BlogPage": () => import("./pages/BlogPage.json"),
-  "pages.BuilderPage": () => import("./pages/BuilderPage.json"), // <-- NUEVO NAMESPACE
+  "pages.BuilderPage": () => import("./pages/BuilderPage.json"),
   "pages.ContactPage": () => import("./pages/ContactPage.json"),
   "pages.CookiePolicyPage": () => import("./pages/CookiePolicyPage.json"),
   "pages.DisclaimerPage": () => import("./pages/DisclaimerPage.json"),
@@ -104,24 +113,26 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "pages.NotFoundPage": () => import("./pages/NotFoundPage.json"),
   "pages.PrivacyPolicyPage": () => import("./pages/PrivacyPolicyPage.json"),
   "pages.ResetPasswordPage": () => import("./pages/ResetPasswordPage.json"),
+  "pages.TemplateGallery": () => import("./pages/TemplateGallery.json"),
   "pages.TermsOfServicePage": () => import("./pages/TermsOfServicePage.json"),
 
   // --- Namespaces Compartidos (sin prefijo) ---
-  ActionDock: () => import("./shared/ActionDock.json"),
-  ValidationErrors: () => import("./shared/ValidationErrors.json"),
-  WelcomeModal: () => import("./shared/WelcomeModal.json"),
+  "shared.ActionDock": () => import("./shared/ActionDock.json"),
+  "shared.ValidationErrors": () => import("./shared/ValidationErrors.json"),
+  "shared.WelcomeModal": () => import("./shared/WelcomeModal.json"),
 };
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha registrado el nuevo namespace `pages.BuilderPage`, resolviendo el error de i18n.
- * 2. **Consolidación de SSoT**: ((Implementada)) El manifiesto ahora es un reflejo completo y preciso de la estructura de archivos de mensajes.
+ * 1. **Completitud y Sincronización**: ((Implementada)) Este manifiesto ahora es un reflejo completo y preciso de toda la estructura de archivos de mensajes del proyecto, incluyendo los namespaces para el `TemplateGallery`.
+ * 2. **Visión Holística**: ((Implementada)) Al ser la SSoT para la carga de mensajes, este aparato es fundamental para la integridad de todo el sistema de i18n.
  *
  * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) Este archivo sigue siendo el candidato ideal para ser generado automáticamente por el script `pnpm gen:i18n:manifest` para prevenir futuros errores de desincronización manual.
+ * 1. **Generación Automática**: ((Vigente)) Este manifiesto es el candidato ideal para ser generado y mantenido por un script (`pnpm gen:i18n:manifest`) que lea la estructura de directorios, eliminando cualquier posibilidad de error de desincronización manual en el futuro.
  *
  * =====================================================================
  */

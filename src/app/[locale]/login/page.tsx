@@ -1,24 +1,23 @@
 // src/app/[locale]/login/page.tsx
 /**
  * @file page.tsx
- * @description Página de inicio de sesión. Refactorizada para eliminar la llamada
- *              a `unstable_setRequestLocale`, que es incompatible con Client
- *              Components, resolviendo un error crítico de runtime.
- * @author Raz Podestá
- * @version 5.0.0
+ * @description Página de inicio de sesión. Ensambla el `AuthCardLayout` y el
+ *              `LoginForm` para construir la vista de inicio de sesión completa.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 1.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { useTranslations } from "next-intl";
-// unstable_setRequestLocale ha sido eliminado.
 
 import { LoginForm } from "@/components/authentication/login-form";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 
 export default function LoginPage(): React.ReactElement {
-  // La llamada a unstable_setRequestLocale ha sido eliminada.
-  // El locale se obtiene del contexto provisto por el Root Layout.
   const t = useTranslations("pages.LoginPage");
   const tSignUp = useTranslations("pages.SignUpPage");
 
@@ -44,11 +43,11 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Runtime**: ((Implementada)) Se ha eliminado la llamada a `unstable_setRequestLocale`, que es una API exclusiva para Server Components, resolviendo la causa raíz del fallo de despliegue en Vercel.
- * 2. **Alineación Arquitectónica**: ((Implementada)) El componente ahora adhiere estrictamente a las reglas de los Client Components.
+ * 1. **Página de Autenticación Dedicada**: ((Implementada)) Este nuevo aparato crea la ruta `/login`, completando el primer paso de la migración del flujo de autenticación.
+ * 2. **Composición Atómica (LEGO)**: ((Implementada)) Actúa como un ensamblador puro, componiendo los aparatos atómicos `AuthCardLayout` y `LoginForm`.
  *
  * @subsection Melhorias Futuras
- * 1. **Paso de `locale` Explícito**: ((Vigente)) Aunque el contexto funciona, una práctica de élite aún más robusta sería que el `RootLayout` leyera los `params` y los pasara explícitamente a un proveedor de contexto, en lugar de que cada página lo haga. (Nota: Esto ya se está haciendo correctamente).
+ * 1. **Metadatos Dinámicos**: ((Vigente)) Convertir a un Server Component para poder usar la función `generateMetadata` y establecer el título de la página de forma dinámica y traducida.
  *
  * =====================================================================
  */

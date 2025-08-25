@@ -1,39 +1,36 @@
 // src/components/feedback/CommandPalette.tsx
 /**
  * @file CommandPalette.tsx
- * @description Orquestador de lógica para la paleta de comandos. Gestiona el estado
- *              local (búsqueda, páginas), consume el contexto del dashboard y el
- *              store de visibilidad, y define los callbacks para la ejecución de comandos.
- *              Ha sido refactorizado para utilizar importaciones atómicas de Server Actions,
- *              resolviendo el error de build "server-only".
+ * @description Orquestador de lógica para la paleta de comandos. Sincronizado
+ *              para consumir el namespace de i18n canónico y completo,
+ *              resolviendo el error `MISSING_MESSAGE`.
  * @author L.I.A. Legacy
- * @version 4.0.0
+ * @version 4.1.0
  */
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
+// --- INICIO DE CORRECCIÓN: Namespace explícito ---
+import { useTranslations } from "next-intl";
+// --- FIN DE CORRECCIÓN ---
 
 import { setActiveWorkspaceAction } from "@/lib/actions/workspaces.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useCommandPaletteStore } from "@/lib/hooks/use-command-palette";
 import { logger } from "@/lib/logging";
-import { useRouter } from "@/lib/navigation";
 import { CommandPaletteContent } from "./CommandPaletteContent";
 
-/**
- * @public
- * @component CommandPalette
- * @description Orquesta la lógica y el estado de la paleta de comandos,
- *              pasando los datos y callbacks al componente de presentación puro
- *              `CommandPaletteContent`.
- * @returns {React.ReactElement} El componente de paleta de comandos.
- */
 export function CommandPalette() {
   const { user, workspaces, activeWorkspace, modules } = useDashboard();
   const { isOpen, close, toggle } = useCommandPaletteStore();
-  const router = useRouter();
+  const router = useRouter(); // Se usa el de 'next/navigation' ya que no hay rutas parametrizadas.
   const [search, setSearch] = React.useState("");
   const [pages, setPages] = React.useState<"root" | "workspaces">("root");
+
+  // --- INICIO DE CORRECCIÓN: Consumo de namespace completo ---
+  const t = useTranslations("components.feedback.CommandPalette");
+  // --- FIN DE CORRECCIÓN ---
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -89,20 +86,23 @@ export function CommandPalette() {
       activeWorkspaceId={activeWorkspace?.id || null}
       runCommand={handleNavCommand}
       handleWorkspaceSelect={handleWorkspaceSelect}
+      t={t} // Se pasa la función 't' al componente de presentación
     />
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución Definitiva de Error de Build**: ((Implementada)) Se ha reemplazado la importación del barril de acciones por una importación atómica y directa de `setActiveWorkspaceAction`, eliminando la causa raíz del fallo de compilación.
- * 2. **Documentación TSDoc de Élite**: ((Implementada)) El componente ha sido documentado exhaustivamente para clarificar su rol como orquestador de lógica.
+ * 1. **Resolución de Error `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para que utilice el namespace completo y canónico, resolviendo la causa raíz del error en tiempo de ejecución.
+ * 2. **Desacoplamiento de i18n**: ((Implementada)) La función `t` ahora se pasa como prop a `CommandPaletteContent`, convirtiendo a este último en un componente de presentación aún más puro y desacoplado, que ya no necesita conocer la estructura de namespaces.
  *
  * @subsection Melhorias Futuras
- * 1. **Comandos de Acción Directa**: ((Vigente)) El `CommandPalette` podría ser extendido para ejecutar Server Actions que no son de navegación, como "Crear Nuevo Sitio". Esto requeriría añadir un nuevo tipo de `CommandItem` y expandir la lógica de `runCommand`.
+ * 1. **Comandos de Acción Directa**: ((Vigente)) El `CommandPalette` podría ser extendido para ejecutar Server Actions que no son de navegación, como "Crear Nuevo Sitio".
  *
  * =====================================================================
  */
+// src/components/feedback/CommandPalette.tsx

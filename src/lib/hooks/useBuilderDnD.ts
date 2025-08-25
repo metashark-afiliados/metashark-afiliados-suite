@@ -8,6 +8,8 @@
  * @author Raz Podestá - MetaShark Tech
  * @version 5.0.0
  * @date 2025-08-24
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -26,10 +28,9 @@ import { shallow } from "zustand/shallow";
 
 import { useBuilderStore } from "@/lib/hooks/use-builder-store";
 import { logger } from "@/lib/logging";
+import { type BuilderState } from "@/lib/builder/core";
 
-const dndSelector = (
-  state: import("@/lib/builder/core/store.types").BuilderState
-) => ({
+const dndSelector = (state: BuilderState) => ({
   addBlock: state.addBlock,
   moveBlock: state.moveBlock,
 });
@@ -75,11 +76,11 @@ export function useBuilderDnD() {
     if (!over) return;
 
     const isFromPalette = active.data.current?.fromPalette === true;
-    if (isFromPalette) {
-      const blockType = active.data.current?.blockType;
-      if (blockType) {
-        addBlock(blockType);
-      }
+    const blockType = active.data.current?.blockType;
+    const initialProps = active.data.current?.initialProps;
+
+    if (isFromPalette && blockType) {
+      addBlock(blockType, initialProps);
       return;
     }
 
@@ -96,20 +97,18 @@ export function useBuilderDnD() {
     handleDragEnd,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización con SSoT de Estado**: ((Implementada)) El hook ahora consume el store a través de la SSoT `useBuilderStore`, resolviendo el error de dependencia crítico y alineándose con la arquitectura de estado de élite.
+ * 1. **Sincronización de Datos de Plantilla**: ((Implementada)) La función `handleDragEnd` ahora extrae `initialProps` desde `active.data.current` y lo pasa a la acción `addBlock`. Esto permite que las plantillas arrastradas desde la galería se inicialicen con sus propiedades predefinidas.
  * 2. **Full Observabilidad**: ((Implementada)) Se han añadido logs de `trace` para `handleDragStart` y `handleDragEnd`, proporcionando visibilidad completa del ciclo de vida de D&D para una depuración más eficiente.
  * 3. **Cero Regresiones**: ((Implementada)) La lógica de negocio para diferenciar entre añadir desde la paleta y mover bloques existentes se ha preservado intacta.
  *
  * @subsection Melhorias Futuras
  * 1. **Previsualización de Drop (`handleDragOver`)**: ((Vigente)) Implementar la lógica en `handleDragOver` para mostrar un "placeholder" visual en el canvas donde el bloque se insertará, mejorando la UX.
- * 2. **Restricciones de Drop**: ((Vigente)) Añadir lógica para prevenir que ciertos bloques se puedan soltar dentro de otros, si las reglas de negocio futuras lo requieren.
  *
  * =====================================================================
  */

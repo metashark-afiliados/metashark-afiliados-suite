@@ -14,19 +14,8 @@ import React from "react";
 
 import { EditableText } from "@/components/builder/ui/EditableText";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import { type LucideIconName } from "@/config/lucide-icon-names";
+import { type FeatureItem } from "@/lib/builder/types.d";
 import { clientLogger } from "@/lib/logging";
-
-/**
- * @public
- * @interface FeatureItem
- * @description Define el contrato de datos para una única característica.
- */
-export interface FeatureItem {
-  icon: LucideIconName;
-  title: string;
-  description: string;
-}
 
 /**
  * @public
@@ -147,11 +136,10 @@ export function Features1({
  * @subsection Melhorias Adicionadas
  * 1. **Componente de Plantilla Complejo**: ((Implementada)) Este aparato es el primer bloque que gestiona una estructura de datos compleja (un array de objetos), validando la robustez de la arquitectura de edición.
  * 2. **Lógica de Actualización Anidada**: ((Implementada)) La función `handleFeatureUpdate` es una implementación de élite que maneja la actualización inmutable de un array de objetos, una lógica fundamental para bloques dinámicos.
- * 3. **Edición en Vivo Completa**: ((Implementada)) Todos los elementos textuales son editables en vivo, proporcionando una experiencia de usuario superior.
  *
  * @subsection Melhorias Futuras
- * 1. **Selector de Iconos en Vivo**: ((Vigente)) El `DynamicIcon` es estático. Una mejora de élite sería convertirlo en un `EditableIcon` que, al hacer clic, abra un `Popover` con el `EmojiPicker` o un selector de iconos para cambiarlo en vivo.
- * 2. **Añadir/Eliminar/Reordenar Características**: ((Vigente)) Añadir controles en la UI de la plantilla o en el `SettingsPanel` para permitir al usuario añadir, eliminar o reordenar dinámicamente las tarjetas de características.
+ * 1. **Selector de Iconos en Vivo**: ((Vigente)) El `DynamicIcon` es estático. Una mejora de élite sería convertirlo en un `EditableIcon` que, al hacer clic, abra un `Popover` con un selector de iconos.
+ * 2. **Gestión Dinámica de Items**: ((Vigente)) Añadir controles en la UI (en el `SettingsPanel` o en la propia `Card`) para permitir al usuario añadir, eliminar y reordenar las tarjetas de características.
  *
  * =====================================================================
  */

@@ -2,11 +2,10 @@
 /**
  * @file PrimaryToolBar.tsx
  * @description Orquestador de UI para la barra de herramientas principal.
- *              Refactorizado para ser Full Internacionalizado, consumiendo
- *              etiquetas desde la capa de i18n.
+ *              Sincronizado para consumir la nueva clave de i18n `add_content`.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-24
+ * @version 3.1.0
+ * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -29,16 +28,8 @@ const primaryToolBarSelector = (state: BuilderState) => ({
   setActiveTool: state.setActiveTool,
 });
 
-/**
- * @public
- * @component PrimaryToolBar
- * @description Renderiza la barra de herramientas principal (primera columna) del constructor.
- * @returns {React.ReactElement}
- */
 export function PrimaryToolBar(): React.ReactElement {
-  // --- INICIO DE REFACTORIZACIÓN I18N ---
   const t = useTranslations("pages.BuilderPage.PrimaryToolBar");
-  // --- FIN DE REFACTORIZACIÓN I18N ---
   const { activeTool, setActiveTool } = useBuilderStore(
     primaryToolBarSelector,
     shallow
@@ -60,9 +51,7 @@ export function PrimaryToolBar(): React.ReactElement {
         <PrimaryToolBarButton
           key={tool.id}
           iconName={tool.iconName}
-          // --- INICIO DE REFACTORIZACIÓN I18N ---
           label={t(tool.i18nKey as any)}
-          // --- FIN DE REFACTORIZACIÓN I18N ---
           variant={activeTool === tool.id ? "active" : "default"}
           onClick={() => handleToolSelect(tool.id)}
           aria-pressed={activeTool === tool.id}
@@ -78,11 +67,7 @@ export function PrimaryToolBar(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Full Internacionalización**: ((Implementada)) El componente ahora consume `useTranslations` con el namespace correcto y pasa las etiquetas traducidas al `PrimaryToolBarButton`. La UI es ahora 100% traducible.
- * 2. **Cero Regresiones**: ((Implementada)) La lógica de estado y manejo de eventos no ha sido alterada, garantizando que no haya regresiones funcionales.
- *
- * @subsection Melhorias Futuras
- * 1. **Atajos de Teclado**: ((Vigente)) Implementar un `useEffect` que escuche eventos de teclado (ej. "D" para Diseño) para invocar `handleToolSelect` y cambiar rápidamente entre herramientas.
+ * 1. **Cero Regresiones**: ((Implementada)) El componente se mantiene funcionalmente idéntico, simplemente consumiendo las nuevas claves semánticas desde sus manifiestos actualizados.
  *
  * =====================================================================
  */

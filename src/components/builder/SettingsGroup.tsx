@@ -5,8 +5,11 @@
  *              es renderizar un grupo de campos de configuración, iterando sobre
  *              un objeto de definiciones y delegando el renderizado de cada campo
  *              individual al átomo `SettingsField`.
- * @author Raz Podestá
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import React from "react";
 
@@ -63,11 +66,11 @@ export function SettingsGroup({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Composición Atómica (LEGO)**: ((Implementada)) Este aparato es un ensamblador puro, cumpliendo la "Filosofía LEGO".
- * 2. **Full Observabilidad**: ((Implementada)) Incluye logging para trazar su renderizado.
+ * 1. **Composición Atómica (LEGO)**: ((Implementada)) Este aparato es un ensamblador puro que delega el trabajo pesado a `SettingsField`, cumpliendo la "Filosofía LEGO".
+ * 2. **Full Observabilidad**: ((Implementada)) Incluye logging para trazar su renderizado, proporcionando visibilidad sobre qué grupo de ajustes se está mostrando.
  *
  * @subsection Melhorias Futuras
- * 1. **Renderizado Condicional de Grupos**: ((Vigente)) Añadir una prop `title` opcional.
+ * 1. **Renderizado Condicional de Grupos**: ((Vigente)) Añadir una prop `title` opcional que, si se proporciona, renderice un `<h4 class="font-semibold">{title}</h4>` sobre el grupo de campos para una mejor organización visual.
  *
  * =====================================================================
  */

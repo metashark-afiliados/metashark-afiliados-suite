@@ -2,51 +2,40 @@
 /**
  * @file block-categories.config.ts
  * @description Manifiesto de Configuración Declarativo y SSoT para las categorías
- *              de bloques del constructor. Corregido para ser un módulo ES6.
+ *              de bloques del constructor. Sincronizado con la nueva visión
+ *              semántica para un constructor de landing pages profesional.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.1
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 import { type LucideIconName } from "@/config/lucide-icon-names";
 
-/**
- * @public
- * @typedef BlockCategoryId
- * @description Define los identificadores únicos para cada categoría de bloque.
- */
 export type BlockCategoryId =
-  | "layout"
-  | "content"
-  | "media"
-  | "forms"
+  | "templates"
+  | "headers"
+  | "heros"
+  | "features"
+  | "testimonials"
   | "footers";
 
-/**
- * @public
- * @interface BlockCategoryDefinition
- * @description Define el contrato de datos para una única categoría de bloques.
- */
 export interface BlockCategoryDefinition {
-  /** El identificador único de la categoría. */
   id: BlockCategoryId;
-  /** El nombre del icono de lucide-react a renderizar. */
   iconName: LucideIconName;
-  /** La clave para obtener el nombre traducido de la categoría. */
   i18nKey: string;
 }
 
-/**
- * @public
- * @constant BLOCK_CATEGORIES_CONFIG
- * @description La SSoT canónica que define todas las categorías de bloques disponibles.
- */
 export const BLOCK_CATEGORIES_CONFIG: BlockCategoryDefinition[] = [
-  { id: "layout", iconName: "PanelTop", i18nKey: "category_layout" },
-  { id: "content", iconName: "Pilcrow", i18nKey: "category_content" },
-  { id: "media", iconName: "Image", i18nKey: "category_media" },
-  { id: "forms", iconName: "Mail", i18nKey: "category_forms" },
+  {
+    id: "templates",
+    iconName: "LayoutTemplate",
+    i18nKey: "category_templates",
+  },
+  { id: "headers", iconName: "PanelTop", i18nKey: "category_headers" },
+  { id: "heros", iconName: "Image", i18nKey: "category_heros" },
+  { id: "features", iconName: "Sparkles", i18nKey: "category_features" },
+  { id: "testimonials", iconName: "Quote", i18nKey: "category_testimonials" },
   { id: "footers", iconName: "PanelBottom", i18nKey: "category_footers" },
 ];
 
@@ -56,7 +45,10 @@ export const BLOCK_CATEGORIES_CONFIG: BlockCategoryDefinition[] = [
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Integridad de Módulo**: ((Implementada)) Se han añadido las palabras clave `export`, convirtiendo el archivo en un módulo ES6 estándar. Esto resuelve el error de compilación `TS2306` en su origen.
+ * 1. **Sincronización Semántica**: ((Implementada)) El manifiesto ahora refleja la nueva estructura de categorías solicitada (`Templates`, `Headers`, `Heros`, etc.), sentando las bases para la nueva UX.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Carga desde Base de Datos**: ((Vigente)) Para una flexibilidad máxima, esta configuración podría ser cargada desde una tabla `block_categories` en la base de datos.
  *
  * =====================================================================
  */

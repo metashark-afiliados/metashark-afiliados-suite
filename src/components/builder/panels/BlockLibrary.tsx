@@ -20,24 +20,18 @@ import {
   BLOCK_CATEGORIES_CONFIG,
   type BlockCategoryId,
 } from "@/config/block-categories.config";
-// --- INICIO DE SINCRONIZACIÓN ---
 import { useTemplateGalleryStore } from "@/lib/hooks/useTemplateGalleryStore";
-// --- FIN DE SINCRONIZACIÓN ---
 import { logger } from "@/lib/logging";
 
 export function BlockLibrary(): React.ReactElement {
   const t = useTranslations("pages.BuilderPage.BlockLibrary");
-  // --- INICIO DE SINCRONIZACIÓN ---
   const openGallery = useTemplateGalleryStore((state) => state.open);
-  // --- FIN DE SINCRONIZACIÓN ---
 
   const handleCategoryClick = (categoryId: BlockCategoryId) => {
     logger.info(
       `[BlockLibrary] Categoría seleccionada: ${categoryId}. Abriendo galería de plantillas...`
     );
-    // --- INICIO DE SINCRONIZACIÓN ---
     openGallery(categoryId);
-    // --- FIN DE SINCRONIZACIÓN ---
   };
 
   return (
@@ -67,6 +61,9 @@ export function BlockLibrary(): React.ReactElement {
  *
  * @subsection Melhorias Adicionadas
  * 1. **Flujo de Usuario Conectado**: ((Implementada)) El `onClick` del botón de categoría ahora invoca la acción `open` del store, conectando la UI con la lógica de estado y completando el flujo de la "Galería de Plantillas".
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Estado Activo Visual**: ((Vigente)) El `BlockLibrary` podría suscribirse al `activeCategoryId` del store. El botón de la categoría actualmente abierta en el modal debería tener un estilo visual "activo" para proporcionar un feedback claro al usuario.
  *
  * =====================================================================
  */

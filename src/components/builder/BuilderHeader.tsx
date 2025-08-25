@@ -2,19 +2,18 @@
 /**
  * @file BuilderHeader.tsx
  * @description Orquestador de UI hiper-atómico para la cabecera del constructor.
- *              Su responsabilidad es ensamblar los componentes de navegación,
- *              controles y acciones, consumiendo el hook soberano `useBuilderHeader`
- *              para obtener el estado y los manejadores de eventos.
+ *              Sincronizado para consumir la API de historial completa del hook
+ *              `useBuilderHeader` y pasarla a los componentes de UI atómicos.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
  */
 "use client";
 
 import React from "react";
 
 import { useBuilderHeader } from "@/lib/hooks/use-builder-header";
-import { HeaderActions, HeaderControls, HeaderNavigation } from "./header";
 import { logger } from "@/lib/logging";
+import { HeaderActions, HeaderControls, HeaderNavigation } from "./header";
 
 /**
  * @public
@@ -41,6 +40,8 @@ export function BuilderHeader(): React.ReactElement {
   logger.trace("[BuilderHeader] Renderizando cabecera.", {
     isDirty,
     isLoading,
+    canUndo: !isUndoDisabled,
+    canRedo: !isRedoDisabled,
   });
 
   return (
@@ -69,13 +70,11 @@ export function BuilderHeader(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Estructural Fundamental**: ((Implementada)) Se ha creado la cabecera, una pieza central de la nueva UI del constructor.
- * 2. **Arquitectura "Hook, Ensamblador"**: ((Implementada)) Este componente es un ejemplo canónico de un ensamblador de UI puro que consume un hook soberano, adhiriéndose a la filosofía de desacoplamiento de élite.
- * 3. **Full Observabilidad**: ((Implementada)) Se ha añadido un log de `trace` para monitorear sus ciclos de renderizado.
+ * 1. **Conexión de Funcionalidad Completa**: ((Implementada)) El orquestador ahora pasa correctamente las funciones `undo`, `redo` y los estados `isUndoDisabled`/`isRedoDisabled` al componente `HeaderControls`, habilitando completamente la funcionalidad de historial en la UI.
+ * 2. **Observabilidad Mejorada**: ((Implementada)) El log de `trace` ha sido enriquecido para incluir el estado de `canUndo` y `canRedo`, proporcionando una visibilidad más granular del estado del historial en cada renderizado.
  *
  * @subsection Melhorias Futuras
- * 1. **Título de la Creación Editable**: ((Vigente)) El `HeaderNavigation` podría ser extendido para mostrar el `campaignConfig.name` y permitir la edición en línea, similar al `WorkspaceTrigger`.
- * 2. **Menú de "Publicar"**: ((Vigente)) El `HeaderActions` es el lugar canónico para añadir un botón "Publicar", que abriría un modal para crear una `Campaign` a partir de la `Creation` actual.
+ * 1. **Título de la Creación Editable**: ((Vigente)) El `HeaderNavigation` podría ser extendido para mostrar el `campaignConfig.name` y permitir la edición en línea.
  *
  * =====================================================================
  */
