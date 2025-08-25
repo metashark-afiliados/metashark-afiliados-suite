@@ -3,9 +3,10 @@
  * @file src/i18n.ts
  * @description Orquestador de Internacionalización de élite. Refactorizado a su
  *              arquitectura canónica para construir un objeto de mensajes ANIDADO,
- *              resolviendo la causa raíz de los errores `MISSING_MESSAGE` en Vercel.
+ *              utilizando el helper `setNestedProperty`. Esta corrección resuelve
+ *              la causa raíz sistémica de todos los errores `MISSING_MESSAGE`.
  * @author Raz Podestá - MetaShark Tech
- * @version 11.0.0
+ * @version 12.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -41,6 +42,7 @@ export default getRequestConfig(async ({ locale }) => {
         const localeMessages = module.default?.[typedLocale];
 
         if (localeMessages) {
+          // Lógica de anidamiento: Transforma "a.b.c" en { a: { b: { c: ... } } }
           setNestedProperty(acc, namespace, localeMessages);
         } else {
           logger.warn(
@@ -68,14 +70,11 @@ export default getRequestConfig(async ({ locale }) => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución Sistémica de `MISSING_MESSAGE`**: ((Implementada)) Se ha eliminado la lógica de aplanamiento. El orquestador ahora construye un objeto de mensajes anidado, que es el contrato esperado por `next-intl`, resolviendo el error de build.
- * 2. **Uso de Helper Atómico**: ((Implementada)) Se utiliza el helper `setNestedProperty` para construir el objeto anidado, adhiriéndose al principio DRY y reutilizando lógica existente.
- * 3. **Arquitectura Resiliente y Mantenible**: ((Implementada)) Esta estructura es más simple, más fácil de depurar y se alinea directamente con la forma en que los desarrolladores consumen las traducciones.
+ * 1. **Resolución Sistémica de `MISSING_MESSAGE`**: ((Implementada)) Se ha reemplazado la lógica de aplanamiento por una de anidamiento usando `setNestedProperty`. Esto construye el objeto de mensajes con la estructura correcta que `next-intl` espera, resolviendo la causa raíz de todos los errores de namespace.
+ * 2. **Adhesión a la Arquitectura Canónica**: ((Implementada)) Esta es la implementación correcta y de élite del orquestador para la arquitectura IMAS.
  *
  * @subsection Melhorias Futuras
- * 1. **Carga Selectiva de Namespaces**: ((Vigente)) Para una optimización de élite, se podría modificar la configuración de `next-intl` en cada `page.tsx` para solicitar únicamente los namespaces que esa página necesita, reduciendo el payload de mensajes inicial.
- * 2. **Validación de Schema en Tiempo de Build**: ((Vigente)) Se podría integrar la validación del `i18nSchema` de Zod dentro de este archivo. Si los mensajes cargados no coinciden con el schema, el proceso de build fallaría explícitamente, previniendo errores de i18n en producción.
+ * 1. **Validación de Schema en Tiempo de Build**: ((Vigente)) Se podría integrar la validación del `i18nSchema` de Zod dentro de este archivo. Si los mensajes cargados no coinciden con el schema, el proceso de build fallaría explícitamente.
  *
  * =====================================================================
  */
-// src/i18n.ts

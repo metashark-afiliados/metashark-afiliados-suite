@@ -4,7 +4,7 @@
  * @description Orquestador de UI soberano para el formulario de registro.
  *              Refactorizado a un estándar de élite para ser un componente de
  *              presentación más puro, recibiendo textos de OAuth vía props y
- *              resolviendo dependencias cruzadas de i18n.
+ *              resolviendo dependencias cruzadas de i18n que causaban errores de build.
  * @author Raz Podestá - MetaShark Tech
  * @version 4.0.0
  * @date 2025-08-25
@@ -103,7 +103,7 @@ export function SignupForm({ texts }: SignupFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(processSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(processSubmit)} className="space-y-4 p-6">
       <SignUpEmailField
         register={register}
         errors={errors}
@@ -126,7 +126,7 @@ export function SignupForm({ texts }: SignupFormProps) {
         isPending={isPending}
       />
       <SubmitButton />
-      <div className="relative my-4">
+      <div className="relative my-2">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
@@ -150,11 +150,11 @@ export function SignupForm({ texts }: SignupFormProps) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia Cruzada**: ((Implementada)) Se ha eliminado la llamada `useTranslations("app.[locale].login.page")`. El componente ahora es puro con respecto a los textos de OAuth, recibiéndolos a través de `props`. Esto resuelve la causa raíz del error `FORMATTING_ERROR`.
+ * 1. **Resolución de Dependencia Cruzada**: ((Implementada)) Se ha eliminado la llamada a `useTranslations("app.[locale].login.page")`. El componente ahora es puro con respecto a los textos de OAuth, recibiéndolos a través de `props`. Esto resuelve la causa raíz del error `FORMATTING_ERROR`.
  * 2. **Adhesión a la "Filosofía LEGO"**: ((Implementada)) Al no tener dependencias de i18n externas, este componente se convierte en una "pieza de LEGO" más robusta y reutilizable.
  *
  * @subsection Melhorias Futuras
- * 1. **Componente 100% Puro**: ((Vigente)) Para una pureza de élite, todas las llamadas a `useTranslations` (incluyendo `tErrors`) podrían ser eliminadas y sus textos requeridos pasados a través de `props`, convirtiéndolo en un componente de presentación 100% puro.
+ * 1. **Componente 100% Puro**: ((Vigente)) Para una pureza de élite, todas las llamadas a `useTranslations` (incluyendo `tErrors` y la del `SubmitButton`) podrían ser eliminadas y sus textos requeridos pasados a través de `props`.
  *
  * =====================================================================
  */

@@ -4,9 +4,9 @@
  * @description Componente de ensamblaje de UI. Refactorizado a un estándar de
  *              élite para ser un componente de presentación 100% puro, recibiendo
  *              todo su contenido textual a través de props y propagándolo a sus
- *              hijos (`OAuthButton`), cumpliendo con el Manifiesto IMAS.
+ *              hijos (`OAuthButton`), cumpliendo con el Manifiesto IMAS v3.0.
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
+ * @version 5.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil

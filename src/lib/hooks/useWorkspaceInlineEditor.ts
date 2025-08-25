@@ -1,12 +1,12 @@
 // src/lib/hooks/useWorkspaceInlineEditor.ts
 /**
  * @file useWorkspaceInlineEditor.ts
- * @description Hook Soberano que encapsula toda la lógica de estado para la
- *              edición en línea del nombre del workspace. Ha sido refactorizado
- *              a un estándar de élite para ser 100% agnóstico a la i18n,
- *              recibiendo sus textos de feedback como dependencias inyectadas.
+ * @description Hook Soberano de lógica pura para la edición en línea.
+ *              Ha sido refactorizado a un estándar de élite para ser 100% agnóstico
+ *              a la i18n, recibiendo textos de feedback como dependencias inyectadas,
+ *              cumpliendo con el Manifiesto IMAS v3.0.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 4.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil

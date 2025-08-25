@@ -132,7 +132,7 @@ export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
  * 3. **Consistencia Visual**: ((Implementada)) Se ha añadido el `padding` (`p-6`) que faltaba, alineando el formulario con el diseño de referencia.
  *
  * @subsection Melhorias Futuras
- * 1. **Mapeo de Errores Tipado**: ((Vigente)) La aserción `state.error as keyof LoginFormTexts` podría ser eliminada si el `ActionResult` se tipara con un `enum` de las claves de error válidas, proporcionando una seguridad de tipos aún mayor.
+ * 1. **Mapeo de Errores Tipado**: ((Vigente)) La aserción `state.error as keyof LoginFormTexts` podría ser eliminada si el `ActionResult` se tipara con un `enum` de las claves de error válidas.
  *
  * =====================================================================
  */

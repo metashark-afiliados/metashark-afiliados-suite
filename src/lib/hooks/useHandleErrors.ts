@@ -1,11 +1,10 @@
 // src/lib/hooks/useHandleErrors.ts
 /**
  * @file useHandleErrors.ts
- * @description Hook Soberano que encapsula la lógica de manejo de errores del lado del cliente.
- *              Este aparato centraliza el feedback al usuario mediante `toast` y el registro
- *              persistente en el servidor mediante `createPersistentErrorLog`.
- *              Ha sido refactorizado para utilizar el namespace de i18n canónico,
- *              resolviendo un error crítico de build `MISSING_MESSAGE`.
+ * @description Hook Soberano que encapsula la lógica de manejo de errores del cliente.
+ *              Ha sido refactorizado a un estándar de élite para ser 100% agnóstico
+ *              a la i18n, recibiendo la función de traducción como una dependencia
+ *              inyectada, cumpliendo con el Manifiesto IMAS v3.0.
  * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  * @date 2025-08-25
@@ -16,12 +15,16 @@
 
 import { useCallback } from "react";
 import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
+import { type useTranslations } from "next-intl";
 import { ZodError } from "zod";
 
 import { createPersistentErrorLog } from "@/lib/actions/_helpers/error-log.helper";
 import { clientLogger } from "@/lib/logging";
 import { isActionError } from "@/lib/validators";
+
+interface UseHandleErrorsProps {
+  tValidationErrors: ReturnType<typeof useTranslations>;
+}
 
 /**
  * @public
@@ -29,13 +32,12 @@ import { isActionError } from "@/lib/validators";
  * @description Hook para centralizar el manejo de errores en componentes de cliente.
  *              Proporciona una función `handleError` que interpreta el tipo de error,
  *              muestra un `toast` amigable al usuario y registra el error de forma
- *              persistente en la base de datos a través de una Server Action.
+ *              persistente en la base de datos.
+ * @param {UseHandleErrorsProps} props - Dependencias del hook, incluyendo la función de traducción.
  * @returns {{ handleError: (error: unknown, context?: Record<string, any>) => Promise<void> }}
  *          Un objeto que contiene la función para manejar errores.
  */
-export function useHandleErrors() {
-  const tValidationErrors = useTranslations("shared.ValidationErrors");
-
+export function useHandleErrors({ tValidationErrors }: UseHandleErrorsProps) {
   const handleError = useCallback(
     async (error: unknown, context?: Record<string, any>) => {
       let userMessageKey: string;
@@ -124,12 +126,11 @@ export function useHandleErrors() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es la corrección de élite que resuelve la causa raíz del error de build `MISSING_MESSAGE`, alineando el hook con la arquitectura IMAS y los schemas de Zod.
+ * 1. **Pureza de Lógica (Agnóstico a i18n)**: ((Implementada)) Se ha eliminado la llamada a `useTranslations`. El hook ahora es una pieza de lógica pura que recibe su dependencia de traducción, cumpliendo el principio de Inyección de Dependencia Textual del Manifiesto IMAS.
+ * 2. **Resolución Preventiva de `MISSING_MESSAGE`**: ((Implementada)) Al no cargar su propio namespace, este hook ya no puede ser la fuente del error. La responsabilidad se transfiere correctamente al hook orquestador que lo consume.
  *
  * @subsection Melhorias Futuras
- * 1. **Contexto de Usuario en Logs**: ((Vigente)) El `handleError` podría mejorarse para obtener el `userId` y el `locale` del `DashboardContext` y pasarlos a `createPersistentErrorLog` como metadatos, enriqueciendo los logs del backend.
- * 2. **Tipado Estricto de Claves de Error**: ((Vigente)) El tipo `error` en `ActionResult` es actualmente `string`. Podría refinarse para ser `keyof typeof ValidationErrorsSchema` o un `z.enum` de todas las claves de error de i18n válidas, permitiendo una comprobación más estricta.
- * 3. **Botón de Acción en Toast**: ((Vigente)) Para ciertos errores (ej. "Error de red"), el `toast` podría incluir un botón "Reintentar" o "Contactar Soporte", que ejecute un callback pasado al `handleError`.
+ * 1. **Contexto de Usuario en Logs**: ((Vigente)) El `handleError` podría ser mejorado para obtener el `userId` y el `locale` del `DashboardContext` y pasarlos a `createPersistentErrorLog`.
  *
  * =====================================================================
  */
