@@ -1,54 +1,21 @@
+// src/i18n.ts
 /**
  * @file src/i18n.ts
- * @description Orquestador de Internacionalización de élite. Ha sido refactorizado
- *              a su arquitectura canónica definitiva. Ahora construye un objeto de
- *              mensajes **aplanado**, que es el patrón más robusto y performante
- *              para `next-intl`. Esta refactorización resuelve la causa raíz de la
- *              cascada de errores `MISSING_MESSAGE` en el entorno de build de Vercel.
- * @author Raz Podestá - MetaShark Tech
- * @version 10.0.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Orquestador de Internacionalización. Ha sido refactorizado
+ *              para eliminar la dependencia de `lodash`, haciéndolo compatible
+ *              con el Edge Runtime y resolviendo el error de build.
+ * @author Raz Podestá
+ * @version 8.1.0
  */
 import { getRequestConfig } from "next-intl/server";
 import { notFound } from "next/navigation";
 
+import { setNestedProperty } from "@/lib/helpers/set-nested-property.helper";
 import { logger } from "@/lib/logging";
 import { type AppLocale, locales } from "@/lib/navigation";
 import { messagesManifest } from "@/messages/manifest";
 
 export const defaultLocale: AppLocale = "es-ES";
-
-/**
- * @private
- * @function flattenMessages
- * @description Función pura que toma un objeto de mensajes anidado y lo aplana,
- *              convirtiendo rutas anidadas en claves con notación de punto.
- * @param {Record<string, any>} nestedMessages - El objeto de mensajes anidado.
- * @param {string} [prefix=""] - Prefijo para la recursión.
- * @returns {Record<string, string>} El objeto de mensajes aplanado.
- */
-const flattenMessages = (
-  nestedMessages: Record<string, any>,
-  prefix = ""
-): Record<string, string> => {
-  return Object.keys(nestedMessages).reduce(
-    (messages, key) => {
-      const value = nestedMessages[key];
-      const newKey = prefix ? `${prefix}.${key}` : key;
-
-      if (typeof value === "string") {
-        messages[newKey] = value;
-      } else if (typeof value === "object" && value !== null) {
-        Object.assign(messages, flattenMessages(value, newKey));
-      }
-
-      return messages;
-    },
-    {} as Record<string, string>
-  );
-};
 
 export default getRequestConfig(async ({ locale }) => {
   const typedLocale = locale as AppLocale;
@@ -65,17 +32,13 @@ export default getRequestConfig(async ({ locale }) => {
     const modulePromises = namespaces.map((ns) => messagesManifest[ns]());
     const modules = await Promise.all(modulePromises);
 
-    // --- INICIO DE REFACTORIZACIÓN ARQUITECTÓNICA: APLANAMIENTO DE MENSAJES ---
     const messages = modules.reduce(
       (acc, module, index) => {
         const namespace = namespaces[index];
         const localeMessages = module.default?.[typedLocale];
 
         if (localeMessages) {
-          // Aplanar el objeto del namespace y fusionarlo en el acumulador.
-          // Ej: { "title": "..." } en el namespace "components.layout.DashboardSidebar"
-          // se convierte en { "components.layout.DashboardSidebar.title": "..." }
-          Object.assign(acc, flattenMessages(localeMessages, namespace));
+          setNestedProperty(acc, namespace, localeMessages);
         } else {
           logger.warn(
             `[I18N] Faltan traducciones para el namespace '${namespace}' en el locale '${typedLocale}'.`
@@ -83,9 +46,8 @@ export default getRequestConfig(async ({ locale }) => {
         }
         return acc;
       },
-      {} as Record<string, string>
+      {} as Record<string, any>
     );
-    // --- FIN DE REFACTORIZACIÓN ARQUITECTÓNICA ---
 
     return { messages };
   } catch (error) {
@@ -103,11 +65,12 @@ export default getRequestConfig(async ({ locale }) => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución Sistémica de `MISSING_MESSAGE`**: ((Implementada)) La transición a un objeto de mensajes aplanado es la solución arquitectónica definitiva para los errores de `next-intl` en Vercel. Elimina cualquier ambigüedad en la resolución de claves anidadas durante la generación estática y en el cliente.
- * 2. **Cohesión de Código**: ((Implementada)) La lógica de aplanamiento se ha encapsulado en una función helper pura y atómica `flattenMessages` dentro del mismo módulo, mejorando la legibilidad.
+ * 1. **Resolución de Incompatibilidad de Runtime**: ((Implementada)) Se ha reemplazado `lodash.set` por el nuevo helper nativo `setNestedProperty`, eliminando la dependencia que causaba el fallo de build en el Edge Runtime.
+ * 2. **Reducción de Dependencias**: ((Implementada)) Se ha eliminado una dependencia externa (`lodash`), lo que reduce el tamaño del bundle y la superficie de posibles vulnerabilidades.
  *
  * @subsection Melhorias Futuras
- * 1. **Optimización de Carga**: ((Vigente)) Para aplicaciones a gran escala, se podría implementar una estrategia donde solo se carguen los namespaces necesarios para la página actual, en lugar de todos. Esto requeriría una configuración más granular en cada `page.tsx`.
+ * 1. **Manejo de Errores Granular**: ((Vigente)) En un entorno de producción a gran escala, si un solo archivo de mensajes falla al cargar, el sistema podría continuar con los mensajes cargados exitosamente en lugar de devolver un objeto vacío, aumentando la resiliencia.
  *
  * =====================================================================
  */
+// src/i18n.ts
