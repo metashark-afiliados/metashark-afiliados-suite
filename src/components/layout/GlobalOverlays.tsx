@@ -49,10 +49,8 @@ export function GlobalOverlays() {
       <CommandPalette />
       <TemplateGalleryModal />
 
-      {/* --- INICIO DE IMPLEMENTACIÓN DE ONBOARDING IMPLÍCITO --- */}
       {/* Flujo de Onboarding (Renderizado Condicional) */}
       {profile && !profile.has_completed_onboarding && <WelcomeModal />}
-      {/* --- FIN DE IMPLEMENTACIÓN DE ONBOARDING IMPLÍCITO --- */}
     </>
   );
 }
@@ -63,12 +61,12 @@ export function GlobalOverlays() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Implementación de Onboarding Implícito**: ((Implementada)) El componente ahora renderiza el `WelcomeModal` condicionalmente, completando la implementación del flujo de onboarding y la arquitectura v8.1.
- * 2. **Desacoplamiento de Lógica**: ((Implementada)) La lógica de renderizado condicional reside en este orquestador, manteniendo los componentes `DashboardLayout` (servidor) y `WelcomeModal` (cliente) puros y desacoplados.
+ * 1. ((Implementada)) Implementación de Onboarding Implícito: El componente ahora renderiza el `WelcomeModal` condicionalmente, completando la implementación del flujo de onboarding y la arquitectura v8.1.
+ * 2. ((Implementada)) Desacoplamiento de Lógica: La lógica de renderizado condicional reside en este orquestador, manteniendo los componentes `DashboardLayout` (servidor) y `WelcomeModal` (cliente) puros y desacoplados.
+ * 3. ((Implementada)) Componente Puro y Sin Estado: El componente no utiliza `useState`, su renderizado es una función pura de los datos del contexto, lo que lo hace predecible y performante.
  *
  * @subsection Melhorias Futuras
- * 1. **Renderizado Condicional por Ruta**: ((Vigente)) Para una optimización de élite, se podría usar el hook `usePathname` para renderizar ciertos overlays (como el `TemplateGalleryModal`) solo en las rutas donde son necesarios.
+ * 1. ((Vigente)) Renderizado Condicional por Ruta: Para una optimización de élite, se podría usar el hook `usePathname` para renderizar ciertos overlays (como el `TemplateGalleryModal`) solo en las rutas donde son necesarios, reduciendo la huella de componentes en páginas irrelevantes.
  *
  * =====================================================================
  */
-// src/components/layout/GlobalOverlays.tsx

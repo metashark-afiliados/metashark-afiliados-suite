@@ -1,8 +1,9 @@
 // src/components/layout/sidebar/UserProfileWidget.tsx
 /**
  * @file UserProfileWidget.tsx
- * @description Aparato de UI atómico y puro. Renderiza el perfil del usuario
- *              de forma flotante y es 100% agnóstico a la lógica de i18n.
+ * @description Aparato de UI atómico y de presentación puro. Renderiza el perfil del usuario
+ *              de forma flotante y es 100% agnóstico a la lógica de i18n, recibiendo
+ *              la función `t` como una dependencia inyectada.
  * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  * @date 2025-08-25
@@ -79,12 +80,12 @@ export function UserProfileWidget({ t }: UserProfileWidgetProps) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación (TS2322)**: ((Implementada)) El componente ahora acepta la prop `t`, sincronizando su contrato con el de su padre (`PrimarySidebar`) y resolviendo el error de compilación.
- * 2. **Componente de Presentación Puro**: ((Implementada)) Se ha eliminado la llamada interna a `useTranslations`. El componente ahora es completamente agnóstico al contenido, lo que mejora su reutilización y testabilidad.
+ * 1. ((Implementada)) Componente de Presentación Puro: Se ha eliminado la llamada interna a `useTranslations`. El componente ahora es 100% agnóstico al contenido, lo que mejora su reutilización y testabilidad.
+ * 2. ((Implementada)) Resolución de Error de Compilación (TS2322): Al aceptar la prop `t`, se sincroniza el contrato con su padre (`PrimarySidebar`) y se resuelve el error de tipo.
+ * 3. ((Implementada)) Experiencia de Usuario de Élite: La integración con `framer-motion` proporciona una animación de entrada/salida fluida, alineándose con la estética del "Workspace Creativo".
  *
  * @subsection Melhorias Futuras
- * 1. **Acciones Rápidas**: ((Vigente)) Se podría añadir un menú contextual (`DropdownMenu`) al hacer clic en el widget para acciones rápidas como "Ver Perfil" o "Cerrar Sesión", recibiendo los textos y callbacks como props.
+ * 1. ((Vigente)) Acciones Rápidas: Se podría añadir un menú contextual (`DropdownMenu`) al hacer clic en el widget para acciones rápidas como "Ver Perfil" o "Cerrar Sesión", recibiendo los textos y callbacks como props.
  *
  * =====================================================================
  */
-// src/components/layout/sidebar/UserProfileWidget.tsx

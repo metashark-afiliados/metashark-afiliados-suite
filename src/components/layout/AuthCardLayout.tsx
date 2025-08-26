@@ -72,14 +72,16 @@ export function AuthCardLayout({
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Abstracción de Layout (DRY): Este nuevo aparato encapsula la lógica de layout que será repetida en las páginas de `login` y `signup`, eliminando la duplicación de código y estableciendo una SSoT visual.
+ * 1. ((Implementada)) Abstracción de Layout (DRY): Este aparato encapsula la lógica de layout que es repetida en las páginas de `login` y `signup`, eliminando la duplicación de código y estableciendo una SSoT visual.
  * 2. ((Implementada)) Layout de Élite Centrado: Utiliza Flexbox para garantizar un centrado vertical y horizontal perfecto, proporcionando una base visual robusta y profesional.
+ * 3. ((Implementada)) Documentación TSDoc Perfeccionada: Se ha enriquecido la documentación para reflejar su rol canónico en la arquitectura.
  *
  * @subsection Melhorias Futuras
  * 1. ((Vigente)) El componente podría ser extendido para aceptar una prop `variant` que modifique sutilmente la apariencia de la tarjeta para diferentes contextos (ej. `variant="compact"` para un modal).
