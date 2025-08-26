@@ -3,8 +3,11 @@
  * @file login-gradient.tsx
  * @description Componente de UI atómico y de presentación puro. Renderiza las capas
  *              de fondo (gradiente, grano, rejilla) para la página de autenticación.
- * @author Raz Podestá (adaptado de paddle-nextjs-starter-kit)
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 export function LoginGradient() {
   return (
@@ -34,10 +37,10 @@ export function LoginGradient() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Visual Atómico**: ((Implementada)) Aísla la lógica de renderizado del fondo, manteniendo la página `LoginPage` más limpia y enfocada en el layout.
+ * 1. ((Implementada)) Componente visual atómico que aísla la lógica de renderizado del fondo, manteniendo la página de autenticación más limpia.
  *
  * @subsection Melhorias Futuras
- * 1. **Props de Configuración**: ((Vigente)) El componente podría aceptar props para controlar la opacidad o la intensidad de los efectos, permitiendo su reutilización en otros contextos con diferentes estéticas.
+ * 1. ((Vigente)) El componente podría aceptar props para controlar la opacidad o la intensidad de los efectos, permitiendo su reutilización.
  *
  * =====================================================================
  */

@@ -73,11 +73,11 @@ export function SignUpConfirmPasswordField({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para los mensajes de error, apuntando al namespace canónico `"shared.ValidationErrors"`. Esto resuelve la causa raíz del error de build para este componente.
- * 2. **Feedback Visual de Error**: ((Implementada)) Se ha añadido la prop `hasError={!!errors.confirmPassword}` al componente `Input`, integrándolo con el sistema de estilos de validación de élite.
+ * 1. ((Implementada)) Componente Atómico de Confirmación: Aísla la lógica y presentación del campo de confirmación, mejorando la modularidad del formulario.
+ * 2. ((Implementada)) Prevención de Pegado: La inclusión de `onPaste={(e) => e.preventDefault()}` es una mejora de UX deliberada para reducir errores de usuario.
  *
  * @subsection Melhorias Futuras
- * 1. **Feedback Visual en Tiempo Real**: ((Vigente)) Se podría añadir un icono de estado que se vuelva verde cuando el valor de este campo coincida con el campo de contraseña, proporcionando un feedback de UX instantáneo.
+ * 1. ((Vigente)) Se podría añadir un feedback visual en tiempo real (ej. un icono de check) que aparezca cuando el valor de este campo coincida con el del campo de contraseña.
  *
  * =====================================================================
  */

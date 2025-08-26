@@ -76,11 +76,11 @@ export function SignUpPasswordField({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para los mensajes de error, apuntando al namespace canónico `"shared.ValidationErrors"`. Esto resuelve la causa raíz del error de build para este componente.
- * 2. **Feedback Visual de Error**: ((Implementada)) Se ha añadido la prop `hasError={!!errors.password}` al componente `Input`, integrándolo con el sistema de estilos de validación de élite.
+ * 1. ((Implementada)) Composición Atómica: Este componente compone el `PasswordStrengthMeter`, demostrando el patrón de ensamblaje de la "Filosofía LEGO" a un nivel granular.
+ * 2. ((Implementada)) Componente de Presentación Controlado: Es completamente controlado por su padre a través de props, recibiendo el `passwordValue` para pasarlo al medidor de fortaleza.
  *
  * @subsection Melhorias Futuras
- * 1. **Toggle de Visibilidad**: ((Vigente)) Añadir un icono de "ojo" dentro del `Input` que permita al usuario alternar la visibilidad de la contraseña, una mejora de UX estándar en la industria.
+ * 1. ((Vigente)) Añadir un icono de "ojo" dentro del `Input` que permita al usuario alternar la visibilidad de la contraseña, una mejora de UX estándar en la industria.
  *
  * =====================================================================
  */

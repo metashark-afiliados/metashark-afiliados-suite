@@ -78,13 +78,12 @@ export function AuthCardLayout({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Abstracción de Layout (DRY)**: ((Implementada)) Este nuevo aparato encapsula la lógica de layout que será repetida en las páginas de `login` y `signup`, eliminando la duplicación de código y estableciendo una SSoT visual.
- * 2. **Layout de Élite Centrado**: ((Implementada)) Utiliza Flexbox para garantizar un centrado vertical y horizontal perfecto, proporcionando una base visual robusta y profesional.
+ * 1. ((Implementada)) Abstracción de Layout (DRY): Este nuevo aparato encapsula la lógica de layout que será repetida en las páginas de `login` y `signup`, eliminando la duplicación de código y estableciendo una SSoT visual.
+ * 2. ((Implementada)) Layout de Élite Centrado: Utiliza Flexbox para garantizar un centrado vertical y horizontal perfecto, proporcionando una base visual robusta y profesional.
  *
  * @subsection Melhorias Futuras
- * 1. **Variantes de Tarjeta**: ((Vigente)) El componente podría ser extendido para aceptar una prop `variant` que modifique sutilmente la apariencia de la tarjeta para diferentes contextos (ej. `variant="compact"` para un modal).
- * 2. **Animación de Entrada**: ((Vigente)) Envolver la tarjeta en `motion.div` de `framer-motion` para añadir una animación de entrada sutil, mejorando la experiencia de usuario.
+ * 1. ((Vigente)) El componente podría ser extendido para aceptar una prop `variant` que modifique sutilmente la apariencia de la tarjeta para diferentes contextos (ej. `variant="compact"` para un modal).
+ * 2. ((Vigente)) Envolver la tarjeta en `motion.div` de `framer-motion` para añadir una animación de entrada sutil, mejorando la experiencia de usuario.
  *
  * =====================================================================
  */
-// src/components/layout/AuthCardLayout.tsx

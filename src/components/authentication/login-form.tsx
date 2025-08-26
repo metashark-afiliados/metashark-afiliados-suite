@@ -127,12 +127,12 @@ export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Presentación Puro**: ((Implementada)) Se ha eliminado `useTranslations`. El componente ahora es 100% agnóstico al contenido y es controlado por su padre (`login/page.tsx`), cumpliendo la "Filosofía LEGO".
- * 2. **Inyección de Dependencia Textual (IDT)**: ((Implementada)) El componente ahora construye el objeto de `props` para `OAuthButtonGroup` y se lo inyecta, cumpliendo con el Manifiesto IMAS.
- * 3. **Consistencia Visual**: ((Implementada)) Se ha añadido el `padding` (`p-6`) que faltaba, alineando el formulario con el diseño de referencia.
+ * 1. ((Implementada)) Componente de Presentación Puro: Se ha eliminado `useTranslations`. El componente ahora es 100% agnóstico al contenido y es controlado por su padre (`login/page.tsx`), cumpliendo la "Filosofía LEGO".
+ * 2. ((Implementada)) Inyección de Dependencia Textual (IDT): El componente ahora construye el objeto de `props` para `OAuthButtonGroup` y se lo inyecta, cumpliendo con el Manifiesto IMAS.
+ * 3. ((Implementada)) Consistencia Visual: Se ha añadido el `padding` (`p-6`) que faltaba, alineando el formulario con el diseño de referencia.
  *
  * @subsection Melhorias Futuras
- * 1. **Mapeo de Errores Tipado**: ((Vigente)) La aserción `state.error as keyof LoginFormTexts` podría ser eliminada si el `ActionResult` se tipara con un `enum` de las claves de error válidas.
+ * 1. ((Vigente)) La aserción `state.error as keyof LoginFormTexts` podría ser eliminada si el `ActionResult` se tipara con un `enum` de las claves de error válidas.
  *
  * =====================================================================
  */

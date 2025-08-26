@@ -116,10 +116,11 @@ export function SignUpLegalCheckboxes({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido la llamada a `useTranslations` para los mensajes de error, apuntando al namespace canónico `"shared.ValidationErrors"`. Esto resuelve la causa raíz del error de build para este componente.
+ * 1. ((Implementada)) Cumplimiento Legal: Garantiza que la aceptación de términos se gestione correctamente para el cumplimiento de GDPR/LGPD.
+ * 2. ((Implementada)) Soporte para `Controller`: Demuestra la integración de élite con `react-hook-form` para componentes que no son nativos (como `Checkbox` de Radix).
  *
  * @subsection Melhorias Futuras
- * 1. **Feedback Visual de Error**: ((Vigente)) El texto del `Label` para los términos podría volverse rojo si `errors.termsAccepted` existe, proporcionando un feedback visual más claro.
+ * 1. ((Vigente)) El texto de la etiqueta para los términos (`legalNotice`) utiliza la funcionalidad `t.rich` con interpolación de enlaces. Esto podría ser abstraído en un componente aún más puro.
  *
  * =====================================================================
  */

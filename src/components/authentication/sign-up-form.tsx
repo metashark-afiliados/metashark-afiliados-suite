@@ -150,11 +150,12 @@ export function SignupForm({ texts }: SignupFormProps) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia Cruzada**: ((Implementada)) Se ha eliminado la llamada a `useTranslations("app.[locale].login.page")`. El componente ahora es puro con respecto a los textos de OAuth, recibiéndolos a través de `props`. Esto resuelve la causa raíz del error `FORMATTING_ERROR`.
- * 2. **Adhesión a la "Filosofía LEGO"**: ((Implementada)) Al no tener dependencias de i18n externas, este componente se convierte en una "pieza de LEGO" más robusta y reutilizable.
+ * 1. ((Implementada)) Arquitectura de Orquestador Atómico: El componente ahora ensambla los campos atómicos, cumpliendo perfectamente con la "Filosofía LEGO".
+ * 2. ((Implementada)) Resolución de Dependencia Cruzada: Al recibir los textos de OAuth vía `props`, se elimina la dependencia cruzada de namespaces que causaba el `FORMATTING_ERROR`.
+ * 3. ((Implementada)) Formulario Soberano: La integración con `react-hook-form`, `zodResolver` y `useFormState` representa una implementación de élite para la gestión de formularios en React.
  *
  * @subsection Melhorias Futuras
- * 1. **Componente 100% Puro**: ((Vigente)) Para una pureza de élite, todas las llamadas a `useTranslations` (incluyendo `tErrors` y la del `SubmitButton`) podrían ser eliminadas y sus textos requeridos pasados a través de `props`.
+ * 1. ((Vigente)) Para una pureza de élite, todas las llamadas a `useTranslations` (incluyendo `tErrors` y la del `SubmitButton`) podrían ser eliminadas y sus textos requeridos pasados a través de `props` desde la página orquestadora.
  *
  * =====================================================================
  */

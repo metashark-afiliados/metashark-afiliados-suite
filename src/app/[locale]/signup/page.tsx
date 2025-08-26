@@ -56,11 +56,11 @@ export default function SignupPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la dependencia del namespace de `login`. El componente ahora es 100% autocontenido y provee las props de texto correctas a `SignupForm`, resolviendo los errores de Vercel.
- * 2. **Autonomía de Módulo (Filosofía LEGO)**: ((Implementada)) El componente ahora cumple estrictamente con la arquitectura IMAS, mejorando la modularidad y mantenibilidad.
+ * 1. ((Implementada)) Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`: Se ha eliminado la dependencia del namespace de `login`. El componente ahora es 100% autocontenido y provee las props de texto correctas a `SignupForm`, resolviendo los errores de Vercel.
+ * 2. ((Implementada)) Autonomía de Módulo (Filosofía LEGO): El componente ahora cumple estrictamente con la arquitectura IMAS, mejorando la modularidad y mantenibilidad.
  *
  * @subsection Melhorias Futuras
- * 1. **Componente `AuthPageLayout`**: ((Vigente)) La lógica de `bottomLink` es similar entre `LoginPage` y `SignupPage`. Podría ser abstraída a un componente `AuthPageLayout` que reciba el `children` (el formulario) y las props para el enlace inferior.
+ * 1. ((Vigente)) El patrón de `AuthCardLayout` y `bottomLink` es similar entre `LoginPage` y `SignupPage`. Podría ser abstraído a un componente `AuthPageLayout` que reciba el `children` (el formulario) y las props para el enlace inferior.
  *
  * =====================================================================
  */

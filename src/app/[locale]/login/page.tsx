@@ -61,11 +61,12 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`**: ((Implementada)) Se ha eliminado la dependencia cruzada con el namespace de `signup`, y ahora se carga el namespace soberano que contiene todas las claves necesarias, resolviendo los errores de Vercel.
- * 2. **Autonomía de Módulo (Filosofía LEGO)**: ((Implementada)) El componente ahora depende exclusivamente de su propio namespace de i18n, adhiriéndose estrictamente al Manifiesto IMAS y convirtiéndose en una "pieza de LEGO" 100% autocontenida.
+ * 1. ((Implementada)) Orquestador de UI Puro: Este componente ahora solo se encarga de la composición y la carga de datos de i18n, delegando la presentación a sus hijos.
+ * 2. ((Implementada)) Soberanía de Namespace: Carga su propio namespace (`app.[locale].login.page`), eliminando dependencias cruzadas y resolviendo la causa raíz de los errores de i18n.
+ * 3. ((Implementada)) Inyección de Dependencia Textual (IDT): Pasa el objeto `texts` al `LoginForm`, convirtiéndolo en un componente puro y reutilizable.
  *
  * @subsection Melhorias Futuras
- * 1. **Componente de Formulario 100% Puro**: ((Vigente)) Para una pureza de élite, el componente `LoginForm` podría ser refactorizado para recibir todos sus textos de error como props.
+ * 1. ((Vigente)) El patrón de `AuthCardLayout` y `bottomLink` se repetirá en la página de registro. Se podría abstraer a un componente `AuthPageLayout` para un mayor cumplimiento del principio DRY.
  *
  * =====================================================================
  */

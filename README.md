@@ -86,7 +86,7 @@ Nuestra visión de producto está respaldada por una arquitectura de software de
 -                           MEJORA CONTINUA
 - =====================================================================
 -
-- @subsection Melhorias Adicionadas
+- @subsection Melhorias
 - 1.  **Transformación a README**: ((Implementada)) El documento ha sido completamente reescrito para servir como el `README.md` principal del proyecto, proporcionando una guía de inicio clara para los desarrolladores.
 - 2.  **Sincronización Completa**: ((Implementada)) Refleja la marca "ConvertiKit", la filosofía "Remote-First" y la lista de scripts de `package.json` actualizada.
 -
