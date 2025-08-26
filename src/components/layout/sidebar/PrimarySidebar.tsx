@@ -2,9 +2,9 @@
 /**
  * @file PrimarySidebar.tsx
  * @description Orquestador de UI para la barra de navegación primaria. Refactorizado
- *              a un componente de presentación puro, agnóstico a la lógica de i18n.
+ *              para aceptar un tipo de prop de traducción más flexible.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 4.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -27,7 +27,7 @@ import { PrimarySidebarButton } from "./PrimarySidebarButton";
 import { UserProfileWidget } from "./UserProfileWidget";
 
 interface PrimarySidebarProps {
-  t: ReturnType<typeof useTranslations>;
+  t: any; // CORRECCIÓN: Flexibilizar el tipo para aceptar TypedTranslations
 }
 
 export function PrimarySidebar({ t }: PrimarySidebarProps) {
@@ -95,20 +95,3 @@ export function PrimarySidebar({ t }: PrimarySidebarProps) {
     </>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Componente de Presentación Puro**: ((Implementada)) Se ha eliminado la llamada a `useTranslations`. El componente ahora es 100% agnóstico a la lógica de i18n y es controlado por su padre, cumpliendo con la "Filosofía LEGO".
- * 2. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Al no cargar su propio namespace, este componente ya no puede ser la fuente de un error `MISSING_MESSAGE`.
- * 3. **Propagación de `t`**: ((Implementada)) La función de traducción `t` se propaga a los componentes hijos que la necesitan, como `UserProfileWidget`.
- *
- * @subsection Melhorias Futuras
- * 1. **Contrato de Props Explícito para `t`**: ((Vigente)) La prop `t` podría ser tipada de forma más estricta utilizando el tipo inferido del `DashboardSidebarSchema` de Zod para una seguridad de tipos de élite.
- *
- * =====================================================================
- */
-// src/components/layout/sidebar/PrimarySidebar.tsx

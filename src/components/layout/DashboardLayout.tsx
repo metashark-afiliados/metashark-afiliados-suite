@@ -58,18 +58,3 @@ export default function DashboardLayout({
     </div>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad de Componentes (SRP)**: ((Implementada)) La lógica de la cabecera ha sido extraída a su propio componente, haciendo que `DashboardLayout` sea un orquestador de layout más puro y simple.
- *
- * @subsection Melhorias Futuras
- * 1. **Persistencia del Estado del Layout**: ((Vigente)) El estado `isSidebarCollapsed` podría ser persistido en `localStorage` para que la preferencia del usuario se mantenga entre sesiones.
- *
- * =====================================================================
- */
-// src/components/layout/DashboardLayout.tsx

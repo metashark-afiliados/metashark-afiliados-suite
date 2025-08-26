@@ -1,16 +1,16 @@
 // src/components/workspaces/WorkspaceSwitcher.tsx
 /**
  * @file WorkspaceSwitcher.tsx
- * @description Orquestador de UI soberano. Sincronizado para importar y componer
- *              el `WorkspacePopoverContent` externo y corregido.
+ * @description Orquestador de UI soberano. Sincronizado para consumir la nueva
+ *              API del hook `useWorkspaceInlineEditor` sin argumentos.
  * @author Raz Podestá - MetaShark Tech
- * @version 7.0.0
+ * @version 8.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 import React from "react";
-import { useTranslations } from "next-intl";
+import { type useTranslations } from "next-intl";
 
 import {
   Popover,
@@ -40,12 +40,11 @@ const WorkspaceSwitcherContent = ({
     handleWorkspaceSelect,
     ...actionHandlers
   } = useWorkspaceManager();
-  const tErrors = useTranslations("shared.ValidationErrors");
 
-  const inlineEditorHook = useWorkspaceInlineEditor({
-    successToastText: t("edit_form.success_toast"),
-    errorToastTextFn: (errorKey: string) => tErrors(errorKey as any),
-  });
+  // --- INICIO DE CORRECCIÓN DE API ---
+  // El hook ahora es soberano y no requiere la inyección de dependencias de i18n.
+  const inlineEditorHook = useWorkspaceInlineEditor();
+  // --- FIN DE CORRECCIÓN DE API ---
 
   const triggerTexts = {
     ariaLabel: t("selectWorkspace_label"),
@@ -95,8 +94,11 @@ export function WorkspaceSwitcher({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución Definitiva de Error de Compilación**: ((Implementada)) La refactorización del `WorkspacePopoverContent` externo y la sincronización de su padre `WorkspaceSwitcher` resuelve el error `TS2741` en su causa raíz.
+ * 1. ((Implementada)) Resolución de Error de Compilación (TS2554): Se ha actualizado la llamada al hook `useWorkspaceInlineEditor` para que no reciba argumentos, sincronizándola con su nueva API soberana.
+ * 2. ((Implementada)) Cierre de Cadena de Refactorización: Esta corrección completa la cadena de refactorización iniciada en `useHandleErrors`, asegurando que toda la lógica de edición en línea sea coherente y funcional.
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) Memoización de Props de Textos: El objeto `triggerTexts` podría ser envuelto en `React.useMemo` para una optimización de micro-rendimiento, previniendo su recreación en cada renderizado.
  *
  * =====================================================================
  */
-// src/components/workspaces/WorkspaceSwitcher.tsx

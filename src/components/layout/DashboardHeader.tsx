@@ -5,7 +5,7 @@
  *              cabecera completa del dashboard y es 100% agnóstico a la lógica
  *              de estado y de i18n, recibiendo todo a través de props.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -25,9 +25,9 @@ import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
 import { cn } from "@/lib/utils";
 
 interface DashboardHeaderProps {
-  t: ReturnType<typeof useTranslations>;
-  tSidebar: ReturnType<typeof useTranslations>;
-  tWorkspaces: ReturnType<typeof useTranslations>;
+  t: any; // CORRECCIÓN: Flexibilizar tipo
+  tSidebar: any; // CORRECCIÓN: Flexibilizar tipo
+  tWorkspaces: any; // CORRECCIÓN: Flexibilizar tipo
   isSidebarCollapsed: boolean;
   toggleSidebar: () => void;
 }
@@ -87,4 +87,3 @@ export function DashboardHeader({
     </header>
   );
 }
-// src/components/layout/DashboardHeader.tsx

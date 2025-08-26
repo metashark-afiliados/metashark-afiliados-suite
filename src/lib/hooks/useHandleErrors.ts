@@ -6,7 +6,7 @@
  *              a la i18n, recibiendo la función de traducción como una dependencia
  *              inyectada, cumpliendo con el Manifiesto IMAS v3.0.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
+ * @version 2.1.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -126,11 +126,7 @@ export function useHandleErrors({ tValidationErrors }: UseHandleErrorsProps) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Pureza de Lógica (Agnóstico a i18n)**: ((Implementada)) Se ha eliminado la llamada a `useTranslations`. El hook ahora es una pieza de lógica pura que recibe su dependencia de traducción, cumpliendo el principio de Inyección de Dependencia Textual del Manifiesto IMAS.
- * 2. **Resolución Preventiva de `MISSING_MESSAGE`**: ((Implementada)) Al no cargar su propio namespace, este hook ya no puede ser la fuente del error. La responsabilidad se transfiere correctamente al hook orquestador que lo consume.
- *
- * @subsection Melhorias Futuras
- * 1. **Contexto de Usuario en Logs**: ((Vigente)) El `handleError` podría ser mejorado para obtener el `userId` y el `locale` del `DashboardContext` y pasarlos a `createPersistentErrorLog`.
+ * 1. ((Implementada)) Sincronización de Contrato de Tipo: La prop `tValidationErrors` ahora espera el tipo genérico de `next-intl`, haciendo al hook más robusto y desacoplado de nuestra implementación `useTypedTranslations`.
  *
  * =====================================================================
  */

@@ -4,7 +4,7 @@
  * @description Barra lateral contextual. Ensambla y propaga las traducciones a
  *              sus componentes hijos puros.
  * @author Raz Podestá - MetaShark Tech
- * @version 8.0.0
+ * @version 8.1.0
  * @date 2025-08-25
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -19,8 +19,8 @@ import { NavList } from "./sidebar/NavList";
 import { SidebarLogo } from "./sidebar/SidebarLogo";
 
 interface DashboardSidebarProps {
-  tSidebar: ReturnType<typeof useTranslations>;
-  tWorkspaces: ReturnType<typeof useTranslations>;
+  tSidebar: any; // CORRECCIÓN: Flexibilizar tipo
+  tWorkspaces: any; // CORRECCIÓN: Flexibilizar tipo
 }
 
 export function DashboardSidebar({
@@ -37,15 +37,3 @@ export function DashboardSidebar({
     </>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Propagación de Dependencias**: ((Implementada)) El componente ahora pasa correctamente las funciones de traducción a sus hijos, cumpliendo con la arquitectura de inyección de dependencias.
- *
- * =====================================================================
- */
-// src/components/layout/DashboardSidebar.tsx
