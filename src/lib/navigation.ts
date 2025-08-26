@@ -1,11 +1,11 @@
 // src/lib/navigation.ts
 /**
  * @file src/lib/navigation.ts
- * @description Manifiesto de Enrutamiento y SSoT. Sincronizado para incluir
- *              las nuevas rutas del "Workspace Creativo".
+ * @description Manifiesto de Enrutamiento y SSoT. Sincronizado para incluir la
+ *              ruta de la Galería de Iconos.
  * @author Raz Podestá - MetaShark Tech
- * @version 8.1.0
- * @date 2025-08-25
+ * @version 8.2.0
+ * @date 2025-08-26
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -30,14 +30,13 @@ export const pathnames = {
   "/contact": "/contact",
   "/cookies": "/cookies",
   "/dashboard": "/dashboard",
-  // --- INICIO DE SINCRONIZACIÓN DE RUTAS ---
   "/dashboard/projects": "/dashboard/projects",
   "/dashboard/templates": "/dashboard/templates",
   "/dashboard/brand": "/dashboard/brand",
-  // --- FIN DE SINCRONIZACIÓN DE RUTAS ---
   "/dashboard/settings": "/dashboard/settings",
   "/dashboard/sites": "/dashboard/sites",
   "/dashboard/sites/[siteId]/campaigns": "/dashboard/sites/[siteId]/campaigns",
+  "/dashboard/resources/icons": "/dashboard/resources/icons", // <-- RUTA AÑADIDA
   "/dev-console": "/dev-console",
   "/dev-console/campaigns": "/dev-console/campaigns",
   "/dev-console/logs": "/dev-console/logs",
@@ -65,7 +64,6 @@ export const { Link, redirect, usePathname, useRouter } =
   createLocalizedPathnamesNavigation({ locales, localePrefix, pathnames });
 
 type PathnameKeys = keyof typeof pathnames;
-
 export type Route =
   | PathnameKeys
   | {
@@ -76,10 +74,8 @@ export type Route =
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de SSoT**: ((Implementada)) Se han añadido las nuevas rutas del "Workspace Creativo" al manifiesto, expandiendo el tipo `Route` y resolviendo el error de compilación.
- *
+ * 1. ((Implementada)) **Sincronización de SSoT:** Resuelve `TS2322` en `NavList.tsx`.
  * =====================================================================
  */
 // src/lib/navigation.ts

@@ -1,17 +1,17 @@
 // src/components/workspaces/WorkspaceSwitcher.tsx
 /**
  * @file WorkspaceSwitcher.tsx
- * @description Orquestador de UI soberano. Sincronizado para consumir la nueva
- *              API del hook `useWorkspaceInlineEditor` sin argumentos.
+ * @description Orquestador de UI soberano. Simplificado para delegar
+ *              el consumo de i18n a sus hijos soberanos.
  * @author Raz Podestá - MetaShark Tech
- * @version 8.0.0
- * @date 2025-08-25
+ * @version 11.0.0
+ * @date 2025-08-26
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
-import React from "react";
-import { type useTranslations } from "next-intl";
+"use client";
 
+import React from "react";
 import {
   Popover,
   PopoverContent,
@@ -27,11 +27,7 @@ import { useWorkspaceManager } from "@/lib/hooks/useWorkspaceManager";
 import { WorkspacePopoverContent } from "./WorkspacePopoverContent";
 import { WorkspaceTrigger } from "./WorkspaceTrigger";
 
-const WorkspaceSwitcherContent = ({
-  t,
-}: {
-  t: ReturnType<typeof useTranslations>;
-}) => {
+const WorkspaceSwitcherContent = () => {
   const { workspaces, activeWorkspace } = useDashboard();
   const { canEdit, canDelete } = useWorkspaceContext();
   const {
@@ -40,26 +36,15 @@ const WorkspaceSwitcherContent = ({
     handleWorkspaceSelect,
     ...actionHandlers
   } = useWorkspaceManager();
-
-  // --- INICIO DE CORRECCIÓN DE API ---
-  // El hook ahora es soberano y no requiere la inyección de dependencias de i18n.
   const inlineEditorHook = useWorkspaceInlineEditor();
-  // --- FIN DE CORRECCIÓN DE API ---
-
-  const triggerTexts = {
-    ariaLabel: t("selectWorkspace_label"),
-    statusText: t("changing_status"),
-    editAriaLabel: t("edit_form.name_aria_label"),
-  };
 
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
       <PopoverTrigger asChild>
-        <WorkspaceTrigger texts={triggerTexts} hook={inlineEditorHook} />
+        <WorkspaceTrigger hook={inlineEditorHook} />
       </PopoverTrigger>
       <PopoverContent className="w-[220px] p-0">
         <WorkspacePopoverContent
-          t={t}
           workspaces={workspaces}
           activeWorkspaceId={activeWorkspace!.id}
           onWorkspaceSelect={handleWorkspaceSelect}
@@ -72,33 +57,23 @@ const WorkspaceSwitcherContent = ({
   );
 };
 
-export function WorkspaceSwitcher({
-  t,
-}: {
-  t: ReturnType<typeof useTranslations>;
-}): React.ReactElement | null {
+export function WorkspaceSwitcher(): React.ReactElement | null {
   const { activeWorkspace } = useDashboard();
   if (!activeWorkspace) {
     return null;
   }
   return (
     <WorkspaceProvider>
-      <WorkspaceSwitcherContent t={t} />
+      <WorkspaceSwitcherContent />
     </WorkspaceProvider>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
  * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Resolución de Error de Compilación (TS2554): Se ha actualizado la llamada al hook `useWorkspaceInlineEditor` para que no reciba argumentos, sincronizándola con su nueva API soberana.
- * 2. ((Implementada)) Cierre de Cadena de Refactorización: Esta corrección completa la cadena de refactorización iniciada en `useHandleErrors`, asegurando que toda la lógica de edición en línea sea coherente y funcional.
- *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) Memoización de Props de Textos: El objeto `triggerTexts` podría ser envuelto en `React.useMemo` para una optimización de micro-rendimiento, previniendo su recreación en cada renderizado.
- *
+ * 1. ((Implementada)) **Simplificación Radical (SRP):** El componente es ahora un ensamblador puro, libre de lógica de i18n.
  * =====================================================================
  */
+// src/components/workspaces/WorkspaceSwitcher.tsx

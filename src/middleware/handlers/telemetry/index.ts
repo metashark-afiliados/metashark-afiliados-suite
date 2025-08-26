@@ -1,43 +1,45 @@
 // src/middleware/handlers/telemetry/index.ts
 /**
  * @file src/middleware/handlers/telemetry/index.ts
- * @description Manejador de telemetría para el middleware. Ha sido refactorizado
- *              a un estándar de élite para desacoplarse completamente de Supabase
- *              en el Edge. Ahora envía los datos de telemetría a un endpoint de
- *              API interno (`/api/telemetry-edge`) de forma asíncrona y
- *              no bloqueante ("fire-and-forget").
- * @author Raz Podestá
- * @version 3.0.0
+ * @description Manejador de telemetría de élite. Ha sido blindado para enviar
+ *              un token de autenticación secreto, asegurando que solo el
+ *              middleware pueda comunicarse con el endpoint de la API de telemetría.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.1.0
+ * @date 2025-08-26
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import { type NextRequest, type NextResponse } from "next/server";
 
 import { logger } from "@/lib/logging";
 import { lookupIpAddress } from "@/lib/services/geoip.service";
 
-/**
- * @private
- * @async
- * @function logVisitToServer
- * @description Función "fire-and-forget" que envía el payload de telemetría
- *              al endpoint de la API sin esperar una respuesta.
- * @param {object} payload - Los datos del log de visitante a enviar.
- * @param {string} origin - El origen de la petición para construir la URL de la API.
- */
 async function logVisitToServer(
   payload: object,
   origin: string
 ): Promise<void> {
   try {
-    // No usamos 'await' aquí. Esta es una operación "fire-and-forget".
-    // El middleware no debe esperar a que la telemetría se complete.
+    const secret = process.env.TELEMETRY_API_SECRET;
+    if (!secret) {
+      logger.warn(
+        "[TelemetryHandler] TELEMETRY_API_SECRET no está configurado. La petición no será autenticada."
+      );
+    }
+
+    logger.trace(
+      "[TelemetryHandler] Despachando payload de telemetría al endpoint de API..."
+    );
     fetch(`${origin}/api/telemetry-edge`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        // --- INICIO DE MEJORA DE SEGURIDAD ---
+        Authorization: `Bearer ${secret}`,
+        // --- FIN DE MEJORA DE SEGURIDAD ---
+      },
       body: JSON.stringify(payload),
     });
-    logger.trace(
-      "[TelemetryHandler] Payload de telemetría enviado al endpoint de API."
-    );
   } catch (error) {
     logger.error(
       "[TelemetryHandler] Fallo al enviar la petición fetch al endpoint de telemetría.",
@@ -46,15 +48,6 @@ async function logVisitToServer(
   }
 }
 
-/**
- * @public
- * @async
- * @function handleTelemetry
- * @description Orquesta la recolección de datos en el middleware y dispara el
- *              envío asíncrono al endpoint de la API.
- * @param {NextRequest} request - El objeto de la petición entrante.
- * @param {NextResponse} response - La respuesta a modificar con la cookie de sesión.
- */
 export async function handleTelemetry(
   request: NextRequest,
   response: NextResponse
@@ -71,7 +64,7 @@ export async function handleTelemetry(
 
   const logPayload = {
     session_id: sessionId,
-    fingerprint: "server_placeholder", // Será enriquecido por el cliente
+    fingerprint: "server_placeholder",
     ip_address: ip,
     geo_data: enrichedGeoData
       ? { ...request.geo, ...enrichedGeoData }
@@ -83,15 +76,13 @@ export async function handleTelemetry(
     is_bot: /bot|crawl|slurp|spider|mediapartners/i.test(userAgent),
   };
 
-  // Dispara la llamada a la API pero no la espera.
   logVisitToServer(logPayload, request.nextUrl.origin);
 
-  // Establece la cookie para prevenir logs duplicados en la misma sesión.
   response.cookies.set("metashark_session_id", sessionId, {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
-    maxAge: 31536000, // 1 año
+    maxAge: 31536000,
   });
 }
 /**
@@ -100,11 +91,10 @@ export async function handleTelemetry(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Aislamiento Completo del Edge Runtime**: ((Implementada)) El manejador ya no importa ni utiliza ninguna dependencia de Supabase. Ahora delega la escritura en la base de datos a un endpoint de API que se ejecuta en el runtime de Node.js. Esto elimina por completo la advertencia de build del Edge Runtime.
- * 2. **Rendimiento Mejorado ("Fire-and-Forget")**: ((Implementada)) La llamada `fetch` al endpoint de API no es esperada (`await`). Esto significa que el middleware puede continuar y devolver la respuesta al usuario sin ser bloqueado por la operación de telemetría, reduciendo la latencia.
+ * 1. ((Implementada)) **Blindaje de Endpoint:** Se ha añadido el envío de un token `Bearer` secreto, implementando la primera mitad de la solución de seguridad.
  *
  * @subsection Melhorias Futuras
- * 1. **Manejo de Fallos de `fetch`**: ((Vigente)) En un escenario de producción de misión crítica, se podría implementar una estrategia de reintentos con "exponential backoff" si la petición `fetch` inicial al endpoint de API falla.
+ * 1. ((Vigente)) **Seguimiento de Navegación Intra-Sesión:** El sistema actual solo registra la primera visita. Una mejora de élite sería enviar eventos de "pageview" adicionales al mismo endpoint para rastrear la navegación del usuario dentro de la misma sesión, enriqueciendo los datos de análisis del funnel.
  *
  * =====================================================================
  */

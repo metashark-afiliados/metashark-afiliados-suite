@@ -1,85 +1,53 @@
 // src/components/sites/SiteCard.tsx
+/**
+ * @file SiteCard.tsx
+ * @description Orquestador de UI. Refactorizado a una plantilla de composición
+ *              de élite que utiliza el patrón de "slots nombrados" para una
+ *              máxima flexibilidad y control.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 6.0.0
+ * @date 2025-08-26
+ */
 import React from "react";
 
-import { Card as CardPrimitive } from "@/components/ui/card";
-import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { SiteCardFooter } from "./SiteCardFooter";
-import { SiteCardHeader } from "./SiteCardHeader";
-
-export interface SiteCardTexts {
-  campaignCount: (count: number) => string;
-  manageCampaignsButton: string;
-  deleteSiteAriaLabel: (subdomain: string) => string;
-  openSiteAriaLabel: string;
-  popoverTitle: string;
-  popoverDescription: string;
-}
-
-export interface DeleteSiteDialogTexts {
-  title: string;
-  description: (subdomain: string) => React.ReactNode;
-  confirmButton: string;
-  cancelButton: string;
-  confirmationLabel: (subdomain: string) => React.ReactNode;
-}
+import { Card as CardPrimitive, CardContent } from "@/components/ui/card";
+import { clientLogger } from "@/lib/logging";
 
 interface SiteCardProps {
-  site: SiteWithCampaignCount;
-  onDelete: (formData: FormData) => void;
-  isPending: boolean;
-  deletingSiteId: string | null;
-  texts: SiteCardTexts;
-  deleteDialogTexts: DeleteSiteDialogTexts;
+  headerSlot: React.ReactNode;
+  footerSlot: React.ReactNode;
+  contentSlot?: React.ReactNode;
+  siteId: string;
 }
 
-/**
- * @public
- * @component SiteCard
- * @description Orquestador de UI puro que ensambla una tarjeta de sitio
- *              a partir de los átomos `SiteCardHeader` y `SiteCardFooter`.
- * @param {SiteCardProps} props - Propiedades para configurar la tarjeta.
- * @returns {React.ReactElement}
- * @version 3.0.0
- * @author Raz Podestá
- */
 export function SiteCard({
-  site,
-  onDelete,
-  isPending,
-  deletingSiteId,
-  texts,
-  deleteDialogTexts,
+  headerSlot,
+  footerSlot,
+  contentSlot,
+  siteId,
 }: SiteCardProps): React.ReactElement {
+  clientLogger.trace(`[SiteCard] Renderizando tarjeta para sitio: ${siteId}`);
   return (
     <CardPrimitive className="flex flex-col justify-between h-full transition-all hover:border-primary/50 hover:shadow-lg">
-      <SiteCardHeader
-        name={site.name}
-        campaignCountText={texts.campaignCount(site.campaign_count)}
-        popoverTitle={texts.popoverTitle}
-        popoverDescription={texts.popoverDescription}
-      />
-      <SiteCardFooter
-        site={site}
-        onDelete={onDelete}
-        isPending={isPending}
-        deletingSiteId={deletingSiteId}
-        texts={texts}
-        deleteDialogTexts={deleteDialogTexts}
-      />
+      <div>
+        {headerSlot}
+        {contentSlot && <CardContent>{contentSlot}</CardContent>}
+      </div>
+      {footerSlot}
     </CardPrimitive>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Hiper-Atomicidad (Orquestador Puro)**: ((Implementada)) El componente ahora es un ensamblador puro que solo compone `SiteCardHeader` y `SiteCardFooter`.
+ * 1. ((Implementada)) **Arquitectura de Slots Nombrados:** El componente ahora utiliza un patrón de composición de élite, proporcionando una API declarativa y flexible.
  *
  * @subsection Melhorias Futuras
- * 1. **Propagación de `children`**: ((Vigente)) El componente podría aceptar `children` para renderizar contenido personalizado en el cuerpo de la tarjeta.
+ * 1. ((Vigente)) **Animación de Hover en Slots:** Los slots podrían recibir props adicionales (ej. `isHovering`) para que su contenido interno pueda reaccionar a las interacciones del usuario en la tarjeta principal.
  *
  * =====================================================================
  */
+// src/components/sites/SiteCard.tsx

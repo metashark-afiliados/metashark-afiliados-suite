@@ -1,34 +1,25 @@
 // src/middleware/handlers/multitenancy/index.ts
 /**
  * @file src/middleware/handlers/multitenancy/index.ts
- * @description Manejador para la lógica multi-tenant. Identifica peticiones a
- *              subdominios y las reescribe internamente a la ruta de renderizado
- *              canónica `/s/[subdomain]`, preservando el locale. Esta es una pieza
- *              central de la arquitectura SaaS del proyecto.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Manejador multi-tenant de élite. Valida la existencia de un
+ *              subdominio contra un caché en el Edge (Vercel KV) antes de
+ *              reescribir la URL, optimizando drásticamente el rendimiento.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-26
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import { type NextRequest, NextResponse } from "next/server";
 
+import { getSiteSubdomainStatus } from "@/lib/data/sites-edge";
 import { logger } from "@/lib/logging";
 import { rootDomain } from "@/lib/utils";
 
-/**
- * @public
- * @function handleMultitenancy
- * @description Detecta si el `host` de la petición corresponde a un subdominio de
- *              la aplicación. Si es así, reescribe la URL para que Next.js la
- *              enrute al `app/s/[subdomain]/page.tsx`, pasando el `locale` y el
- *              `pathname` original.
- * @param {NextRequest} request - El objeto de la petición entrante.
- * @param {NextResponse} response - La respuesta del manejador anterior (i18n),
- *                                  de la cual se extrae el `locale` detectado.
- * @returns {NextResponse} La respuesta, que puede ser una reescritura o la original.
- */
-export function handleMultitenancy(
+export async function handleMultitenancy(
   request: NextRequest,
   response: NextResponse
-): NextResponse {
+): Promise<NextResponse> {
   const { host, pathname } = request.nextUrl;
   const rootDomainWithoutPort = rootDomain.split(":")[0];
   const hostWithoutPort = host.split(":")[0];
@@ -41,6 +32,15 @@ export function handleMultitenancy(
     const subdomain = hostWithoutPort.replace(`.${rootDomainWithoutPort}`, "");
     logger.trace(`[MULTITENANCY_HANDLER] Subdominio detectado: ${subdomain}`);
 
+    const isValidSubdomain = await getSiteSubdomainStatus(subdomain);
+
+    if (!isValidSubdomain) {
+      logger.warn(
+        `[MULTITENANCY_HANDLER] Subdominio inválido o no encontrado en el caché del Edge: '${subdomain}'. Dejando que Next.js maneje el 404.`
+      );
+      return response;
+    }
+
     const locale = response.headers.get("x-app-locale") || "pt-BR";
     const rewriteUrl = new URL(
       `/${locale}/s/${subdomain}${pathname}`,
@@ -52,7 +52,6 @@ export function handleMultitenancy(
       { to: rewriteUrl.pathname }
     );
 
-    // Se clonan las cabeceras de la respuesta anterior para preservar el locale.
     const headers = new Headers(response.headers);
     return NextResponse.rewrite(rewriteUrl, { headers });
   }
@@ -62,19 +61,17 @@ export function handleMultitenancy(
   );
   return response;
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Cacheo de Subdominios Válidos (Edge Caching)**: ((Vigente)) Para optimizar el rendimiento, se podría consultar si el subdominio existe en la base de datos (con caché en Vercel KV) aquí mismo. Si no existe, se podría redirigir a una página 404 personalizada en lugar de dejar que Next.js lo maneje, proporcionando una UX más rápida.
- * 2. **Soporte para Dominios Personalizados**: ((Vigente)) La lógica debería ser expandida para consultar una tabla `sites` por `custom_domain` además de por `subdomain`, permitiendo que los usuarios conecten sus propios dominios.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Reconstrucción de Lógica Multi-Tenant**: ((Implementada)) Este aparato restaura la funcionalidad central SaaS del proyecto, permitiendo que las peticiones a subdominios sean enrutadas correctamente.
- * 2. **Integración con Pipeline**: ((Implementada)) La función consume y propaga correctamente el objeto `NextResponse`, asegurando que la cabecera `x-app-locale` establecida por el manejador de i18n se conserve.
+ * 1. ((Implementada)) **Validación Preventiva en el Edge:** El manejador ahora valida la existencia del subdominio antes de la reescritura, optimizando el rendimiento.
+ * 2. ((Implementada)) **Reducción de Carga del Backend:** Se reduce la carga sobre el runtime de Node.js y la base de datos PostgreSQL.
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) **Soporte para Dominios Personalizados:** La lógica debe ser expandida para consultar también un set de `custom_domains` en Vercel KV.
  *
  * =====================================================================
  */

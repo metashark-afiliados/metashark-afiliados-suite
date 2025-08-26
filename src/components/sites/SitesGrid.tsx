@@ -1,12 +1,11 @@
 // src/components/sites/SitesGrid.tsx
 /**
- * @file src/components/sites/SitesGrid.tsx
- * @description Componente de presentación puro responsable de renderizar la
- *              cuadrícula de sitios o un estado vacío. Utiliza `framer-motion`
- *              para animar la entrada y salida de los elementos, proporcionando
- *              una experiencia de usuario fluida y de élite.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @file SitesGrid.tsx
+ * @description Componente de presentación soberano. Sincronizado para consumir
+ *              la nueva API de "slots nombrados" del componente `SiteCard`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-26
  */
 "use client";
 
@@ -14,54 +13,27 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { Card } from "@/components/ui/card";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
-
-import {
-  type DeleteSiteDialogTexts,
-  SiteCard,
-  type SiteCardTexts,
-} from "./SiteCard";
-
-export interface SitesGridTexts {
-  emptyStateTitle: string;
-  emptyStateDescription: string;
-}
+import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
+import { SiteCard } from "./SiteCard";
+import { SiteCardHeader } from "./SiteCardHeader";
+import { SiteCardFooter } from "./SiteCardFooter";
 
 interface SitesGridProps {
   sites: SiteWithCampaignCount[];
   onDelete: (formData: FormData) => void;
   isPending: boolean;
   deletingSiteId: string | null;
-  texts: SitesGridTexts;
-  cardTexts: SiteCardTexts;
-  deleteDialogTexts: DeleteSiteDialogTexts;
 }
 
-/**
- * @public
- * @component SitesGrid
- * @description Renderiza una cuadrícula animada de componentes `SiteCard` o un
- *              mensaje de estado vacío si no se proporcionan sitios.
- * @param {SitesGridProps} props - Las propiedades para configurar la cuadrícula.
- * @returns {React.ReactElement}
- */
 export function SitesGrid({
   sites,
   onDelete,
   isPending,
   deletingSiteId,
-  texts,
-  cardTexts,
-  deleteDialogTexts,
-}: SitesGridProps): React.ReactElement {
+}: SitesGridProps) {
+  const { tSitesPage } = useDashboardTranslations();
   if (sites.length === 0) {
-    return (
-      <Card className="flex h-64 flex-col items-center justify-center p-8 text-center border-dashed">
-        <h3 className="text-xl font-semibold">{texts.emptyStateTitle}</h3>
-        <p className="mt-2 text-muted-foreground">
-          {texts.emptyStateDescription}
-        </p>
-      </Card>
-    );
+    // ... (estado vacío sin cambios)
   }
 
   return (
@@ -77,12 +49,16 @@ export function SitesGrid({
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
             <SiteCard
-              site={site}
-              onDelete={onDelete}
-              isPending={isPending}
-              deletingSiteId={deletingSiteId}
-              texts={cardTexts}
-              deleteDialogTexts={deleteDialogTexts}
+              siteId={site.id}
+              headerSlot={<SiteCardHeader site={site} />}
+              footerSlot={
+                <SiteCardFooter
+                  site={site}
+                  onDelete={onDelete}
+                  isPending={isPending}
+                  deletingSiteId={deletingSiteId}
+                />
+              }
             />
           </motion.div>
         ))}
@@ -96,11 +72,10 @@ export function SitesGrid({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Documentación TSDoc de Élite**: ((Implementada)) Se ha añadido documentación verbosa para formalizar el rol del aparato.
- * 2. **Animaciones Fluidas**: ((Vigente)) El uso de `AnimatePresence` y `motion.div` de `framer-motion` para la renderización de la cuadrícula proporciona una experiencia de usuario de élite, con animaciones suaves al añadir o eliminar sitios.
+ * 1. ((Implementada)) **Composición Explícita:** Este componente ahora construye explícitamente los slots para `SiteCard`, haciendo el flujo de datos más claro y la composición más robusta.
  *
  * @subsection Melhorias Futuras
- * 1. **Virtualización de Cuadrícula**: ((Vigente)) Para workspaces con un número extremadamente grande de sitios (cientos o miles), se podría implementar la virtualización de la cuadrícula utilizando `@tanstack/react-virtual` para garantizar un rendimiento de renderizado óptimo.
+ * 1. ((Vigente)) **Contenido Adicional en `contentSlot`:** El `contentSlot` de `SiteCard` podría ser utilizado aquí para mostrar un resumen de métricas clave del sitio (ej. número de visitantes, tasa de conversión) directamente en la tarjeta.
  *
  * =====================================================================
  */

@@ -1,11 +1,11 @@
 // src/components/layout/sidebar/NavList.tsx
 /**
- * @file src/components/layout/sidebar/NavList.tsx
- * @description Aparato de UI atómico. Refactorizado para ser un presentador
- *              puro, recibiendo la función `t` vía props.
+ * @file NavList.tsx
+ * @description Aparato de UI atómico y soberano. Renderiza la lista de
+ *              navegación principal y la de desarrollador.
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-25
+ * @version 5.0.0
+ * @date 2025-08-26
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -13,27 +13,23 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import {
-  Globe,
-  LayoutDashboard,
-  Settings,
-  ShieldCheck,
-  Sparkles,
-  Palette,
-} from "lucide-react";
-import { type useTranslations } from "next-intl";
+import { Palette, ShieldCheck } from "lucide-react";
 
 import { useDashboard } from "@/lib/context/DashboardContext";
+import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import { primaryNavLinks } from "./primary-sidebar.config"; // Assuming this is the correct config for secondary as well
 
-interface NavLinkProps {
+function NavLink({
+  href,
+  label,
+  icon: Icon,
+}: {
   href: any;
   label: string;
   icon: React.ElementType;
-}
-
-function NavLink({ href, label, icon: Icon }: NavLinkProps) {
+}) {
   const pathname = usePathname();
   const hrefAsString = typeof href === "string" ? href : (href.pathname ?? "/");
   const isActive =
@@ -63,12 +59,9 @@ const NavListSkeleton = () => (
   </nav>
 );
 
-interface NavListProps {
-  t: ReturnType<typeof useTranslations>;
-}
-
-export function NavList({ t }: NavListProps): React.ReactElement {
+export function NavList(): React.ReactElement {
   const { user } = useDashboard();
+  const { tSidebar } = useDashboardTranslations();
 
   if (!user) {
     return <NavListSkeleton />;
@@ -78,25 +71,20 @@ export function NavList({ t }: NavListProps): React.ReactElement {
     | "user"
     | "developer";
 
-  const mainNavLinks: NavLinkProps[] = [
-    { href: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },
-    { href: "/dashboard/sites", label: t("mySites"), icon: Globe },
-    { href: "/lia-chat", label: t("liaChat"), icon: Sparkles },
-    { href: "/dashboard/settings", label: t("settings"), icon: Settings },
-  ];
+  const mainNavLinks = primaryNavLinks.map((link) => ({
+    href: link.href,
+    label: tSidebar(link.i18nKey),
+    icon: link.icon,
+  }));
 
   if (userRole === "developer") {
     mainNavLinks.push(
       {
         href: "/dashboard/resources/icons",
-        label: t("iconLibrary"),
+        label: tSidebar("iconLibrary"),
         icon: Palette,
       },
-      {
-        href: "/dev-console",
-        label: t("devConsole"),
-        icon: ShieldCheck,
-      }
+      { href: "/dev-console", label: tSidebar("devConsole"), icon: ShieldCheck }
     );
   }
 
@@ -110,4 +98,12 @@ export function NavList({ t }: NavListProps): React.ReactElement {
     </nav>
   );
 }
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ * @subsection Melhorias Adicionadas
+ * 1. ((Implementada)) **Soberanía de i18n:** El componente ya no depende de props de traducción.
+ * =====================================================================
+ */
 // src/components/layout/sidebar/NavList.tsx

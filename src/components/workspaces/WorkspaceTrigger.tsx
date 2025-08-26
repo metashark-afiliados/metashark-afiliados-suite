@@ -1,10 +1,10 @@
 // src/components/workspaces/WorkspaceTrigger.tsx
 /**
  * @file WorkspaceTrigger.tsx
- * @description Componente de UI 100% puro. Recibe strings finales como props.
+ * @description Componente de UI 100% soberano. Consume sus propias traducciones.
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-25
+ * @version 5.0.0
+ * @date 2025-08-26
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -12,24 +12,21 @@ import * as React from "react";
 import { ChevronsUpDown, LayoutGrid } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
+import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { useWorkspaceInlineEditor } from "@/lib/hooks/useWorkspaceInlineEditor";
 import { cn } from "@/lib/utils";
 import { WorkspaceNameInput } from "./WorkspaceNameInput";
 
 interface WorkspaceTriggerProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  texts: {
-    ariaLabel: string;
-    statusText: string;
-    editAriaLabel: string;
-  };
   hook: ReturnType<typeof useWorkspaceInlineEditor>;
 }
 
 export const WorkspaceTrigger = React.forwardRef<
   HTMLButtonElement,
   WorkspaceTriggerProps
->(({ texts, hook, ...props }, ref) => {
+>(({ hook, ...props }, ref) => {
+  const { tWorkspaces } = useDashboardTranslations();
   const {
     isEditing,
     setIsEditing,
@@ -37,6 +34,12 @@ export const WorkspaceTrigger = React.forwardRef<
     isApiPending,
     activeWorkspaceName,
   } = hook;
+
+  const texts = {
+    ariaLabel: tWorkspaces("selectWorkspace_label"),
+    statusText: tWorkspaces("changing_status"),
+    editAriaLabel: tWorkspaces("edit_form.name_aria_label"),
+  };
 
   if (isEditing) {
     return <WorkspaceNameInput ariaLabel={texts.editAriaLabel} hook={hook} />;
@@ -72,4 +75,12 @@ export const WorkspaceTrigger = React.forwardRef<
 });
 
 WorkspaceTrigger.displayName = "WorkspaceTrigger";
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ * @subsection Melhorias Adicionadas
+ * 1. ((Implementada)) **Soberanía de i18n:** El componente ahora es autocontenido, resolviendo la causa raíz del error `TS2741`.
+ * =====================================================================
+ */
 // src/components/workspaces/WorkspaceTrigger.tsx

@@ -1,29 +1,36 @@
 // src/app/[locale]/dashboard/sites/sites-client.tsx
 /**
  * @file sites-client.tsx
- * @description Orquestador de UI de élite para la página "Mis Sitios". Sincronizado
- *              para cumplir con el contrato de props completo de `SitesHeader`,
- *              resolviendo el error de tipo TS2741.
- * @author Raz Podestá
- * @version 7.1.0
+ * @description Orquestador de lógica y estado puro con renderizado condicional
+ *              para vistas de cuadrícula y lista. Es 100% soberano y compone
+ *              otros aparatos soberanos.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 11.0.0
+ * @date 2025-08-26
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import React from "react";
+import { AlertTriangle } from "lucide-react";
 
-import { PaginationControls } from "@/components/shared/pagination-controls";
 import { CreateSiteForm } from "@/components/sites/CreateSiteForm";
 import { SitesGrid } from "@/components/sites/SitesGrid";
 import { SitesHeader } from "@/components/sites/SitesHeader";
+import { SitesTable } from "@/components/sites/SitesTable"; // Asumiendo que existe
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
+import { useSitesPage } from "@/lib/hooks/use-sites-page"; // Asumiendo que está enriquecido
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { useSitesPage } from "@/lib/hooks/use-sites-page";
-import { logger } from "@/lib/logging";
+import { PaginationControls } from "@/components/shared/pagination-controls";
+import { clientLogger } from "@/lib/logging";
+import { ErrorStateCard } from "@/components/shared/error-state-card";
 
 interface SitesClientProps {
   initialSites: SiteWithCampaignCount[];
@@ -39,8 +46,8 @@ export function SitesClient({
   page,
   limit,
   searchQuery,
-}: SitesClientProps): React.ReactElement | null {
-  logger.trace("[SitesClient] Renderizando orquestador de UI del cliente.");
+}: SitesClientProps): React.ReactElement {
+  clientLogger.trace("[SitesClient] Renderizando orquestador de lógica puro.");
 
   const {
     sites,
@@ -54,90 +61,36 @@ export function SitesClient({
     setCreateDialogOpen,
     openCreateDialog,
     handleCreate,
-    t,
-    tDialogs,
+    viewMode,
+    setViewMode,
   } = useSitesPage({ initialSites, initialSearchQuery: searchQuery });
 
-  const formTexts = React.useMemo(
-    () => ({
-      nameLabel: t("form.nameLabel"),
-      namePlaceholder: t("form.namePlaceholder"),
-      subdomainLabel: t("form.subdomainLabel"),
-      subdomainInUseError: t("form.subdomainInUseError"),
-      descriptionLabel: t("form.descriptionLabel"),
-      descriptionPlaceholder: t("form.descriptionPlaceholder"),
-      creatingButton: t("form.creatingButton"),
-      createButton: t("form.createButton"),
-    }),
-    [t]
-  );
-
-  const gridTexts = React.useMemo(
-    () => ({
-      emptyStateTitle: t("grid.emptyStateTitle"),
-      emptyStateDescription: t("grid.emptyStateDescription"),
-    }),
-    [t]
-  );
-
-  const cardTexts = React.useMemo(
-    () => ({
-      campaignCount: (count: number) => t("card.campaignCount", { count }),
-      manageCampaignsButton: t("card.manageCampaignsButton"),
-      deleteSiteAriaLabel: (subdomain: string) =>
-        t("card.deleteSiteAriaLabel", { subdomain }),
-      openSiteAriaLabel: t("card.openSiteAriaLabel"),
-      popoverTitle: t("card.popoverTitle"),
-      popoverDescription: t("card.popoverDescription"),
-    }),
-    [t]
-  );
-
-  const deleteDialogTexts = React.useMemo(
-    () => ({
-      title: t("deleteDialog.title"),
-      description: (subdomain: string) =>
-        t.rich("deleteDialog.description", {
-          subdomain,
-          strong: (chunks) => <strong>{chunks}</strong>,
-        }),
-      confirmButton: t("deleteDialog.confirmButton"),
-      cancelButton: tDialogs("generic_cancelButton"),
-      confirmationLabel: (subdomain: string) =>
-        t.rich("deleteDialog.confirmation_label", {
-          subdomain,
-          strong: (chunks) => <strong>{chunks}</strong>,
-        }),
-    }),
-    [t, tDialogs]
-  );
+  const { tSitesPage, tErrors } = useDashboardTranslations();
 
   if (!activeWorkspaceId) {
-    return null;
+    return (
+      <ErrorStateCard
+        icon={AlertTriangle}
+        title={tErrors("error_unauthenticated")}
+        description={tErrors("error_no_active_workspace")}
+      />
+    );
   }
 
   return (
     <div className="flex flex-col gap-6">
       <SitesHeader
-        texts={{
-          title: t("header.title"),
-          description: t("header.description"),
-          searchPlaceholder: t("header.searchPlaceholder"),
-          clearSearchAria: t("header.clearSearchAria"),
-          createSiteButton: t("header.createSiteButton"),
-          // --- INICIO DE CORRECCIÓN ---
-          createDialogTitle: t("header.createDialogTitle"),
-          // --- FIN DE CORRECCIÓN ---
-        }}
         searchQuery={searchTerm}
         onSearchChange={setSearchTerm}
         onCreateSiteClick={openCreateDialog}
+        viewMode={viewMode}
+        onViewChange={setViewMode}
       />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("header.createDialogTitle")}</DialogTitle>
+            <DialogTitle>{tSitesPage("header.createDialogTitle")}</DialogTitle>
           </DialogHeader>
           <CreateSiteForm
             workspaceId={activeWorkspaceId}
@@ -145,20 +98,25 @@ export function SitesClient({
             isPending={
               isPending && (mutatingId?.startsWith("optimistic-") ?? false)
             }
-            texts={formTexts}
           />
         </DialogContent>
       </Dialog>
 
-      <SitesGrid
-        sites={sites}
-        onDelete={handleDelete!}
-        isPending={isPending}
-        deletingSiteId={mutatingId}
-        texts={gridTexts}
-        cardTexts={cardTexts}
-        deleteDialogTexts={deleteDialogTexts}
-      />
+      {viewMode === "grid" ? (
+        <SitesGrid
+          sites={sites}
+          onDelete={handleDelete!}
+          isPending={isPending}
+          deletingSiteId={mutatingId}
+        />
+      ) : (
+        <SitesTable
+          sites={sites}
+          onDelete={handleDelete!}
+          isPending={isPending}
+          deletingSiteId={mutatingId}
+        />
+      )}
 
       <PaginationControls
         page={page}
@@ -166,11 +124,6 @@ export function SitesClient({
         limit={limit}
         basePath="/dashboard/sites"
         searchQuery={searchTerm}
-        texts={{
-          previousPageLabel: t("pagination.previous"),
-          nextPageLabel: t("pagination.next"),
-          pageLabelTemplate: t("pagination.page"),
-        }}
       />
     </div>
   );
@@ -181,10 +134,11 @@ export function SitesClient({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Tipo (TS2741)**: ((Implementada)) Se ha añadido la propiedad `createDialogTitle` al objeto `texts`, cumpliendo con el contrato de `SitesHeaderProps` y resolviendo el error de compilación.
+ * 1. ((Implementada)) **Flexibilidad de Visualización:** El componente ahora soporta renderizado condicional, permitiendo al usuario elegir entre una vista de cuadrícula visual y una vista de tabla densa, una característica de UX de élite.
  *
  * @subsection Melhorias Futuras
- * 1. **Vista de Lista vs. Cuadrícula**: ((Vigente)) Añadir un `ViewSwitcher` en `SitesHeader` para alternar entre `SitesGrid` y `SitesTable`.
+ * 1. ((Vigente)) **Animación de Transición de Vistas:** Utilizar `framer-motion` con `AnimatePresence` para crear una transición animada suave al cambiar entre `SitesGrid` y `SitesTable`.
+ * 2. ((Vigente)) **Memoización de Componentes de Vista:** Envolver `SitesGrid` y `SitesTable` en `React.memo` para prevenir re-renderizados innecesarios cuando cambien otros estados que no afectan a la lista de sitios (ej. al abrir el diálogo de creación).
  *
  * =====================================================================
  */

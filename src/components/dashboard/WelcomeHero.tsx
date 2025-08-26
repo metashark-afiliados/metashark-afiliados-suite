@@ -1,30 +1,34 @@
 // src/components/dashboard/WelcomeHero.tsx
 /**
  * @file WelcomeHero.tsx
- * @description Componente de UI "Hero" del dashboard. Refactorizado a un
- *              estándar de élite inspirado en Canva para la v13.0.
- * @author Raz Podestá
- * @version 4.0.0
+ * @description Componente de UI "Hero" soberano. Sincronizado con la SSoT
+ *              de traducciones y el contrato de SearchInput.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.1.0
+ * @date 2025-08-26
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import React from "react";
 
 import { SearchInput } from "@/components/ui/SearchInput";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useDashboard } from "@/lib/context/DashboardContext";
+import { useCommandPaletteStore } from "@/lib/hooks/use-command-palette";
+import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
+import { clientLogger } from "@/lib/logging";
 
-export interface WelcomeHeroProps {
-  username: string;
-  searchPlaceholder: string;
-}
+export function WelcomeHero(): React.ReactElement {
+  clientLogger.trace("[WelcomeHero] Renderizando componente soberano.");
 
-export function WelcomeHero({
-  username,
-  searchPlaceholder,
-}: WelcomeHeroProps): React.ReactElement {
-  const t = useTranslations("app.[locale].dashboard.page.welcomeHero");
-  const firstName = username.split(" ")[0];
+  const { user } = useDashboard();
+  const { tDashboardPage } = useDashboardTranslations();
+  const openCommandPalette = useCommandPaletteStore((state) => state.open);
+
+  const username = user.user_metadata?.full_name || user.email || "User";
 
   const FADE_UP = {
     hidden: { opacity: 0, y: 10 },
@@ -36,9 +40,7 @@ export function WelcomeHero({
       initial="hidden"
       animate="show"
       variants={FADE_UP}
-      // --- INICIO DE REFACTORIZACIÓN VISUAL ---
       className="relative flex flex-col items-center justify-center text-center p-4 pt-8 pb-6 rounded-lg overflow-hidden"
-      // --- FIN DE REFACTORIZACIÓN VISUAL ---
     >
       <div
         className="absolute inset-0 -z-10"
@@ -47,36 +49,33 @@ export function WelcomeHero({
             "radial-gradient(ellipse at 50% -20%, hsl(var(--primary)/0.15), transparent 60%)",
         }}
       />
-      {/* --- INICIO DE REFACTORIZACIÓN VISUAL --- */}
       <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-        {t.rich("title_rich", {
-          firstName: firstName,
-          italic: (chunks) => (
-            <i className="text-primary not-italic">{chunks}</i>
-          ),
-        })}
+        {tDashboardPage("welcomeHero.title", { username })}
       </h1>
-      {/* --- FIN DE REFACTORIZACIÓN VISUAL --- */}
-
       <Tabs defaultValue="templates" className="mt-6">
         <TabsList>
-          <TabsTrigger value="my-designs">{t("tabs.myDesigns")}</TabsTrigger>
-          <TabsTrigger value="templates">{t("tabs.templates")}</TabsTrigger>
-          <TabsTrigger value="ai-tools">{t("tabs.aiTools")}</TabsTrigger>
+          <TabsTrigger value="my-designs">
+            {tDashboardPage("welcomeHero.tabs.myDesigns")}
+          </TabsTrigger>
+          <TabsTrigger value="templates">
+            {tDashboardPage("welcomeHero.tabs.templates")}
+          </TabsTrigger>
+          <TabsTrigger value="ai-tools">
+            {tDashboardPage("welcomeHero.tabs.aiTools")}
+          </TabsTrigger>
         </TabsList>
       </Tabs>
-
-      {/* --- INICIO DE REFACTORIZACIÓN VISUAL --- */}
       <div className="relative mt-6 w-full max-w-lg">
         <SearchInput
-          placeholder={searchPlaceholder}
+          placeholder={tDashboardPage("welcomeHero.searchPlaceholder")}
           value=""
           onChange={() => {}}
+          readOnly
+          onClick={openCommandPalette}
           clearAriaLabel="Clear search"
-          className="h-12 text-base rounded-full pl-12"
+          className="h-12 text-base rounded-full pl-12 cursor-pointer"
         />
       </div>
-      {/* --- FIN DE REFACTORIZACIÓN VISUAL --- */}
     </motion.section>
   );
 }
@@ -86,8 +85,10 @@ export function WelcomeHero({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación Visual con Canva**: ((Implementada)) Se ha ajustado la tipografía, el espaciado y el estilo de la barra de búsqueda para un mayor alineamiento con el diseño de referencia.
- * 2. **Personalización Mejorada**: ((Implementada)) El saludo ahora es más personal y estilizado, utilizando solo el primer nombre en itálica.
+ * 1. ((Implementada)) **Sincronización de Contratos:** Resuelve los errores `TS2339` y `TS2741` al consumir la SSoT de i18n correcta y cumplir con el contrato de `SearchInput`. Se elimina el uso de `t.rich` en favor de una clave simple para evitar complejidad de tipos.
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) **Búsqueda Real:** Conectar el `onChange` a una lógica de búsqueda real.
  *
  * =====================================================================
  */

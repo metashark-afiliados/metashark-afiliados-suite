@@ -1,23 +1,17 @@
 // src/components/workspaces/WorkspacePopoverContent.tsx
 /**
  * @file WorkspacePopoverContent.tsx
- * @description Componente de ensamblaje de élite. Compone los aparatos atómicos
- *              `WorkspaceList` y `WorkspaceActions` y les inyecta sus textos
- *              traducidos.
+ * @description Componente de ensamblaje soberano. Consume sus propias traducciones.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-25
+ * @version 3.0.0
+ * @date 2025-08-26
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 import React from "react";
-import { type useTranslations } from "next-intl";
-
 import { Command, CommandSeparator } from "@/components/ui/command";
 import { type Workspace } from "@/lib/data/workspaces";
-import { useDashboard } from "@/lib/context/DashboardContext";
-import { useWorkspaceContext } from "@/lib/hooks/useWorkspaceContext.tsx";
-import { useWorkspaceManager } from "@/lib/hooks/useWorkspaceManager";
+import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import {
   WorkspaceActions,
   type WorkspaceActionsProps,
@@ -29,27 +23,26 @@ export interface WorkspacePopoverContentProps
   workspaces: Workspace[];
   activeWorkspaceId: string | null;
   onWorkspaceSelect: (workspaceId: string) => void;
-  t: ReturnType<typeof useTranslations>;
 }
 
 export function WorkspacePopoverContent({
   workspaces,
   activeWorkspaceId,
   onWorkspaceSelect,
-  t,
   ...actionProps
 }: WorkspacePopoverContentProps) {
-  const listTexts = {
-    searchPlaceholder: t("search_placeholder"),
-    emptyResults: t("empty_results"),
-  };
+  const { tWorkspaces } = useDashboardTranslations();
 
+  const listTexts = {
+    searchPlaceholder: tWorkspaces("search_placeholder"),
+    emptyResults: tWorkspaces("empty_results"),
+  };
   const actionTexts = {
-    create: t("createWorkspace_button"),
-    invite: t("inviteMember_button"),
-    rename: t("renameWorkspace_button"),
-    settings: t("workspaceSettings_button"),
-    delete: t("deleteWorkspace_button"),
+    create: tWorkspaces("createWorkspace_button"),
+    invite: tWorkspaces("inviteMember_button"),
+    rename: tWorkspaces("renameWorkspace_button"),
+    settings: tWorkspaces("workspaceSettings_button"),
+    delete: tWorkspaces("deleteWorkspace_button"),
   };
 
   return (
@@ -65,4 +58,12 @@ export function WorkspacePopoverContent({
     </Command>
   );
 }
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ * @subsection Melhorias Adicionadas
+ * 1. ((Implementada)) **Soberanía de i18n:** Resuelve `TS2739`.
+ * =====================================================================
+ */
 // src/components/workspaces/WorkspacePopoverContent.tsx

@@ -1,75 +1,89 @@
 // next.config.mjs
 /**
  * @file next.config.mjs
- * @description Manifiesto de configuración de Next.js. Ha sido refactorizado para
- *              incluir la directiva CSP `worker-src`, resolviendo un fallo crítico
- *              con la integración de Sentry Replay.
- * @author L.I.A. Legacy
- * @version 8.1.0
+ * @description Manifiesto de configuración de Next.js. Corregido para alinear la
+ *              estructura de la función `headers` con el contrato de la API de
+ *              Next.js, resolviendo el error `Invalid header found`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 9.1.0
+ * @date 2025-08-26
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
+import crypto from "crypto";
 import createNextIntlPlugin from "next-intl/plugin";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n.ts");
 
-const cspDirectives = {
-  "default-src": ["'self'"],
-  "script-src": ["'self'", "'unsafe-eval'", "'unsafe-inline'"],
-  // --- INICIO DE CORRECCIÓN DE CSP ---
-  "worker-src": ["'self'", "blob:"],
-  // --- FIN DE CORRECCIÓN DE CSP ---
-  "style-src": ["'self'", "'unsafe-inline'"],
-  "img-src": [
-    "'self'",
-    "data:",
-    "https://avatars.githubusercontent.com",
-    "https://api.dicebear.com",
-  ],
-  "font-src": ["'self'"],
-  "connect-src": [
-    "'self'",
-    `https://${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("://")[1]}`,
-    `wss://${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("://")[1]}`,
-    "https://*.sentry.io",
-  ],
-  "frame-src": ["'self'"],
-  "object-src": ["'none'"],
-  "base-uri": ["'self'"],
-  "form-action": ["'self'"],
-  "frame-ancestors": ["'none'"],
-};
-
-const cspHeader = Object.entries(cspDirectives)
-  .map(([key, value]) => `${key} ${value.join(" ")}`)
-  .join("; ");
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
+  // La función async `headers` es la propiedad de nivel superior.
   async headers() {
+    // Esta función se ejecuta para CADA petición en el servidor.
+    const nonce = crypto.randomBytes(16).toString("base64");
+
+    const cspDirectives = {
+      "default-src": ["'self'"],
+      "script-src": [
+        "'self'",
+        process.env.NODE_ENV === "production"
+          ? `'nonce-${nonce}'`
+          : "'unsafe-eval'",
+        "'unsafe-inline'",
+      ],
+      "worker-src": ["'self'", "blob:"],
+      "style-src": ["'self'", "'unsafe-inline'"],
+      "img-src": [
+        "'self'",
+        "data:",
+        "https://avatars.githubusercontent.com",
+        "https://api.dicebear.com",
+        "https://raw.githubusercontent.com",
+        "https://images.unsplash.com",
+      ],
+      "font-src": ["'self'"],
+      "connect-src": [
+        "'self'",
+        `https://${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("://")[1]}`,
+        `wss://${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("://")[1]}`,
+        "https://*.sentry.io",
+        "http://ip-api.com",
+      ],
+      "frame-src": ["'self'"],
+      "object-src": ["'none'"],
+      "base-uri": ["'self'"],
+      "form-action": ["'self'"],
+      "frame-ancestors": ["'none'"],
+    };
+
+    const cspHeader = Object.entries(cspDirectives)
+      .map(([key, value]) => `${key} ${value.join(" ")}`)
+      .join("; ");
+
+    // La función devuelve un array de objetos de ruta.
     return [
       {
         source: "/:path*",
+        // La propiedad `headers` aquí debe ser un ARRAY ESTÁTICO, no una función.
         headers: [
           {
             key: "Content-Security-Policy",
             value: cspHeader.replace(/\s{2,}/g, " ").trim(),
           },
+          { key: "x-nonce", value: nonce },
         ],
       },
     ];
   },
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "avatars.githubusercontent.com",
-        port: "",
-        pathname: "/u/**",
-      },
-      {
-        protocol: "https",
-        hostname: "api.dicebear.com",
-      },
+      { protocol: "https", hostname: "avatars.githubusercontent.com" },
+      { protocol: "https", hostname: "api.dicebear.com" },
+      { protocol: "https", hostname: "raw.githubusercontent.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
 };
@@ -92,18 +106,16 @@ const finalConfig = withSentryConfig(
 );
 
 export default finalConfig;
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Fallo de Sentry Replay**: ((Implementada)) Se ha añadido la directiva `worker-src 'self' 'blob:'` a la CSP. Esto resuelve la causa raíz del error, permitiendo que la funcionalidad de Sentry Replay opere correctamente.
- * 2. **Blindaje de Seguridad**: ((Implementada)) La política ahora es más explícita y segura. También se han añadido `wss://...` a `connect-src` y `api.dicebear.com` a `img-src` para prevenir futuros errores de CSP.
+ * 1. ((Implementada)) **Resolución de Regresión Crítica:** Se ha reestructurado la función `headers` para que cumpla con el contrato de la API de Next.js, resolviendo el error `Invalid header found` y restaurando la funcionalidad del servidor.
  *
  * @subsection Melhorias Futuras
- * 1. **Gestión Dinámica de CSP**: ((Vigente)) Mover la generación de las cabeceras CSP al middleware para una gestión más centralizada y flexible, especialmente si se necesitan directivas diferentes para rutas específicas.
+ * 1. ((Vigente)) **CSP Dinámica:** La configuración de la CSP podría ser externalizada a un archivo de manifiesto (`csp.config.js`) para una mayor separación de responsabilidades y mantenibilidad.
  *
  * =====================================================================
  */

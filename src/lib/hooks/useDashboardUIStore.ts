@@ -1,45 +1,37 @@
+// src/lib/hooks/useDashboardUIStore.ts
 /**
  * @file useDashboardUIStore.ts
  * @description Store de estado global de Zustand para la UI del Dashboard.
- *              Esta es la Única Fuente de Verdad (SSoT) para el estado visual
- *              del layout del "Workspace Creativo", gestionando la visibilidad
- *              de la barra lateral contextual y el widget de perfil de usuario.
+ *              Corregido con tipificación explícita y aserciones quirúrgicas
+ *              para resolver errores de inferencia de tipos complejos al anidar
+ *              middlewares.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-25
+ * @version 3.3.0
+ * @date 2025-08-26
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
-import { create } from "zustand";
+import { create, type StateCreator } from "zustand";
+import {
+  createJSONStorage,
+  persist,
+  type PersistOptions,
+} from "zustand/middleware";
+import { syncTabs } from "zustand-sync-tabs";
 import { clientLogger } from "@/lib/logging";
 
-/**
- * @public
- * @interface DashboardUIState
- * @description Define la estructura del estado y las acciones para el store de la UI del dashboard.
- */
 interface DashboardUIState {
-  /** Controla si la barra lateral secundaria (contextual) está colapsada. */
   isSidebarCollapsed: boolean;
-  /** Controla si el widget de perfil de usuario flotante está visible. */
   isProfileWidgetOpen: boolean;
-  /** Acción para alternar el estado de colapso de la barra lateral. */
   toggleSidebar: () => void;
-  /** Acción para alternar la visibilidad del widget de perfil. */
   toggleProfileWidget: () => void;
-  /** Acción para establecer explícitamente la visibilidad del widget de perfil. */
   setProfileWidgetOpen: (isOpen: boolean) => void;
 }
 
-/**
- * @public
- * @constant useDashboardUIStore
- * @description Hook de Zustand que proporciona acceso al estado de la UI del dashboard
- *              y a las acciones para manipularlo desde cualquier componente de cliente.
- */
-export const useDashboardUIStore = create<DashboardUIState>((set) => ({
+// --- INICIO DE CORRECCIÓN DE TIPO (TS7006) ---
+const creator: StateCreator<DashboardUIState> = (set) => ({
   isSidebarCollapsed: false,
   isProfileWidgetOpen: true,
   toggleSidebar: () =>
@@ -59,13 +51,37 @@ export const useDashboardUIStore = create<DashboardUIState>((set) => ({
   setProfileWidgetOpen: (isOpen) => {
     clientLogger.trace(
       "[Zustand:DashboardUI] Estableciendo visibilidad del widget de perfil.",
-      {
-        newState: isOpen,
-      }
+      { newState: isOpen }
     );
     set({ isProfileWidgetOpen: isOpen });
   },
-}));
+});
+// --- FIN DE CORRECCIÓN DE TIPO (TS7006) ---
+
+// --- INICIO DE CORRECCIÓN DE TIPO (TS2322) ---
+const persistOptions: PersistOptions<
+  DashboardUIState,
+  Pick<DashboardUIState, "isSidebarCollapsed"> // Especifica la forma del estado persistido
+> = {
+  name: "convertikit-dashboard-ui-preferences",
+  storage: createJSONStorage(() => localStorage),
+  partialize: (state) => ({
+    isSidebarCollapsed: state.isSidebarCollapsed,
+  }),
+};
+// --- FIN DE CORRECCIÓN DE TIPO (TS2322) ---
+
+export const useDashboardUIStore = create<DashboardUIState>()(
+  syncTabs(
+    // --- INICIO DE CORRECCIÓN DE TIPO (TS2345) ---
+    persist(creator, persistOptions) as StateCreator<DashboardUIState>,
+    // --- FIN DE CORRECCIÓN DE TIPO (TS2345) ---
+    {
+      name: "convertikit-dashboard-ui-sync",
+      exclude: ["isProfileWidgetOpen"],
+    }
+  )
+);
 
 /**
  * =====================================================================
@@ -73,11 +89,11 @@ export const useDashboardUIStore = create<DashboardUIState>((set) => ({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Estado de UI Desacoplado**: ((Implementada)) Este store es una implementación de élite de la "Filosofía LEGO". Permite que componentes no relacionados (ej. el `PrimarySidebar` y el `DashboardLayout`) se comuniquen y compartan estado de UI sin acoplamiento directo.
- * 2. **Full Observabilidad**: ((Implementada)) Cada acción que muta el estado registra un evento de `trace`, proporcionando visibilidad completa sobre las interacciones del usuario con la UI del layout.
+ * 1. ((Implementada)) **Resolución de Regresión de Tipo Compleja:** La tipificación explícita de `PersistOptions` y la aserción de tipo quirúrgica en `persist` resuelven la cascada de errores de TypeScript, restaurando la integridad del sistema de tipos.
  *
  * @subsection Melhorias Futuras
- * 1. **Persistencia de Preferencias**: ((Vigente)) Se podría integrar el middleware `persist` de Zustand para guardar el estado `isSidebarCollapsed` en `localStorage`. Esto permitiría que la preferencia del usuario sobre el layout se mantenga entre sesiones.
+ * 1. ((Vigente)) **Sincronización Selectiva con el Servidor:** El estado persistido en `localStorage` podría ser sincronizado periódicamente con la base de datos para mantener las preferencias de UI entre diferentes dispositivos.
  *
  * =====================================================================
  */
+// src/lib/hooks/useDashboardUIStore.ts

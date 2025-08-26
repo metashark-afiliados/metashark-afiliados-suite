@@ -1,18 +1,25 @@
 // src/components/shared/pagination-controls.tsx
+/**
+ * @file pagination-controls.tsx
+ * @description Componente de cliente soberano para la navegación paginada.
+ *              Consume sus propias traducciones a través del hook SSoT
+ *              `useDashboardTranslations`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-26
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { usePagination, DOTS } from "@/lib/hooks/ui/use-pagination";
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-
-interface PaginationTexts {
-  previousPageLabel: string;
-  nextPageLabel: string;
-  pageLabelTemplate: string;
-}
+import { clientLogger } from "@/lib/logging";
 
 export interface PaginationControlsProps {
   page: number;
@@ -21,18 +28,8 @@ export interface PaginationControlsProps {
   basePath: string;
   routeParams?: Record<string, string>;
   searchQuery?: string;
-  texts: PaginationTexts;
 }
 
-/**
- * @public
- * @component PaginationControls
- * @description Componente de cliente de presentación puro para la navegación paginada.
- *              Consume el hook `usePagination` para la lógica y solo se encarga
- *              de renderizar la UI.
- * @author L.I.A. Legacy
- * @version 3.0.0
- */
 export function PaginationControls({
   page,
   totalCount,
@@ -40,8 +37,10 @@ export function PaginationControls({
   basePath,
   routeParams,
   searchQuery,
-  texts,
 }: PaginationControlsProps) {
+  clientLogger.trace("[PaginationControls] Renderizando componente soberano.");
+  const { tSitesPage } = useDashboardTranslations();
+
   const { paginationRange, hasPreviousPage, hasNextPage } = usePagination({
     currentPage: page,
     totalCount,
@@ -59,11 +58,7 @@ export function PaginationControls({
     if (searchQuery) {
       query.q = searchQuery;
     }
-    return {
-      pathname: basePath,
-      params: routeParams,
-      query,
-    };
+    return { pathname: basePath, params: routeParams, query };
   };
 
   return (
@@ -71,7 +66,7 @@ export function PaginationControls({
       <Button asChild variant="outline" size="icon" disabled={!hasPreviousPage}>
         <Link
           href={createPageLink(page - 1) as any}
-          aria-label={texts.previousPageLabel}
+          aria-label={tSitesPage("pagination.previous")}
         >
           <ChevronLeft className="h-4 w-4" />
         </Link>
@@ -95,10 +90,9 @@ export function PaginationControls({
           >
             <Link
               href={createPageLink(Number(pageNumber)) as any}
-              aria-label={texts.pageLabelTemplate.replace(
-                "{pageNumber}",
-                String(pageNumber)
-              )}
+              aria-label={tSitesPage("pagination.page", {
+                pageNumber: String(pageNumber),
+              })}
               aria-current={pageNumber === page ? "page" : undefined}
             >
               {pageNumber}
@@ -110,7 +104,7 @@ export function PaginationControls({
       <Button asChild variant="outline" size="icon" disabled={!hasNextPage}>
         <Link
           href={createPageLink(page + 1) as any}
-          aria-label={texts.nextPageLabel}
+          aria-label={tSitesPage("pagination.next")}
         >
           <ChevronRight className="h-4 w-4" />
         </Link>
@@ -118,14 +112,18 @@ export function PaginationControls({
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Hiper-Atomicidad (Presentación Pura)**: ((Implementada)) El componente ahora solo se encarga de la renderización, delegando toda la lógica de cálculo al hook `usePagination`.
+ * 1. ((Implementada)) **Soberanía de i18n:** El componente ahora consume `useDashboardTranslations` internamente. Se ha eliminado la prop `texts`, resolviendo la causa raíz del error de tipo `TS2741` en su orquestador (`sites-client.tsx`).
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) **Input de Página:** Añadir un campo de entrada (`<Input type="number">`) que permita al usuario saltar directamente a una página específica, una mejora de UX para conjuntos de datos muy grandes.
+ * 2. ((Vigente)) **Información de Conteo:** Mostrar información de conteo como "Mostrando 1-10 de 100 resultados" para dar más contexto al usuario.
  *
  * =====================================================================
  */
+// src/components/shared/pagination-controls.tsx

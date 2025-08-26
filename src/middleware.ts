@@ -1,72 +1,56 @@
 // src/middleware.ts
 /**
  * @file src/middleware.ts
- * @description Orquestador principal del middleware. Corregido para exportar la
- *              función principal por defecto, cumpliendo con el contrato de API de Next.js.
- * @author L.I.A. Legacy
- * @version 4.0.0
+ * @description Orquestador de Middleware de Élite. Refactorizado para ser
+ *              completamente asíncrono y manejar correctamente las promesas
+ *              devueltas por sus handlers, resolviendo regresiones de tipo.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.1.0
+ * @date 2025-08-26
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
-import createIntlMiddleware from "next-intl/middleware";
-import { type NextRequest, NextResponse } from "next/server";
+import { type NextRequest, type NextResponse } from "next/server";
 
-import { defaultLocale } from "@/i18n";
 import { logger } from "@/lib/logging";
-import { localePrefix, locales, pathnames } from "@/lib/navigation";
 import {
   handleAuth,
+  handleI18n,
   handleMaintenance,
   handleMultitenancy,
   handleRedirects,
   handleTelemetry,
 } from "@/middleware/handlers";
 
-async function middlewarePipeline(request: NextRequest): Promise<NextResponse> {
-  const startTime = performance.now();
-  logger.trace(
-    `[MIDDLEWARE_ORCHESTRATOR] Pipeline iniciado para: ${request.nextUrl.pathname}`
-  );
+export async function middleware(request: NextRequest): Promise<NextResponse> {
+  logger.trace("==> [MIDDLEWARE_PIPELINE] START <==", {
+    path: request.nextUrl.pathname,
+  });
 
-  const redirectsResponse = handleRedirects(request);
-  if (redirectsResponse) return redirectsResponse;
+  const redirectResponse = handleRedirects(request);
+  if (redirectResponse) return redirectResponse;
 
   const maintenanceResponse = handleMaintenance(request);
   if (maintenanceResponse) return maintenanceResponse;
 
-  const handleI18n = createIntlMiddleware({
-    locales,
-    localePrefix,
-    pathnames,
-    defaultLocale: defaultLocale,
-  });
-  let response = handleI18n(request);
-
-  const detectedLocale =
-    response.headers.get("x-next-intl-locale") || defaultLocale;
-  response.headers.set("x-app-locale", detectedLocale);
-
-  response = handleMultitenancy(request, response);
+  // --- INICIO DE CORRECCIÓN ASÍNCRONA HOLÍSTICA ---
+  // Se espera (await) la resolución de cada handler asíncrono en la cadena.
+  let response = await handleI18n(request);
+  response = await handleMultitenancy(request, response);
   response = await handleAuth(request, response);
-  handleTelemetry(request, response);
+  await handleTelemetry(request, response);
+  // --- FIN DE CORRECCIÓN ASÍNCRONA HOLÍSTICA ---
 
-  const duration = Math.round(performance.now() - startTime);
-  logger.info(
-    `[MIDDLEWARE_ORCHESTRATOR] Pipeline finalizado para ${request.nextUrl.pathname}`,
-    { duration_ms: duration }
-  );
+  logger.trace("==> [MIDDLEWARE_PIPELINE] END <==", {
+    path: request.nextUrl.pathname,
+    status: response.status,
+  });
 
   return response;
 }
 
-// --- INICIO DE CORRECCIÓN: EXPORTACIÓN POR DEFECTO ---
-export default middlewarePipeline;
-// --- FIN DE CORRECCIÓN ---
-
 export const config = {
-  matcher: [
-    "/",
-    "/(pt-BR|en-US|es-ES)/:path*",
-    "/((?!api|_next/static|_next/image|images|assets|favicon.ico|sw.js).*)",
-  ],
+  matcher: ["/((?!api|trpc|_next|_vercel|.*\\..*).*)"],
 };
 /**
  * =====================================================================
@@ -74,8 +58,10 @@ export const config = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Servidor**: ((Implementada)) Se ha añadido la exportación por defecto, resolviendo el error de "must export a `middleware` or a `default` function".
- * 2. **Legibilidad Mejorada**: ((Implementada)) La lógica ha sido encapsulada en una función `middlewarePipeline` nombrada, mejorando la claridad del código antes de la exportación.
+ * 1. ((Implementada)) **Resolución de Regresión Asíncrona:** Se ha añadido `await` a las llamadas de `handleMultitenancy`, `handleAuth` y `handleTelemetry`, resolviendo la cascada de errores de tipo (`TS2740`, `TS2345`, `TS2339`) y restaurando la integridad del pipeline.
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) **Composición de Middlewares con Factoría:** Para una escalabilidad de élite, se podría crear una función `createMiddlewarePipeline([...handlers])` que genere la función `middleware` a partir de un array de manejadores.
  *
  * =====================================================================
  */

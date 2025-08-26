@@ -1,29 +1,29 @@
 // src/app/[locale]/layout.tsx
 /**
  * @file src/app/[locale]/layout.tsx
- * @description Layout Canónico de Contexto y Estilo. Este aparato envuelve todas
- *              las páginas internacionalizadas y configura los proveedores de contexto
- *              globales como `NextIntlClientProvider` y `ThemeProvider`. Ha sido
- *              alineado con la arquitectura de Tailwind CSS v4.1, eliminando la
- *              importación del archivo de variables obsoleto.
- * @author L.I.A. Legacy
- * @version 12.0.0
+ * @description Layout Canónico de Contexto y Estilo. Refactorizado para consumir
+ *              el `nonce` de la cabecera de la petición y aplicarlo al `body`,
+ *              completando el blindaje de seguridad contra ataques XSS.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 13.0.0
+ * @date 2025-08-26
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import React from "react";
 import { Toaster } from "react-hot-toast";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { unstable_setRequestLocale } from "next-intl/server";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { locales } from "@/lib/navigation";
-
-// La única importación de CSS necesaria es la de globals.css, que ahora contiene todo.
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
-  title: "Metashark - Plataforma de Marketing de Afiliados",
+  title: "ConvertiKit - Plataforma de Marketing de Afiliados",
   description:
     "Crea, gestiona y optimiza tus campañas de marketing de afiliados en minutos.",
   icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
@@ -45,11 +45,17 @@ export default function LocaleLayout({
   }
   unstable_setRequestLocale(locale);
 
+  // --- INICIO DE REFACTORIZACIÓN DE SEGURIDAD (CSP) ---
+  // Se lee el nonce generado por `next.config.js` en cada petición.
+  const nonce = headers().get("x-nonce") || "";
+  // --- FIN DE REFACTORIZACIÓN DE SEGURIDAD (CSP) ---
+
   const messages = useMessages();
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className="antialiased">
+      {/* Se aplica el nonce al body. Next.js lo propagará a sus scripts. */}
+      <body className="antialiased" nonce={nonce}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider
             attribute="class"
@@ -65,17 +71,17 @@ export default function LocaleLayout({
     </html>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica Definitiva**: ((Implementada)) La eliminación de la importación obsoleta de `theme-variables.css` completa la refactorización del sistema de diseño a la arquitectura canónica de Tailwind CSS v4.1. El proyecto está ahora libre de la deuda técnica que causaba el fallo de compilación.
+ * 1. ((Implementada)) **Blindaje de Seguridad XSS Completado:** El layout ahora consume el `nonce` de la cabecera `x-nonce` y lo aplica al `<body>`. Next.js utilizará este `nonce` para autorizar la ejecución de sus propios scripts, completando así la implementación de la CSP estricta.
+ * 2. ((Implementada)) **Arquitectura de Flujo de Datos Servidor:** La utilización de `headers()` de `next/headers` es la implementación canónica y de élite para acceder a las cabeceras de la petición dentro de un Server Component.
  *
  * @subsection Melhorias Futuras
- * 1. **Proveedores de Contexto Adicionales**: ((Vigente)) Este layout sigue siendo el lugar canónico para añadir cualquier otro proveedor global que la aplicación necesite, como un futuro `SessionProvider` o el `DashboardProvider`.
+ * 1. ((Vigente)) **Propagación de Nonce a Scripts de Terceros:** Si en el futuro se añaden scripts de terceros directamente en este layout (ej. Google Tag Manager), se deberá pasar explícitamente la prop `nonce={nonce}` a cada etiqueta `<Script>` de `next/script`.
  *
  * =====================================================================
  */

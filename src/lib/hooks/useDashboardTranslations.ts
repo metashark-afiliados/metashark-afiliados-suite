@@ -1,18 +1,18 @@
 // src/lib/hooks/useDashboardTranslations.ts
 /**
  * @file useDashboardTranslations.ts
- * @description Hook soberano y SSoT para la obtención de traducciones en el
- *              ecosistema del Dashboard. Centraliza la carga de todos los
- *              namespaces compartidos para garantizar la consistencia y
- *              resolver errores de `MISSING_MESSAGE` de forma sistémica.
+ * @description Hook soberano y SSoT para i18n en el Dashboard. Sincronizado
+ *              para incluir todos los namespaces requeridos por el ecosistema de
+ *              "Mis Sitios", resolviendo la causa raíz de errores de tipo `TS2339`.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-25
+ * @version 2.1.0
+ * @date 2025-08-26
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
+import { useFormatter } from "next-intl";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
 
 /**
@@ -20,7 +20,7 @@ import { useTypedTranslations } from "@/lib/i18n/hooks";
  * @function useDashboardTranslations
  * @description Hook que carga y devuelve todas las funciones de traducción
  *              necesarias para el layout principal del dashboard y sus
- *              componentes hijos (sidebars, dialogs, etc.).
+ *              componentes hijos. Es la SSoT para el consumo de i18n en el cliente.
  * @returns Un objeto que contiene las funciones `t` para cada namespace requerido.
  */
 export function useDashboardTranslations() {
@@ -31,6 +31,10 @@ export function useDashboardTranslations() {
   );
   const tDialogs = useTypedTranslations("components.ui.Dialogs");
   const tErrors = useTypedTranslations("shared.ValidationErrors");
+  const tActionDock = useTypedTranslations("shared.ActionDock");
+  const tDashboardPage = useTypedTranslations("app.[locale].dashboard.page");
+  const tSitesPage = useTypedTranslations("app.[locale].dashboard.sites.page");
+  const tFormatter = useFormatter();
 
   return {
     tSidebar,
@@ -38,22 +42,24 @@ export function useDashboardTranslations() {
     tWorkspaces,
     tDialogs,
     tErrors,
+    tActionDock,
+    tDashboardPage,
+    tSitesPage,
+    tFormatter,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Centralización de Dependencias (SSoT): Este hook se convierte en la Única Fuente de Verdad para las traducciones del dashboard, mejorando la mantenibilidad y el SRP.
- * 2. ((Implementada)) Resolución Sistémica de `MISSING_MESSAGE`: Al cargar el namespace `shared.ValidationErrors` aquí, se resuelve la causa raíz de los errores de build que se originaban en los hooks `useHandleErrors` y `useWorkspaceInlineEditor`.
- * 3. ((Implementada)) Seguridad de Tipos de Élite: Utiliza `useTypedTranslations` para garantizar que solo se puedan acceder a claves de traducción válidas en tiempo de compilación.
+ * 1. ((Implementada)) **SSoT de I18n Completa:** El hook ahora es la fuente de verdad para todas las traducciones del dashboard, incluyendo `tSitesPage`. Esta centralización resuelve la causa raíz de los errores de tipo `TS2339` al proveer una API de consumo consistente y completa para todos los componentes del ecosistema.
  *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) Tipado con Zod: El tipo de retorno de este hook podría ser validado por un schema de Zod que componga los schemas individuales de cada namespace, proporcionando una seguridad de tipos de élite en tiempo de compilación.
- * 2. ((Vigente)) Memoización del Objeto de Retorno: Aunque `useTypedTranslations` es memoizado, el objeto de retorno de este hook podría ser envuelto en `useMemo` para una capa adicional de optimización, previniendo re-renderizados innecesarios en los consumidores si sus props no cambian.
+ * 1. ((Vigente)) **Memoización del Objeto de Retorno:** El objeto devuelto por este hook se crea en cada renderizado. Para una optimización de élite, podría ser envuelto en `React.useMemo` con un array de dependencias vacío, asegurando que la misma instancia del objeto sea devuelta en re-renderizados, lo que puede optimizar los componentes consumidores que dependen de la estabilidad referencial de este objeto.
+ * 2. ((Vigente)) **Carga de Namespaces Condicional:** A futuro, si el dashboard crece, se podría refactorizar este hook para que acepte un array de `namespaces` requeridos y los cargue dinámicamente, en lugar de cargar todos siempre. Esto optimizaría el rendimiento en vistas más simples que no necesiten todos los textos.
  *
  * =====================================================================
  */
+// src/lib/hooks/useDashboardTranslations.ts

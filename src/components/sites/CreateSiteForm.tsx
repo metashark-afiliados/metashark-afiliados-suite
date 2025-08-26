@@ -1,16 +1,18 @@
 // src/components/sites/CreateSiteForm.tsx
 /**
- * @file src/components/sites/CreateSiteForm.tsx
- * @description Formulario de cliente para la creación de nuevos sitios. Es un
- *              componente de presentación inteligente: gestiona su propio estado
- *              con `react-hook-form` pero delega la mutación a una Server Action
- *              pasada por props. Es completamente internacionalizado y observable.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @file CreateSiteForm.tsx
+ * @description Formulario de cliente soberano para la creación de nuevos sitios.
+ *              Gestiona su propio estado y consume sus propias traducciones.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-26
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { type SubmitHandler, useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import type { z } from "zod";
@@ -19,48 +21,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CreateSiteClientSchema } from "@/lib/validators";
-
+import { clientLogger } from "@/lib/logging";
 import { SubdomainInput } from "./SubdomainInput";
-
-/**
- * @public
- * @interface CreateSiteFormTexts
- * @description Define el contrato de props para todos los textos internacionalizados
- *              que el formulario necesita, asegurando su desacoplamiento de i18n.
- */
-export interface CreateSiteFormTexts {
-  nameLabel: string;
-  namePlaceholder: string;
-  subdomainLabel: string;
-  subdomainInUseError: string;
-  descriptionLabel: string;
-  descriptionPlaceholder: string;
-  creatingButton: string;
-  createButton: string;
-}
 
 interface CreateSiteFormProps {
   workspaceId: string;
   onSuccess: (formData: FormData) => void;
   isPending: boolean;
-  texts: CreateSiteFormTexts;
 }
 
 type FormInputData = z.infer<typeof CreateSiteClientSchema>;
 
-/**
- * @public
- * @component CreateSiteForm
- * @description Renderiza un formulario robusto para la creación de sitios.
- * @param {CreateSiteFormProps} props - Las propiedades para configurar el formulario.
- * @returns {React.ReactElement}
- */
 export function CreateSiteForm({
   workspaceId,
   onSuccess,
   isPending,
-  texts,
 }: CreateSiteFormProps): React.ReactElement {
+  clientLogger.trace("[CreateSiteForm] Renderizando formulario soberano.");
+  const t = useTranslations("SitesPage.form");
+  const tErrors = useTranslations("SitesPage.validationErrors");
+
   const form = useForm<FormInputData>({
     resolver: zodResolver(CreateSiteClientSchema),
     mode: "onTouched",
@@ -92,61 +72,58 @@ export function CreateSiteForm({
   return (
     <form onSubmit={handleSubmit(processSubmit)} className="space-y-4 relative">
       <input type="hidden" {...register("workspaceId")} />
-
       <div className="space-y-2">
-        <Label htmlFor="name">{texts.nameLabel}</Label>
+        <Label htmlFor="name">{t("nameLabel")}</Label>
         <Input
           id="name"
-          placeholder={texts.namePlaceholder}
+          placeholder={t("namePlaceholder")}
           {...register("name")}
+          disabled={isLoading}
+          hasError={!!errors.name}
         />
         {errors.name && (
           <p className="text-sm text-destructive" role="alert">
-            {errors.name.message}
+            {tErrors(errors.name.message as any)}
           </p>
         )}
       </div>
-
       <div className="space-y-2">
-        <Label htmlFor="subdomain">{texts.subdomainLabel}</Label>
-        <SubdomainInput form={form} errorText={texts.subdomainInUseError} />
+        <Label htmlFor="subdomain">{t("subdomainLabel")}</Label>
+        <SubdomainInput form={form} errorText={t("subdomainInUseError")} />
       </div>
-
       <div className="space-y-2">
-        <Label htmlFor="description">{texts.descriptionLabel}</Label>
+        <Label htmlFor="description">{t("descriptionLabel")}</Label>
         <Input
           id="description"
-          placeholder={texts.descriptionPlaceholder}
+          placeholder={t("descriptionPlaceholder")}
           {...register("description")}
+          disabled={isLoading}
+          hasError={!!errors.description}
         />
         {errors.description && (
           <p className="text-sm text-destructive" role="alert">
-            {errors.description.message}
+            {tErrors(errors.description.message as any)}
           </p>
         )}
       </div>
-
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isLoading ? texts.creatingButton : texts.createButton}
+        {isLoading ? t("creatingButton") : t("createButton")}
       </Button>
     </form>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Composición Atómica**: ((Implementada)) Este formulario compone el aparato `SubdomainInput` reconstruido, demostrando la "Filosofía LEGO".
- * 2. **Patrón de Formulario Soberano**: ((Implementada)) Utiliza `react-hook-form` y `zodResolver` para una validación robusta y una UX superior del lado del cliente.
- * 3. **Componente Puro y Controlado**: ((Implementada)) Es un componente puro que recibe su lógica de mutación (`onSuccess`) y todo su contenido textual (`texts`) a través de props.
+ * 1. ((Implementada)) **Soberanía de i18n:** El componente ahora consume `useTranslations` internamente, eliminando la prop `texts` y simplificando su API.
+ * 2. ((Implementada)) **Full Observabilidad:** Se ha añadido `clientLogger.trace` para registrar su renderizado.
  *
  * @subsection Melhorias Futuras
- * 1. **Selector de Iconos**: ((Vigente)) Añadir un campo para que el usuario pueda seleccionar un emoji como ícono para su sitio, similar al `CreateWorkspaceForm`.
- * 2. **Feedback de Validación en Tiempo Real**: ((Vigente)) Aunque `onTouched` está configurado, la UI podría mejorarse para mostrar marcas de verificación verdes junto a los campos que pasan la validación, proporcionando un feedback más proactivo.
+ * 1. ((Vigente)) **Selector de Iconos:** Añadir un campo para que el usuario pueda seleccionar un emoji como ícono para su sitio, similar a la creación de workspaces.
  *
  * =====================================================================
  */
