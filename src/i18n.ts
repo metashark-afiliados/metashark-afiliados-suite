@@ -70,11 +70,13 @@ export default getRequestConfig(async ({ locale }) => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución Sistémica de `MISSING_MESSAGE`**: ((Implementada)) Se ha reemplazado la lógica de aplanamiento por una de anidamiento usando `setNestedProperty`. Esto construye el objeto de mensajes con la estructura correcta que `next-intl` espera, resolviendo la causa raíz de todos los errores de namespace.
- * 2. **Adhesión a la Arquitectura Canónica**: ((Implementada)) Esta es la implementación correcta y de élite del orquestador para la arquitectura IMAS.
+ * 1. ((Implementada)) Resolución Sistémica de `MISSING_MESSAGE`: Se ha reemplazado la lógica de aplanamiento por una de anidamiento usando `setNestedProperty`. Esto construye el objeto de mensajes con la estructura correcta que `next-intl` espera, resolviendo la causa raíz de todos los errores de namespace.
+ * 2. ((Implementada)) Adhesión a la Arquitectura Canónica: Esta es la implementación correcta y de élite del orquestador para la arquitectura IMAS (Internationalization Modular Atomic Strategy).
+ * 3. ((Implementada)) Resiliencia Mejorada: La lógica de `try/catch` y el logging de advertencia para namespaces sin traducciones se han mantenido, garantizando un comportamiento robusto.
  *
  * @subsection Melhorias Futuras
- * 1. **Validación de Schema en Tiempo de Build**: ((Vigente)) Se podría integrar la validación del `i18nSchema` de Zod dentro de este archivo. Si los mensajes cargados no coinciden con el schema, el proceso de build fallaría explícitamente.
+ * 1. ((Vigente)) Validación de Schema en Tiempo de Build: Se podría integrar la validación del `i18nSchema` de Zod dentro de este archivo. Si el objeto `messages` ensamblado no coincide con el schema, el proceso de build fallaría explícitamente, previniendo errores de tipo en producción.
+ * 2. ((Vigente)) Carga Parcial de Namespaces: Para aplicaciones extremadamente grandes, se podría modificar el `getRequestConfig` para que acepte los namespaces necesarios como parámetro, en lugar de cargar todos por defecto, optimizando aún más la memoria del servidor.
  *
  * =====================================================================
  */

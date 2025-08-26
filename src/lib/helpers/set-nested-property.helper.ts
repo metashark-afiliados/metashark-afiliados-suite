@@ -44,8 +44,11 @@ export function setNestedProperty(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Compatibilidad Universal**: ((Implementada)) Se ha verificado la ausencia de directivas de runtime, asegurando que este helper pueda ser consumido por el orquestador `i18n.ts` durante el build.
+ * 1. ((Implementada)) Compatibilidad Universal: Al no tener directivas de runtime, este helper es una pieza de lógica pura y reutilizable en cualquier entorno, lo que lo hace ideal para ser consumido por el orquestador `i18n.ts` que se ejecuta en el servidor durante el build.
+ * 2. ((Implementada)) Lógica Robusta: Maneja la creación de objetos anidados de forma segura, previniendo errores de `TypeError: Cannot set properties of undefined`.
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) Tipado Genérico Avanzado: Para una seguridad de tipos de élite, la firma de la función podría ser mejorada con tipos genéricos avanzados para inferir la forma del objeto resultante basándose en la ruta del `path`.
  *
  * =====================================================================
  */
-// src/lib/helpers/set-nested-property.helper.ts
