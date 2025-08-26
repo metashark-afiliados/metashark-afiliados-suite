@@ -1,4 +1,5 @@
 // README.md
+
 <p align="center">
   <a href="https://convertikit.com" target="_blank">
     <img src="https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logo.png" alt="Logo de ConvertiKit" width="150"/>
@@ -34,17 +35,17 @@ Nuestra visión de producto está respaldada por una arquitectura de software de
 
 ### **3. Tech Stack de Élite**
 
-| Categoría         | Tecnología                | Propósito                               |
-| ----------------- | ------------------------- | --------------------------------------- |
-| **Framework**     | Next.js 14 (App Router)   | Renderizado Híbrido, Server Actions     |
-| **UI y Estilos**  | React 18, TailwindCSS, Shadcn/UI | UI moderna y componetizable             |
-| **Base de Datos** | Supabase (PostgreSQL)     | Persistencia, Autenticación, RLS, Realtime |
-| **Estado Cliente**| Zustand                   | Gestión de estado global simple y potente |
-| **Validación**    | Zod                       | Validación de esquemas en cliente y servidor |
-| **Pruebas**       | Vitest & Testing Library  | Pruebas unitarias y de integración      |
-| **Pruebas E2E**   | Playwright                | Pruebas de flujo de usuario de extremo a extremo |
-| **i18n**          | `next-intl`               | Internacionalización completa           |
-| **Observabilidad**| Sentry                    | Monitoreo de errores y rendimiento      |
+| Categoría          | Tecnología                       | Propósito                                        |
+| ------------------ | -------------------------------- | ------------------------------------------------ |
+| **Framework**      | Next.js 14 (App Router)          | Renderizado Híbrido, Server Actions              |
+| **UI y Estilos**   | React 18, TailwindCSS, Shadcn/UI | UI moderna y componetizable                      |
+| **Base de Datos**  | Supabase (PostgreSQL)            | Persistencia, Autenticación, RLS, Realtime       |
+| **Estado Cliente** | Zustand                          | Gestión de estado global simple y potente        |
+| **Validación**     | Zod                              | Validación de esquemas en cliente y servidor     |
+| **Pruebas**        | Vitest & Testing Library         | Pruebas unitarias y de integración               |
+| **Pruebas E2E**    | Playwright                       | Pruebas de flujo de usuario de extremo a extremo |
+| **i18n**           | `next-intl`                      | Internacionalización completa                    |
+| **Observabilidad** | Sentry                           | Monitoreo de errores y rendimiento               |
 
 ---
 
@@ -59,35 +60,36 @@ Nuestra visión de producto está respaldada por una arquitectura de software de
     pnpm install
     ```
 3.  **Configurar Entorno Local:**
-    *   Copia `.env.example` a `.env.local`.
-    *   Rellena **todas** las variables en `.env.local` con las credenciales de tu proyecto Supabase remoto.
+    - Copia `.env.example` a `.env.local`.
+    - Rellena **todas** las variables en `.env.local` con las credenciales de tu proyecto Supabase remoto.
 
 4.  **Ejecutar la Aplicación:**
     ```bash
     pnpm dev
     ```
 
-### **5. Comandos Críticos del Proyecto**
+### **5. Comandos del Proyecto**
 
-| Comando             | Descripción                                                              |
-| ------------------- | ------------------------------------------------------------------------ |
-| `pnpm dev`          | Inicia el servidor de desarrollo conectado a la BD remota.               |
-| `pnpm test`         | Ejecuta la suite completa de pruebas (unit/int).                         |
-| `pnpm test:watch`   | Ejecuta las pruebas en modo interactivo.                                 |
-| `pnpm test:unit`    | Ejecuta solo las pruebas unitarias.                                      |
-| `pnpm test:integration`| Ejecuta solo las pruebas de integración.                               |
-| `pnpm e2e`          | Ejecuta la suite de pruebas E2E (Playwright).                            |
-| `pnpm diag:all`     | Ejecuta una auditoría completa del esquema en la BD remota.              |
+| Comando                 | Descripción                                                 |
+| ----------------------- | ----------------------------------------------------------- |
+| `pnpm dev`              | Inicia el servidor de desarrollo conectado a la BD remota.  |
+| `pnpm test`             | Ejecuta la suite completa de pruebas (unit/int).            |
+| `pnpm test:watch`       | Ejecuta las pruebas en modo interactivo.                    |
+| `pnpm test:unit`        | Ejecuta solo las pruebas unitarias.                         |
+| `pnpm test:integration` | Ejecuta solo las pruebas de integración.                    |
+| `pnpm e2e`              | Ejecuta la suite de pruebas E2E (Playwright).               |
+| `pnpm diag:all`         | Ejecuta una auditoría completa del esquema en la BD remota. |
 
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Transformación a README**: ((Implementada)) El documento ha sido completamente reescrito para servir como el `README.md` principal del proyecto, proporcionando una guía de inicio clara para los desarrolladores.
- * 2. **Sincronización Completa**: ((Implementada)) Refleja la marca "ConvertiKit", la filosofía "Remote-First" y la lista de scripts de `package.json` actualizada.
- *
- * =====================================================================
- */
-// README.md
+/\*\*
+
+- =====================================================================
+-                           MEJORA CONTINUA
+- =====================================================================
+-
+- @subsection Melhorias Adicionadas
+- 1.  **Transformación a README**: ((Implementada)) El documento ha sido completamente reescrito para servir como el `README.md` principal del proyecto, proporcionando una guía de inicio clara para los desarrolladores.
+- 2.  **Sincronización Completa**: ((Implementada)) Refleja la marca "ConvertiKit", la filosofía "Remote-First" y la lista de scripts de `package.json` actualizada.
+-
+- =====================================================================
+  \*/
+  // README.md
