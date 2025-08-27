@@ -2,18 +2,18 @@
 /**
  * @file page.tsx
  * @description Orquestador de UI para la página de inicio de sesión. Refactorizado
- *              a un estándar de élite para ser completamente autónomo en su consumo de i18n,
- *              proveyendo todas las props de texto requeridas a sus componentes hijos
- *              y resolviendo errores críticos de build en Vercel.
+ *              a un estándar de élite para ser declarado explícitamente como
+ *              dinámico, resolviendo el conflicto de renderizado estático en Vercel.
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
- * @date 2025-08-25
+ * @version 7.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { useTranslations } from "next-intl";
+import { unstable_setRequestLocale } from "next-intl/server";
 
 import {
   LoginForm,
@@ -23,7 +23,18 @@ import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { clientLogger } from "@/lib/logging";
 
-export default function LoginPage(): React.ReactElement {
+// --- INICIO DE CORRECCIÓN DE BUILD (VERCEL) ---
+// Declara explícitamente que esta ruta debe ser renderizada dinámicamente.
+// Esto resuelve el conflicto entre el `headers()` del layout y la generación estática.
+export const dynamic = "force-dynamic";
+// --- FIN DE CORRECCIÓN DE BUILD (VERCEL) ---
+
+export default function LoginPage({
+  params: { locale },
+}: {
+  params: { locale: string };
+}): React.ReactElement {
+  unstable_setRequestLocale(locale);
   clientLogger.trace("[LoginPage] Renderizando orquestador de UI.");
   const t = useTranslations("app.[locale].login.page");
 
@@ -61,12 +72,11 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Orquestador de UI Puro: Este componente ahora solo se encarga de la composición y la carga de datos de i18n, delegando la presentación a sus hijos.
- * 2. ((Implementada)) Soberanía de Namespace: Carga su propio namespace (`app.[locale].login.page`), eliminando dependencias cruzadas y resolviendo la causa raíz de los errores de i18n.
- * 3. ((Implementada)) Inyección de Dependencia Textual (IDT): Pasa el objeto `texts` al `LoginForm`, convirtiéndolo en un componente puro y reutilizable.
+ * 1. ((Implementada)) **Resolución de Error Crítico de Build**: Se ha añadido `export const dynamic = 'force-dynamic'`. Esta directiva instruye a Next.js a no intentar la generación estática de esta página, resolviendo la causa raíz del fallo de despliegue en Vercel.
  *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) El patrón de `AuthCardLayout` y `bottomLink` se repetirá en la página de registro. Se podría abstraer a un componente `AuthPageLayout` para un mayor cumplimiento del principio DRY.
+ * 1. ((Vigente)) El patrón de `AuthCardLayout` y `bottomLink` se repetirá en la página de registro. Se podría abstraer a un componente `AuthPageLayout`.
  *
  * =====================================================================
  */
+// src/app/[locale]/login/page.tsx

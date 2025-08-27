@@ -1,18 +1,19 @@
 // src/app/[locale]/signup/page.tsx
 /**
  * @file page.tsx
- * @description Página de registro. Refactorizada a un estándar de élite para ser
- *              completamente autónoma en su consumo de i18n, proveyendo
- *              todas las props de texto requeridas a sus componentes hijos.
+ * @description Página de registro. Refactorizada a un estándar de élite para
+ *              ser declarada explícitamente como dinámica, resolviendo el
+ *              conflicto de renderizado estático en Vercel.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-25
+ * @version 6.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { useTranslations } from "next-intl";
+import { unstable_setRequestLocale } from "next-intl/server";
 
 import {
   SignupForm,
@@ -22,7 +23,17 @@ import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { clientLogger } from "@/lib/logging";
 
-export default function SignupPage(): React.ReactElement {
+// --- INICIO DE CORRECCIÓN DE BUILD (VERCEL) ---
+// Declara explícitamente que esta ruta debe ser renderizada dinámicamente.
+export const dynamic = "force-dynamic";
+// --- FIN DE CORRECCIÓN DE BUILD (VERCEL) ---
+
+export default function SignupPage({
+  params: { locale },
+}: {
+  params: { locale: string };
+}): React.ReactElement {
+  unstable_setRequestLocale(locale);
   clientLogger.trace("[SignupPage] Renderizando página de registro.");
   const t = useTranslations("app.[locale].signup.page");
 
@@ -56,11 +67,11 @@ export default function SignupPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Resolución de `MISSING_MESSAGE` y `FORMATTING_ERROR`: Se ha eliminado la dependencia del namespace de `login`. El componente ahora es 100% autocontenido y provee las props de texto correctas a `SignupForm`, resolviendo los errores de Vercel.
- * 2. ((Implementada)) Autonomía de Módulo (Filosofía LEGO): El componente ahora cumple estrictamente con la arquitectura IMAS, mejorando la modularidad y mantenibilidad.
+ * 1. ((Implementada)) **Resolución de Error Crítico de Build**: Se ha añadido `export const dynamic = 'force-dynamic'`, resolviendo la causa raíz del fallo de despliegue en Vercel para la ruta `/signup`.
  *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) El patrón de `AuthCardLayout` y `bottomLink` es similar entre `LoginPage` y `SignupPage`. Podría ser abstraído a un componente `AuthPageLayout` que reciba el `children` (el formulario) y las props para el enlace inferior.
+ * 1. ((Vigente)) El patrón de `AuthCardLayout` y `bottomLink` es similar entre `LoginPage` y `SignupPage`. Podría ser abstraído a un componente `AuthPageLayout`.
  *
  * =====================================================================
  */
+// src/app/[locale]/signup/page.tsx
