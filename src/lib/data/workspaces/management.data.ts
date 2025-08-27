@@ -24,6 +24,17 @@ type Supabase = SupabaseClient<
   "public"
 >;
 
+/**
+ * @public
+ * @async
+ * @function getWorkspacesByUserId
+ * @description Obtiene todos los workspaces a los que pertenece un usuario.
+ *              La consulta a la base de datos está envuelta en `React.cache` para
+ *              prevenir ejecuciones duplicadas dentro de una misma renderización de servidor.
+ * @param {string} userId - El ID del usuario.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
+ * @returns {Promise<Workspace[]>} Un array con los workspaces del usuario.
+ */
 export const getWorkspacesByUserId = cache(
   async (userId: string, supabaseClient?: Supabase): Promise<Workspace[]> => {
     logger.trace(`[Cache MISS] Cargando workspaces para usuario: ${userId}`);
@@ -44,6 +55,16 @@ export const getWorkspacesByUserId = cache(
   }
 );
 
+/**
+ * @public
+ * @async
+ * @function getWorkspaceById
+ * @description Obtiene los datos básicos de un workspace por su ID.
+ *              La consulta está envuelta en `React.cache`.
+ * @param {string} workspaceId - El ID del workspace a obtener.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
+ * @returns {Promise<Pick<Workspace, "id" | "name"> | null>} El objeto del workspace o null si no se encuentra.
+ */
 export const getWorkspaceById = cache(
   async (
     workspaceId: string,
@@ -75,14 +96,19 @@ export const getWorkspaceById = cache(
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 1.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad de Lógica de Datos (SRP)**: ((Implementada)) Este nuevo aparato aísla perfectamente la lógica de obtención de datos para workspaces, cumpliendo con la directiva de atomización.
+ * 1. **Atomicidad de Lógica de Datos (SRP)**: ((Implementada)) Este nuevo aparato aísla perfectamente la lógica de obtención de datos para workspaces, cumpliendo con la directiva de atomización. Su lógica ha sido migrada directamente del archivo monolítico.
  * 2. **Optimización de Rendimiento**: ((Implementada)) Ambas funciones utilizan `React.cache` para prevenir consultas duplicadas a la base de datos dentro de la misma request.
  *
  * @subsection Melhorias Futuras
- * 1. **Función `getWorkspaceMembers`**: ((Vigente)) Para una futura página de gestión de miembros del workspace, se necesitará una nueva función `getWorkspaceMembers(workspaceId: string)` que devuelva la lista de usuarios y sus roles.
+ * 1. **Función `getWorkspaceMembers`**: ((Vigente)) Para una futura página de gestión de miembros del workspace, se necesitará una nueva función `getWorkspaceMembers(workspaceId: string)` que devuelva la lista de usuarios y sus roles. Propondré añadirla cuando se aborde dicha funcionalidad.
  *
  * =====================================================================
  */

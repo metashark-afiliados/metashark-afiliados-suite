@@ -20,9 +20,10 @@ import { type UserProfilesWithEmail } from "./types";
  * @public
  * @async
  * @function getPaginatedUsersWithRoles
- * @description Obtiene una lista paginada y filtrada de todos los perfiles de usuario.
+ * @description Obtiene una lista paginada y filtrada de todos los perfiles de usuario
+ *              de la plataforma, consultando la vista `user_profiles_with_email`.
  * @param {object} options - Opciones de paginación y búsqueda.
- * @returns {Promise<{ profiles: UserProfilesWithEmail[]; totalCount: number }>}
+ * @returns {Promise<{ profiles: UserProfilesWithEmail[]; totalCount: number }>} Los perfiles y el conteo total.
  * @throws {Error} Si la consulta a la base de datos falla.
  */
 export async function getPaginatedUsersWithRoles({
@@ -66,13 +67,18 @@ export async function getPaginatedUsersWithRoles({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 1.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato tiene la única y clara responsabilidad de gestionar el acceso a los datos de los usuarios, mejorando la cohesión y mantenibilidad.
+ * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato tiene la única y clara responsabilidad de gestionar el acceso a los datos de los usuarios, mejorando la cohesión y mantenibilidad. Su lógica fue migrada directamente desde el monolito `admin.ts`.
  *
  * @subsection Melhorias Futuras
- * 1. **Índices de Búsqueda**: ((Vigente)) Para optimizar el rendimiento, se deben crear índices GIN con `pg_trgm` en las columnas `email` y `full_name` de la tabla `profiles`.
+ * 1. **Índices de Búsqueda**: ((Vigente)) Para optimizar el rendimiento de la búsqueda a gran escala, se deben crear índices GIN con la extensión `pg_trgm` en las columnas `email` y `full_name` de la tabla `profiles`. Propondré la creación del script de migración SQL para esto.
  *
  * =====================================================================
  */

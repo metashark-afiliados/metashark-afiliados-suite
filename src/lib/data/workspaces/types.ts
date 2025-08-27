@@ -17,7 +17,12 @@ export type Workspace = Tables<"workspaces">;
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 1.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
  * 1. **Centralización de Contratos (SSoT)**: ((Implementada)) Este nuevo aparato se convierte en la SSoT para los tipos de datos del módulo `workspaces`, mejorando la organización, la legibilidad y eliminando la duplicación de tipos.

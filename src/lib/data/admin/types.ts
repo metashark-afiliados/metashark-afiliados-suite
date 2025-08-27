@@ -2,24 +2,19 @@
 /**
  * @file types.ts
  * @description Aparato de contrato de datos y SSoT para el módulo de
- *              administración. Ha sido refactorizado para consumir correctamente
- *              el helper de tipo genérico `Views<T>`, resolviendo la cascada de
- *              errores de tipo TS2339.
+ *              administración. Define los tipos de datos compuestos que son
+ *              utilizados por las funciones de acceso a datos de alto privilegio.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 1.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 import { type Tables, type Views } from "@/lib/types/database";
 
-// --- INICIO DE CORRECCIÓN DE TIPO (TS2339) ---
-// El helper genérico `Views<T>` ya extrae la propiedad `Row`.
-// La sintaxis correcta es consumir el helper directamente, sin el `["Row"]` redundante.
 export type UserProfilesWithEmail = Views<"user_profiles_with_email">;
 
 export type SiteWithCampaignsCount = Views<"sites_with_campaign_counts">;
-// --- FIN DE CORRECCIÓN DE TIPO (TS2339) ---
 
 export type CampaignWithSiteInfo = Tables<"campaigns"> & {
   sites: { subdomain: string | null } | null;
@@ -30,17 +25,17 @@ export type CampaignWithSiteInfo = Tables<"campaigns"> & {
  *                           MEJORA CONTINUA
  *
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 1.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución Sistémica de `TS2339`**: ((Implementada)) Se ha eliminado el acceso `["Row"]` redundante. Esta corrección alinea el consumo de tipos con la definición del helper genérico `Views<T>`, resolviendo la causa raíz de los errores de compilación y estabilizando la capa de tipos.
- * 2. **Cohesión de Módulo**: ((Implementada)) Este aparato ahora sirve como la SSoT canónica y correcta para los tipos de datos del módulo de administración.
+ * 1. **Cohesión de Módulo (SRP)**: ((Implementada)) Este nuevo aparato se convierte en la SSoT canónica para los tipos de datos del módulo de administración, mejorando la organización y desacoplando los contratos de la lógica.
+ * 2. **Consistencia Arquitectónica**: ((Implementada)) La creación de este archivo continúa con el patrón de atomización de la capa de datos, haciendo que la estructura del módulo `admin` sea consistente con la del resto del proyecto.
  *
  * @subsection Melhorias Futuras
- * 1. **Renombrar Helper Genérico**: ((Vigente)) Para una DX de élite y para prevenir esta confusión en el futuro, el helper genérico `Views<T>` en `_shared.ts` podría ser renombrado a `ViewRow<T>` para que su propósito (extraer el tipo `Row`) sea semánticamente explícito.
+ * 1. **Tipos Derivados de RPC**: ((Vigente)) Si en el futuro se añaden funciones RPC específicas para administración (ej. `get_platform_statistics`), sus tipos de retorno deberían ser definidos aquí para mantener la cohesión del contrato de datos. Propondré esta adición cuando se implemente dicha funcionalidad.
  *
  * =====================================================================
  */

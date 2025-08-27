@@ -47,13 +47,12 @@ export async function getAllCampaignsWithSiteInfo(): Promise<
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato tiene la única y clara responsabilidad de gestionar el acceso a los datos de las campañas, mejorando la cohesión.
+ * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato tiene la única y clara responsabilidad de gestionar el acceso a los datos de las campañas, mejorando la cohesión. Su lógica ha sido migrada directamente desde el monolito `admin.ts`.
  *
  * @subsection Melhorias Futuras
- * 1. **Paginación y Búsqueda**: ((Vigente)) Para escalar, esta función debe ser refactorizada a `getPaginatedCampaigns` y aceptar opciones de paginación (`page`, `limit`) y búsqueda (`query`), similar a `getPaginatedUsersWithRoles`.
+ * 1. **Paginación y Búsqueda**: ((Vigente)) Para escalar a miles de campañas, esta función debe ser refactorizada a `getPaginatedCampaigns` y aceptar opciones de paginación (`page`, `limit`) y búsqueda (`query`), similar a `getPaginatedUsersWithRoles`. Propondré esta mejora una vez completada la atomización.
  *
  * =====================================================================
  */

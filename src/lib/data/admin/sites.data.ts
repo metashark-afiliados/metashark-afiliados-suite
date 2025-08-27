@@ -58,13 +58,12 @@ export async function getAllSites({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato tiene la única y clara responsabilidad de gestionar el acceso a los datos de todos los sitios, mejorando la cohesión.
+ * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato tiene la única y clara responsabilidad de gestionar el acceso a los datos de todos los sitios, mejorando la cohesión. Su lógica ha sido migrada directamente desde el monolito `admin.ts`.
  *
  * @subsection Melhorias Futuras
- * 1. **Búsqueda y Filtrado**: ((Vigente)) Para una funcionalidad de administración completa, esta función debería ser extendida para aceptar un `query` y otros parámetros de filtro (ej. por `status` o `owner_id`).
+ * 1. **Búsqueda y Filtrado**: ((Vigente)) Para una funcionalidad de administración completa, esta función debería ser extendida para aceptar un `query` y otros parámetros de filtro (ej. por `status` o `owner_id`). Propondré esta mejora una vez completada la atomización.
  *
  * =====================================================================
  */
