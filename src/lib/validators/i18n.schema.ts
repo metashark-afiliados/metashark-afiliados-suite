@@ -1,23 +1,20 @@
-// src/lib/validators/i18n.schema.ts
 /**
  * @file i18n.schema.ts
- * @description Manifiesto de Tipos y Única Fuente de Verdad (SSoT) para el
- *              contrato de datos del sistema de internacionalización. Este
- *              aparato ensambla todos los schemas atómicos en un único
- *              schema Zod aplanado, garantizando la integridad y seguridad
- *              de tipos de extremo a extremo para todas las traducciones.
+ * @description Manifiesto de Tipos y SSoT para el contrato de i18n. Ha sido
+ *              actualizado para ensamblar los nuevos schemas soberanos del Hub
+ *              Creativo, resolviendo la desincronización de tipos y completando
+ *              la refactorización de la Épica 6.
  * @author L.I.A. Legacy (Generado por script, verificado manualmente)
- * @version 20.0.1
+ * @version 21.0.0
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
- * @date 2025-08-25
+ * @date 2025-08-26
  */
 import { z } from "zod";
 
 // --- Importaciones de Schemas Atómicos (Ensamblaje "LEGO") ---
-import { ActionDockSchema } from "./i18n/ActionDock.schema";
 import { AboutPageSchema } from "./i18n/AboutPage.schema";
-import { AdminDashboardSchema } from "./i18n/AdminDashboard.schema";
+import { ActionDockSchema } from "./i18n/ActionDock.schema";
 import { AuthLayoutSchema } from "./i18n/AuthLayout.schema";
 import { AuthNoticePageSchema } from "./i18n/AuthNoticePage.schema";
 import { BlocksPaletteSchema } from "./i18n/BlocksPalette.schema";
@@ -58,6 +55,7 @@ import { NotFoundPageSchema } from "./i18n/NotFoundPage.schema";
 import { OAuthButtonSchema } from "./i18n/OAuthButton.schema";
 import { PrivacyPolicyPageSchema } from "./i18n/PrivacyPolicyPage.schema";
 import { ProcessStepsSchema } from "./i18n/ProcessSteps.schema";
+import { RecentActivitySchema } from "./i18n/RecentActivity.schema"; // <-- IMPORTACIÓN AÑADIDA
 import { ResetPasswordPageSchema } from "./i18n/ResetPasswordPage.schema";
 import { SettingsPanelSchema } from "./i18n/SettingsPanel.schema";
 import { SignUpPageSchema } from "./i18n/SignUpPage.schema";
@@ -73,16 +71,10 @@ import { TestimonialsSchema } from "./i18n/Testimonials.schema";
 import { ThemeSwitcherSchema } from "./i18n/ThemeSwitcher.schema";
 import { UserManagementTableSchema } from "./i18n/UserManagementTable.schema";
 import { ValidationErrorsSchema } from "./i18n/ValidationErrors.schema";
+import { WelcomeHeroSchema } from "./i18n/WelcomeHero.schema"; // <-- IMPORTACIÓN AÑADIDA
 import { WelcomeModalSchema } from "./i18n/WelcomeModal.schema";
 import { WorkspaceSwitcherSchema } from "./i18n/WorkspaceSwitcher.schema";
 
-/**
- * @public
- * @constant i18nSchema
- * @description El schema Zod aplanado que representa la estructura completa
- *              de todos los mensajes de internacionalización, ensamblado a
- *              partir de todos los schemas atómicos.
- */
 export const i18nSchema = z.object({
   "app.dev-console.CampaignsTable": CampaignsTableSchema,
   "app.dev-console.ImpersonationDialog": ImpersonationDialogSchema,
@@ -102,6 +94,8 @@ export const i18nSchema = z.object({
   "components.builder.SettingsPanel": SettingsPanelSchema,
   "components.builder.SiteAssignmentControl": SiteAssignmentControlSchema,
   "components.dashboard.InvitationBell": InvitationBellSchema,
+  "components.dashboard.RecentActivity": RecentActivitySchema, // <-- REGISTRO AÑADIDO
+  "components.dashboard.WelcomeHero": WelcomeHeroSchema, // <-- REGISTRO AÑADIDO
   "components.dev-console.DevSidebar": DevSidebarSchema,
   "components.feedback.CommandPalette": CommandPaletteSchema,
   "components.feedback.LiaChatWidget": LiaChatWidgetSchema,
@@ -145,12 +139,6 @@ export const i18nSchema = z.object({
   "shared.WelcomeModal": WelcomeModalSchema,
 });
 
-/**
- * @public
- * @typedef Messages
- * @description El tipo de TypeScript completo para todos los mensajes,
- *              inferido directamente desde el `i18nSchema`.
- */
 export type Messages = z.infer<typeof i18nSchema>;
 
 /**

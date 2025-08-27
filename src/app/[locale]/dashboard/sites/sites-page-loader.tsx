@@ -1,20 +1,26 @@
 // src/app/[locale]/dashboard/sites/sites-page-loader.tsx
 /**
  * @file src/app/[locale]/dashboard/sites/sites-page-loader.tsx
- * @description Componente de servidor aislado que encapsula toda la lógica de
- *              carga de datos y manejo de estados para la página "Mis Sitios".
- *              Actúa como la capa de seguridad y obtención de datos, pasando la
- *              información necesaria al componente `SitesClient` para su renderizado.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Componente de servidor que encapsula la carga de datos. Ha sido
+ *              refactorizado a un estándar de élite para leer los nuevos
+ *              parámetros de filtro (`status`, `sort`) de la URL y pasarlos
+ *              tanto a la capa de datos como al estado inicial del cliente,
+ *              haciendo que la URL sea la SSoT para el estado de la vista.
+ * @author L.I.A. Legacy & Raz Podestá
+ * @version 2.0.0
  */
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
+import React from "react";
 
 import { ErrorStateCard } from "@/components/shared/error-state-card";
-import { sites as sitesData } from "@/lib/data";
+import {
+  sites as sitesData,
+  type SiteSortOption,
+  type SiteStatusFilter,
+} from "@/lib/data/sites";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 
@@ -26,16 +32,22 @@ const SITES_PER_PAGE = 9;
  * @public
  * @async
  * @function SitesPageLoader
- * @description Obtiene la sesión, el workspace activo, y los datos paginados de
- *              los sitios. Maneja los casos de error y pasa las props al `SitesClient`.
+ * @description Obtiene la sesión, el workspace activo, y los datos paginados
+ *              y filtrados de los sitios. Maneja los casos de error y pasa las
+ *              props al `SitesClient`.
  * @param {object} props
- * @param {{ page?: string; q?: string }} props.searchParams - Los parámetros de búsqueda de la URL.
- * @returns {Promise<React.ReactElement>} El componente `SitesClient` con datos o un `ErrorStateCard`.
+ * @param {{ page?: string; q?: string; status?: SiteStatusFilter; sort?: SiteSortOption }} props.searchParams
+ * @returns {Promise<React.ReactElement>}
  */
 export async function SitesPageLoader({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: {
+    page?: string;
+    q?: string;
+    status?: SiteStatusFilter;
+    sort?: SiteSortOption;
+  };
 }): Promise<React.ReactElement> {
   const cookieStore = cookies();
   const supabase = createClient();
@@ -43,7 +55,7 @@ export async function SitesPageLoader({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return redirect("/auth/login?next=/dashboard/sites");
+    return redirect("/login?next=/dashboard/sites");
   }
 
   const workspaceId = cookieStore.get("active_workspace_id")?.value;
@@ -54,17 +66,30 @@ export async function SitesPageLoader({
     return redirect("/welcome");
   }
 
+  const page = Number(searchParams.page) || 1;
+  const searchQuery = searchParams.q || "";
+  const statusFilter = searchParams.status || "all";
+  const sortOption = searchParams.sort || "created_at_desc";
+
   logger.trace("[SitesPageLoader] Cargando datos para la página de sitios.", {
     userId: user.id,
     workspaceId,
+    page,
+    searchQuery,
+    statusFilter,
+    sortOption,
   });
 
   try {
-    const page = Number(searchParams.page) || 1;
-    const searchQuery = searchParams.q || "";
     const { sites, totalCount } = await sitesData.getSitesByWorkspaceId(
       workspaceId,
-      { page, limit: SITES_PER_PAGE, query: searchQuery }
+      {
+        page,
+        limit: SITES_PER_PAGE,
+        query: searchQuery,
+        status: statusFilter,
+        sort: sortOption,
+      }
     );
     return (
       <SitesClient
@@ -72,7 +97,9 @@ export async function SitesPageLoader({
         totalCount={totalCount}
         page={page}
         limit={SITES_PER_PAGE}
-        searchQuery={searchQuery}
+        initialSearchQuery={searchQuery}
+        initialStatusFilter={statusFilter}
+        initialSortOption={sortOption}
       />
     );
   } catch (error) {
@@ -90,19 +117,18 @@ export async function SitesPageLoader({
     );
   }
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Full Observabilidad**: ((Implementada)) Se ha añadido `logger.trace` para monitorear el inicio de la carga de datos. La observabilidad de errores ya era de élite.
- * 2. **Documentación TSDoc de Élite**: ((Implementada)) Se ha añadido documentación verbosa al componente para formalizar su rol.
- * 3. **Capa de Lógica de Servidor**: ((Vigente)) Este aparato ya aísla perfectamente toda la lógica del lado del servidor, como la lectura de cookies y la obtención de datos, manteniendo los componentes de página y de cliente puros.
- * 4. **Seguridad y Resiliencia**: ((Vigente)) Ya incluye guardias de seguridad robustos y un manejo de errores que muestra una UI de fallback.
+ * 1. **Persistencia de Filtros (Server-Side)**: ((Implementada)) El cargador ahora lee `status` y `sort` de los `searchParams`. Esto hace que la URL sea la SSoT. Si un usuario comparte una URL con filtros, el servidor ahora obtendrá y renderizará los datos correctos en la carga inicial.
+ * 2. **Sincronización de Estado Inicial**: ((Implementada)) Pasa los filtros leídos de la URL como estado inicial al `SitesClient`, asegurando que la UI del cliente se hidrate en un estado consistente con los datos del servidor.
  *
  * @subsection Melhorias Futuras
- * 1. **Filtros Avanzados**: ((Vigente)) La llamada a `getSitesByWorkspaceId` podría ser extendida para aceptar más `searchParams`, como un parámetro de ordenamiento (`sortBy=name_asc`), para permitir al usuario ordenar la cuadrícula de sitios.
+ * 1. **Validación de Parámetros de URL**: ((Vigente)) Los valores de `status` y `sort` se están pasando directamente a la capa de datos. Para una seguridad de élite, se deberían validar contra los tipos `SiteStatusFilter` y `SiteSortOption` aquí en el cargador, usando un valor por defecto si son inválidos, para prevenir inyecciones de parámetros maliciosos. Propondré esta mejora de seguridad en una futura épica de blindaje.
  *
  * =====================================================================
  */

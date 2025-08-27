@@ -1,27 +1,18 @@
-// src/messages/manifest.ts
 /**
  * @file manifest.ts
- * @description Manifiesto de Importación Dinámica y Única Fuente de Verdad (SSoT)
- *              para el registro de todos los archivos de mensajes de i18n. Este aparato
- *              es el corazón de la arquitectura de internacionalización IMAS, permitiendo
- *              la carga dinámica y modular de traducciones.
+ * @description Manifiesto de Importación Dinámica y SSoT. Ha sido actualizado
+ *              para registrar los nuevos namespaces soberanos del Hub Creativo,
+ *              resolviendo la primera mitad de la desincronización de i18n.
  * @author L.I.A. Legacy (Generado por script, verificado manualmente)
- * @version 20.0.0
+ * @version 21.0.0
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
- * @date 2025-08-25
+ * @date 2025-08-26
  */
 import { type ManifestModule } from "./types";
 
-/**
- * @public
- * @constant messagesManifest
- * @description El registro canónico de todos los namespaces de mensajes.
- *              Cada entrada es una función de importación dinámica que `next-intl`
- *              utiliza para cargar los mensajes necesarios para un locale específico.
- */
 export const messagesManifest: Record<string, ManifestModule> = {
-  // --- Namespaces a Nivel de App (Rutas Específicas) ---
+  // --- Namespaces a Nivel de App ---
   "app.dev-console.CampaignsTable": () =>
     import("./app/[locale]/dev-console/CampaignsTable.json"),
   "app.dev-console.ImpersonationDialog": () =>
@@ -54,6 +45,10 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./components/builder/SettingsPanel.json"),
   "components.builder.SiteAssignmentControl": () =>
     import("./components/builder/SiteAssignmentControl.json"),
+  "components.dashboard.RecentActivity": () =>
+    import("./components/dashboard/RecentActivity.json"), // <-- REGISTRO AÑADIDO
+  "components.dashboard.WelcomeHero": () =>
+    import("./components/dashboard/WelcomeHero.json"), // <-- REGISTRO AÑADIDO
   "components.dashboard.InvitationBell": () =>
     import("./components/dashboard/InvitationBell.json"),
   "components.dev-console.DevSidebar": () =>
@@ -99,7 +94,7 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "components.workspaces.WorkspaceSwitcher": () =>
     import("./components/workspaces/WorkspaceSwitcher.json"),
 
-  // --- Namespaces de Páginas Genéricas ---
+  // --- Namespaces de Páginas ---
   "pages.AboutPage": () => import("./pages/AboutPage.json"),
   "pages.AuthNoticePage": () => import("./pages/AuthNoticePage.json"),
   "pages.BlogPage": () => import("./pages/BlogPage.json"),
@@ -116,24 +111,8 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "pages.TemplateGallery": () => import("./pages/TemplateGallery.json"),
   "pages.TermsOfServicePage": () => import("./pages/TermsOfServicePage.json"),
 
-  // --- Namespaces Compartidos (sin prefijo) ---
+  // --- Namespaces Compartidos ---
   "shared.ActionDock": () => import("./shared/ActionDock.json"),
   "shared.ValidationErrors": () => import("./shared/ValidationErrors.json"),
   "shared.WelcomeModal": () => import("./shared/WelcomeModal.json"),
 };
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Completitud y Sincronización**: ((Implementada)) Este manifiesto ahora es un reflejo completo y preciso de toda la estructura de archivos de mensajes del proyecto, incluyendo los namespaces para el `TemplateGallery`.
- * 2. **Visión Holística**: ((Implementada)) Al ser la SSoT para la carga de mensajes, este aparato es fundamental para la integridad de todo el sistema de i18n.
- *
- * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) Este manifiesto es el candidato ideal para ser generado y mantenido por un script (`pnpm gen:i18n:manifest`) que lea la estructura de directorios, eliminando cualquier posibilidad de error de desincronización manual en el futuro.
- *
- * =====================================================================
- */
-// src/messages/manifest.ts

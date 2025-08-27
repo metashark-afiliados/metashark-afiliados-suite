@@ -1,0 +1,20 @@
+{
+  "en-US": {
+    "title": "Recent Designs",
+    "viewAll": "View All",
+    "cardAriaLabel": "Continue working on {campaignName}",
+    "lastEdited": "Last edited"
+  },
+  "es-ES": {
+    "title": "Diseños Recientes",
+    "viewAll": "Ver Todo",
+    "cardAriaLabel": "Continuar trabajando en {campaignName}",
+    "lastEdited": "Última edición"
+  },
+  "pt-BR": {
+    "title": "Designs Recentes",
+    "viewAll": "Ver Tudo",
+    "cardAriaLabel": "Continuar trabalhando em {campaignName}",
+    "lastEdited": "Última edição"
+  }
+}

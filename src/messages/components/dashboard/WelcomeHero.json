@@ -1,0 +1,29 @@
+{
+  "en-US": {
+    "title": "What will we design today, {username}?",
+    "searchPlaceholder": "Search templates, AI tools, or start a new design...",
+    "tabs": {
+      "myDesigns": "My Designs",
+      "templates": "Templates",
+      "aiTools": "AI Tools"
+    }
+  },
+  "es-ES": {
+    "title": "¿Qué vamos a diseñar hoy, {username}?",
+    "searchPlaceholder": "Busca plantillas, herramientas de IA o inicia un nuevo diseño...",
+    "tabs": {
+      "myDesigns": "Mis Diseños",
+      "templates": "Plantillas",
+      "aiTools": "Herramientas IA"
+    }
+  },
+  "pt-BR": {
+    "title": "O que vamos criar hoje, {username}?",
+    "searchPlaceholder": "Busque modelos, ferramentas de IA ou inicie um novo design...",
+    "tabs": {
+      "myDesigns": "Meus Designs",
+      "templates": "Modelos",
+      "aiTools": "Ferramentas de IA"
+    }
+  }
+}

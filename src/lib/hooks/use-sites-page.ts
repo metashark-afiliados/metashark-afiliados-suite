@@ -1,4 +1,13 @@
 // src/lib/hooks/use-sites-page.ts
+/**
+ * @file use-sites-page.ts
+ * @description Hook orquestador soberano. Enriquecido para gestionar el estado
+ *              de la vista dual (`viewMode`) y persistir la preferencia del
+ *              usuario en `localStorage`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.0.0
+ * @date 2025-08-26
+ */
 "use client";
 
 import { useTranslations } from "next-intl";
@@ -7,24 +16,14 @@ import {
   createSiteAction,
   deleteSiteAction,
 } from "@/lib/actions/sites.actions";
-import { useDashboard } from "@/lib/context/DashboardContext";
-import { type SiteWithCampaignCount } from "@/lib/data/sites";
+import { type SiteWithCampaignCount, type ViewMode } from "@/lib/data/sites";
 import { useOptimisticResourceManagement } from "@/lib/hooks/use-optimistic-resource-management";
 import { useDialogState } from "@/lib/hooks/ui/useDialogState";
 import { useSearchSync } from "@/lib/hooks/ui/useSearchSync";
-import { logger } from "@/lib/logging";
+import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
+import { clientLogger } from "@/lib/logging";
+import { useDashboard } from "@/lib/context/DashboardContext";
 
-/**
- * @public
- * @function useSitesPage
- * @description Hook orquestador soberano que encapsula toda la lógica de estado y
- *              acciones para la página "Mis Sitios". Delega la construcción
- *              de textos y JSX a la capa de presentación.
- * @param {{ initialSites: SiteWithCampaignCount[], initialSearchQuery: string }} params
- * @returns Un objeto con todo el estado y los manejadores necesarios para la UI.
- * @version 4.1.0
- * @author Raz Podestá
- */
 export function useSitesPage({
   initialSites,
   initialSearchQuery,
@@ -32,9 +31,8 @@ export function useSitesPage({
   initialSites: SiteWithCampaignCount[];
   initialSearchQuery: string;
 }) {
-  logger.trace("[useSitesPage] Hook soberano inicializado.");
+  clientLogger.trace("[useSitesPage] Hook soberano inicializado.");
   const t = useTranslations("SitesPage");
-  const tDialogs = useTranslations("Dialogs");
   const { activeWorkspace, user } = useDashboard();
 
   const { searchTerm, setSearchTerm } = useSearchSync({
@@ -46,6 +44,13 @@ export function useSitesPage({
     close: closeCreateDialog,
     setIsOpen: setCreateDialogOpen,
   } = useDialogState();
+
+  // --- INICIO DE MEJORA: GESTIÓN DE VISTA DUAL ---
+  const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
+    "sites-view-mode",
+    "grid"
+  );
+  // --- FIN DE MEJORA ---
 
   const {
     items: sites,
@@ -94,19 +99,21 @@ export function useSitesPage({
     setCreateDialogOpen,
     openCreateDialog,
     handleCreate,
-    t, // Devuelve las funciones de traducción
-    tDialogs, // Devuelve las funciones de traducción
+    viewMode,
+    setViewMode,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error Crítico (TS2552)**: ((Implementada)) Se ha eliminado la construcción de objetos de texto con JSX del hook, resolviendo la causa raíz del error de compilación.
- * 2. **Restauración de SRP**: ((Implementada)) El hook ahora se enfoca exclusivamente en la lógica de estado y de negocio, dejando la construcción de la UI (incluyendo textos con formato) al componente de presentación, lo cual es una arquitectura más limpia.
+ * 1. ((Implementada)) **Gestión de Estado de Vista Dual:** El hook ahora gestiona el estado `viewMode`, proporcionando la lógica necesaria para que el orquestador de cliente renderice la vista correcta.
+ * 2. ((Implementada)) **Persistencia de Preferencia de Usuario:** Al utilizar `useLocalStorage`, la preferencia de vista del usuario se recuerda entre sesiones, una característica de UX de élite.
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) **Gestión de Ordenamiento:** Añadir un nuevo estado `sortBy` y un `setSortBy` que también se sincronicen con la URL y se pasen a la capa de datos para permitir el ordenamiento de los sitios.
  *
  * =====================================================================
  */

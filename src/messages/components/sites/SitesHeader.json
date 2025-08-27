@@ -1,0 +1,39 @@
+
+{
+  "en-US": {
+    "title": "My Sites",
+    "description": "Manage and search your sites. Each site can have multiple campaigns.",
+    "searchPlaceholder": "Search by subdomain...",
+    "clearSearchAria": "Clear search",
+    "createSiteButton": "Create Site",
+    "createDialogTitle": "Create a new site",
+    "viewGridAria": "Switch to grid view",
+    "viewListAria": "Switch to list view",
+    "viewGridTooltip": "Grid View",
+    "viewListTooltip": "List View"
+  },
+  "es-ES": {
+    "title": "Mis Sitios",
+    "description": "Gestiona y busca en tus sitios. Cada sitio puede tener múltiples campañas.",
+    "searchPlaceholder": "Buscar por subdominio...",
+    "clearSearchAria": "Limpiar búsqueda",
+    "createSiteButton": "Crear Sitio",
+    "createDialogTitle": "Crear un nuevo sitio",
+    "viewGridAria": "Cambiar a vista de cuadrícula",
+    "viewListAria": "Cambiar a vista de lista",
+    "viewGridTooltip": "Vista de Cuadrícula",
+    "viewListTooltip": "Vista de Lista"
+  },
+  "pt-BR": {
+    "title": "Meus Sites",
+    "description": "Gerencie e pesquise seus sites. Cada site pode ter múltiplas campanhas.",
+    "searchPlaceholder": "Buscar por subdomínio...",
+    "clearSearchAria": "Limpar busca",
+    "createSiteButton": "Criar Site",
+    "createDialogTitle": "Criar um novo site",
+    "viewGridAria": "Mudar para visualização em grade",
+    "viewListAria": "Mudar para visualização em lista",
+    "viewGridTooltip": "Visualização em Grade",
+    "viewListTooltip": "Visualização em Lista"
+  }
+}

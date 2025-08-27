@@ -1,11 +1,12 @@
 // src/app/[locale]/dashboard/sites/sites-client.tsx
 /**
  * @file sites-client.tsx
- * @description Orquestador de lógica y estado puro con renderizado condicional
- *              para vistas de cuadrícula y lista. Es 100% soberano y compone
- *              otros aparatos soberanos.
+ * @description Orquestador de lógica y estado puro. Ha sido refactorizado
+ *              a un estándar de élite para consumir la nueva API del hook
+ *              `useSitesPage`, orquestando la funcionalidad completa de filtros
+ *              persistentes y vista dual.
  * @author Raz Podestá - MetaShark Tech
- * @version 11.0.0
+ * @version 13.0.0
  * @date 2025-08-26
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -14,30 +15,40 @@
 
 import React from "react";
 import { AlertTriangle } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
+import { ErrorStateCard } from "@/components/shared/error-state-card";
+import { PaginationControls } from "@/components/shared/pagination-controls";
 import { CreateSiteForm } from "@/components/sites/CreateSiteForm";
 import { SitesGrid } from "@/components/sites/SitesGrid";
 import { SitesHeader } from "@/components/sites/SitesHeader";
-import { SitesTable } from "@/components/sites/SitesTable"; // Asumiendo que existe
+import { SitesTable } from "@/components/sites/SitesTable";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  type SiteSortOption,
+  type SiteStatusFilter,
+  type SiteWithCampaignCount,
+} from "@/lib/data/sites";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
-import { useSitesPage } from "@/lib/hooks/use-sites-page"; // Asumiendo que está enriquecido
-import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { PaginationControls } from "@/components/shared/pagination-controls";
+import { useSitesPage } from "@/lib/hooks/use-sites-page";
 import { clientLogger } from "@/lib/logging";
-import { ErrorStateCard } from "@/components/shared/error-state-card";
+
+const MemoizedSitesGrid = React.memo(SitesGrid);
+const MemoizedSitesTable = React.memo(SitesTable);
 
 interface SitesClientProps {
   initialSites: SiteWithCampaignCount[];
   totalCount: number;
   page: number;
   limit: number;
-  searchQuery: string;
+  initialSearchQuery: string;
+  initialStatusFilter: SiteStatusFilter;
+  initialSortOption: SiteSortOption;
 }
 
 export function SitesClient({
@@ -45,7 +56,7 @@ export function SitesClient({
   totalCount,
   page,
   limit,
-  searchQuery,
+  ...initialFilters
 }: SitesClientProps): React.ReactElement {
   clientLogger.trace("[SitesClient] Renderizando orquestador de lógica puro.");
 
@@ -54,16 +65,20 @@ export function SitesClient({
     activeWorkspaceId,
     isPending,
     mutatingId,
-    searchTerm,
-    setSearchTerm,
     handleDelete,
     isCreateDialogOpen,
-    setCreateDialogOpen,
     openCreateDialog,
+    setCreateDialogOpen,
     handleCreate,
     viewMode,
     setViewMode,
-  } = useSitesPage({ initialSites, initialSearchQuery: searchQuery });
+    ...filterProps
+  } = useSitesPage({
+    initialSites,
+    initialSearchQuery: initialFilters.initialSearchQuery,
+    initialStatusFilter: initialFilters.initialStatusFilter,
+    initialSortOption: initialFilters.initialSortOption,
+  });
 
   const { tSitesPage, tErrors } = useDashboardTranslations();
 
@@ -80,11 +95,16 @@ export function SitesClient({
   return (
     <div className="flex flex-col gap-6">
       <SitesHeader
-        searchQuery={searchTerm}
-        onSearchChange={setSearchTerm}
+        searchQuery={filterProps.searchQuery}
+        onSearchChange={filterProps.onSearchChange}
         onCreateSiteClick={openCreateDialog}
         viewMode={viewMode}
         onViewChange={setViewMode}
+        sortOption={filterProps.sortOption}
+        onSortChange={filterProps.onSortChange}
+        statusFilter={filterProps.statusFilter}
+        onStatusFilterChange={filterProps.onStatusFilterChange}
+        onClearFilters={filterProps.onClearFilters}
       />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
@@ -102,28 +122,38 @@ export function SitesClient({
         </DialogContent>
       </Dialog>
 
-      {viewMode === "grid" ? (
-        <SitesGrid
-          sites={sites}
-          onDelete={handleDelete!}
-          isPending={isPending}
-          deletingSiteId={mutatingId}
-        />
-      ) : (
-        <SitesTable
-          sites={sites}
-          onDelete={handleDelete!}
-          isPending={isPending}
-          deletingSiteId={mutatingId}
-        />
-      )}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={viewMode}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {viewMode === "grid" ? (
+            <MemoizedSitesGrid
+              sites={sites}
+              onDelete={handleDelete!}
+              isPending={isPending}
+              deletingSiteId={mutatingId}
+            />
+          ) : (
+            <MemoizedSitesTable
+              sites={sites}
+              onDelete={handleDelete!}
+              isPending={isPending}
+              deletingSiteId={mutatingId}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       <PaginationControls
         page={page}
         totalCount={totalCount}
         limit={limit}
         basePath="/dashboard/sites"
-        searchQuery={searchTerm}
+        searchQuery={filterProps.searchQuery}
       />
     </div>
   );
@@ -134,11 +164,11 @@ export function SitesClient({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Flexibilidad de Visualización:** El componente ahora soporta renderizado condicional, permitiendo al usuario elegir entre una vista de cuadrícula visual y una vista de tabla densa, una característica de UX de élite.
+ * 1. **Integración Completa de Filtros**: ((Implementada)) Este orquestador ahora consume la API completa del hook `useSitesPage` y pasa todas las props de estado y manejadores de filtros (`sortOption`, `statusFilter`, etc.) a sus hijos `SitesHeader` y `PaginationControls`. Esto completa la funcionalidad de filtros persistentes.
+ * 2. **Desacoplamiento de UI**: ((Vigente)) El componente se mantiene como un orquestador de lógica puro, delegando toda la presentación a sus hijos atomizados.
  *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Animación de Transición de Vistas:** Utilizar `framer-motion` con `AnimatePresence` para crear una transición animada suave al cambiar entre `SitesGrid` y `SitesTable`.
- * 2. ((Vigente)) **Memoización de Componentes de Vista:** Envolver `SitesGrid` y `SitesTable` en `React.memo` para prevenir re-renderizados innecesarios cuando cambien otros estados que no afectan a la lista de sitios (ej. al abrir el diálogo de creación).
+ * 1. **Indicador de Carga de Sincronización**: ((Pendiente)) El hook `useUrlStateSync` (consumido por `useSitesPage`) devuelve un booleano `isSyncing`. Propondré pasar este estado a `SitesHeader` para que pueda mostrar un indicador de carga en el `SearchInput` o en los filtros mientras la URL se actualiza.
  *
  * =====================================================================
  */

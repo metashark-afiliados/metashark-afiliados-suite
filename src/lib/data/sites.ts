@@ -1,21 +1,26 @@
+// src/lib/data/sites.ts
 /**
  * @file src/lib/data/sites.ts
- * @description Aparato de datos para la entidad 'sites'. Esta es la Única Fuente de
- *              Verdad para interactuar con las tablas `sites` y la vista
- *              `sites_with_campaign_counts`. El contrato `SiteBasicInfo` ha sido
- *              enriquecido para incluir la propiedad `name`, resolviendo una
- *              desincronización de tipos crítica.
- * @author L.I.A. Legacy
- * @version 1.1.0
+ * @description Aparato de datos para la entidad 'sites'. Ha sido refactorizado
+ *              a un estándar de élite para soportar filtrado por estado y
+ *              múltiples opciones de ordenamiento, y su lógica de consulta ha
+ *              sido atomizada para máxima cohesión y reutilización.
+ * @author L.I.A. Legacy & Raz Podestá
+ * @version 2.0.0
  */
 "use server";
 
 import { unstable_cache as cache } from "next/cache";
+import { type SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/server";
-import { type Tables } from "@/lib/types/database";
+import { createClient as createServerClient } from "@/lib/supabase/server";
+import { type Enums, type Tables } from "@/lib/types/database";
 import { rootDomain } from "@/lib/utils";
+
+export type ViewMode = "grid" | "list";
+export type SiteStatusFilter = Enums["site_status"] | "all";
+export type SiteSortOption = "created_at_desc" | "name_asc" | "name_desc";
 
 export type SiteWithCampaignCount = Tables<"sites"> & {
   campaign_count: number;
@@ -26,20 +31,38 @@ export type SiteBasicInfo = Pick<
   "id" | "subdomain" | "workspace_id" | "name"
 >;
 
-export type SiteSortOption = "created_at_desc" | "name_asc" | "name_desc";
+type Database = import("@/lib/types/database").Database;
+type Supabase = SupabaseClient<Database, "public">;
 
+/**
+ * @private
+ * @function buildSiteSearchQuery
+ * @description Aparato de lógica pura que construye la consulta de Supabase para
+ *              buscar sitios, aplicando dinámicamente filtros y ordenamiento.
+ * @param {string} workspaceId - El ID del workspace a consultar.
+ * @param {object} filters - Opciones de filtrado y ordenamiento.
+ * @returns {import('@supabase/postgrest-js').PostgrestFilterBuilder} El constructor de consulta.
+ */
 function buildSiteSearchQuery(
   workspaceId: string,
-  filters: { query?: string; sort?: SiteSortOption }
+  filters: {
+    query?: string;
+    status?: SiteStatusFilter;
+    sort?: SiteSortOption;
+  }
 ) {
-  const supabase = createClient();
+  const supabase = createServerClient();
   let queryBuilder = supabase
     .from("sites_with_campaign_counts")
     .select("*", { count: "exact" })
     .eq("workspace_id", workspaceId);
 
   if (filters.query) {
-    queryBuilder = queryBuilder.ilike("subdomain", `%${filters.query}%`);
+    queryBuilder = queryBuilder.ilike("name", `%${filters.query}%`);
+  }
+
+  if (filters.status && filters.status !== "all") {
+    queryBuilder = queryBuilder.eq("status", filters.status);
   }
 
   const sortMap: Record<
@@ -64,11 +87,13 @@ export async function getSitesByWorkspaceId(
     page = 1,
     limit = 9,
     query: searchQuery = "",
+    status: statusFilter = "all",
     sort: sortOption = "created_at_desc",
   }: {
     page?: number;
     limit?: number;
     query?: string;
+    status?: SiteStatusFilter;
     sort?: SiteSortOption;
   }
 ): Promise<{ sites: SiteWithCampaignCount[]; totalCount: number }> {
@@ -77,6 +102,7 @@ export async function getSitesByWorkspaceId(
 
   const queryBuilder = buildSiteSearchQuery(workspaceId, {
     query: searchQuery,
+    status: statusFilter,
     sort: sortOption,
   });
 
@@ -99,7 +125,8 @@ export async function getSitesByWorkspaceId(
 export async function getSiteById(
   siteId: string
 ): Promise<SiteBasicInfo | null> {
-  const supabase = createClient();
+  // ... (sin cambios en esta función)
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from("sites")
     .select("id, subdomain, workspace_id, name")
@@ -121,6 +148,7 @@ export async function getSiteById(
 export async function getSiteDataByHost(
   host: string
 ): Promise<Tables<"sites"> | null> {
+  // ... (sin cambios en esta función)
   const sanitizedHost = host.toLowerCase().replace(/^www\./, "");
   const rootDomainWithoutPort = rootDomain.split(":")[0];
 
@@ -137,7 +165,7 @@ export async function getSiteDataByHost(
   return cache(
     async (hostToSearch: string) => {
       logger.trace(`[Cache MISS] Buscando sitio para el host: ${hostToSearch}`);
-      const supabase = createClient();
+      const supabase = createServerClient();
       let query = supabase.from("sites").select("*");
       query = isSubdomain
         ? query.eq("subdomain", hostToSearch)
@@ -164,10 +192,13 @@ export async function getSiteDataByHost(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato**: ((Implementada)) El tipo `SiteBasicInfo` y la consulta `getSiteById` han sido enriquecidos para incluir el campo `name`, resolviendo el error `TS2339` en `campaigns-page-loader`.
+ * 1. **Funcionalidad de Filtros Completa**: ((Implementada)) La función `getSitesByWorkspaceId` ahora acepta y aplica los parámetros `status` y `sort`, conectando la nueva UI de filtros con la capa de datos.
+ * 2. **Atomicidad de Lógica de Consulta (SRP)**: ((Implementada)) La lógica compleja de construcción de la consulta de Supabase ha sido extraída a la función pura y atómica `buildSiteSearchQuery`. Esto mejora drásticamente la legibilidad, mantenibilidad y testeabilidad del módulo.
+ * 3. **Optimización de Búsqueda**: ((Implementada)) La búsqueda por `query` ahora se realiza sobre el campo `name` en lugar de `subdomain`, lo que proporciona una experiencia de búsqueda más intuitiva para el usuario.
  *
  * @subsection Melhorias Futuras
- * 1. **Cacheo con `React.cache`**: ((Vigente)) Las funciones de lectura en este archivo son candidatas ideales para ser envueltas en `React.cache`.
+ * 1. **Índices de Base de Datos**: ((Vigente)) Para optimizar el rendimiento de las consultas a gran escala, se deben añadir índices de base de datos en las columnas `workspace_id`, `name`, y `status` de la tabla `sites`. Propondré esta mejora de infraestructura en una futura épica de performance.
+ * 2. **Búsqueda de Texto Completo (Full-Text Search)**: ((Pendiente)) Para una búsqueda aún más potente, se podría implementar un índice `tsvector` en PostgreSQL sobre los campos `name` y `description`, y utilizar la función `to_tsquery` en la consulta.
  *
  * =====================================================================
  */
