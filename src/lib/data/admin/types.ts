@@ -2,11 +2,11 @@
 /**
  * @file types.ts
  * @description Aparato de contrato de datos y SSoT para el módulo de
- *              administración. Ha sido corregido para acceder correctamente a la
- *              propiedad 'Row' de los tipos de `Views`, resolviendo la cascada de
+ *              administración. Ha sido refactorizado para consumir correctamente
+ *              el helper de tipo genérico `Views<T>`, resolviendo la cascada de
  *              errores de tipo TS2339.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
+ * @version 3.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -14,14 +14,11 @@
 import { type Tables, type Views } from "@/lib/types/database";
 
 // --- INICIO DE CORRECCIÓN DE TIPO (TS2339) ---
-// La estructura correcta para acceder al tipo de fila de una vista es `Views<'view_name'>['Row']`.
-// El error indicaba que el tipo de la vista en sí no tenía la propiedad 'Row'.
-// La solución canónica es asegurar que la SSoT de `views.ts` tenga la
-// estructura `{ Row: {...} }`, haciendo este acceso válido y resolviendo el error
-// de tipo en su origen.
-export type UserProfilesWithEmail = Views<"user_profiles_with_email">["Row"];
+// El helper genérico `Views<T>` ya extrae la propiedad `Row`.
+// La sintaxis correcta es consumir el helper directamente, sin el `["Row"]` redundante.
+export type UserProfilesWithEmail = Views<"user_profiles_with_email">;
 
-export type SiteWithCampaignsCount = Views<"sites_with_campaign_counts">["Row"];
+export type SiteWithCampaignsCount = Views<"sites_with_campaign_counts">;
 // --- FIN DE CORRECCIÓN DE TIPO (TS2339) ---
 
 export type CampaignWithSiteInfo = Tables<"campaigns"> & {
@@ -31,14 +28,19 @@ export type CampaignWithSiteInfo = Tables<"campaigns"> & {
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Resolución de Error de Tipo (`TS2339`)**: Se ha corregido el acceso a la propiedad `Row` en los tipos de `Views`. Esta refactorización es la solución canónica que depende de que `src/lib/types/database/views.ts` tenga la estructura de tipo correcta, resolviendo la cascada de errores de tipo en su origen.
- * 2. ((Implementada)) **Cohesión de Módulo**: Este aparato ahora sirve como la SSoT canónica y correcta para los tipos de datos del módulo de administración.
+ * 1. **Resolución Sistémica de `TS2339`**: ((Implementada)) Se ha eliminado el acceso `["Row"]` redundante. Esta corrección alinea el consumo de tipos con la definición del helper genérico `Views<T>`, resolviendo la causa raíz de los errores de compilación y estabilizando la capa de tipos.
+ * 2. **Cohesión de Módulo**: ((Implementada)) Este aparato ahora sirve como la SSoT canónica y correcta para los tipos de datos del módulo de administración.
  *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Tipos Derivados de RPC**: Si en el futuro se añaden funciones RPC específicas para administración, sus tipos de retorno deberían ser definidos aquí para mantener la cohesión del contrato de datos.
+ * 1. **Renombrar Helper Genérico**: ((Vigente)) Para una DX de élite y para prevenir esta confusión en el futuro, el helper genérico `Views<T>` en `_shared.ts` podría ser renombrado a `ViewRow<T>` para que su propósito (extraer el tipo `Row`) sea semánticamente explícito.
  *
  * =====================================================================
  */
