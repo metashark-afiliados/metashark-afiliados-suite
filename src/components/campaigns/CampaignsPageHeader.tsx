@@ -1,46 +1,30 @@
 // src/components/campaigns/CampaignsPageHeader.tsx
 /**
- * @file src/components/campaigns/CampaignsPageHeader.tsx
- * @description Aparato de presentación de élite. Ha sido refactorizado para ser un
- *              componente de presentación puro, delegando la gestión del diálogo
- *              al hook soberano `useCampaignCreationDialog`.
- * @author Raz Podestá
- * @version 4.0.0
+ * @file CampaignsPageHeader.tsx
+ * @description Orquestador de UI de élite para el encabezado de "Campañas".
+ *              Ha sido refactorizado holísticamente para consumir el componente
+ *              de layout abstracto `ResourcePageHeader`, delegando toda la
+ *              lógica de layout y cumpliendo el principio DRY al más alto nivel.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
+import React from "react";
 import { type useTranslations } from "next-intl";
-import {
-  ArrowLeft,
-  FilePlus,
-  ImageIcon,
-  LayoutTemplate,
-  PlusCircle,
-} from "lucide-react";
 
-import { useCampaignCreationDialog } from "@/lib/hooks/use-campaign-creation-dialog";
-import { CreateCampaignForm } from "@/components/campaigns/CreateCampaignForm";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "@/lib/navigation";
 import { type CampaignMetadata } from "@/lib/data/campaigns";
+import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
+import { clientLogger } from "@/lib/logging";
+import { ResourcePageHeader } from "@/components/shared/ResourcePageHeader";
+import { CampaignsHeaderActions } from "./CampaignsHeaderActions";
+import { CampaignsPageTitle } from "./CampaignsPageTitle";
 
 type TFunction = ReturnType<typeof useTranslations>;
-type SiteInfo = { id: string; subdomain: string | null };
+type SiteInfo = Pick<SiteWithCampaignCount, "id" | "name" | "subdomain">;
 type CampaignStatus = "draft" | "published" | "archived";
 type SortByOption = "updated_at_desc" | "name_asc";
 
@@ -60,98 +44,32 @@ export interface CampaignsPageHeaderProps {
 }
 
 export function CampaignsPageHeader({
-  t,
   site,
-  handleCreate,
-  isPending,
-  mutatingId,
-  statusFilter,
-  onStatusChange,
-  sortBy,
-  onSortChange,
+  ...props
 }: CampaignsPageHeaderProps): React.ReactElement {
-  const {
-    isCreateDialogOpen,
-    setCreateDialogOpen,
-    handleCreateCampaign,
-    openCreateDialog,
-  } = useCampaignCreationDialog({
-    siteId: site.id,
-    handleCreate: handleCreate,
-  });
+  clientLogger.trace(
+    "[CampaignsPageHeader] Renderizando orquestador de UI consumiendo abstracción."
+  );
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <Button variant="ghost" size="sm" asChild className="-ml-4">
-            <Link href="/dashboard/sites">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("backToSitesButton")}
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-bold">
-            {t.rich("pageTitle", {
-              siteName: site.subdomain,
-              span: (chunks) => <span className="text-primary">{chunks}</span>,
-            })}
-          </h1>
-          <p className="text-muted-foreground">{t("pageDescription")}</p>
-        </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <Button onClick={openCreateDialog} className="w-full sm:w-auto">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            {t("createCampaignButton")}
-          </Button>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>{t("createDialog.title")}</DialogTitle>
-              <DialogDescription>
-                {t("createDialog.description")}
-              </DialogDescription>
-            </DialogHeader>
-            <Tabs defaultValue="from_scratch" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="from_scratch">
-                  <FilePlus className="mr-2 h-4 w-4" />
-                  {t("createDialog.tabs.from_scratch")}
-                </TabsTrigger>
-                <TabsTrigger value="from_template">
-                  <LayoutTemplate className="mr-2 h-4 w-4" />
-                  {t("createDialog.tabs.from_template")}
-                </TabsTrigger>
-                <TabsTrigger value="from_image_ai" disabled>
-                  <ImageIcon className="mr-2 h-4 w-4" />
-                  {t("createDialog.tabs.from_image_ai")}
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="from_scratch" className="pt-4">
-                <CreateCampaignForm
-                  siteId={site.id}
-                  onSubmit={handleCreateCampaign}
-                  isPending={
-                    isPending &&
-                    (mutatingId?.startsWith("optimistic-") ?? false)
-                  }
-                />
-              </TabsContent>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
-      </div>
-      <div className="mt-4 flex flex-col sm:flex-row items-center gap-4">
-        {/* ...Filtros (sin cambios)... */}
-      </div>
-    </div>
+    <ResourcePageHeader
+      titleSlot={<CampaignsPageTitle site={site} />}
+      actionsSlot={<CampaignsHeaderActions site={site} {...props} />}
+    />
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Presentación Puro**: ((Implementada)) Este componente ya no contiene lógica de estado para el diálogo de creación. Ahora consume `useCampaignCreationDialog`, simplificando su código y convirtiéndolo en un componente de presentación puro y controlado.
+ * 1. **Adopción de Abstracción de Layout (DRY)**: ((Implementada)) El componente ahora consume `ResourcePageHeader`, delegando toda la lógica de layout y adhiriéndose al principio DRY.
+ * 2. **Simplificación Radical**: ((Implementada)) El JSX del componente se ha reducido a su mínima expresión, mejorando drásticamente la legibilidad y la mantenibilidad.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Hook `useCampaignsHeader`**: ((Vigente)) Para una pureza de élite, las props podrían ser gestionadas por un hook `useCampaignsHeader` y provistas a través de contexto.
  *
  * =====================================================================
  */

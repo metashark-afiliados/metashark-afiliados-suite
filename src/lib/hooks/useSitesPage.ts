@@ -1,42 +1,40 @@
 // src/lib/hooks/useSitesPage.ts
 /**
  * @file useSitesPage.ts
- * @description Hook orquestador soberano de élite. Ha sido refactorizado
- *              holísticamente para consumir el hook `useUrlStateSync`, proveyendo
- *              filtros persistentes en la URL. Gestiona toda la lógica de estado
- *              (datos, UI, filtros, modales) para la página "Mis Sitios".
+ * @description Hook orquestador soberano de élite. Encapsula toda la lógica de
+ *              estado y negocio para la página "Mis Sitios", incluyendo filtros
+ *              sincronizados con URL, gestión de vista, UI optimista y manejo
+ *              de diálogos.
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
- * @date 2025-08-26
+ * @version 1.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import React from "react";
+import toast from "react-hot-toast";
 
 import {
   createSiteAction,
   deleteSiteAction,
 } from "@/lib/actions/sites.actions";
+import { useDashboard } from "@/lib/context/DashboardContext";
 import {
   type SiteSortOption,
   type SiteStatusFilter,
   type SiteWithCampaignCount,
   type ViewMode,
-} from "@/lib/data/sites";
-import { useDashboard } from "@/lib/context/DashboardContext";
+} from "@/lib/data/sites/types";
 import { useDialogState } from "@/lib/hooks/ui/useDialogState";
 import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
-import { useOptimisticResourceManagement } from "@/lib/hooks/use-optimistic-resource-management";
 import { useUrlStateSync } from "@/lib/hooks/ui/useUrlStateSync";
 import { clientLogger } from "@/lib/logging";
+import { useOptimisticResourceManagement } from "./use-optimistic-resource-management";
 
-/**
- * @public
- * @interface UseSitesPageProps
- * @description Contrato de props para el hook. Define los datos iniciales
- *              obtenidos desde el cargador de datos del servidor.
- */
 export interface UseSitesPageProps {
   initialSites: SiteWithCampaignCount[];
   initialSearchQuery: string;
@@ -44,14 +42,6 @@ export interface UseSitesPageProps {
   initialSortOption: SiteSortOption;
 }
 
-/**
- * @public
- * @function useSitesPage
- * @description Orquesta todos los hooks y la lógica de estado necesarios para
- *              la página "Mis Sitios". Es la SSoT para la lógica de cliente.
- * @param {UseSitesPageProps} props - Propiedades de inicialización del hook.
- * @returns Un objeto con todo el estado y los manejadores para la UI.
- */
 export function useSitesPage({
   initialSites,
   initialSearchQuery,
@@ -61,8 +51,13 @@ export function useSitesPage({
   clientLogger.trace("[useSitesPage] Hook soberano inicializado.");
   const t = useTranslations("SitesPage");
   const { activeWorkspace, user } = useDashboard();
+  const router = useRouter();
 
-  const { state: filters, setState: setFilters } = useUrlStateSync({
+  const {
+    state: filters,
+    setState: setFilters,
+    isSyncing,
+  } = useUrlStateSync({
     initialState: {
       q: initialSearchQuery,
       status: initialStatusFilter,
@@ -83,24 +78,11 @@ export function useSitesPage({
     setIsOpen: setCreateDialogOpen,
   } = useDialogState();
 
-  const {
-    items: sites,
-    isPending,
-    mutatingId,
-    handleCreate: genericHandleCreate,
-    handleDelete,
-  } = useOptimisticResourceManagement<SiteWithCampaignCount>({
-    initialItems: initialSites,
-    entityName: t("entityName"),
-    createAction: createSiteAction,
-    deleteAction: deleteSiteAction,
-  });
-
-  const handleCreate = (formData: FormData) => {
+  const createOptimisticSite = (formData: FormData): SiteWithCampaignCount => {
     const name = formData.get("name") as string;
     const subdomain = formData.get("subdomain") as string;
-
-    const optimisticSite: Omit<SiteWithCampaignCount, "id"> = {
+    return {
+      id: `optimistic-${Date.now()}`,
       name: name || subdomain,
       subdomain,
       workspace_id: activeWorkspace!.id,
@@ -113,12 +95,46 @@ export function useSitesPage({
       status: "draft",
       campaign_count: 0,
     };
+  };
 
-    genericHandleCreate?.(formData, optimisticSite);
+  const {
+    items: sites,
+    isPending,
+    mutatingId,
+    handleCreate: genericHandleCreate,
+    handleDelete: genericHandleDelete,
+  } = useOptimisticResourceManagement<SiteWithCampaignCount>({
+    initialItems: initialSites,
+    createAction: createSiteAction,
+    deleteAction: deleteSiteAction,
+    createOptimisticItem: createOptimisticSite,
+  });
+
+  const handleCreate = async (formData: FormData) => {
+    if (!genericHandleCreate) return;
+    const result = await genericHandleCreate(formData);
+    if (result.success) {
+      toast.success(t("entityName") + " creado con éxito.");
+      router.refresh();
+    } else {
+      toast.error(result.error);
+    }
     closeCreateDialog();
   };
 
+  const handleDelete = async (formData: FormData) => {
+    if (!genericHandleDelete) return;
+    const result = await genericHandleDelete(formData);
+    if (result.success) {
+      toast.success(t("entityName") + " eliminado con éxito.");
+      router.refresh();
+    } else {
+      toast.error(result.error);
+    }
+  };
+
   const handleClearFilters = React.useCallback(() => {
+    clientLogger.info("[useSitesPage] Limpiando todos los filtros.");
     setFilters({ q: "", status: "all", sort: "created_at_desc" });
   }, [setFilters]);
 
@@ -127,12 +143,13 @@ export function useSitesPage({
     activeWorkspaceId: activeWorkspace?.id,
     isPending,
     mutatingId,
+    isSyncing,
     searchQuery: filters.q,
     onSearchChange: (value: string) => setFilters((f) => ({ ...f, q: value })),
-    statusFilter: filters.status,
+    statusFilter: filters.status as SiteStatusFilter,
     onStatusFilterChange: (status: SiteStatusFilter) =>
       setFilters((f) => ({ ...f, status })),
-    sortOption: filters.sort,
+    sortOption: filters.sort as SiteSortOption,
     onSortChange: (sort: SiteSortOption) => setFilters((f) => ({ ...f, sort })),
     onClearFilters: handleClearFilters,
     handleDelete,
@@ -144,20 +161,17 @@ export function useSitesPage({
     setViewMode,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Filtros Persistentes vía URL**: ((Implementada)) El hook ahora consume `useUrlStateSync` para gestionar `searchQuery`, `statusFilter` y `sortOption`. Esto implementa la persistencia de filtros de forma robusta y escalable, proporcionando una UX de élite.
- * 2. **Desacoplamiento de Lógica de Estado**: ((Implementada)) Se han eliminado las dependencias de `useSearchSync` y `useLocalStorage` para los filtros, centralizando toda la lógica de estado de URL en un único aparato SSoT.
- * 3. **Funcionalidad "Limpiar Filtros"**: ((Implementada)) Se ha añadido el manejador `handleClearFilters` que resetea el estado de los filtros a sus valores por defecto.
+ * 1. ((Implementada)) **Encapsulamiento Holístico (SRP)**: Este hook soberano se convierte en el "cerebro" de la página, encapsulando toda la lógica de estado (filtros, vista, diálogos, UI optimista) y las acciones. Esto permite que el componente `sites-client.tsx` se convierta en un presentador puro y simple.
+ * 2. ((Implementada)) **Composición de Hooks de Élite**: Demuestra un patrón de élite al componer múltiples hooks atómicos (`useUrlStateSync`, `useLocalStorage`, `useDialogState`, `useOptimisticResourceManagement`) para construir una lógica compleja de forma cohesiva y mantenible.
  *
  * @subsection Melhorias Futuras
- * 1. **Indicador de Carga de Sincronización**: ((Vigente)) El hook `useUrlStateSync` devuelve un booleano `isSyncing`. Propondré pasar este estado al `SitesHeader` para que pueda mostrar un indicador de carga (ej. en el `SearchInput`) mientras la URL se está actualizando, mejorando el feedback al usuario.
- * 2. **Abstracción de `handleCreate`**: ((Pendiente)) La lógica para construir el `optimisticSite` es específica de la entidad "Site". Para que `useOptimisticResourceManagement` sea verdaderamente genérico, esta lógica de construcción del item optimista podría ser pasada como un callback al hook, en lugar de residir aquí.
+ * 1. ((Vigente)) **Factoría de Items Optimistas Atómica**: La lógica de `createOptimisticSite` es específica de esta entidad. Para una reutilización máxima, podría ser extraída a un archivo de factorías (`/lib/factories/optimistic-items.ts`) si otros hooks necesitaran crear sitios optimistas.
  *
  * =====================================================================
  */

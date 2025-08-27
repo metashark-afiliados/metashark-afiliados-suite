@@ -1,14 +1,13 @@
+// src/lib/validators/i18n.schema.ts
 /**
  * @file i18n.schema.ts
  * @description Manifiesto de Tipos y SSoT para el contrato de i18n. Ha sido
- *              actualizado para ensamblar los nuevos schemas soberanos del Hub
- *              Creativo, resolviendo la desincronización de tipos y completando
- *              la refactorización de la Épica 6.
+ *              actualizado para ensamblar todos los nuevos schemas soberanos,
+ *              resolviendo la desincronización de tipos y completando la
+ *              cascada de correcciones.
  * @author L.I.A. Legacy (Generado por script, verificado manualmente)
- * @version 21.0.0
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- * @date 2025-08-26
+ * @version 23.0.0
+ * @date 2025-08-27
  */
 import { z } from "zod";
 
@@ -55,11 +54,12 @@ import { NotFoundPageSchema } from "./i18n/NotFoundPage.schema";
 import { OAuthButtonSchema } from "./i18n/OAuthButton.schema";
 import { PrivacyPolicyPageSchema } from "./i18n/PrivacyPolicyPage.schema";
 import { ProcessStepsSchema } from "./i18n/ProcessSteps.schema";
-import { RecentActivitySchema } from "./i18n/RecentActivity.schema"; // <-- IMPORTACIÓN AÑADIDA
+import { RecentActivitySchema } from "./i18n/RecentActivity.schema";
 import { ResetPasswordPageSchema } from "./i18n/ResetPasswordPage.schema";
 import { SettingsPanelSchema } from "./i18n/SettingsPanel.schema";
 import { SignUpPageSchema } from "./i18n/SignUpPage.schema";
 import { SiteAssignmentControlSchema } from "./i18n/SiteAssignmentControl.schema";
+import { SitesHeaderSchema } from "./i18n/SitesHeader.schema"; // <-- SINCRONIZADO
 import { SitesPageSchema } from "./i18n/SitesPage.schema";
 import { SocialProofSchema } from "./i18n/SocialProof.schema";
 import { SupabaseAuthUISchema } from "./i18n/SupabaseAuthUI.schema";
@@ -71,7 +71,7 @@ import { TestimonialsSchema } from "./i18n/Testimonials.schema";
 import { ThemeSwitcherSchema } from "./i18n/ThemeSwitcher.schema";
 import { UserManagementTableSchema } from "./i18n/UserManagementTable.schema";
 import { ValidationErrorsSchema } from "./i18n/ValidationErrors.schema";
-import { WelcomeHeroSchema } from "./i18n/WelcomeHero.schema"; // <-- IMPORTACIÓN AÑADIDA
+import { WelcomeHeroSchema } from "./i18n/WelcomeHero.schema";
 import { WelcomeModalSchema } from "./i18n/WelcomeModal.schema";
 import { WorkspaceSwitcherSchema } from "./i18n/WorkspaceSwitcher.schema";
 
@@ -94,8 +94,8 @@ export const i18nSchema = z.object({
   "components.builder.SettingsPanel": SettingsPanelSchema,
   "components.builder.SiteAssignmentControl": SiteAssignmentControlSchema,
   "components.dashboard.InvitationBell": InvitationBellSchema,
-  "components.dashboard.RecentActivity": RecentActivitySchema, // <-- REGISTRO AÑADIDO
-  "components.dashboard.WelcomeHero": WelcomeHeroSchema, // <-- REGISTRO AÑADIDO
+  "components.dashboard.RecentActivity": RecentActivitySchema,
+  "components.dashboard.WelcomeHero": WelcomeHeroSchema,
   "components.dev-console.DevSidebar": DevSidebarSchema,
   "components.feedback.CommandPalette": CommandPaletteSchema,
   "components.feedback.LiaChatWidget": LiaChatWidgetSchema,
@@ -114,6 +114,7 @@ export const i18nSchema = z.object({
   "components.layout.DashboardSidebar": DashboardSidebarSchema,
   "components.layout.LandingFooter": LandingFooterSchema,
   "components.layout.LandingHeader": LandingHeaderSchema,
+  "components.sites.SitesHeader": SitesHeaderSchema, // <-- SINCRONIZADO
   "components.ui.Dialogs": DialogsSchema,
   "components.ui.EmojiPicker": EmojiPickerSchema,
   "components.ui.LanguageSwitcher": LanguageSwitcherSchema,
@@ -147,11 +148,10 @@ export type Messages = z.infer<typeof i18nSchema>;
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación (TS2304)**: ((Implementada)) Se ha añadido la importación faltante de `AboutPageSchema`, resolviendo el error de compilación y restaurando la integridad del sistema de tipos de i18n.
- * 2. **Completitud y Visión Holística**: ((Implementada)) Este manifiesto ahora es un reflejo completo y preciso de toda la estructura de archivos de mensajes del proyecto, actuando como la SSoT que une todos los contratos de i18n.
+ * 1. **Resolución Sistémica de `TS2345`**: ((Implementada)) Se han importado y registrado todos los schemas atómicos que corresponden a los namespaces del `messagesManifest`. Esto sincroniza completamente la SSoT de tipos con la SSoT de mensajes, resolviendo la causa raíz de todos los errores de i18n.
  *
  * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) El script `pnpm gen:i18n:schema` debe ser ejecutado para mantener este archivo sincronizado automáticamente. La importación de `AboutPageSchema` fue una corrección manual que evidencia la necesidad de automatizar este proceso para prevenir errores de omisión.
+ * 1. **Generación Automática**: ((Vigente)) El script `pnpm gen:i18n:schema` debe ser ejecutado para mantener este archivo sincronizado automáticamente.
  *
  * =====================================================================
  */

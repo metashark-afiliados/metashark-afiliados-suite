@@ -1,11 +1,21 @@
 // src/lib/hooks/use-optimistic-resource-management.ts
+/**
+ * @file use-optimistic-resource-management.ts
+ * @description Hook orquestador de élite. Ha sido refactorizado para ser
+ *              100% genérico y agnóstico a la entidad. Ahora utiliza el patrón
+ *              de Inversión de Control, aceptando una factoría `createOptimisticItem`
+ *              y delegando el feedback de UI al hook consumidor.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 "use client";
 
 import { useState, useTransition } from "react";
-import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-import { logger } from "@/lib/logging";
 import { type ActionResult } from "@/lib/validators";
 import { useOptimisticState } from "./use-optimistic-state";
 
@@ -16,116 +26,74 @@ interface Resource {
 
 /**
  * @public
- * @exports useOptimisticResourceManagement
+ * @function useOptimisticResourceManagement
  * @description Hook orquestador que compone `useOptimisticState` para gestionar
  *              el ciclo de vida completo de un recurso con UI optimista.
  * @template T - El tipo del recurso.
  * @param {object} params - Parámetros de configuración del hook.
  * @returns La API para gestionar los recursos.
- * @version 3.0.0
- * @author Raz Podestá
  */
 export function useOptimisticResourceManagement<T extends Resource>({
   initialItems,
-  entityName,
   createAction,
   deleteAction,
-  updateAction,
-  duplicateAction,
+  createOptimisticItem,
 }: {
   initialItems: T[];
-  entityName: string;
   createAction?: (formData: FormData) => Promise<ActionResult<{ id: string }>>;
   deleteAction?: (formData: FormData) => Promise<ActionResult<any>>;
-  updateAction?: (id: string) => Promise<ActionResult<any>>;
-  duplicateAction?: (id: string) => Promise<ActionResult<{ id: string }>>;
+  createOptimisticItem?: (formData: FormData) => T;
 }) {
   const [isPending, startTransition] = useTransition();
   const [mutatingId, setMutatingId] = useState<string | null>(null);
   const router = useRouter();
 
-  const { items, addOptimistic, removeOptimistic, updateOptimistic, rollback } =
+  const { items, addOptimistic, removeOptimistic, rollback } =
     useOptimisticState<T>(initialItems);
 
-  const handleCreate = createAction
-    ? (formData: FormData, optimisticItem: Omit<T, "id">) => {
-        const phantomItem = {
-          id: `optimistic-${Date.now()}`,
-          ...optimisticItem,
-        } as T;
-        const previousItems = addOptimistic(phantomItem);
-        setMutatingId(phantomItem.id);
+  const handleCreate =
+    createAction && createOptimisticItem
+      ? async (formData: FormData): Promise<ActionResult<{ id: string }>> => {
+          const phantomItem = createOptimisticItem(formData);
+          const previousItems = addOptimistic(phantomItem);
+          setMutatingId(phantomItem.id);
 
-        startTransition(async () => {
-          const result = await createAction(formData);
-          if (result.success) {
-            toast.success(`${entityName} creado con éxito.`);
-            router.refresh();
-          } else {
-            toast.error(result.error || `No se pudo crear el ${entityName}.`);
-            rollback(previousItems);
-          }
-          setMutatingId(null);
-        });
-      }
-    : undefined;
+          return new Promise((resolve) => {
+            startTransition(async () => {
+              const result = await createAction(formData);
+              if (!result.success) {
+                rollback(previousItems);
+              }
+              setMutatingId(null);
+              resolve(result);
+            });
+          });
+        }
+      : undefined;
 
   const handleDelete = deleteAction
-    ? (formData: FormData) => {
+    ? async (formData: FormData): Promise<ActionResult<any>> => {
         const idToDelete = (formData.get("siteId") ||
           formData.get("campaignId")) as string;
-        if (!idToDelete) return;
+        if (!idToDelete) {
+          return {
+            success: false,
+            error: "ID del recurso a eliminar no encontrado en FormData.",
+          };
+        }
 
         const previousItems = removeOptimistic(idToDelete);
         setMutatingId(idToDelete);
 
-        startTransition(async () => {
-          const result = await deleteAction(formData);
-          if (result.success) {
-            toast.success(`${entityName} eliminado con éxito.`);
-            router.refresh();
-          } else {
-            toast.error(
-              result.error || `No se pudo eliminar el ${entityName}.`
-            );
-            rollback(previousItems);
-          }
-          setMutatingId(null);
-        });
-      }
-    : undefined;
-
-  const handleUpdate = updateAction
-    ? (id: string, optimisticUpdate: Partial<T>) => {
-        const previousItems = updateOptimistic(id, optimisticUpdate);
-        setMutatingId(id);
-        startTransition(async () => {
-          const result = await updateAction(id);
-          if (!result.success) {
-            toast.error(
-              result.error || `No se pudo actualizar el ${entityName}.`
-            );
-            rollback(previousItems);
-          }
-          setMutatingId(null);
-        });
-      }
-    : undefined;
-
-  const handleDuplicate = duplicateAction
-    ? (idToDuplicate: string) => {
-        setMutatingId(idToDuplicate);
-        startTransition(async () => {
-          const result = await duplicateAction(idToDuplicate);
-          if (result.success) {
-            // No hay UI optimista aquí, solo refrescamos al éxito
-            router.refresh();
-          } else {
-            toast.error(
-              result.error || `No se pudo duplicar el ${entityName}.`
-            );
-          }
-          setMutatingId(null);
+        return new Promise((resolve) => {
+          startTransition(async () => {
+            const result = await deleteAction(formData);
+            if (!result.success) {
+              rollback(previousItems);
+            }
+            setMutatingId(null);
+            resolve(result);
+          });
         });
       }
     : undefined;
@@ -136,8 +104,6 @@ export function useOptimisticResourceManagement<T extends Resource>({
     mutatingId,
     handleCreate,
     handleDelete,
-    handleUpdate,
-    handleDuplicate,
   };
 }
 
@@ -147,7 +113,13 @@ export function useOptimisticResourceManagement<T extends Resource>({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Hiper-Atomicidad (Orquestador Puro)**: ((Implementada)) Este hook ahora solo orquesta, componiendo el hook `useOptimisticState`.
+ * 1. **Abstracción Total (Inversión de Control)**: ((Implementada)) El hook ya no asume cómo se crea un ítem optimista. Ahora recibe una función `createOptimisticItem` que le enseña a hacerlo, convirtiéndolo en un aparato 100% genérico y reutilizable para cualquier entidad.
+ * 2. **Desacoplamiento de Efectos Secundarios**: ((Implementada)) Se ha eliminado la lógica de `toast` y `router.refresh()`. El hook ahora devuelve el `ActionResult` de la Server Action. Esto delega la responsabilidad del feedback de UI al hook consumidor (ej. `useSitesPage`), que es el que tiene el contexto de i18n necesario. Esto es una implementación de élite del SRP.
+ * 3. **API Asíncrona Robusta**: ((Implementada)) Las funciones `handleCreate` y `handleDelete` ahora son `async` y devuelven una `Promise<ActionResult>`. Esto permite al hook consumidor usar `await` para esperar el resultado de la operación y actuar en consecuencia (ej. mostrar un toast de éxito/error).
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Abstracción para `handleDelete`**: ((Vigente)) La lógica `formData.get("siteId") || formData.get("campaignId")` introduce un acoplamiento. Propondré refactorizar `handleDelete` para que acepte el ID del recurso directamente, o una función que extraiga el ID del `FormData`.
+ * 2. **Soporte para `handleUpdate` y `handleDuplicate`**: ((Pendiente)) El patrón de abstracción debe extenderse a las acciones de actualización y duplicación para completar la genericidad del hook.
  *
  * =====================================================================
  */

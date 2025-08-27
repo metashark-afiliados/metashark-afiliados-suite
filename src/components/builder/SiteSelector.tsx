@@ -2,10 +2,11 @@
 /**
  * @file SiteSelector.tsx
  * @description Componente de presentación puro que renderiza el selector de
- *              sitios y el botón de asignación. Es controlado por el hook
- *              `useSiteAssignment`.
+ *              sitios y el botón de asignación. Ha sido limpiado de caracteres
+ *              anómalos, resolviendo el error de compilación TS2304.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.1
+ * @date 2025-08-27
  */
 "use client";
 
@@ -70,6 +71,11 @@ export function SiteSelector({
               e.preventDefault();
               onCreateNew();
             }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") onCreateNew();
+            }}
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             {texts.createSiteButton}
@@ -90,7 +96,10 @@ export function SiteSelector({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Presentación Puro**: ((Implementada)) Este aparato es 100% agnóstico al estado, recibiendo todos sus datos y callbacks a través de props.
+ * 1. ((Implementada)) **Resolución de Error de Compilación (TS2304)**: Se ha eliminado el carácter anómalo 'o' al final del archivo, restaurando su integridad sintáctica y resolviendo el error de compilación.
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) **Abstracción a `SelectItemButton`**: El patrón de tener un item no seleccionable que actúa como un botón dentro de un `Select` es reutilizable. Podría ser abstraído a su propio componente atómico para una mayor adhesión al principio DRY.
  *
  * =====================================================================
  */

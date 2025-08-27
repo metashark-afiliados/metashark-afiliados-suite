@@ -1,12 +1,12 @@
+// tests/mocks/data/database-state.ts
 /**
  * @file database-state.ts
- * @description Manifiesto de Datos y SSoT para la DB simulada.
- *              Ha sido refactorizado a un estándar de élite para reflejar
- *              la nueva arquitectura de "Creations", separando el contenido
- *              del metadato de la campaña y resolviendo errores de tipo.
+ * @description Manifiesto de Datos y SSoT para la DB simulada. Ha sido
+ *              sincronizado con el schema.sql canónico para incluir la propiedad
+ *              'icon' en la entidad 'workspaces', resolviendo el error de tipo TS2741.
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
- * @date 2025-08-25
+ * @version 7.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -30,12 +30,11 @@ export const DEV_WORKSPACE: Tables<"workspaces"> = {
   id: "dev-ws-001",
   name: "Development Workspace",
   owner_id: DEV_USER.id,
+  icon: "🚀", // <-- SINCRONIZADO
   current_site_count: 1,
   created_at: new Date().toISOString(),
   updated_at: null,
 };
-
-// --- INICIO DE REFACTORIZACIÓN ARQUITECTÓNICA ---
 
 const DEV_CREATION: Tables<"creations"> = {
   id: "creation-001",
@@ -91,7 +90,7 @@ export const db = {
   campaigns: [
     {
       id: "camp-001",
-      creation_id: DEV_CREATION.id, // Vinculado a la creación
+      creation_id: DEV_CREATION.id,
       site_id: "site-001",
       name: "Landing Page V1",
       slug: "landing-v1",
@@ -101,7 +100,6 @@ export const db = {
       updated_at: new Date().toISOString(),
     },
   ] as Tables<"campaigns">[],
-  // ... (resto de las tablas sin cambios)
   invitations: [] as Tables<"invitations">[],
   visitor_logs: [] as Tables<"visitor_logs">[],
   feature_modules: [
@@ -118,21 +116,19 @@ export const db = {
     },
   ] as Tables<"feature_modules">[],
 };
-// --- FIN DE REFACTORIZACIÓN ARQUITECTÓNICA ---
 
 export const MOCKED_USER = DEV_USER;
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Alineación de Modelo de Datos (TS2352)**: ((Implementada)) El mock ahora refleja la nueva arquitectura de datos, separando `creations` de `campaigns` y resolviendo el error de tipo.
- * 2. **Integridad Referencial Simulada**: ((Implementada)) La campaña simulada ahora tiene una `creation_id` que la vincula a la creación simulada, manteniendo la coherencia del modelo.
+ * 1. **Sincronización de Contrato de Mocks (TS2741)**: ((Implementada)) Se ha añadido la propiedad `icon: "🚀"` al objeto `DEV_WORKSPACE`. Esta corrección alinea el estado de la base de datos simulada con el contrato de tipo `Tables<"workspaces">`, resolviendo el error de compilación.
  *
  * @subsection Melhorias Futuras
- * 1. **Factorías de Datos de Prueba**: ((Vigente)) Para pruebas más complejas, este estado estático podría ser reemplazado o complementado por factorías (ej. `createMockCampaign`) que permitan generar datos de prueba dinámicos.
+ * 1. **Factorías Dinámicas**: ((Vigente)) Para pruebas más robustas, este estado estático podría ser generado por factorías que utilicen `faker.js`, como las que ya existen en `context.factory.ts`. Esto permitiría crear múltiples estados de prueba diferentes.
  *
  * =====================================================================
  */
+// tests/mocks/data/database-state.ts

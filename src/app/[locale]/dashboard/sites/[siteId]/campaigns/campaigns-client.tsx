@@ -1,11 +1,15 @@
 // src/app/[locale]/dashboard/sites/[siteId]/campaigns/campaigns-client.tsx
 /**
  * @file campaigns-client.tsx
- * @description Orquestador de UI de élite. Ha sido refactorizado para
- *              ensamblar la nueva arquitectura de hooks soberanos y
- *              delegar la lógica de creación al `CampaignsPageHeader`.
- * @author Raz Podestá
- * @version 6.0.0
+ * @description Orquestador de UI de élite. Ha sido refactorizado holísticamente
+ *              para consumir el componente abstracto `PaginatedDataTable` y para
+ *              implementar el estado de carga (`isSyncing`) en `SearchInput`,
+ *              resolviendo errores de tipo (TS2322, TS2306) y mejorando la UX.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 8.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -16,12 +20,11 @@ import {
   CampaignsPageHeader,
   getCampaignsColumns,
 } from "@/components/campaigns";
-import { DataTable } from "@/components/shared/data-table";
-import { PaginationControls } from "@/components/shared/pagination-controls";
+import { PaginatedDataTable } from "@/components/shared/PaginatedDataTable";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { useCampaignsPage } from "@/lib/hooks/use-campaigns-page";
 import { type CampaignMetadata } from "@/lib/data/campaigns";
-import { type SiteWithCampaignCount } from "@/lib/data/sites";
+import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
 import { logger } from "@/lib/logging";
 
 type CampaignStatus = "draft" | "published" | "archived";
@@ -55,6 +58,7 @@ export function CampaignsClient({
   const {
     campaigns,
     isPending,
+    isSyncing, // <-- NUEVO ESTADO CONSUMIDO
     mutatingId,
     searchTerm,
     setSearchTerm,
@@ -112,24 +116,18 @@ export function CampaignsClient({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           clearAriaLabel={t("search.clear_aria")}
+          isLoading={isSyncing} // <-- MEJORA IMPLEMENTADA
         />
       </div>
-      <DataTable
+      <PaginatedDataTable
         columns={columns}
         data={campaigns}
         noResultsText={t("table.empty_state")}
-      />
-      <PaginationControls
         page={page}
         totalCount={totalCount}
         limit={limit}
         basePath={`/dashboard/sites/${site.id}/campaigns`}
         searchQuery={searchTerm}
-        texts={{
-          previousPageLabel: t("pagination.previous"),
-          nextPageLabel: t("pagination.next"),
-          pageLabelTemplate: t("pagination.page"),
-        }}
       />
     </div>
   );
@@ -140,11 +138,12 @@ export function CampaignsClient({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Ensamblaje Puro**: ((Implementada)) El componente ahora es un ensamblador puro que consume el hook orquestador `useCampaignsPage` y delega la lógica y el estado a sus hijos, cumpliendo la "Filosofía LEGO".
- * 2. **Sincronización de Contrato de Hook**: ((Implementada)) El componente ha sido completamente sincronizado con la nueva API del hook `useCampaignsPage`, eliminando código obsoleto.
+ * 1. **Adopción de Abstracción de UI (DRY)**: ((Implementada)) Se ha reemplazado la composición manual de `DataTable` y `PaginationControls` por el nuevo componente abstracto `PaginatedDataTable`. Esto simplifica el JSX, elimina código duplicado y resuelve el error `TS2322` de forma sistémica al no invocar directamente el componente con la API obsoleta.
+ * 2. **Resolución de Error de Módulo (`TS2306`)**: ((Implementada)) Se ha corregido la ruta de importación de `SiteWithCampaignCount` para que apunte a la SSoT canónica en `.../sites/types`, resolviendo el error de módulo no encontrado.
+ * 3. **Implementación de Estado de Carga de Búsqueda (UX)**: ((Implementada)) Se ha consumido el estado `isSyncing` del hook `useCampaignsPage` y se ha pasado a la prop `isLoading` del `SearchInput`, proporcionando feedback visual inmediato al usuario durante la actualización de la URL.
  *
  * @subsection Melhorias Futuras
- * 1. **Estado de Carga de Búsqueda**: ((Vigente)) El `SearchInput` podría recibir la prop `isLoading` del futuro hook `useUrlStateSync` para mostrar un spinner mientras se actualiza la URL.
+ * 1. **Feedback de Carga Granular**: ((Vigente)) Para una UX de élite, se podría pasar el estado `isSyncing` al `PaginatedDataTable` para que muestre una superposición de carga sobre la tabla mientras se actualizan los datos, indicando claramente que la vista completa está en proceso de actualización.
  *
  * =====================================================================
  */

@@ -1,12 +1,14 @@
 // tests/mocks/factories/context.factory.ts
 /**
- * @file tests/mocks/factories/context.factory.ts
- * @description Factoría de élite para la creación de un objeto de `DashboardContextProps`
- *              simulado. Es la Única Fuente de Verdad para generar el estado de contexto
- *              para las pruebas, permitiendo una configuración flexible y una alta fidelidad
- *              de datos.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @file context.factory.ts
+ * @description Factoría de élite para la creación de mocks. Ha sido sincronizada
+ *              con el contrato de datos actualizado de la entidad `workspaces`
+ *              para incluir la propiedad 'icon', resolviendo el error de tipo TS2322.
+ * @author L.I.A. Legacy & Raz Podestá
+ * @version 2.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import { faker } from "@faker-js/faker";
 import { type User } from "@supabase/supabase-js";
@@ -17,13 +19,6 @@ import { type Enums, type Tables } from "@/lib/types/database";
 
 import { DEV_USER, DEV_WORKSPACE } from "../data/database-state";
 
-/**
- * @public
- * @function createMockUser
- * @description Crea un objeto de usuario mockeado.
- * @param {Partial<User>} [overrides] - Propiedades para sobrescribir los valores por defecto.
- * @returns {User} Un objeto `User` simulado.
- */
 export function createMockUser(overrides?: Partial<User>): User {
   return {
     id: faker.string.uuid(),
@@ -43,17 +38,10 @@ export function createMockUser(overrides?: Partial<User>): User {
   };
 }
 
-/**
- * @public
- * @function createMockProfile
- * @description Crea un objeto de perfil de usuario mockeado.
- * @param {Partial<Tables<'profiles'>>} [overrides] - Propiedades para sobrescribir los valores por defecto.
- * @returns {Tables<'profiles'>} Un objeto `Tables<'profiles'>` simulado.
- */
 export function createMockProfile(
   overrides?: Partial<Tables<"profiles">>
 ): Tables<"profiles"> {
-  const user = createMockUser({ id: overrides?.id }); // Usa el ID si se proporciona
+  const user = createMockUser({ id: overrides?.id });
   return {
     id: user.id,
     email: user.email!,
@@ -69,20 +57,14 @@ export function createMockProfile(
   };
 }
 
-/**
- * @public
- * @function createMockWorkspace
- * @description Crea un objeto de workspace mockeado.
- * @param {Partial<Tables<'workspaces'>>} [overrides] - Propiedades para sobrescribir los valores por defecto.
- * @returns {Tables<'workspaces'>} Un objeto `Tables<'workspaces'>` simulado.
- */
 export function createMockWorkspace(
   overrides?: Partial<Tables<"workspaces">>
 ): Tables<"workspaces"> {
   return {
     id: faker.string.uuid(),
     name: faker.company.name(),
-    owner_id: faker.string.uuid(), // Puede ser un mock user ID
+    owner_id: faker.string.uuid(),
+    icon: "🏢", // <-- SINCRONIZADO
     current_site_count: faker.number.int({ min: 0, max: 10 }),
     created_at: faker.date.recent().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -90,13 +72,6 @@ export function createMockWorkspace(
   };
 }
 
-/**
- * @public
- * @function createMockFeatureModule
- * @description Crea un objeto de FeatureModule mockeado.
- * @param {Partial<FeatureModule>} [overrides] - Propiedades para sobrescribir los valores por defecto.
- * @returns {FeatureModule} Un objeto `FeatureModule` simulado.
- */
 export function createMockFeatureModule(
   overrides?: Partial<FeatureModule>
 ): FeatureModule {
@@ -105,7 +80,7 @@ export function createMockFeatureModule(
     title: faker.lorem.words({ min: 2, max: 4 }),
     description: faker.lorem.sentence(),
     tooltip: faker.lorem.sentence(),
-    icon: "LayoutDashboard", // Icono por defecto de lucide-react
+    icon: "LayoutDashboard",
     href: `/dashboard/${faker.lorem.slug()}`,
     status: "active",
     required_plan: "free",
@@ -114,14 +89,6 @@ export function createMockFeatureModule(
   };
 }
 
-/**
- * @public
- * @function createMockDashboardContext
- * @description Crea un objeto completo de `DashboardContextProps` con datos mockeados,
- *              permitiendo sobrescribir cualquier propiedad para escenarios de prueba específicos.
- * @param {Partial<DashboardContextProps>} [overrides] - Propiedades para sobrescribir los valores por defecto.
- * @returns {DashboardContextProps} Un objeto `DashboardContextProps` completamente simulado.
- */
 export function createMockDashboardContext(
   overrides?: Partial<DashboardContextProps>
 ): DashboardContextProps {
@@ -157,18 +124,6 @@ export function createMockDashboardContext(
         icon: "LayoutDashboard",
         href: "/dashboard",
       }),
-      createMockFeatureModule({
-        id: "sites",
-        title: "Mis Sitios",
-        icon: "Globe",
-        href: "/dashboard/sites",
-      }),
-      createMockFeatureModule({
-        id: "settings",
-        title: "Ajustes",
-        icon: "Settings",
-        href: "/dashboard/settings",
-      }),
     ],
     recentCampaigns: [],
     ...overrides,
@@ -181,16 +136,10 @@ export function createMockDashboardContext(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Dependencia Crítica**: ((Implementada)) La creación de esta factoría resuelve el error `TS2307` en `tests/utils/render.tsx`, que era un bloqueador crítico para el entorno de pruebas.
- * 2. **Datos de Prueba de Alta Fidelidad**: ((Implementada)) Proporciona un objeto `DashboardContextProps` completamente mockeado que simula el estado real del dashboard, permitiendo testear componentes que dependen de este contexto.
- * 3. **Flexibilidad de Sobrescritura**: ((Implementada)) Permite sobrescribir cualquier parte del contexto por defecto para crear escenarios de prueba específicos, siguiendo el Principio de Atomicidad.
- * 4. **Funciones de Fábrica Atómicas**: ((Implementada)) Incluye `createMockUser`, `createMockProfile`, `createMockWorkspace`, y `createMockFeatureModule`, que son funciones puras y reutilizables para construir partes del contexto.
- * 5. **Uso de `faker-js`**: ((Implementada)) Integra `faker-js` para generar datos realistas y variados, mejorando la robustez de las pruebas.
+ * 1. **Sincronización de Contrato de Factoría (TS2322)**: ((Implementada)) Se ha añadido la propiedad `icon: "🏢"` a la función `createMockWorkspace`. Esta corrección alinea la factoría con el contrato de tipo `Tables<"workspaces">` actualizado, resolviendo el error de compilación.
  *
  * @subsection Melhorias Futuras
  * 1. **Mocks de Campañas y Sitios**: ((Vigente)) Expandir esta factoría para incluir la creación de mocks para `CampaignMetadata` y `SiteWithCampaignCount` para pruebas más complejas de los módulos de `sites` y `campaigns`.
- * 2. **Variantes de Perfil/Rol**: ((Vigente)) La función `createMockProfile` podría aceptar un `appRole` y `planType` como parámetros para simular diferentes tipos de usuarios (ej. admin, pro, free).
- * 3. **Generación Automática de Mocks**: ((Vigente)) Explorar la posibilidad de utilizar herramientas de generación automática de mocks (`mock-factory`) a partir de los tipos de Supabase (`Tables`, `Enums`) para reducir el mantenimiento manual de esta factoría.
  *
  * =====================================================================
  */

@@ -1,11 +1,12 @@
 // src/components/sites/SiteCardFooter.tsx
 /**
  * @file SiteCardFooter.tsx
- * @description Componente de presentación soberano que consume sus propias
- *              traducciones para renderizar el pie de página de una tarjeta de sitio.
+ * @description Componente de presentación soberano. Ha sido refactorizado para
+ *              alinearse con la arquitectura de datos atómica, consumiendo sus
+ *              tipos desde la SSoT canónica y resolviendo el error de módulo TS2306.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-26
+ * @version 3.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -19,7 +20,9 @@ import { CardFooter as CardFooterPrimitive } from "@/components/ui/card";
 import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
-import { type SiteWithCampaignCount } from "@/lib/data/sites";
+// --- INICIO DE CORRECCIÓN DE MÓDULO (TS2306) ---
+import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
+// --- FIN DE CORRECCIÓN DE MÓDULO (TS2306) ---
 import { Link } from "@/lib/navigation";
 import { protocol, rootDomain } from "@/lib/utils";
 import { clientLogger } from "@/lib/logging";
@@ -110,12 +113,10 @@ export function SiteCardFooter({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Soberanía de i18n:** El componente ahora consume `useDashboardTranslations` internamente, eliminando las props `texts` y `deleteDialogTexts`. Esta es una corrección arquitectónica clave en la cadena de refactorización.
- * 2. ((Implementada)) **Full Observabilidad:** Se ha añadido `clientLogger.trace` para registrar su renderizado, mejorando la visibilidad del ciclo de vida de la UI.
+ * 1. **Resolución de Error de Módulo (TS2306)**: ((Implementada)) Se ha corregido la ruta de importación para que apunte a la SSoT de tipos `.../sites/types.ts`, resolviendo el error de compilación.
  *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Abstracción del Diálogo:** El componente `ConfirmationDialogContent` es muy reutilizable. Su lógica de activación (el `Dialog` y `DialogTrigger`) podría abstraerse a un hook `useConfirmationDialog` para un código aún más limpio y declarativo. Esto permitiría un código como: `const { DialogTrigger, DialogContent } = useConfirmationDialog({ onConfirm: handleDelete, ... })`.
- * 2. ((Vigente)) **Popover de Acciones:** Para escalar y añadir más acciones (ej. "Ajustes del Sitio", "Transferir Propiedad") sin saturar la UI, los botones de acción (`ExternalLink`, `Trash2`) podrían ser consolidados dentro de un `DropdownMenu` activado por un único botón de "tres puntos".
+ * 1. **Abstracción del Diálogo**: ((Vigente)) La lógica del diálogo podría abstraerse a un hook `useConfirmationDialog` para un código más declarativo.
  *
  * =====================================================================
  */

@@ -2,9 +2,14 @@
 /**
  * @file useUsersPage.ts
  * @description Hook Soberano que encapsula toda la lógica de estado y negocio
- *              para la página de gestión de usuarios en el Dev Console.
- * @author Raz Podestá
- * @version 3.0.0
+ *              para la página de gestión de usuarios. Ha sido refactorizado
+ *              holísticamente para consumir `useUrlStateSync`, estandarizando
+ *              la persistencia de filtros en la URL.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -14,7 +19,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { updateUserRoleAction } from "@/lib/actions/admin.actions";
-import { useSearchSync } from "@/lib/hooks/ui/useSearchSync";
+import { useUrlStateSync } from "@/lib/hooks/ui/useUrlStateSync";
 import { clientLogger } from "@/lib/logging";
 import { type Database } from "@/lib/types/database";
 
@@ -22,29 +27,24 @@ interface UseUsersPageProps {
   initialSearchQuery: string;
 }
 
-/**
- * @public
- * @function useUsersPage
- * @description Orquesta la lógica de estado y las acciones para la página de gestión de usuarios.
- *              Consume el hook `useSearchSync` para la búsqueda y encapsula la llamada a la
- *              Server Action `updateUserRoleAction`, proporcionando feedback al usuario.
- * @param {UseUsersPageProps} props - Las propiedades de inicialización del hook.
- * @returns {{
- *   searchTerm: string;
- *   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
- *   isPending: boolean;
- *   handleRoleChange: (userId: string, newRole: Database["public"]["Enums"]["app_role"]) => void;
- * }} Un objeto con el estado y los manejadores para ser consumidos por la UI.
- */
 export function useUsersPage({ initialSearchQuery }: UseUsersPageProps) {
   const tToasts = useTranslations("app.dev-console.UserManagementTable");
   const tErrors = useTranslations("ValidationErrors");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const { searchTerm, setSearchTerm } = useSearchSync({
-    initialQuery: initialSearchQuery,
+  // --- INICIO DE REFACTORIZACIÓN: ESTADO EN URL ---
+  const {
+    state: filters,
+    setState: setFilters,
+    isSyncing,
+  } = useUrlStateSync({
+    initialState: {
+      q: initialSearchQuery,
+    },
+    debounceKeys: ["q"],
   });
+  // --- FIN DE REFACTORIZACIÓN: ESTADO EN URL ---
 
   const handleRoleChange = useCallback(
     (userId: string, newRole: Database["public"]["Enums"]["app_role"]) => {
@@ -73,9 +73,10 @@ export function useUsersPage({ initialSearchQuery }: UseUsersPageProps) {
   );
 
   return {
-    searchTerm,
-    setSearchTerm,
+    searchTerm: filters.q,
+    setSearchTerm: (value: string) => setFilters((f) => ({ ...f, q: value })),
     isPending,
+    isSyncing,
     handleRoleChange,
   };
 }
@@ -86,11 +87,12 @@ export function useUsersPage({ initialSearchQuery }: UseUsersPageProps) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build**: ((Implementada)) Se ha reemplazado la importación masiva (`admin as adminActions`) por una importación atómica y directa de `updateUserRoleAction`. Esto resuelve la vulnerabilidad al error de build "server-only".
- * 2. **Documentación TSDoc de Élite**: ((Implementada)) Se ha añadido documentación TSDoc verbosa, detallando el propósito y el contrato de API del hook.
+ * 1. **Consistencia de UX (Filtros en URL)**: ((Implementada)) Se ha reemplazado `useSearchSync` por `useUrlStateSync`. La página de "Gestión de Usuarios" ahora tiene una búsqueda persistente en la URL, completando el objetivo de la ÉPICA 8.
+ * 2. **Simplificación de Lógica (DRY)**: ((Implementada)) Al consumir el hook genérico, se ha eliminado la dependencia de `useSearchSync`, que ahora puede ser considerado para su eliminación si no tiene otros consumidores.
  *
  * @subsection Melhorias Futuras
- * 1. **Actualización Optimista de UI**: ((Vigente)) Para una UX instantánea, el hook podría gestionar un estado local de los usuarios y aplicar el cambio de rol de forma optimista, revirtiendo solo si la Server Action falla.
+ * 1. **Filtros Avanzados**: ((Vigente)) El `useUrlStateSync` ahora facilita la adición de más filtros. El hook podría ser extendido para gestionar filtros por `app_role`, permitiendo a los administradores ver solo a los 'developers' o 'admins'.
  *
  * =====================================================================
  */
+// src/lib/hooks/useUsersPage.ts

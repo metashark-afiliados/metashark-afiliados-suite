@@ -1,13 +1,12 @@
 // src/components/sites/SitesPageTitle.tsx
 /**
  * @file SitesPageTitle.tsx
- * @description Aparato de UI atómico y soberano. Ha sido refactorizado a un
- *              estándar de élite para aceptar una prop `titleOverride` opcional,
- *              permitiendo que su título sea dinámico y controlado por un
- *              orquestador, o que consuma su propio contenido de i18n por defecto.
+ * @description Aparato de UI atómico y soberano. Su única responsabilidad es
+ *              renderizar el título y la descripción de la página "Mis Sitios",
+ *              consumiendo sus propias traducciones.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-26
+ * @version 1.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -16,36 +15,15 @@
 import { useTypedTranslations } from "@/lib/i18n/hooks";
 import { clientLogger } from "@/lib/logging";
 
-/**
- * @public
- * @interface SitesPageTitleProps
- * @description Contrato de props para el componente.
- */
-export interface SitesPageTitleProps {
-  /**
-   * @property {string} [titleOverride]
-   * @description Si se proporciona, este string sobrescribirá el título
-   *              obtenido del archivo de internacionalización.
-   */
-  titleOverride?: string;
-}
-
-export function SitesPageTitle({ titleOverride }: SitesPageTitleProps) {
-  const t = useTypedTranslations("components.sites.SitesHeader");
-
-  const displayTitle = titleOverride || t("title");
-
+export function SitesPageTitle() {
   clientLogger.trace(
-    "[SitesPageTitle] Renderizando componente de título soberano.",
-    {
-      source: titleOverride ? "prop" : "i18n",
-      title: displayTitle,
-    }
+    "[SitesPageTitle] Renderizando componente de título soberano."
   );
+  const t = useTypedTranslations("components.sites.SitesHeader");
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">{displayTitle}</h1>
+      <h1 className="text-2xl font-bold">{t("title")}</h1>
       <p className="text-muted-foreground">{t("description")}</p>
     </div>
   );
@@ -57,6 +35,12 @@ export function SitesPageTitle({ titleOverride }: SitesPageTitleProps) {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Título Dinámico y Reutilización Mejorada**: ((Implementada)) El componente ahora acepta una prop `titleOverride`, cumpliendo la directiva. Esto lo transforma de un componente específico para "Mis Sitios" a un componente de título de página genérico y reutilizable, capaz de manejar tanto contenido estático (desde i18n) como dinámico (desde props).
- * 2. **Observabilidad Mejorada**: ((Implementada)) El `clientLogger` ahora registra la fuente del título (`prop` o `i18n`), proporcionando una visibilidad de élite sobre el comportamiento del componente para una depuración más sencilla.
+ * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato aísla perfectamente la responsabilidad de renderizar el título de la página, desacoplándolo de los controles de acción y adhiriéndose a la "Filosofía LEGO".
+ * 2. **Soberanía de I18n**: ((Implementada)) El componente es autocontenido en su consumo de traducciones, mejorando la modularidad.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Título Dinámico**: ((Vigente)) El componente podría aceptar una prop `titleOverride?: string` para permitir que el título sea dinámico (ej. "Sitios en 'Mi Workspace'"), haciéndolo aún más reutilizable. Propondré esta mejora en la siguiente fase de refactorización de la UI.
+ *
+ * =====================================================================
  */
+// src/components/sites/SitesPageTitle.tsx

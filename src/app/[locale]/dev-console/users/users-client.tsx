@@ -1,10 +1,14 @@
 // src/app/[locale]/dev-console/users/users-client.tsx
 /**
  * @file users-client.tsx
- * @description Orquestador de UI de élite. Ha sido refactorizado para componer
- *              el nuevo aparato atómico `UsersPageHeader`, mejorando el SRP.
- * @author Raz Podestá
- * @version 6.0.0
+ * @description Orquestador de UI de élite. Ha sido refactorizado holísticamente
+ *              para consumir el nuevo componente abstracto `PaginatedDataTable`,
+ *              eliminando código duplicado y resolviendo el error de tipo TS2322.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 7.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -13,8 +17,7 @@ import { useTranslations } from "next-intl";
 
 import { useUsersPage } from "@/lib/hooks/useUsersPage";
 import { type UserProfilesWithEmail } from "@/lib/types/database/views";
-import { DataTable } from "@/components/shared/data-table";
-import { PaginationControls } from "@/components/shared/pagination-controls";
+import { PaginatedDataTable } from "@/components/shared/PaginatedDataTable";
 import { getUsersColumns } from "../components/users-table-columns";
 import { UsersPageHeader } from "./components/UsersPageHeader";
 
@@ -54,23 +57,18 @@ export function UsersClient({
         onSearchChange={(e) => setSearchTerm(e.target.value)}
         clearSearchAriaLabel={t("clear_search_aria")}
       />
-      <DataTable
+      {/* --- INICIO DE REFACTORIZACIÓN HOLÍSTICA (DRY) --- */}
+      <PaginatedDataTable
         columns={columns}
         data={profiles}
         noResultsText={t("table_empty_state")}
-      />
-      <PaginationControls
         page={page}
         totalCount={totalCount}
         limit={limit}
         basePath="/dev-console/users"
         searchQuery={searchTerm}
-        texts={{
-          previousPageLabel: t("pagination.previousPageLabel"),
-          nextPageLabel: t("pagination.nextPageLabel"),
-          pageLabelTemplate: t("pagination.pageLabelTemplate"),
-        }}
       />
+      {/* --- FIN DE REFACTORIZACIÓN HOLÍSTICA (DRY) --- */}
     </div>
   );
 }
@@ -80,11 +78,11 @@ export function UsersClient({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Hiper-Atomicidad (SRP)**: ((Implementada)) La lógica de presentación del encabezado ha sido abstraída, haciendo que este componente sea un orquestador de UI aún más puro.
- * 2. **Internacionalización Corregida**: ((Implementada)) El texto de descripción ahora se consume desde la capa de i18n, eliminando un texto codificado.
+ * 1. **Resolución de Error Sistémico (TS2322)**: ((Implementada)) Al reemplazar `DataTable` y `PaginationControls` por el nuevo `PaginatedDataTable`, se elimina la llamada que contenía la prop obsoleta `texts`, resolviendo el error de compilación de forma arquitectónica.
+ * 2. **Adopción del Principio DRY**: ((Implementada)) Este componente ahora es más simple y declarativo. Su código ya no está duplicado en `campaigns-client.tsx`, lo que mejora la mantenibilidad de la base de código.
  *
  * @subsection Melhorias Futuras
- * 1. **Abstracción de `DataTable`**: ((Vigente)) La composición de `DataTable` y `PaginationControls` es un patrón repetido. Podría abstraerse a un componente `PaginatedDataTable` para una mayor reutilización.
+ * 1. **Acciones en Lote**: ((Vigente)) La `PaginatedDataTable` podría ser mejorada para soportar la selección de filas. Este componente padre podría entonces pasar un componente de "Barra de Acciones en Lote" para operaciones como "Cambiar Rol a Seleccionados".
  *
  * =====================================================================
  */

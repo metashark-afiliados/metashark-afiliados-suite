@@ -1,9 +1,12 @@
 // src/lib/actions/campaigns/create.action.ts
 /**
  * @file create.action.ts
- * @description Server Action atómica para crear una nueva campaña.
+ * @description Server Action atómica para crear una nueva campaña. Ha sido
+ *              refactorizada para consumir la nueva API de datos atomizada,
+ *              resolviendo el error de compilación TS2339.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
+ * @date 2025-08-27
  */
 "use server";
 import "server-only";
@@ -11,8 +14,11 @@ import "server-only";
 import { revalidatePath } from "next/cache";
 import { ZodError } from "zod";
 
-import { sites as sitesData } from "@/lib/data";
 import { hasWorkspacePermission } from "@/lib/data/permissions";
+// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
+// Se importa el módulo 'sites' completo, que ahora contiene los namespaces.
+import { sites as sitesData } from "@/lib/data";
+// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 import { type ActionResult, CreateCampaignSchema } from "@/lib/validators";
@@ -29,7 +35,10 @@ export async function createCampaignAction(
     const rawData = Object.fromEntries(formData);
     const { name, slug, site_id } = CreateCampaignSchema.parse(rawData);
 
-    const site = await sitesData.getSiteById(site_id);
+    // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
+    // La llamada ahora utiliza la API namespaced correcta: `sitesData.management.getSiteById`.
+    const site = await sitesData.management.getSiteById(site_id);
+    // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
     if (!site) {
       return { success: false, error: "error_site_not_found" };
     }
@@ -78,7 +87,11 @@ export async function createCampaignAction(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad de Acción (SRP)**: ((Implementada)) Este aparato tiene ahora una única responsabilidad.
+ * 1. ((Implementada)) **Resolución de Error de Compilación (TS2339)**: Se ha actualizado la llamada a la capa de datos para usar `sitesData.management.getSiteById`, alineando la acción con la nueva arquitectura de datos atomizada.
+ * 2. ((Implementada)) **Consistencia Arquitectónica**: Esta corrección propaga la nueva arquitectura de datos a la capa de acciones, reforzando la estructura modular del backend.
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) **Transacción RPC**: La creación de la campaña y la actualización del `current_site_count` en la tabla `sites` deberían ser una única operación atómica a través de una función RPC en PostgreSQL para garantizar la integridad de los datos.
  *
  * =====================================================================
  */

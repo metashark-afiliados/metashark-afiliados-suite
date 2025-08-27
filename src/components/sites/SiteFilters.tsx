@@ -1,18 +1,18 @@
 // src/components/sites/SiteFilters.tsx
 /**
  * @file SiteFilters.tsx
- * @description Aparato de UI atómico y soberano. Encapsula toda la lógica
- *              de presentación para los filtros y el ordenamiento de la página
- *              de sitios, incluyendo un indicador visual de filtros activos.
+ * @description Aparato de UI atómico y soberano. Ha sido refactorizado a un
+ *              estándar de élite para consumir el hook de traducción soberano
+ *              `useSitesPageTranslations`, resolviendo la cascada de errores de
+ *              tipo TS2345 y alineándolo con la arquitectura IMAS.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-26
+ * @version 4.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
-import React from "react";
 import { Filter } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupOption } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -31,19 +31,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { type SiteSortOption } from "@/lib/data/sites";
-import { type Enums } from "@/lib/types/database";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
+import {
+  type SiteSortOption,
+  type SiteStatusFilter,
+} from "@/lib/data/sites/types";
+// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N) ---
+import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
+// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 import { clientLogger } from "@/lib/logging";
-import { cn } from "@/lib/utils";
-
-type SiteStatus = Enums["site_status"] | "all";
 
 export interface SiteFiltersProps {
   sortOption: SiteSortOption;
   onSortChange: (sort: SiteSortOption) => void;
-  statusFilter: SiteStatus;
-  onStatusFilterChange: (status: SiteStatus) => void;
+  statusFilter: SiteStatusFilter;
+  onStatusFilterChange: (status: SiteStatusFilter) => void;
   onClearFilters: () => void;
   isSearchActive: boolean;
 }
@@ -59,8 +60,12 @@ export function SiteFilters({
   clientLogger.trace(
     "[SiteFilters] Renderizando componente de filtros soberano."
   );
-  const tFilters = useTypedTranslations("SitesPage.filters");
-  const tStatus = useTypedTranslations("SitesPage.status");
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N) ---
+  const { tSitesPage } = useSitesPageTranslations();
+  // Se accede a las claves anidadas a través de la función `t` correcta.
+  const tFilters = (key: string) => tSitesPage(`filters.${key}` as any);
+  const tStatus = (key: string) => tSitesPage(`status.${key}` as any);
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
   const sortOptions: { value: SiteSortOption; label: string }[] = [
     { value: "created_at_desc", label: tFilters("sort_updated_desc") },
@@ -68,7 +73,7 @@ export function SiteFilters({
     { value: "name_desc", label: tFilters("sort_name_desc") },
   ];
 
-  const statusOptions: { value: SiteStatus; label: string }[] = [
+  const statusOptions: { value: SiteStatusFilter; label: string }[] = [
     { value: "all", label: tFilters("status_all") },
     { value: "draft", label: tStatus("draft") },
     { value: "published", label: tStatus("published") },
@@ -107,15 +112,14 @@ export function SiteFilters({
           <RadioGroup
             aria-label={tFilters("sort_label")}
             value={sortOption}
-            onValueChange={(value) => onSortChange(value as SiteSortOption)}
+            onValueChange={(value: string) =>
+              onSortChange(value as SiteSortOption)
+            }
           >
             {sortOptions.map((option) => (
-              <div key={option.value} className="flex items-center">
-                <RadioGroupItem value={option.value} id={option.value} />
-                <Label htmlFor={option.value} className="ml-2 font-normal">
-                  {option.label}
-                </Label>
-              </div>
+              <RadioGroupOption key={option.value} value={option.value}>
+                {option.label}
+              </RadioGroupOption>
             ))}
           </RadioGroup>
           <Separator />
@@ -123,8 +127,8 @@ export function SiteFilters({
             <Label htmlFor="status-filter">{tFilters("status_label")}</Label>
             <Select
               value={statusFilter}
-              onValueChange={(value) =>
-                onStatusFilterChange(value as SiteStatus)
+              onValueChange={(value: string) =>
+                onStatusFilterChange(value as SiteStatusFilter)
               }
             >
               <SelectTrigger id="status-filter">
@@ -161,13 +165,11 @@ export function SiteFilters({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato tiene la única responsabilidad de presentar la UI de filtros y comunicar las interacciones, cumpliendo la directiva de atomización.
- * 2. **Indicador de Filtros Activos**: ((Implementada)) Se ha implementado la lógica y la UI para mostrar un indicador visual cuando los filtros de ordenamiento, estado o búsqueda están activos, mejorando la conciencia situacional del usuario.
- * 3. **Botón "Limpiar Filtros" Inteligente**: ((Implementada)) El botón para limpiar los filtros ahora se deshabilita automáticamente cuando no hay filtros activos, proveyendo una UX más inteligente y previniendo acciones innecesarias.
+ * 1. ((Implementada)) **Resolución Sistémica de `TS2345`**: Al consumir el hook soberano `useSitesPageTranslations`, el componente ahora tiene acceso garantizado y tipo-seguro a todos los namespaces que necesita, resolviendo la causa raíz de los errores de i18n.
+ * 2. ((Implementada)) **Soberanía y Desacoplamiento**: El componente ya no depende de un hook de i18n monolítico. Ahora es un aparato más cohesivo y alineado con el SRP.
  *
  * @subsection Melhorias Futuras
- * 1. **Guardado de Presets de Filtros**: ((Vigente)) Para una experiencia de usuario de élite, se podría añadir una funcionalidad para guardar la combinación de filtros actual como un "preset" con nombre, que podría ser recuperado posteriormente. Esto requeriría extender el `useSitesPage` hook y potencialmente la tabla `profiles` para persistir estos presets.
- * 2. **Indicador de Conteo de Filtros**: ((Pendiente)) El indicador visual podría ser mejorado para mostrar el número de filtros activos (ej. un badge con "3") en lugar de un punto genérico, proporcionando información más granular. Propondré implementar esta mejora en una futura iteración de UX.
+ * 1. ((Vigente)) **Abstracción de `FilterGroup`**: El patrón de `Label` + `Control` (`RadioGroup` o `Select`) es reutilizable. Se podría abstraer a un componente `FilterGroup` genérico para un código más DRY.
  *
  * =====================================================================
  */

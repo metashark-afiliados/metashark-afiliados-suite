@@ -2,15 +2,15 @@
 /**
  * @file src/lib/supabase/mock-client-factory.ts
  * @description Factoría de élite para el cliente Supabase simulado. Ha sido
- *              refactorizada para integrar una capa de persistencia Vercel KV
- *              (simulada en memoria), manteniendo la simulación de alta fidelidad
- *              de la API de Supabase. Esta es la SSoT para el cliente simulado
- *              en despliegues de desarrollo y pruebas.
- * @author L.I.A. Legacy
- * @version 3.1.0
+ *              sincronizado con el contrato de datos de `workspaces` para
+ *              incluir la propiedad 'icon', resolviendo el error de tipo TS2345
+ *              en la simulación de la RPC.
+ * @author L.I.A. Legacy & Raz Podestá
+ * @version 4.0.0
+ * @date 2025-08-27
  */
 import { type User } from "@supabase/supabase-js";
-import { faker } from "@faker-js/faker"; // <-- CORRECCIÓN: Importar faker
+import { faker } from "@faker-js/faker";
 import { logger } from "@/lib/logging";
 import { type Tables } from "@/lib/types/database";
 import {
@@ -28,7 +28,6 @@ interface MinimalCookieStore {
 function createMockQueryBuilder<T extends { id: string | number }>(
   tableName: keyof MockDbState
 ) {
-  // Estado para el encadenamiento de filtros. Se mantiene en memoria por llamada.
   let filteredIds: Set<string | number> | null = null;
 
   const builder = {
@@ -40,7 +39,7 @@ function createMockQueryBuilder<T extends { id: string | number }>(
         ...r,
         id: r.id || `dev-${String(tableName)}-${Date.now()}`,
       }));
-      (db as any)[tableName].push(...newRows); // Assert type here or refine MockDbState
+      (db as any)[tableName].push(...newRows);
       await updateDbState(db);
       return { data: newRows, error: null };
     },
@@ -141,10 +140,10 @@ export function createDevMockSupabaseClient(
           id: newId,
           name: params.new_workspace_name,
           owner_id: params.owner_user_id,
+          icon: "🚀", // <-- SINCRONIZADO
           current_site_count: 0,
           created_at: new Date().toISOString(),
           updated_at: null,
-          // icon: null, // <-- CORRECCIÓN: ELIMINADO para coincidir con el esquema actual (TS2353)
         });
         db.workspace_members.push({
           id: faker.string.uuid(),
@@ -192,13 +191,10 @@ export function createDevMockSupabaseClient(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error `TS2353` (`icon` property)**: ((Implementada)) Se ha eliminado la propiedad `icon: null` del objeto `workspaces` al crear un mock, sincronizando el mock con el tipo de la tabla `workspaces` (`src/lib/types/database/tables/workspaces.ts`) y resolviendo el error de tipos.
- * 2. **Resolución de Error `TS2304` (`faker` not found)**: ((Implementada)) Se ha añadido la importación `import { faker } from "@faker-js/faker";` al inicio del archivo, resolviendo los errores de `faker` no definido.
- * 3. **Consistencia y No Regresión**: ((Implementada)) Todos los demás mocks y lógicas existentes se mantienen intactos, asegurando la no regresión.
+ * 1. **Resolución de Error `TS2345` (`icon` property)**: ((Implementada)) Se ha añadido `icon: "🚀"` al objeto de workspace que se inserta en la simulación de la RPC. Esto alinea la lógica de la simulación con el contrato de datos `Tables<"workspaces">` y resuelve el último error de tipo de la Causa Raíz #2.
  *
  * @subsection Melhorias Futuras
- * 1. **Factoría de Query Builder Completa**: ((Vigente)) El `createMockQueryBuilder` aún no maneja todos los métodos de `postgrest-js` (ej. `filter`, `limit`, `order` completo). Una mejora de élite sería implementar todos los métodos relevantes para una simulación más completa, operando sobre el estado `inMemoryDbState`.
- * 2. **Tipado Estricto de `rpc`**: ((Vigente)) Aunque funcional, el `rpc` genérico con `any` podría refinarse para aceptar un tipo genérico que infiera `Args` y `Returns` para cada función RPC, mejorando la seguridad de tipos.
+ * 1. **Tipado Estricto de RPCs**: ((Vigente)) El mock de `rpc` podría ser refactorizado para usar un `switch` statement y tener tipos más estrictos para los `params` de cada RPC simulada, mejorando la seguridad de tipos interna del mock.
  *
  * =====================================================================
  */

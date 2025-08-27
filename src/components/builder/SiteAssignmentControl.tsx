@@ -2,10 +2,14 @@
 /**
  * @file SiteAssignmentControl.tsx
  * @description Orquestador de UI puro. Consume el hook `useSiteAssignment` y
- *              ensambla los componentes atómicos `SiteSelector` y `CreateSiteModal`
- *              para construir el flujo completo de asignación de sitios.
- * @author Raz Podestá
- * @version 3.0.0
+ *              ensambla los componentes atómicos `SiteSelector` y `CreateSiteModal`.
+ *              Ha sido refactorizado para alinearse con la API soberana de
+ *              `CreateSiteModal`, resolviendo el error de tipo TS2322.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -48,17 +52,6 @@ export function SiteAssignmentControl({
     );
   }
 
-  const formTexts = {
-    nameLabel: texts.tSitesPage("form.nameLabel"),
-    namePlaceholder: texts.tSitesPage("form.namePlaceholder"),
-    subdomainLabel: texts.tSitesPage("form.subdomainLabel"),
-    subdomainInUseError: texts.tSitesPage("form.subdomainInUseError"),
-    descriptionLabel: texts.tSitesPage("form.descriptionLabel"),
-    descriptionPlaceholder: texts.tSitesPage("form.descriptionPlaceholder"),
-    creatingButton: texts.tSitesPage("form.creatingButton"),
-    createButton: texts.tSitesPage("form.createButton"),
-  };
-
   return (
     <>
       <div className="p-4 border-t space-y-3">
@@ -81,17 +74,15 @@ export function SiteAssignmentControl({
           }}
         />
       </div>
+      {/* --- INICIO DE CORRECCIÓN DE API (TS2322) --- */}
       <CreateSiteModal
         isOpen={isCreateDialogOpen}
         onOpenChange={setCreateDialogOpen}
         workspaceId={activeWorkspace?.id || ""}
         onCreateSite={handleCreateSite}
         isCreating={isCreating}
-        texts={{
-          dialogTitle: texts.tSitesPage("header.createDialogTitle"),
-          formTexts,
-        }}
       />
+      {/* --- FIN DE CORRECCIÓN DE API (TS2322) --- */}
     </>
   );
 }
@@ -102,8 +93,10 @@ export function SiteAssignmentControl({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Ensamblaje (LEGO)**: ((Implementada)) El componente ahora es un orquestador puro que sigue el patrón "Hook, Ensamblador, Componentes Atómicos", una implementación canónica de la "Filosofía LEGO".
- * 2. **Legibilidad y Mantenibilidad Mejoradas**: ((Implementada)) La complejidad ha sido distribuida en aparatos de responsabilidad única, haciendo el código más fácil de entender, probar y mantener.
+ * 1. **Resolución de Error de Compilación (TS2322)**: ((Implementada)) Se ha eliminado la prop `texts` de la invocación de `CreateSiteModal`. Esta corrección alinea este componente con la API soberana de `CreateSiteModal`, que ahora consume sus propias traducciones internamente.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Componente de Esqueleto de Carga**: ((Vigente)) El estado de carga (`isLoadingSites`) podría renderizar un componente de esqueleto (`Skeleton`) más sofisticado en lugar de un simple texto con spinner.
  *
  * =====================================================================
  */

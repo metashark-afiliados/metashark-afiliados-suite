@@ -1,9 +1,12 @@
 // src/lib/validators/i18n/ValidationErrors.schema.ts
 /**
  * @file ValidationErrors.schema.ts
- * @description Define el contrato de datos para el namespace 'ValidationErrors'.
+ * @description Define el contrato de datos para el namespace 'shared.ValidationErrors'.
+ *              Ha sido enriquecido para incluir claves de error de autenticación
+ *              y de contexto, resolviendo errores de tipo TS2345 en los consumidores.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
+ * @date 2025-08-27
  */
 import { z } from "zod";
 
@@ -26,6 +29,10 @@ export const ValidationErrorsSchema = z.object({
   error_server_generic: z.string(),
   error_user_already_exists: z.string(),
   error_signup_failed: z.string(),
+  // --- INICIO DE ENRIQUECIMIENTO DE CONTRATO (TS2345) ---
+  error_unauthenticated: z.string(),
+  error_no_active_workspace: z.string(),
+  // --- FIN DE ENRIQUECIMIENTO DE CONTRATO (TS2345) ---
 });
 /**
  * =====================================================================
@@ -33,7 +40,10 @@ export const ValidationErrorsSchema = z.object({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Contrato de Errores Centralizado**: ((Implementada)) ((Vigente)) Crea la SSoT para los mensajes de error de validación.
+ * 1. ((Implementada)) **Resolución Sistémica de `TS2345`**: Se han añadido las claves `error_unauthenticated` y `error_no_active_workspace` al schema. Esto alinea el contrato de datos con su uso real en `sites-client.tsx`, resolviendo la causa raíz del error de compilación.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Descripciones Detalladas**: ((Vigente)) Añadir `.describe()` a cada propiedad para proporcionar contexto a los traductores.
  *
  * =====================================================================
  */

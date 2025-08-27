@@ -80,18 +80,27 @@ export const useUrlStateSync = <T extends Record<string, string>>({
       }
     });
 
-    const currentFilters = Object.fromEntries(currentParams.entries());
-    const newFilters = Object.fromEntries(newParams.entries());
-
-    // Solo resetea la página si los filtros realmente cambian
-    if (!isEqual(currentFilters, newFilters) && newParams.has("page")) {
-      newParams.set("page", "1");
-    }
-
-    const newUrl = `${pathname}?${newParams.toString()}`;
+    // Ordenar para una comparación canónica
+    currentParams.sort();
+    newParams.sort();
 
     // Solo actualiza la URL si ha cambiado para evitar bucles de renderizado
-    if (`${pathname}?${currentParams.toString()}` !== newUrl) {
+    if (currentParams.toString() !== newParams.toString()) {
+      // Resetear a la primera página si los filtros gestionados cambian
+      if (newParams.has("page")) {
+        const currentFilters = { ...initialState };
+        const newFilters = { ...initialState };
+        Object.keys(initialState).forEach((key) => {
+          if (currentParams.has(key))
+            (currentFilters as any)[key] = currentParams.get(key);
+          if (newParams.has(key)) (newFilters as any)[key] = newParams.get(key);
+        });
+        if (!isEqual(currentFilters, newFilters)) {
+          newParams.set("page", "1");
+        }
+      }
+
+      const newUrl = `${pathname}?${newParams.toString()}`;
       clientLogger.trace(`[useUrlStateSync] Sincronizando URL de búsqueda.`, {
         newUrl,
       });
@@ -114,8 +123,8 @@ export const useUrlStateSync = <T extends Record<string, string>>({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Errores de Módulo (`TS2305`, `TS2614`)**: ((Implementada)) Se han corregido las rutas de importación para `useSearchParams` (ahora desde `next/navigation`) y `isEqual` (ahora como importación por defecto), resolviendo los errores de compilación y alineando el hook con las APIs canónicas.
- * 2. **Prevención de Bucles de Renderizado**: ((Implementada)) Se ha añadido una comprobación para actualizar la URL solo si los parámetros han cambiado realmente, mejorando la robustez y el rendimiento.
+ * 1. **Resolución de Errores de Módulo (`TS2305`, `TS2614`)**: ((Implementada)) Se han corregido las importaciones para `useSearchParams` (ahora desde `next/navigation`) y `isEqual` (ahora como importación por defecto), resolviendo los errores de compilación.
+ * 2. **Prevención de Bucles de Renderizado Robusta**: ((Implementada)) La comparación de `URLSearchParams` ahora se realiza después de ordenar los parámetros, garantizando una comparación canónica y previniendo actualizaciones innecesarias.
  *
  * @subsection Melhorias Futuras
  * 1. **Soporte para Tipos de Datos Complejos**: ((Vigente)) El hook está optimizado para valores de tipo string. Podría ser extendido para manejar la serialización y deserialización de arrays o números.

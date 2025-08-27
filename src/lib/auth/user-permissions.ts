@@ -1,11 +1,12 @@
 // src/lib/auth/user-permissions.ts
 /**
  * @file user-permissions.ts
- * @description Guardián de seguridad de élite. Ha sido restaurado y mejorado para que
- *              el tipo `AuthResult` devuelva contexto de usuario en fallos de
- *              permisos, habilitando una observabilidad y manejo de errores superiores.
+ * @description Guardián de seguridad de élite. Ha sido extendido para incluir
+ *              `requireCampaignPermission`, un nuevo guardián para validar
+ *              permisos a nivel de campaña.
  * @author Raz Podestá
- * @version 2.1.0
+ * @version 4.0.0
+ * @date 2025-08-27
  */
 "use server";
 import "server-only";
@@ -14,8 +15,12 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { type User } from "@supabase/supabase-js";
 
-import { hasWorkspacePermission } from "@/lib/data/permissions";
-import { getSiteById, type SiteBasicInfo } from "@/lib/data/sites";
+import {
+  sites as sitesData,
+  permissions as permissionsData,
+  campaignsData,
+} from "@/lib/data";
+import { type SiteBasicInfo } from "@/lib/data/sites/types";
 import { logger } from "@/lib/logging";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { type Database } from "@/lib/types/database";
@@ -29,15 +34,13 @@ export type UserAuthData = {
   activeWorkspaceId: string | null;
 };
 
-// --- INICIO DE RESTAURACIÓN DE CONTRATO DE ÉLITE ---
 type AuthResultSuccess<T> = { success: true; data: T };
 type AuthResultError =
   | { success: false; error: "SESSION_NOT_FOUND"; data: null }
-  | { success: false; error: "PERMISSION_DENIED"; data: UserAuthData } // Devuelve contexto de usuario
+  | { success: false; error: "PERMISSION_DENIED"; data: UserAuthData }
   | { success: false; error: "NOT_FOUND"; data: null };
 
 export type AuthResult<T> = AuthResultSuccess<T> | AuthResultError;
-// --- FIN DE RESTAURACIÓN DE CONTRATO DE ÉLITE ---
 
 export const getAuthenticatedUserAuthData = cache(
   async (): Promise<UserAuthData | null> => {
@@ -70,18 +73,15 @@ export async function requireAppRole(
   requiredRoles: AppRole[]
 ): Promise<AuthResult<UserAuthData>> {
   const authData = await getAuthenticatedUserAuthData();
-
   if (!authData) {
     return { success: false, error: "SESSION_NOT_FOUND", data: null };
   }
-
   if (!requiredRoles.includes(authData.appRole)) {
     logger.warn(
       `[AuthGuard] VIOLACIÓN DE ACCESO DE ROL: Usuario ${authData.user.id} con rol '${authData.appRole}' intentó acceder a un recurso que requiere [${requiredRoles.join(", ")}].`
     );
     return { success: false, error: "PERMISSION_DENIED", data: authData };
   }
-
   return { success: true, data: authData };
 }
 
@@ -90,21 +90,17 @@ export async function requireWorkspacePermission(
   requiredRoles: WorkspaceRole[]
 ): Promise<AuthResult<UserAuthData>> {
   const authData = await getAuthenticatedUserAuthData();
-
   if (!authData) {
     return { success: false, error: "SESSION_NOT_FOUND", data: null };
   }
-
-  const isAuthorized = await hasWorkspacePermission(
+  const isAuthorized = await permissionsData.hasWorkspacePermission(
     authData.user.id,
     workspaceId,
     requiredRoles
   );
-
   if (!isAuthorized) {
     return { success: false, error: "PERMISSION_DENIED", data: authData };
   }
-
   return { success: true, data: authData };
 }
 
@@ -113,41 +109,76 @@ export async function requireSitePermission(
   requiredRoles: WorkspaceRole[]
 ): Promise<AuthResult<{ user: User; site: SiteBasicInfo }>> {
   const authData = await getAuthenticatedUserAuthData();
-
   if (!authData) {
     return { success: false, error: "SESSION_NOT_FOUND", data: null };
   }
   const { user } = authData;
-
-  const site = await getSiteById(siteId);
+  const site = await sitesData.management.getSiteById(siteId);
   if (!site) {
     return { success: false, error: "NOT_FOUND", data: null };
   }
-
-  const isAuthorized = await hasWorkspacePermission(
+  const isAuthorized = await permissionsData.hasWorkspacePermission(
     user.id,
     site.workspace_id,
     requiredRoles
   );
-
   if (!isAuthorized) {
     logger.warn(
       `[AuthGuard] VIOLACIÓN DE ACCESO A SITIO: Usuario ${user.id} intentó acceder al sitio ${siteId} sin permisos en el workspace ${site.workspace_id}.`
     );
-    // Aunque falle, devolvemos el contexto del usuario para logging.
-    // El tipo de retorno para éxito es diferente, por lo que aquí devolvemos un error genérico
-    // que incluye el contexto del usuario.
     const errorResult: AuthResultError = {
       success: false,
       error: "PERMISSION_DENIED",
       data: authData,
     };
-    // Realizamos un type assertion aquí porque la lógica de negocio es devolver un error específico,
-    // y este tipo específico es compatible con la definición amplia de AuthResult.
     return errorResult as AuthResult<{ user: User; site: SiteBasicInfo }>;
   }
-
   return { success: true, data: { user, site } };
+}
+
+/**
+ * @public
+ * @async
+ * @function requireCampaignPermission
+ * @description Guardián de seguridad de élite para campañas. Valida que el
+ *              usuario autenticado pertenezca al workspace que contiene la campaña.
+ * @param {string} campaignId - El ID de la campaña a verificar.
+ * @param {WorkspaceRole[]} requiredRoles - Los roles de workspace requeridos para el acceso.
+ * @returns {Promise<AuthResult<UserAuthData>>} El resultado de la validación.
+ */
+export async function requireCampaignPermission(
+  campaignId: string,
+  requiredRoles: WorkspaceRole[]
+): Promise<AuthResult<UserAuthData>> {
+  const authData = await getAuthenticatedUserAuthData();
+  if (!authData) {
+    return { success: false, error: "SESSION_NOT_FOUND", data: null };
+  }
+  const { user } = authData;
+
+  const campaignInfo =
+    await campaignsData.management.getCampaignSiteInfoById(campaignId);
+  if (!campaignInfo || !campaignInfo.workspace_id) {
+    logger.warn(
+      `[AuthGuard] Fallo de permiso de campaña: Campaña ${campaignId} no encontrada o no asignada a un workspace.`
+    );
+    return { success: false, error: "NOT_FOUND", data: null };
+  }
+
+  const isAuthorized = await permissionsData.hasWorkspacePermission(
+    user.id,
+    campaignInfo.workspace_id,
+    requiredRoles
+  );
+
+  if (!isAuthorized) {
+    logger.warn(
+      `[AuthGuard] VIOLACIÓN DE ACCESO A CAMPAÑA: Usuario ${user.id} intentó acceder a la campaña ${campaignId} sin permisos en el workspace ${campaignInfo.workspace_id}.`
+    );
+    return { success: false, error: "PERMISSION_DENIED", data: authData };
+  }
+
+  return { success: true, data: authData };
 }
 
 /**
@@ -156,8 +187,12 @@ export async function requireSitePermission(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Restauración de Funcionalidad**: ((Implementada)) Se ha restaurado y mejorado el contrato `AuthResult`, eliminando la regresión y resolviendo el error `TS2339` en `dev-console/layout.tsx`.
- * 2. **Seguridad de Tipos Mejorada**: ((Implementada)) La unión discriminada explícita `AuthResultSuccess | AuthResultError` hace que el contrato sea aún más robusto y fácil de entender para el compilador y los desarrolladores.
+ * 1. ((Implementada)) **Nuevo Guardián de Seguridad**: Se ha implementado `requireCampaignPermission`, un nuevo guardián que extiende la capa de seguridad al nivel de la entidad `campaigns`.
+ * 2. ((Implementada)) **Reutilización de Lógica (DRY)**: El nuevo guardián reutiliza `hasWorkspacePermission` y consume la nueva función de datos `getCampaignSiteInfoById`, demostrando una arquitectura de capas cohesiva y eficiente.
+ * 3. ((Implementada)) **Full Observabilidad**: El guardián incluye logs de advertencia específicos para violaciones de acceso, mejorando la auditoría de seguridad.
+ *
+ * @subsection Melhorias Futuras
+ * 1. ((Vigente)) **Permisos a Nivel de Campaña**: Para una granularidad de élite, se podría crear una tabla `campaign_members` que permita asignar permisos de edición o visualización a usuarios específicos para una campaña individual, independientemente de su rol en el workspace.
  *
  * =====================================================================
  */

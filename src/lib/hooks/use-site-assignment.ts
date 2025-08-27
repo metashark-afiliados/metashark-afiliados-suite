@@ -2,9 +2,12 @@
 /**
  * @file use-site-assignment.ts
  * @description Hook Soberano que encapsula toda la lógica de estado y acciones
- *              para el flujo de asignación de sitios en el constructor.
+ *              para el flujo de asignación de sitios en el constructor. Ha sido
+ *              refactorizado para consumir la API de datos y acciones atomizada,
+ *              resolviendo el error de módulo TS2306.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
+ * @date 2025-08-27
  */
 "use client";
 
@@ -12,12 +15,14 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 
+// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
 import { sites as sitesActions } from "@/lib/actions";
 import { assignSiteToCampaignAction } from "@/lib/actions/campaigns/assign-site.action";
 import { useDashboard } from "@/lib/context/DashboardContext";
-import { type SiteBasicInfo, getSitesByWorkspaceId } from "@/lib/data/sites";
+import { sites as sitesData } from "@/lib/data";
+import { type SiteBasicInfo } from "@/lib/data/sites";
+// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 import { logger } from "@/lib/logging";
-
 import { useDialogState } from "./ui/useDialogState";
 
 /**
@@ -50,10 +55,12 @@ export function useSiteAssignment(campaignId: string) {
     if (activeWorkspace) {
       setIsLoadingSites(true);
       try {
-        const { sites: fetchedSites } = await getSitesByWorkspaceId(
-          activeWorkspace.id,
-          { limit: 1000 }
-        );
+        // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
+        const { sites: fetchedSites } =
+          await sitesData.management.getSitesByWorkspaceId(activeWorkspace.id, {
+            limit: 1000,
+          });
+        // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
         setSites(fetchedSites);
       } catch (err) {
         logger.error(
@@ -87,12 +94,14 @@ export function useSiteAssignment(campaignId: string) {
         toast.error(tErrors(result.error as any) || t("toast_assign_error"));
       }
     });
-  }, [campaignId, selectedSiteId, t, tErrors, startAssignTransition]);
+  }, [campaignId, selectedSiteId, t, tErrors]);
 
   const handleCreateSite = useCallback(
     (formData: FormData) => {
       startCreateTransition(async () => {
+        // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
         const result = await sitesActions.createSiteAction(formData);
+        // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
         if (result.success) {
           toast.success(tSitesPage("header.createDialogTitle"));
           setCreateDialogOpen(false);
@@ -103,7 +112,7 @@ export function useSiteAssignment(campaignId: string) {
         }
       });
     },
-    [fetchSites, setCreateDialogOpen, tSitesPage, startCreateTransition]
+    [fetchSites, setCreateDialogOpen, tSitesPage]
   );
 
   return {
@@ -126,17 +135,18 @@ export function useSiteAssignment(campaignId: string) {
     },
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (Lógica de UI)**: ((Implementada)) Este nuevo aparato aísla completamente la lógica del flujo de asignación, convirtiendo al componente `SiteAssignmentControl` en un orquestador puro.
+ * 1. ((Implementada)) **Resolución de Error de Módulo (TS2306)**: Se han corregido todas las importaciones para que consuman las APIs y tipos desde los nuevos módulos atomizados (`@/lib/data/sites`, `@/lib/actions`), resolviendo el error de compilación.
+ * 2. ((Implementada)) **Consistencia Arquitectónica**: El hook ahora es un consumidor canónico de la nueva arquitectura de datos y acciones, propagando el nuevo diseño a la capa de lógica de UI.
  *
  * @subsection Melhorias Futuras
- * 1. **Optimistic UI para Creación**: ((Vigente)) El hook podría añadir el nuevo sitio al estado `sites` de forma optimista, en lugar de esperar a `fetchSites`.
+ * 1. ((Vigente)) **UI Optimista para Creación**: El hook podría añadir el nuevo sitio al estado `sites` de forma optimista inmediatamente después de llamar a `createSiteAction`, en lugar de esperar a `fetchSites`. Esto proporcionaría una UX más instantánea.
+ * 2. ((Pendiente)) **Inyección de Dependencias para Pruebas**: Para facilitar las pruebas unitarias, el hook podría ser refactorizado para aceptar las Server Actions y funciones de datos como dependencias opcionales, permitiendo su fácil simulación.
  *
  * =====================================================================
  */

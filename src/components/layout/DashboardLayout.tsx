@@ -1,11 +1,14 @@
 // src/components/layout/DashboardLayout.tsx
 /**
  * @file DashboardLayout.tsx
- * @description Ensamblador de UI de élite. Simplificado para delegar el consumo
- *              de i18n a sus componentes hijos soberanos.
+ * @description Ensamblador de UI de élite. Ha sido refactorizado para añadir
+ *              un identificador único a su contenedor principal de scroll,
+ *              estableciendo un anclaje de DOM estable para que los componentes
+ *              hijos (como las cuadrículas virtualizadas) puedan funcionar
+ *              con un rendimiento óptimo.
  * @author Raz Podestá - MetaShark Tech
- * @version 18.3.0
- * @date 2025-08-26
+ * @version 19.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -47,9 +50,31 @@ export default function DashboardLayout({
         </aside>
         <div className="flex flex-1 flex-col">
           <DashboardHeader />
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+          {/* --- INICIO DE MEJORA DE INFRAESTRUCTURA (VIRTUALIZACIÓN) --- */}
+          <main
+            id="main-content-scroller"
+            className="flex-1 overflow-y-auto p-4 sm:p-6"
+          >
+            {children}
+          </main>
+          {/* --- FIN DE MEJORA DE INFRAESTRUCTURA (VIRTUALIZACIÓN) --- */}
         </div>
       </div>
     </div>
   );
 }
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Anclaje para Virtualización**: ((Implementada)) Se ha añadido `id="main-content-scroller"` al elemento `<main>`. Este ID estático sirve como un "anclaje" en el DOM, permitiendo que los hooks de virtualización en componentes hijos (`useVirtualizer`) encuentren su contenedor de scroll sin necesidad de pasar `ref` a través de las props. Esta es una implementación de élite para una arquitectura de componentes desacoplada.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Contexto de Scroll**: ((Vigente)) Para una solución aún más desacoplada, se podría crear un `ScrollContext` que exponga la referencia (`ref`) al elemento de scroll, eliminando la dependencia de un ID de DOM estático.
+ *
+ * =====================================================================
+ */
+// src/components/layout/DashboardLayout.tsx

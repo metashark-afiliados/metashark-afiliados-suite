@@ -2,15 +2,18 @@
 /**
  * @file workspaces.ts
  * @description Define el contrato de datos atómico para la tabla `workspaces`.
- *              Sincronizado con la arquitectura v8.0 para eliminar el campo `icon`.
+ *              Ha sido sincronizado con el `schema.sql` canónico para reintroducir
+ *              la propiedad `icon`, resolviendo una desincronización de tipos
+ *              y un error de compilación crítico (`TS2353`) en el mock factory.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 3.1.0
  */
 export type Workspaces = {
   Row: {
     id: string;
     name: string;
     owner_id: string;
+    icon: string | null; // <-- PROPIEDAD RESTAURADA
     current_site_count: number;
     created_at: string;
     updated_at: string | null;
@@ -19,6 +22,7 @@ export type Workspaces = {
     id?: string;
     name: string;
     owner_id: string;
+    icon?: string | null; // <-- PROPIEDAD RESTAURADA
     current_site_count?: number;
     created_at?: string;
     updated_at?: string | null;
@@ -27,6 +31,7 @@ export type Workspaces = {
     id?: string;
     name?: string;
     owner_id?: string;
+    icon?: string | null; // <-- PROPIEDAD RESTAURADA
     current_site_count?: number;
     created_at?: string;
     updated_at?: string | null;
@@ -41,16 +46,17 @@ export type Workspaces = {
     },
   ];
 };
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Simplificación de Esquema**: ((Implementada)) Se ha eliminado la propiedad `icon` del contrato de datos, alineándolo con la nueva directiva de diseño.
+ * 1. **Sincronización de Esquema (Resolución de `TS2353`)**: ((Implementada)) Se ha reintroducido la propiedad `icon` en los tipos `Row`, `Insert`, y `Update`. Esto alinea el contrato de TypeScript con el `schema.sql` y resuelve el error de tipo en `mock-client-factory.ts`.
  *
  * @subsection Melhorias Futuras
- * 1. **Limites de Recursos**: ((Vigente)) Considerar añadir columnas como `max_sites` o `max_members` que puedan ser configuradas de acuerdo con el `plan_type` del workspace.
+ * 1. **Validación de Formato de Icono**: ((Vigente)) El campo `icon` está diseñado para almacenar un único emoji. Para una integridad de datos de élite, se podría crear un `WorkspaceIconSchema` de Zod con una validación de regex para asegurar que el valor sea siempre un emoji válido, y usarlo en los schemas de validación de Server Action. Propondré esta mejora en la próxima épica de refactorización de validadores.
  *
  * =====================================================================
  */

@@ -1,13 +1,13 @@
 // src/components/sites/SitesHeader.tsx
 /**
  * @file SitesHeader.tsx
- * @description Orquestador de layout de máxima élite. Ha sido refactorizado
- *              radicalmente a un ensamblador puro que compone los aparatos
- *              atómicos soberanos `SitesPageTitle` y `SitesHeaderActions`,
- *              cumpliendo con la "Filosofía LEGO" al más alto nivel.
+ * @description Orquestador de UI de élite para el encabezado de "Mis Sitios".
+ *              Ha sido refactorizado holísticamente para consumir el componente
+ *              de layout abstracto `ResourcePageHeader`, delegando toda la
+ *              lógica de layout y cumpliendo el principio DRY al más alto nivel.
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
- * @date 2025-08-26
+ * @version 7.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -15,20 +15,16 @@
 
 import React from "react";
 
-import { type SiteSortOption, type ViewMode } from "@/lib/data/sites";
-import { type Enums } from "@/lib/types/database";
+import {
+  type SiteSortOption,
+  type SiteStatusFilter,
+  type ViewMode,
+} from "@/lib/data/sites/types";
 import { clientLogger } from "@/lib/logging";
+import { ResourcePageHeader } from "@/components/shared/ResourcePageHeader";
 import { SitesHeaderActions } from "./SitesHeaderActions";
 import { SitesPageTitle } from "./SitesPageTitle";
 
-type SiteStatus = Enums["site_status"] | "all";
-
-/**
- * @public
- * @interface SitesHeaderProps
- * @description Contrato de props para el orquestador de layout `SitesHeader`.
- *              Define todo el estado y los callbacks necesarios para sus hijos atómicos.
- */
 export interface SitesHeaderProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
@@ -37,31 +33,26 @@ export interface SitesHeaderProps {
   onViewChange: (view: ViewMode) => void;
   sortOption: SiteSortOption;
   onSortChange: (sort: SiteSortOption) => void;
-  statusFilter: SiteStatus;
-  onStatusFilterChange: (status: SiteStatus) => void;
+  statusFilter: SiteStatusFilter;
+  onStatusFilterChange: (status: SiteStatusFilter) => void;
   onClearFilters: () => void;
+  isSyncing: boolean;
 }
 
-/**
- * @public
- * @component SitesHeader
- * @description Orquesta el layout del encabezado de la página "Mis Sitios",
- *              ensamblando los componentes atómicos para el título y los controles.
- * @param {SitesHeaderProps} props - Propiedades para configurar el encabezado.
- * @returns {React.ReactElement}
- */
 export function SitesHeader({
   ...props
 }: SitesHeaderProps): React.ReactElement {
   clientLogger.trace(
-    "[SitesHeader] Renderizando orquestador de layout de élite."
+    "[SitesHeader] Renderizando orquestador de UI consumiendo abstracción."
   );
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative">
-      <SitesPageTitle />
-      <SitesHeaderActions {...props} />
-    </div>
+    // --- INICIO DE IMPLEMENTACIÓN DE ABSTRACCIÓN HOLÍSTICA ---
+    <ResourcePageHeader
+      titleSlot={<SitesPageTitle />}
+      actionsSlot={<SitesHeaderActions {...props} />}
+    />
+    // --- FIN DE IMPLEMENTACIÓN DE ABSTRACCIÓN HOLÍSTICA ---
   );
 }
 
@@ -71,11 +62,11 @@ export function SitesHeader({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP) a Nivel de Orquestador**: ((Implementada)) El componente `SitesHeader` ha alcanzado su forma más pura. Su única responsabilidad es el layout, delegando toda la presentación y lógica a sus hijos. Esta es la implementación canónica de un "componente ensamblador".
- * 2. **Máxima Legibilidad y Mantenibilidad**: ((Implementada)) La complejidad del componente ha sido drásticamente reducida. Ahora es trivialmente simple de leer, entender y mantener.
+ * 1. **Adopción de Abstracción de Layout (DRY)**: ((Implementada)) El componente ahora consume `ResourcePageHeader`. Toda la lógica de `flex`, `justify-between`, etc., ha sido delegada al componente abstracto, haciendo que `SitesHeader` sea un orquestador de composición puro, más simple y declarativo.
+ * 2. **Simplificación Radical**: ((Implementada)) El JSX del componente se ha reducido a su mínima expresión, mejorando drásticamente la legibilidad y la mantenibilidad.
  *
  * @subsection Melhorias Futuras
- * 1. **Abstracción a `ResourcePageHeader`**: ((Vigente)) El patrón `Título | Acciones` ahora es tan limpio y claro que la creación de un componente genérico `ResourcePageHeader.tsx` que acepte `titleComponent` y `actionsComponent` como slots se vuelve el siguiente paso lógico de élite para maximizar la reutilización en toda la aplicación (ej. en la página de Campañas). Propondré esta épica de refactorización de UI a continuación.
+ * 1. **Consolidación de Props**: ((Vigente)) El componente todavía pasa un gran número de props a `SitesHeaderActions`. Una futura refactorización de élite podría ser crear un `useSitesHeader` hook que gestione este estado y lo provea a través de un contexto, simplificando aún más el paso de props.
  *
  * =====================================================================
  */

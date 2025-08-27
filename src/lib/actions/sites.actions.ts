@@ -1,11 +1,12 @@
 // src/lib/actions/sites.actions.ts
 /**
  * @file src/lib/actions/sites.actions.ts
- * @description Acciones de servidor seguras para la entidad 'sites'. Corregido
- *              para una desestructuración de tipos segura del resultado del
- *              guardián de permisos.
+ * @description Acciones de servidor seguras para la entidad 'sites'. Ha sido
+ *              refactorizado para consumir la nueva API de datos atomizada,
+ *              resolviendo el error de compilación TS2339.
  * @author Raz Podestá
- * @version 1.1.0
+ * @version 2.0.0
+ * @date 2025-08-27
  */
 "use server";
 import "server-only";
@@ -36,7 +37,11 @@ export async function checkSubdomainAvailabilityAction(
     return { success: false, error: "Subdominio inválido." };
   }
   try {
-    const existingSite = await sitesData.getSiteDataByHost(subdomain);
+    // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
+    // La llamada ahora utiliza la API namespaced correcta: `sitesData.publicData.getSiteDataByHost`.
+    const existingSite =
+      await sitesData.publicData.getSiteDataByHost(subdomain);
+    // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
     return { success: true, data: { isAvailable: !existingSite } };
   } catch (error) {
     logger.error(
@@ -199,10 +204,11 @@ export async function deleteSiteAction(
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Integridad de Código de Producción**: ((Implementada)) Se ha verificado que no se realizaron cambios en el código de producción. La corrección se aisló completamente al entorno de pruebas.
+ * 1. ((Implementada)) **Resolución de Error de Compilación (TS2339)**: Se ha actualizado la llamada para usar `sitesData.publicData.getSiteDataByHost`, alineando la acción con la nueva arquitectura de datos.
+ * 2. ((Implementada)) **No Regresión**: Se ha verificado que las demás acciones (`create`, `update`, `delete`) no requieren cambios en sus llamadas directas, ya que delegan la lógica de acceso a datos a los guardianes de permisos.
  *
  * @subsection Melhorias Futuras
- * 1. **Eliminación en Cascada**: ((Vigente)) La acción `deleteSiteAction` debería invocar una función RPC `delete_site_with_campaigns` para asegurar la atomicidad.
+ * 1. ((Vigente)) **Eliminación en Cascada (RPC)**: La acción `deleteSiteAction` sigue siendo un candidato para ser migrada a una función RPC `delete_site_with_campaigns` para garantizar la atomicidad.
  *
  * =====================================================================
  */

@@ -1,13 +1,13 @@
+// src/messages/manifest.ts
 /**
  * @file manifest.ts
  * @description Manifiesto de Importación Dinámica y SSoT. Ha sido actualizado
- *              para registrar los nuevos namespaces soberanos del Hub Creativo,
- *              resolviendo la primera mitad de la desincronización de i18n.
+ *              para registrar los nuevos namespaces soberanos del ecosistema de
+ *              "Mis Sitios" y "Hub Creativo", resolviendo la desincronización
+ *              sistémica de i18n y la cascada de errores TS2345.
  * @author L.I.A. Legacy (Generado por script, verificado manualmente)
- * @version 21.0.0
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- * @date 2025-08-26
+ * @version 23.0.0
+ * @date 2025-08-27
  */
 import { type ManifestModule } from "./types";
 
@@ -45,12 +45,12 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./components/builder/SettingsPanel.json"),
   "components.builder.SiteAssignmentControl": () =>
     import("./components/builder/SiteAssignmentControl.json"),
-  "components.dashboard.RecentActivity": () =>
-    import("./components/dashboard/RecentActivity.json"), // <-- REGISTRO AÑADIDO
-  "components.dashboard.WelcomeHero": () =>
-    import("./components/dashboard/WelcomeHero.json"), // <-- REGISTRO AÑADIDO
   "components.dashboard.InvitationBell": () =>
     import("./components/dashboard/InvitationBell.json"),
+  "components.dashboard.RecentActivity": () =>
+    import("./components/dashboard/RecentActivity.json"),
+  "components.dashboard.WelcomeHero": () =>
+    import("./components/dashboard/WelcomeHero.json"),
   "components.dev-console.DevSidebar": () =>
     import("./components/dev-console/DevSidebar.json"),
   "components.feedback.CommandPalette": () =>
@@ -85,6 +85,8 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./components/layout/LandingFooter.json"),
   "components.layout.LandingHeader": () =>
     import("./components/layout/LandingHeader.json"),
+  "components.sites.SitesHeader": () =>
+    import("./components/sites/SitesHeader.json"),
   "components.ui.Dialogs": () => import("./components/ui/Dialogs.json"),
   "components.ui.EmojiPicker": () => import("./components/ui/EmojiPicker.json"),
   "components.ui.LanguageSwitcher": () =>
@@ -116,3 +118,4 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "shared.ValidationErrors": () => import("./shared/ValidationErrors.json"),
   "shared.WelcomeModal": () => import("./shared/WelcomeModal.json"),
 };
+// src/messages/manifest.ts

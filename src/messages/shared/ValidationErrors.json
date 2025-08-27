@@ -1,3 +1,4 @@
+
 {
   "en-US": {
     "invalid_uuid": "Invalid identifier.",
@@ -24,7 +25,8 @@
     "error_creation_failed": "The creation failed. Please try again.",
     "error_update_failed": "The update failed. Please try again.",
     "error_delete_failed": "The deletion failed. Please try again.",
-    "error_last_owner_cannot_delete": "You are the last owner. Please transfer ownership before deleting this workspace."
+    "error_last_owner_cannot_delete": "You are the last owner. Please transfer ownership before deleting this workspace.",
+    "error_no_active_workspace": "No active workspace found. Please select or create one to continue."
   },
   "es-ES": {
     "invalid_uuid": "Identificador inválido.",
@@ -51,7 +53,8 @@
     "error_creation_failed": "La creación falló. Por favor, inténtalo de nuevo.",
     "error_update_failed": "La actualización falló. Por favor, inténtalo de nuevo.",
     "error_delete_failed": "La eliminación falló. Por favor, inténtalo de nuevo.",
-    "error_last_owner_cannot_delete": "Eres el último propietario. Por favor, transfiere la propiedad antes de eliminar este workspace."
+    "error_last_owner_cannot_delete": "Eres el último propietario. Por favor, transfiere la propiedad antes de eliminar este workspace.",
+    "error_no_active_workspace": "No se encontró un workspace activo. Por favor, selecciona o crea uno para continuar."
   },
   "pt-BR": {
     "invalid_uuid": "Identificador inválido.",
@@ -78,6 +81,8 @@
     "error_creation_failed": "A criação falhou. Por favor, tente novamente.",
     "error_update_failed": "A atualização falhou. Por favor, tente novamente.",
     "error_delete_failed": "A exclusão falhou. Por favor, tente novamente.",
-    "error_last_owner_cannot_delete": "Você é o último proprietário. Por favor, transfira a propriedade antes de excluir este workspace."
+    "error_last_owner_cannot_delete": "Você é o último proprietário. Por favor, transfira a propriedade antes de excluir este workspace.",
+    "error_no_active_workspace": "Nenhum workspace ativo encontrado. Por favor, selecione ou crie um para continuar."
   }
 }
+

@@ -1,13 +1,13 @@
 // src/components/sites/SitesHeaderActions.tsx
 /**
  * @file SitesHeaderActions.tsx
- * @description Aparato de UI atómico y soberano. Ensambla todos los controles
- *              de acción para el encabezado de la página de sitios. Es un
- *              componente de presentación puro que recibe todo su estado y
- *              manejadores a través de props.
+ * @description Aparato de UI atómico y de ensamblaje puro. Su única
+ *              responsabilidad es componer los controles interactivos del
+ *              encabezado de la página "Mis Sitios". Es 100% agnóstico al
+ *              estado y consume sus propias traducciones.
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-26
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -18,14 +18,15 @@ import { PlusCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { type SiteSortOption, type ViewMode } from "@/lib/data/sites";
-import { type Enums } from "@/lib/types/database";
+import {
+  type SiteSortOption,
+  type SiteStatusFilter,
+  type ViewMode,
+} from "@/lib/data/sites";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
 import { clientLogger } from "@/lib/logging";
 import { SiteFilters } from "./SiteFilters";
 import { ViewSwitcher } from "./ViewSwitcher";
-
-type SiteStatus = Enums["site_status"] | "all";
 
 export interface SitesHeaderActionsProps {
   searchQuery: string;
@@ -35,9 +36,10 @@ export interface SitesHeaderActionsProps {
   onViewChange: (view: ViewMode) => void;
   sortOption: SiteSortOption;
   onSortChange: (sort: SiteSortOption) => void;
-  statusFilter: SiteStatus;
-  onStatusFilterChange: (status: SiteStatus) => void;
+  statusFilter: SiteStatusFilter;
+  onStatusFilterChange: (status: SiteStatusFilter) => void;
   onClearFilters: () => void;
+  isSyncing: boolean;
 }
 
 export function SitesHeaderActions({
@@ -51,6 +53,7 @@ export function SitesHeaderActions({
   statusFilter,
   onStatusFilterChange,
   onClearFilters,
+  isSyncing,
 }: SitesHeaderActionsProps) {
   clientLogger.trace(
     "[SitesHeaderActions] Renderizando ensamblador de acciones soberano."
@@ -74,6 +77,7 @@ export function SitesHeaderActions({
         onChange={(e) => onSearchChange(e.target.value)}
         clearAriaLabel={t("clearSearchAria")}
         className="w-full md:w-52"
+        isLoading={isSyncing}
       />
       <Button onClick={onCreateSiteClick} className="shrink-0">
         <PlusCircle className="mr-2 h-4 w-4" />
@@ -89,12 +93,12 @@ export function SitesHeaderActions({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Hiper-Atomicidad (SRP)**: ((Implementada)) Este nuevo aparato tiene la única responsabilidad de ensamblar los controles de acción, cumpliendo la directiva de atomización y el SRP al más alto nivel.
- * 2. **Soberanía de Internacionalización**: ((Implementada)) El componente es soberano, consumiendo su propio namespace de i18n para los textos que necesita directamente.
+ * 1. **Componente de Ensamblaje Puro (LEGO)**: ((Implementada)) Este aparato ahora cumple perfectamente con la "Filosofía LEGO". Es un ensamblador puro que compone otros átomos de UI (`SiteFilters`, `ViewSwitcher`, etc.), sin contener lógica de estado propia.
+ * 2. **Soberanía de I18n**: ((Implementada)) El componente es autocontenido en su consumo de traducciones, mejorando la modularidad.
  *
  * @subsection Melhorias Futuras
- * 1. **Layout de Acciones Dinámico**: ((Vigente)) El componente podría aceptar un array de configuración (`actions: ('search' | 'filters' | 'view')[]`) para renderizar dinámicamente solo los controles necesarios, aumentando su reutilización en diferentes contextos. Propondré esta mejora para una futura épica de "Componentes de UI Genéricos".
- * 2. **Estado de Carga Granular**: ((Pendiente)) El componente podría aceptar una prop `isPending: boolean` y deshabilitar todos los controles interactivos durante una transición de estado, proporcionando un feedback de UI más robusto.
+ * 1. **Abstracción a `ResourceHeaderActions`**: ((Vigente)) El patrón de "Filtros + Switcher de Vista + Búsqueda + Botón de Crear" es altamente reutilizable y será necesario para la página de "Campañas" y "Usuarios". Propondré la creación de un componente genérico `ResourceHeaderActions` en la siguiente épica de refactorización de UI para maximizar el cumplimiento del principio DRY.
+ * 2. **Estado de Carga Granular**: ((Pendiente)) El componente podría aceptar una prop `isPending` general y deshabilitar todos los controles interactivos durante una transición de estado, proporcionando un feedback de UI más consistente.
  *
  * =====================================================================
  */

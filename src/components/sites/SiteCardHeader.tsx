@@ -1,204 +1,137 @@
-// src/components/sites/SitesHeader.tsx
+// src/components/sites/SiteCardHeader.tsx
 /**
- * @file SitesHeader.tsx
- * @description Encabezado soberano para la página "Mis Sitios". Ha sido
- *              refactorizado a un estándar de élite para ser completamente
- *              autocontenido en su consumo de i18n, e implementa una nueva
- *              funcionalidad de ordenamiento y filtrado a través de un Popover.
+ * @file SiteCardHeader.tsx
+ * @description Componente de presentación soberano. Ha sido refactorizado para
+ *              alinearse con la arquitectura de datos atómica, consumiendo sus
+ *              tipos desde la SSoT canónica y resolviendo el error de módulo TS2306.
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-26
+ * @version 5.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import React from "react";
-import { Filter, PlusCircle } from "lucide-react";
+import { ExternalLink, ShieldAlert, Trash2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { SearchInput } from "@/components/ui/SearchInput";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { type SiteSortOption, type ViewMode } from "@/lib/data/sites";
-import { type Enums } from "@/lib/types/database";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
+import { useDialogState } from "@/lib/hooks/ui/useDialogState";
+import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
+// --- INICIO DE CORRECCIÓN DE MÓDULO (TS2306) ---
+import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
+// --- FIN DE CORRECCIÓN DE MÓDULO (TS2306) ---
+import { Link } from "@/lib/navigation";
+import { protocol, rootDomain } from "@/lib/utils";
 import { clientLogger } from "@/lib/logging";
-import { ViewSwitcher } from "./ViewSwitcher";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  CardHeader as CardHeaderPrimitive,
+  CardTitle,
+} from "@/components/ui/card";
+import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 
-type SiteStatus = Enums["site_status"] | "all";
-
-/**
- * @public
- * @interface SitesHeaderProps
- * @description Contrato de props para el componente de presentación puro `SitesHeader`.
- *              Define todo el estado y los callbacks que el componente necesita
- *              para renderizar la UI y comunicar las interacciones del usuario
- *              a su orquestador padre.
- */
-export interface SitesHeaderProps {
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
-  onCreateSiteClick: () => void;
-  viewMode: ViewMode;
-  onViewChange: (view: ViewMode) => void;
-  sortOption: SiteSortOption;
-  onSortChange: (sort: SiteSortOption) => void;
-  statusFilter: SiteStatus;
-  onStatusFilterChange: (status: SiteStatus) => void;
+export interface SiteCardHeaderProps {
+  site: SiteWithCampaignCount;
+  onDelete: (formData: FormData) => void;
+  isPending: boolean;
+  deletingSiteId: string | null;
 }
 
-/**
- * @public
- * @component SitesHeader
- * @description Renderiza el encabezado completo de la página "Mis Sitios",
- *              incluyendo título, descripción, y controles de UI para ordenar,
- *              filtrar, cambiar la vista, buscar y crear nuevos sitios.
- * @param {SitesHeaderProps} props - Propiedades para configurar el encabezado.
- * @returns {React.ReactElement}
- */
-export function SitesHeader({
-  searchQuery,
-  onSearchChange,
-  onCreateSiteClick,
-  viewMode,
-  onViewChange,
-  sortOption,
-  onSortChange,
-  statusFilter,
-  onStatusFilterChange,
-}: SitesHeaderProps): React.ReactElement {
-  clientLogger.trace(
-    "[SitesHeader] Renderizando componente soberano con filtros avanzados."
-  );
-  const t = useTypedTranslations("components.sites.SitesHeader");
-  const tFilters = useTypedTranslations("SitesPage.filters");
-  const tStatus = useTypedTranslations("SitesPage.status");
+export function SiteCardHeader({
+  site,
+  onDelete,
+  isPending,
+  deletingSiteId,
+}: SiteCardHeaderProps): React.ReactElement {
+  clientLogger.trace(`[SiteCardHeader] Renderizando para sitio: ${site.id}`);
+  const { tSitesPage, tDialogs } = useSitesPageTranslations();
+  const {
+    isOpen: isDeleteDialogOpen,
+    open: openDeleteDialog,
+    setIsOpen: setIsDeleteDialogOpen,
+  } = useDialogState();
 
-  const sortOptions: { value: SiteSortOption; label: string }[] = [
-    {
-      value: "created_at_desc",
-      label: tFilters("sort_updated_desc"),
-    },
-    { value: "name_asc", label: tFilters("sort_name_asc") },
-    { value: "name_desc", label: tFilters("sort_name_desc") },
-  ];
-
-  const statusOptions: { value: SiteStatus; label: string }[] = [
-    { value: "all", label: tFilters("status_all") },
-    { value: "draft", label: tStatus("draft") },
-    { value: "published", label: tStatus("published") },
-    { value: "archived", label: tStatus("archived") },
-  ];
-
-  const handleClearFilters = () => {
-    clientLogger.info("[SitesHeader] Limpiando todos los filtros.");
-    onSortChange("created_at_desc");
-    onStatusFilterChange("all");
-    onSearchChange("");
-  };
+  const siteUrl = `${protocol}://${site.subdomain}.${rootDomain}`;
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative">
-      <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <p className="text-muted-foreground">{t("description")}</p>
-      </div>
-      <div className="flex w-full md:w-auto items-center gap-2">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" />
-              <span className="hidden sm:inline">{tFilters("sort_label")}</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64" align="end">
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <h4 className="font-medium leading-none">
-                  {tFilters("sort_label")}
-                </h4>
-                <p className="text-sm text-muted-foreground">
-                  {tFilters("sort_placeholder")}
-                </p>
-              </div>
-              <RadioGroup
-                aria-label={tFilters("sort_label")}
-                value={sortOption}
-                onValueChange={(value) => onSortChange(value as SiteSortOption)}
-              >
-                {sortOptions.map((option) => (
-                  <div key={option.value} className="flex items-center">
-                    <RadioGroupItem value={option.value} id={option.value} />
-                    <Label htmlFor={option.value} className="ml-2 font-normal">
-                      {option.label}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-              <Separator />
-              <div className="space-y-2">
-                <Label htmlFor="status-filter">
-                  {tFilters("status_label")}
-                </Label>
-                <Select
-                  value={statusFilter}
-                  onValueChange={(value) =>
-                    onStatusFilterChange(value as SiteStatus)
-                  }
-                >
-                  <SelectTrigger id="status-filter">
-                    <SelectValue placeholder={tFilters("status_placeholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Separator />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearFilters}
-                className="w-full"
-              >
-                {tFilters("clear_all")}
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+    <CardHeaderPrimitive className="flex-row items-start justify-between gap-4">
+      <Link
+        href={{
+          pathname: "/dashboard/sites/[siteId]/campaigns",
+          params: { siteId: site.id },
+        }}
+        className="flex items-center gap-4 group"
+      >
+        <Avatar>
+          <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+            {site.icon || site.name.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <div>
+          <CardTitle className="group-hover:underline">{site.name}</CardTitle>
+          <p className="text-sm text-muted-foreground font-mono">
+            {site.subdomain}
+          </p>
+        </div>
+      </Link>
 
-        <ViewSwitcher viewMode={viewMode} onViewChange={onViewChange} />
-        <SearchInput
-          placeholder={t("searchPlaceholder")}
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          clearAriaLabel={t("clearSearchAria")}
-          className="w-full md:w-52"
-        />
-        <Button onClick={onCreateSiteClick} className="shrink-0">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          {t("createSiteButton")}
-        </Button>
+      <div className="flex items-center -mr-2">
+        <a
+          href={siteUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={tSitesPage("card.openSiteAriaLabel", {
+            subdomain: site.subdomain,
+          })}
+        >
+          <Button variant="ghost" size="icon" className="h-9 w-9">
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+        </a>
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive h-9 w-9"
+              onClick={(e) => {
+                e.stopPropagation();
+                openDeleteDialog();
+              }}
+              aria-label={tSitesPage("card.deleteSiteAriaLabel", {
+                subdomain: site.subdomain,
+              })}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <ConfirmationDialogContent
+            icon={ShieldAlert}
+            title={tSitesPage("deleteDialog.title")}
+            description={tSitesPage.rich("deleteDialog.description", {
+              subdomain: site.subdomain,
+              strong: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
+            })}
+            confirmButtonText={tSitesPage("deleteDialog.confirmButton")}
+            cancelButtonText={tDialogs("generic_cancelButton")}
+            onConfirm={onDelete}
+            onClose={() => setIsDeleteDialogOpen(false)}
+            isPending={isPending && deletingSiteId === site.id}
+            hiddenInputs={{ siteId: site.id }}
+            confirmationText={site.subdomain || ""}
+            confirmationLabel={tSitesPage.rich(
+              "deleteDialog.confirmation_label",
+              {
+                subdomain: site.subdomain,
+                strong: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
+              }
+            )}
+          />
+        </Dialog>
       </div>
-    </div>
+    </CardHeaderPrimitive>
   );
 }
 
@@ -208,14 +141,11 @@ export function SitesHeader({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Implementación de Filtros Avanzados**: ((Implementada)) Se ha implementado la funcionalidad de filtro por estado (`status`) y el botón "Limpiar Filtros", cumpliendo con la directiva holística. La UI del Popover ahora es un centro de control completo para la visualización de datos.
- * 2. **Soberanía de Internacionalización**: ((Implementada)) El componente es 100% soberano, consumiendo `useTypedTranslations` con sus namespaces dedicados (`components.sites.SitesHeader`, `SitesPage.filters`, `SitesPage.status`).
- * 3. **Observabilidad Mejorada**: ((Implementada)) Se ha añadido `clientLogger.info` para registrar la acción de limpiar filtros, proporcionando visibilidad sobre esta interacción clave del usuario.
+ * 1. **Resolución de Error de Módulo (TS2306)**: ((Implementada)) Se ha corregido la ruta de importación para que apunte a la SSoT de tipos `.../sites/types.ts`, resolviendo el error de compilación.
  *
  * @subsection Melhorias Futuras
- * 1. **Filtros Persistentes**: ((Vigente)) La mejora de élite para este ecosistema sigue siendo la sincronización de los estados de filtro (`sortOption`, `statusFilter`, `searchQuery`) con los `searchParams` de la URL. Propondré implementar esto en la refactorización del hook orquestador `useSitesPage`, que es el lugar arquitectónicamente correcto para manejar esta lógica.
- * 2. **Indicador de Filtros Activos**: ((Pendiente)) El botón del `Popover` de filtros podría mostrar un pequeño indicador visual (ej. un punto de color) cuando hay filtros activos (diferentes a los valores por defecto), para que el usuario tenga una conciencia situacional inmediata.
+ * 1. **Edición en Línea del Nombre**: ((Vigente)) El `CardTitle` es un candidato ideal para ser reemplazado por un componente `EditableText`.
  *
  * =====================================================================
  */
-// src/components/sites/SitesHeader.tsx
+// src/components/sites/SiteCardHeader.tsx
