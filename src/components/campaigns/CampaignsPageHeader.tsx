@@ -5,8 +5,9 @@
  *              Ha sido refactorizado holísticamente para consumir el componente
  *              de layout abstracto `ResourcePageHeader`, delegando toda la
  *              lógica de layout y cumpliendo el principio DRY al más alto nivel.
+ *              Corregido para aceptar 'all' como un valor válido para el filtro de estado.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
+ * @version 6.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -37,7 +38,9 @@ export interface CampaignsPageHeaderProps {
   ) => void;
   isPending: boolean;
   mutatingId: string | null;
-  statusFilter?: CampaignStatus;
+  // --- INICIO DE REFACTORIZACIÓN: Tipo de statusFilter ---
+  statusFilter?: CampaignStatus | "all";
+  // --- FIN DE REFACTORIZACIÓN ---
   onStatusChange: (status: CampaignStatus | "all") => void;
   sortBy: SortByOption;
   onSortChange: (sort: SortByOption) => void;
@@ -72,19 +75,11 @@ export function CampaignsPageHeader({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-27
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Adopción de Abstracción de Layout (DRY)**: ((Implementada)) El componente ahora consume `ResourcePageHeader`, delegando toda la lógica de layout (`flex`, `justify-between`, etc.) al componente abstracto. Esto hace que `CampaignsPageHeader` sea un orquestador de composición puro, más simple y declarativo.
- * 2. **Simplificación Radical**: ((Implementada)) El JSX del componente se ha reducido a su mínima expresión, mejorando drásticamente la legibilidad y la mantenibilidad, y garantizando una consistencia visual con otros encabezados de página como `SitesHeader`.
- *
  * @subsection Melhorias Futuras
  * 1. **Hook `useCampaignsHeader`**: ((Vigente)) Para una pureza de élite, la gestión de las numerosas props de este componente podría ser encapsulada en un hook `useCampaignsHeader`. Este hook proveería los datos y callbacks a través de un contexto, simplificando la firma del componente y desacoplándolo aún más. Propondré esta refactorización si la complejidad de las props aumenta.
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Alineación de Contrato de Tipos (`TS2322`)**: ((Implementada)) Se ha modificado el tipo de la propiedad `statusFilter` en la interfaz `CampaignsPageHeaderProps` para incluir el literal `"all"`. Esto resuelve el error de compilación al permitir que el componente acepte el valor `statusFilter` de `campaigns-client.tsx`.
  *
  * =====================================================================
  */

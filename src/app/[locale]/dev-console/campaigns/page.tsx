@@ -1,11 +1,14 @@
 // src/app/[locale]/dev-console/campaigns/page.tsx
 /**
  * @file page.tsx
- * @description Página del Visor de Campañas en el Dev Console. Actúa como
- *              un Server Component para obtener todos los datos de las campañas
- *              y pasarlos al componente de cliente para su renderizado.
- * @author Raz Podestá
- * @version 1.0.0
+ * @description Página del Visor de Campañas en el Dev Console. Ha sido
+ *              refactorizado a un estándar de élite para consumir la nueva API
+ *              de datos atomizada, resolviendo el error de compilación TS2339.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
@@ -24,7 +27,11 @@ export default async function CampaignsViewerPage({
   const t = await getTranslations("app.dev-console.CampaignsTable");
 
   try {
-    const campaigns = await adminData.getAllCampaignsWithSiteInfo();
+    // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (TS2339) ---
+    // Se consume la función desde el módulo atomizado y namespaced,
+    // alineando el componente con la nueva SSoT de la capa de datos.
+    const campaigns = await adminData.campaigns.getAllCampaignsWithSiteInfo();
+    // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
     return (
       <div className="space-y-6">
@@ -55,13 +62,9 @@ export default async function CampaignsViewerPage({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Arquitectura Servidor-Cliente**: ((Implementada)) Sigue el patrón de élite donde el Server Component maneja la carga de datos y el Client Component maneja la UI.
- * 2. **Manejo de Errores Robusto**: ((Implementada)) Incluye un bloque `try/catch` que renderiza un `ErrorStateCard` internacionalizado si la capa de datos falla.
- * 3. **Full Observabilidad**: ((Implementada)) Registra errores críticos en el servidor para un diagnóstico rápido.
- *
  * @subsection Melhorias Futuras
- * 1. **Paginación del Lado del Servidor**: ((Vigente)) Para escalar a miles de campañas, la llamada a `adminData.getAllCampaignsWithSiteInfo` debería aceptar parámetros de paginación leídos desde la URL (`searchParams`), y esta página debería pasar la información de paginación al `CampaignViewerTable`.
+ * 1. **Paginación del Lado del Servidor**: ((Vigente)) Para escalar a miles de campañas, la llamada a `getAllCampaignsWithSiteInfo` debería aceptar parámetros de paginación leídos desde la URL (`searchParams`), y esta página debería pasar la información de paginación al `CampaignViewerTable`.
+ * 2. **Abstracción a `PaginatedResourceView`**: ((Vigente)) Una vez implementada la paginación, este componente podría ser refactorizado para utilizar la abstracción `PaginatedResourceView`, siguiendo el mismo patrón de élite que `sites-client.tsx`, para una máxima reutilización de código y consistencia de UI.
  *
  * =====================================================================
  */

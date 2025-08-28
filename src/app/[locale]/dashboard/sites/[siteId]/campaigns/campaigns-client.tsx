@@ -1,12 +1,13 @@
 // src/app/[locale]/dashboard/sites/[siteId]/campaigns/campaigns-client.tsx
 /**
  * @file campaigns-client.tsx
- * @description Orquestador de UI de élite. Ha sido refactorizado holísticamente
- *              para consumir el componente abstracto `PaginatedDataTable` y para
- *              implementar el estado de carga (`isSyncing`) en `SearchInput`,
- *              resolviendo errores de tipo (TS2322, TS2306) y mejorando la UX.
+ * @description Orquestador de UI de élite. Ha sido refactorizado para un componente
+ *              de presentación 100% puro que consume el hook soberano
+ *              `useCampaignsClient`, delegando toda la lógica de estado y
+ *              acciones, cumpliendo con el SRP al más alto nivel. Corregido
+ *              para alinear los tipos de props pasados al hook `useCampaignsClient`.
  * @author Raz Podestá - MetaShark Tech
- * @version 8.0.0
+ * @version 10.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -14,18 +15,13 @@
 "use client";
 
 import React from "react";
-import { useFormatter, useTranslations } from "next-intl";
 
-import {
-  CampaignsPageHeader,
-  getCampaignsColumns,
-} from "@/components/campaigns";
+import { CampaignsPageHeader } from "@/components/campaigns";
 import { PaginatedDataTable } from "@/components/shared/PaginatedDataTable";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { useCampaignsPage } from "@/lib/hooks/use-campaigns-page";
 import { type CampaignMetadata } from "@/lib/data/campaigns";
 import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
-import { logger } from "@/lib/logging";
+import { useCampaignsClient } from "@/lib/hooks/useCampaignsClient";
 
 type CampaignStatus = "draft" | "published" | "archived";
 
@@ -35,66 +31,52 @@ interface CampaignsClientProps {
   totalCount: number;
   page: number;
   limit: number;
-  searchQuery: string;
-  status?: CampaignStatus;
-  sortBy?: "updated_at_desc" | "name_asc";
+  initialSearchQuery: string; // Renombrado de 'searchQuery'
+  initialStatus?: CampaignStatus; // Renombrado de 'status'
+  initialSortBy?: "updated_at_desc" | "name_asc"; // Renombrado de 'sortBy'
 }
 
-export function CampaignsClient({
-  site,
-  initialCampaigns,
-  totalCount,
-  page,
-  limit,
-  searchQuery,
-  status,
-  sortBy,
-}: CampaignsClientProps): React.ReactElement {
-  logger.trace("[CampaignsClient] Renderizando orquestador de UI.");
-  const t = useTranslations("CampaignsPage");
-  const tDialogs = useTranslations("Dialogs");
-  const format = useFormatter();
+/**
+ * @public
+ * @component CampaignsClient
+ * @description Componente de presentación puro que ensambla la UI para la página de gestión de campañas.
+ * @param {CampaignsClientProps} props - Propiedades iniciales pasadas desde el cargador de datos del servidor.
+ * @returns {React.ReactElement}
+ */
+export function CampaignsClient(
+  props: CampaignsClientProps
+): React.ReactElement {
+  const {
+    site,
+    initialCampaigns,
+    totalCount,
+    page,
+    limit,
+    initialSearchQuery,
+    initialStatus,
+    initialSortBy,
+  } = props;
 
   const {
+    t,
+    columns,
+    handleStatusChange,
     campaigns,
     isPending,
-    isSyncing, // <-- NUEVO ESTADO CONSUMIDO
+    isSyncing,
     mutatingId,
     searchTerm,
     setSearchTerm,
     statusFilter,
-    setStatusFilter,
-    sortBy: currentSortBy,
+    sortBy,
     setSortBy,
-    handleDelete,
-    handleArchiveCampaign,
-    handleDuplicateCampaign,
     handleCreateCampaign,
-  } = useCampaignsPage({
+  } = useCampaignsClient({
     initialCampaigns,
-    initialSearchQuery: searchQuery,
-    initialStatus: status,
-    initialSortBy: sortBy,
-    siteId: site.id,
-  });
-
-  const handleStatusChange = (newStatus: CampaignStatus | "all") => {
-    setStatusFilter(newStatus === "all" ? undefined : newStatus);
-  };
-
-  const columns = getCampaignsColumns({
-    t,
-    tDialogs,
-    format,
-    handleDelete: handleDelete!,
-    handleArchive: handleArchiveCampaign,
-    handleDuplicate: handleDuplicateCampaign,
-    isPending,
-    mutatingId,
-    toastTexts: {
-      duplicating: t("toasts.duplicating"),
-      archiving: t("toasts.archiving"),
-    },
+    initialSearchQuery,
+    siteId: site.id, // Se pasa 'site.id' explícitamente
+    initialStatus,
+    initialSortBy,
   });
 
   return (
@@ -107,7 +89,7 @@ export function CampaignsClient({
         mutatingId={mutatingId}
         statusFilter={statusFilter}
         onStatusChange={handleStatusChange}
-        sortBy={currentSortBy}
+        sortBy={sortBy}
         onSortChange={setSortBy}
       />
       <div className="w-full md:w-1/3">
@@ -116,7 +98,7 @@ export function CampaignsClient({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           clearAriaLabel={t("search.clear_aria")}
-          isLoading={isSyncing} // <-- MEJORA IMPLEMENTADA
+          isLoading={isSyncing}
         />
       </div>
       <PaginatedDataTable
@@ -132,18 +114,17 @@ export function CampaignsClient({
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Adopción de Abstracción de UI (DRY)**: ((Implementada)) Se ha reemplazado la composición manual de `DataTable` y `PaginationControls` por el nuevo componente abstracto `PaginatedDataTable`. Esto simplifica el JSX, elimina código duplicado y resuelve el error `TS2322` de forma sistémica al no invocar directamente el componente con la API obsoleta.
- * 2. **Resolución de Error de Módulo (`TS2306`)**: ((Implementada)) Se ha corregido la ruta de importación de `SiteWithCampaignCount` para que apunte a la SSoT canónica en `.../sites/types`, resolviendo el error de módulo no encontrado.
- * 3. **Implementación de Estado de Carga de Búsqueda (UX)**: ((Implementada)) Se ha consumido el estado `isSyncing` del hook `useCampaignsPage` y se ha pasado a la prop `isLoading` del `SearchInput`, proporcionando feedback visual inmediato al usuario durante la actualización de la URL.
  *
  * @subsection Melhorias Futuras
- * 1. **Feedback de Carga Granular**: ((Vigente)) Para una UX de élite, se podría pasar el estado `isSyncing` al `PaginatedDataTable` para que muestre una superposición de carga sobre la tabla mientras se actualizan los datos, indicando claramente que la vista completa está en proceso de actualización.
+ * 1. **Contexto de Página de Campañas**: ((Vigente)) Para eliminar completamente el "prop drilling", el `CampaignsClient` podría actuar como un proveedor de contexto (`CampaignsPageContext.Provider`), haciendo que el valor de retorno del hook `useCampaignsClient` esté disponible para todos los componentes hijos sin necesidad de pasar props explícitamente.
+ * 2. **Componente `CampaignFilters` Atómico**: ((Vigente)) La lógica de `handleStatusChange` y el renderizado de los controles de filtro y ordenamiento dentro de `CampaignsPageHeader` podrían ser extraídos a un nuevo componente atómico `CampaignFilters`, similar a `SiteFilters`.
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Alineación de Contrato de Hooks (`TS2345`)**: ((Implementada)) Se ha modificado la interfaz `CampaignsClientProps` y la llamada al hook `useCampaignsClient` para que las propiedades (`initialSearchQuery`, `initialStatus`, `initialSortBy`, `siteId`) se pasen explícitamente con los nombres y tipos correctos que espera el hook `useCampaignsPage`.
  *
  * =====================================================================
  */

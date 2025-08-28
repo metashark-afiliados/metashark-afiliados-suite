@@ -1,0 +1,71 @@
+{
+  "en-US": {
+    "title": "Wiki & Knowledge Base",
+    "content": [
+      {
+        "title": "1. Getting Started with ConvertiKit",
+        "body": [
+          "Welcome to the ConvertiKit Wiki! Here you'll find comprehensive guides and tutorials to help you get the most out of our platform.",
+          "Start by exploring our quick setup guide for new users."
+        ]
+      },
+      {
+        "title": "2. Advanced Features & Strategies",
+        "body": [
+          "Dive deeper into ConvertiKit's powerful features, including AI-powered copywriting, predictive analytics, and advanced campaign optimization techniques.",
+          "Learn how to leverage AI to boost your conversion rates and scale your affiliate business."
+        ]
+      }
+    ],
+    "search_placeholder": "Search the wiki...",
+    "category_general": "General",
+    "category_ai_tools": "AI Tools",
+    "category_campaigns": "Campaign Management"
+  },
+  "es-ES": {
+    "title": "Wiki y Base de Conocimiento",
+    "content": [
+      {
+        "title": "1. Primeros Pasos con ConvertiKit",
+        "body": [
+          "¡Bienvenido a la Wiki de ConvertiKit! Aquí encontrarás guías y tutoriales completos para ayudarte a sacar el máximo provecho de nuestra plataforma.",
+          "Comienza explorando nuestra guía de configuración rápida para nuevos usuarios."
+        ]
+      },
+      {
+        "title": "2. Funciones Avanzadas y Estrategias",
+        "body": [
+          "Profundiza en las potentes funciones de ConvertiKit, incluyendo la redacción con IA, el análisis predictivo y las técnicas avanzadas de optimización de campañas.",
+          "Aprende cómo aprovechar la IA para aumentar tus tasas de conversión y escalar tu negocio de afiliados."
+        ]
+      }
+    ],
+    "search_placeholder": "Buscar en la wiki...",
+    "category_general": "General",
+    "category_ai_tools": "Herramientas IA",
+    "category_campaigns": "Gestión de Campañas"
+  },
+  "pt-BR": {
+    "title": "Wiki e Base de Conhecimento",
+    "content": [
+      {
+        "title": "1. Primeiros Passos com o ConvertiKit",
+        "body": [
+          "Bem-vindo(a) à Wiki do ConvertiKit! Aqui você encontrará guias e tutoriais abrangentes para ajudá-lo(a) a aproveitar ao máximo nossa plataforma.",
+          "Comece explorando nosso guia de configuração rápida para novos usuários."
+        ]
+      },
+      {
+        "title": "2. Recursos e Estratégias Avançadas",
+        "body": [
+          "Aprofunde-se nos poderosos recursos do ConvertiKit, incluindo copywriting com IA, análise preditiva e técnicas avançadas de otimização de campanhas.",
+          "Aprenda como alavancar a IA para aumentar suas taxas de conversão e escalar seu negócio de afiliados."
+        ]
+      }
+    ],
+    "search_placeholder": "Buscar na wiki...",
+    "category_general": "Geral",
+    "category_ai_tools": "Ferramentas de IA",
+    "category_campaigns": "Gerenciamento de Campanhas"
+  }
+}

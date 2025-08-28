@@ -2,11 +2,11 @@
 /**
  * @file useUsersPage.ts
  * @description Hook Soberano que encapsula toda la lógica de estado y negocio
- *              para la página de gestión de usuarios. Ha sido refactorizado
- *              holísticamente para consumir `useUrlStateSync`, estandarizando
- *              la persistencia de filtros en la URL.
+ *              para la página de gestión de usuarios. Ha sido blindado con
+ *              tipado explícito en los callbacks de `setState`, resolviendo
+ *              el error de tipo `any` implícito (TS7006).
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
+ * @version 5.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -27,24 +27,34 @@ interface UseUsersPageProps {
   initialSearchQuery: string;
 }
 
+// Se define un tipo para el estado de los filtros para mayor claridad.
+type UserFiltersState = {
+  q: string;
+};
+
+/**
+ * @public
+ * @function useUsersPage
+ * @description Orquesta el estado y las acciones para la página de gestión de usuarios del Dev Console.
+ * @param {UseUsersPageProps} props - Propiedades iniciales para el hook.
+ * @returns La API para gestionar la UI de la página de usuarios.
+ */
 export function useUsersPage({ initialSearchQuery }: UseUsersPageProps) {
   const tToasts = useTranslations("app.dev-console.UserManagementTable");
-  const tErrors = useTranslations("ValidationErrors");
+  const tErrors = useTranslations("shared.ValidationErrors");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // --- INICIO DE REFACTORIZACIÓN: ESTADO EN URL ---
   const {
     state: filters,
     setState: setFilters,
     isSyncing,
-  } = useUrlStateSync({
+  } = useUrlStateSync<UserFiltersState>({
     initialState: {
       q: initialSearchQuery,
     },
     debounceKeys: ["q"],
   });
-  // --- FIN DE REFACTORIZACIÓN: ESTADO EN URL ---
 
   const handleRoleChange = useCallback(
     (userId: string, newRole: Database["public"]["Enums"]["app_role"]) => {
@@ -74,7 +84,8 @@ export function useUsersPage({ initialSearchQuery }: UseUsersPageProps) {
 
   return {
     searchTerm: filters.q,
-    setSearchTerm: (value: string) => setFilters((f) => ({ ...f, q: value })),
+    setSearchTerm: (value: string) =>
+      setFilters((f: UserFiltersState) => ({ ...f, q: value })),
     isPending,
     isSyncing,
     handleRoleChange,
@@ -86,12 +97,9 @@ export function useUsersPage({ initialSearchQuery }: UseUsersPageProps) {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Consistencia de UX (Filtros en URL)**: ((Implementada)) Se ha reemplazado `useSearchSync` por `useUrlStateSync`. La página de "Gestión de Usuarios" ahora tiene una búsqueda persistente en la URL, completando el objetivo de la ÉPICA 8.
- * 2. **Simplificación de Lógica (DRY)**: ((Implementada)) Al consumir el hook genérico, se ha eliminado la dependencia de `useSearchSync`, que ahora puede ser considerado para su eliminación si no tiene otros consumidores.
- *
  * @subsection Melhorias Futuras
- * 1. **Filtros Avanzados**: ((Vigente)) El `useUrlStateSync` ahora facilita la adición de más filtros. El hook podría ser extendido para gestionar filtros por `app_role`, permitiendo a los administradores ver solo a los 'developers' o 'admins'.
+ * 1. **Filtros por Rol**: ((Vigente)) El `useUrlStateSync` ahora facilita la adición de más filtros. El hook podría ser extendido para gestionar un `statusFilter: AppRole | 'all'`, permitiendo a los administradores ver solo a los 'developers' o 'admins'.
+ * 2. **Acciones en Lote (Bulk Actions)**: ((Vigente)) El hook podría ser extendido para gestionar un estado de selección (`selectedUserIds`) y exponer una acción `handleBulkRoleChange` que actualice el rol de múltiples usuarios a la vez.
  *
  * =====================================================================
  */

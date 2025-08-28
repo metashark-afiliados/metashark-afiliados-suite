@@ -1,30 +1,30 @@
 // src/app/[locale]/dev-console/users/page.tsx
 /**
  * @file page.tsx
- * @description Punto de entrada principal para la página de gestión de usuarios en la Dev Console.
- *              Actúa como un guardián de seguridad y un cargador de datos, pasando
- *              la información al orquestador de cliente para su renderizado.
- *              Corregido para pasar el tipo de dato correcto al componente de cliente
- *              e implementando un `Suspense Boundary` para una UX mejorada.
- * @author Raz Podestá
- * @version 2.0.0
+ * @description Punto de entrada para la gestión de usuarios. Ha sido refactorizado
+ *              para consumir la nueva API de datos atomizada, resolviendo el
+ *              error de compilación TS2339 y alineándose con la SSoT de la
+ *              capa de datos.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import type { Metadata } from "next";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
-import { Suspense } from "react"; // IMPROVEMENT: Import Suspense
+import { Suspense } from "react";
 
 import { requireAppRole } from "@/lib/auth/user-permissions";
 import { admin as adminData } from "@/lib/data";
 import { logger } from "@/lib/logging";
 import { ErrorStateCard } from "@/components/shared/error-state-card";
 import { UsersClient } from "./users-client";
-import { Card } from "@/components/ui/card"; // Required for skeleton
 
 const USERS_PER_PAGE = 20;
 
-// IMPROVEMENT: Add a skeleton for UsersTable
 const UsersTableSkeleton = () => (
   <div className="space-y-6 relative animate-pulse">
     <div className="h-10 w-1/3 bg-muted rounded-md mb-4" />
@@ -88,7 +88,6 @@ export async function generateMetadata({
   };
 }
 
-// Separate loader component for Suspense
 async function UsersPageLoader({
   searchParams,
 }: {
@@ -97,7 +96,6 @@ async function UsersPageLoader({
   const page = Number(searchParams.page) || 1;
   const searchQuery = searchParams.q || "";
 
-  // 1. Guardián de Seguridad (moved up as it's critical and should not be suspended)
   const roleCheck = await requireAppRole(["developer"]);
   if (!roleCheck.success) {
     const redirectPath =
@@ -108,20 +106,21 @@ async function UsersPageLoader({
   }
 
   try {
-    // 2. Carga de Datos
-    const { profiles, totalCount } = await adminData.getPaginatedUsersWithRoles(
-      {
+    // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (TS2339) ---
+    // Se consume la función desde el módulo atomizado y namespaced,
+    // alineando el componente con la nueva SSoT de la capa de datos.
+    const { profiles, totalCount } =
+      await adminData.users.getPaginatedUsersWithRoles({
         page,
         limit: USERS_PER_PAGE,
         query: searchQuery,
-      }
-    );
+      });
+    // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
-    // 3. Renderizado del Cliente
     return (
       <div className="space-y-6">
         <UsersClient
-          profiles={profiles} // Now profiles is UserProfilesWithEmail['Row'][]
+          profiles={profiles}
           totalCount={totalCount ?? 0}
           page={page}
           limit={USERS_PER_PAGE}
@@ -134,7 +133,7 @@ async function UsersPageLoader({
       "[DevConsole/Users] Error al cargar la lista de usuarios:",
       error instanceof Error ? error.message : String(error)
     );
-    const t = await getTranslations("app.dev-console.CampaignsTable"); // Namespace similar para errores
+    const t = await getTranslations("app.dev-console.CampaignsTable");
     return (
       <ErrorStateCard
         icon={AlertTriangle}
@@ -153,8 +152,6 @@ export default async function UsersPage({
   searchParams: { page?: string; q?: string };
 }) {
   unstable_setRequestLocale(locale);
-  // The roleCheck happens directly inside UsersPageLoader,
-  // this top-level page component only handles the Suspense boundary.
   return (
     <Suspense fallback={<UsersTableSkeleton />}>
       <UsersPageLoader searchParams={searchParams} />
@@ -167,12 +164,10 @@ export default async function UsersPage({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **`Suspense Boundary` de Élite**: ((Implementada)) A página agora usa um `<Suspense>` com um `UsersTableSkeleton` como fallback, o que melhora drasticamente a experiência de usuário percebida durante o carregamento de dados.
- * 2. **Separação de Lógica de Carregamento**: ((Implementada)) A lógica de carregamento de dados (incluindo o guardião de segurança) foi encapsulada no componente `UsersPageLoader`, seguindo o padrão canônico para Server Components e `Suspense`.
- *
  * @subsection Melhorias Futuras
- * 1. **Feedback de Carregamento de Ação**: ((Vigente)) O `UsersTableSkeleton` pode ser aprimorado para exibir um spinner ou indicador de carregamento dentro da tabela quando ações de mutação são pendentes.
+ * 1. **Abstracción de `loading.tsx`**: ((Vigente)) El componente `UsersTableSkeleton` está definido localmente. Para una adhesión estricta a las convenciones de Next.js y al principio DRY, debería ser extraído a su propio archivo `loading.tsx` en el mismo directorio.
+ * 2. **Filtros Avanzados**: ((Vigente)) La UI podría ser extendida para incluir filtros que permitan al administrador buscar usuarios por `app_role` específico. Esto requeriría actualizar la función `getPaginatedUsersWithRoles` para aceptar un nuevo parámetro de filtro.
  *
  * =====================================================================
  */
+// src/app/[locale]/dev-console/users/page.tsx

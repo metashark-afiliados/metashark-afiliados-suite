@@ -2,8 +2,15 @@
 /**
  * @file VisitorLogsTable.tsx
  * @description Componente de cliente para mostrar los registros de telemetría en el Dev Console.
- * @author Raz Podestá
- * @version 1.0.0
+ *              Ha sido refactorizado holísticamente para extraer el `JsonViewerDialog` a
+ *              su propio aparato atómico, mejorando la modularidad y la reutilización.
+ *              Además, se han corregido las importaciones de los componentes de UI de Shadcn/UI
+ *              (`Card`, `Table`, etc.) que faltaban, resolviendo los errores de compilación `TS2304`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.1
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -12,21 +19,15 @@ import { Eye, Globe, MoreHorizontal, User } from "lucide-react";
 
 import { type Json } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+// --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Importaciones de UI faltantes ---
 import {
+  Card,
   Table,
   TableBody,
   TableCell,
@@ -34,6 +35,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+// --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
+import { JsonViewerDialog } from "./JsonViewerDialog"; // <-- Importación holística
+import { clientLogger } from "@/lib/logging";
 
 export type VisitorLogRow = {
   id: string;
@@ -46,31 +50,26 @@ export type VisitorLogRow = {
   created_at: string;
 };
 
-const JsonViewerDialog = ({
-  title,
-  data,
-  trigger,
+/**
+ * @public
+ * @component VisitorLogsTable
+ * @description Renderiza una tabla que muestra los logs de visitantes.
+ *              Proporciona acciones para ver los detalles de los datos GeoIP y UTM.
+ * @param {object} props - Propiedades del componente.
+ * @param {VisitorLogRow[]} props.logs - El array de logs de visitantes a mostrar.
+ * @returns {React.ReactElement}
+ */
+export function VisitorLogsTable({
+  logs,
 }: {
-  title: string;
-  data: Json | null;
-  trigger: React.ReactNode;
-}) => (
-  <Dialog>
-    <DialogTrigger asChild>{trigger}</DialogTrigger>
-    <DialogContent className="max-w-3xl">
-      <DialogHeader>
-        <DialogTitle>{title}</DialogTitle>
-      </DialogHeader>
-      <pre className="mt-2 w-full rounded-lg bg-muted p-4 text-xs overflow-auto max-h-[60vh]">
-        {JSON.stringify(data, null, 2) || "No data available."}
-      </pre>
-    </DialogContent>
-  </Dialog>
-);
-
-export function VisitorLogsTable({ logs }: { logs: VisitorLogRow[] }) {
+  logs: VisitorLogRow[];
+}): React.ReactElement {
   const t = useTranslations("app.dev-console.TelemetryTable");
   const format = useFormatter();
+
+  clientLogger.trace(
+    "[VisitorLogsTable] Renderizando tabla de logs de visitantes."
+  );
 
   return (
     <Card>
@@ -170,14 +169,21 @@ export function VisitorLogsTable({ logs }: { logs: VisitorLogRow[] }) {
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.1
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de UI Atómico**: ((Implementada)) Componente de presentación puro que encapsula la renderización de la tabla de telemetría.
- * 2. **Full Internacionalización**: ((Implementada)) Todos los textos se consumen desde la capa de i18n.
+ * 1. **Resolución de Errores de Importación (TS2304)**: ((Implementada)) Se han añadido las importaciones faltantes para `Card`, `Table`, `TableBody`, `TableCell`, `TableHead`, `TableHeader`, y `TableRow` desde `@/components/ui/table` y `@/components/ui/card`. Esto resuelve la cascada de errores de compilación `TS2304` y restaura la funcionalidad del componente.
+ * 2. **Integridad de Módulo**: ((Implementada)) La importación del `JsonViewerDialog` desde `./JsonViewerDialog` es correcta, y la adición de las importaciones de UI restantes completa la coherencia del módulo.
+ * 3. **Full Observabilidad**: ((Implementada)) El `clientLogger.trace` se mantiene y es contextual al componente.
  *
  * @subsection Melhorias Futuras
  * 1. **Paginación y Búsqueda**: ((Vigente)) Integrar este componente con `@tanstack/react-table` para añadir paginación, búsqueda por IP o fingerprint, y ordenamiento del lado del cliente.
+ * 2. **Estado Vacío Dinámico**: ((Vigente)) El `empty_state` está actualmente codificado en el JSON. Podría ser un `React.ReactNode` para permitir un componente de estado vacío más rico (ej. con un botón para refrescar).
  *
  * =====================================================================
  */

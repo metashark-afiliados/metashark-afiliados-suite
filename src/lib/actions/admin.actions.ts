@@ -6,9 +6,15 @@
  *              DEBE comenzar con una verificación de rol explícita utilizando el
  *              guardián de seguridad `requireAppRole`. Estas operaciones son
  *              sensibles y se registran en la auditoría para una trazabilidad completa.
- *              Refactorizado para que `impersonateUserAction` acepte `FormData`.
- * @author L.I.A. Legacy
- * @version 1.0.1
+ *              Ha sido refactorizado holísticamente para **centralizar todos los
+ *              mensajes de error en el namespace `shared.ValidationErrors`**,
+ *              alineando la gestión de errores con la "Única Fuente de Verdad"
+ *              para los errores de la aplicación.
+ * @author L.I.A. Legacy - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use server";
 import "server-only";
@@ -20,8 +26,9 @@ import { logger } from "@/lib/logging";
 import { createAdminClient } from "@/lib/supabase/server";
 import { type Database } from "@/lib/types/database";
 import { type ActionResult } from "@/lib/validators"; // Asegurarse de que ActionResult se importa
+import { ZodError } from "zod";
 
-import { createAuditLog } from "./_helpers";
+import { createAuditLog, createPersistentErrorLog } from "./_helpers";
 
 /**
  * @public
@@ -40,21 +47,30 @@ export async function impersonateUserAction(
 ): Promise<ActionResult<{ signInLink: string }>> {
   const roleCheck = await requireAppRole(["developer"]);
   if (!roleCheck.success) {
-    return { success: false, error: roleCheck.error };
+    return { success: false, error: roleCheck.error }; // Ya es una clave i18n
   }
 
-  // --- INICIO DE REFACTORIZACIÓN: Extraer userId de FormData ---
   const userId = formData.get("userId") as string;
   if (!userId) {
     logger.warn(
-      "[AdminActions] Impersonation: userId is missing from FormData."
+      "[AdminActions:impersonateUserAction] Impersonation: userId is missing from FormData."
     );
-    return { success: false, error: "ID de usuario faltante." }; // Mensaje de error codificado.
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+    return {
+      success: false,
+      error: "ValidationErrors.admin_impersonation_user_id_missing",
+    };
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
   }
-  // --- FIN DE REFACTORIZACIÓN ---
 
   if (roleCheck.data.user.id === userId) {
-    return { success: false, error: "No puedes suplantarte a ti mismo." };
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+    return {
+      success: false,
+      error:
+        "ValidationErrors.admin_impersonation_self_impersonation_forbidden",
+    };
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
   }
 
   const adminSupabase = createAdminClient();
@@ -63,10 +79,15 @@ export async function impersonateUserAction(
 
   if (userError || !userData.user) {
     logger.error(
-      `[AdminActions] Error al obtener usuario para suplantación ${userId}:`,
+      `[AdminActions:impersonateUserAction] Error al obtener usuario para suplantación ${userId}:`,
       userError
     );
-    return { success: false, error: "Usuario no encontrado." };
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+    return {
+      success: false,
+      error: "ValidationErrors.admin_impersonation_user_not_found",
+    };
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
   }
 
   const { data, error } = await adminSupabase.auth.admin.generateLink({
@@ -76,13 +97,15 @@ export async function impersonateUserAction(
 
   if (error) {
     logger.error(
-      `[AdminActions] Error al generar link de suplantación para ${userId}:`,
+      `[AdminActions:impersonateUserAction] Error al generar link de suplantación para ${userId}:`,
       error
     );
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
     return {
       success: false,
-      error: "No se pudo generar el link de suplantación.",
+      error: "ValidationErrors.admin_impersonation_link_generation_failed",
     };
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
   }
 
   await createAuditLog("user_impersonated", {
@@ -113,38 +136,66 @@ export async function deleteSiteAsAdminAction(
   }
 
   const subdomain = formData.get("subdomain") as string;
-  if (!subdomain) return { success: false, error: "Subdominio ausente." };
-
-  const adminSupabase = createAdminClient();
-  const { error, data: deletedSite } = await adminSupabase
-    .from("sites")
-    .delete()
-    .eq("subdomain", subdomain)
-    .select("id, subdomain")
-    .single();
-
-  if (error || !deletedSite) {
-    logger.error(
-      `[AdminActions] Error al eliminar el sitio ${subdomain}:`,
-      error
-    );
-    return { success: false, error: "No se pudo eliminar el sitio." };
+  if (!subdomain) {
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+    return {
+      success: false,
+      error: "ValidationErrors.admin_delete_site_subdomain_missing",
+    };
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
   }
 
-  revalidateTag(`sites:${subdomain}`);
-  revalidatePath("/admin");
+  try {
+    const adminSupabase = createAdminClient();
+    const { error, data: deletedSite } = await adminSupabase
+      .from("sites")
+      .delete()
+      .eq("subdomain", subdomain)
+      .select("id, subdomain")
+      .single();
 
-  await createAuditLog("site_deleted_admin", {
-    userId: roleCheck.data.user.id,
-    targetEntityId: deletedSite.id,
-    targetEntityType: "site",
-    metadata: { subdomain: deletedSite.subdomain },
-  });
+    if (error || !deletedSite) {
+      logger.error(
+        `[AdminActions:deleteSiteAsAdminAction] Error al eliminar el sitio ${subdomain}:`,
+        error
+      );
+      // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+      return {
+        success: false,
+        error: "ValidationErrors.admin_delete_site_failed",
+      };
+      // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
+    }
 
-  return {
-    success: true,
-    data: { message: `Sitio ${subdomain} eliminado correctamente.` },
-  };
+    revalidateTag(`sites:${subdomain}`);
+    revalidatePath("/admin"); // Considerar una ruta más específica si existe
+
+    await createAuditLog("site_deleted_admin", {
+      userId: roleCheck.data.user.id,
+      targetEntityId: deletedSite.id,
+      targetEntityType: "site",
+      metadata: { subdomain: deletedSite.subdomain },
+    });
+
+    return {
+      success: true,
+      data: { message: `Sitio ${subdomain} eliminado correctamente.` }, // Mantener este mensaje para el toast específico de admin
+    };
+  } catch (error) {
+    const errorId = await createPersistentErrorLog(
+      "deleteSiteAsAdminAction.unexpected",
+      error as Error,
+      {
+        userId: roleCheck.data.user.id,
+        subdomain,
+      }
+    );
+    logger.error(
+      `[AdminActions:deleteSiteAsAdminAction] Error inesperado. Log ID: ${errorId}`,
+      { error: error instanceof Error ? error.message : String(error) }
+    );
+    return { success: false, error: "ValidationErrors.error_server_generic" };
+  }
 }
 
 /**
@@ -167,48 +218,78 @@ export async function updateUserRoleAction(
   }
 
   if (roleCheck.data.user.id === userId) {
-    return { success: false, error: "No puedes cambiar tu propio rol." };
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+    return {
+      success: false,
+      error:
+        "ValidationErrors.admin_update_user_role_self_role_change_forbidden",
+    };
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
   }
 
-  const adminSupabase = createAdminClient();
-  const { error } = await adminSupabase
-    .from("profiles")
-    .update({ app_role: newRole })
-    .eq("id", userId);
+  try {
+    const adminSupabase = createAdminClient();
+    const { error } = await adminSupabase
+      .from("profiles")
+      .update({ app_role: newRole })
+      .eq("id", userId);
 
-  if (error) {
-    logger.error(
-      `[AdminActions] Error al actualizar rol para ${userId}:`,
-      error
+    if (error) {
+      logger.error(
+        `[AdminActions:updateUserRoleAction] Error al actualizar rol para ${userId}:`,
+        error
+      );
+      // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+      return {
+        success: false,
+        error: "ValidationErrors.admin_update_user_role_failed",
+      };
+      // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
+    }
+
+    revalidatePath("/dev-console/users");
+
+    await createAuditLog("user_role_updated", {
+      userId: roleCheck.data.user.id,
+      targetEntityId: userId,
+      targetEntityType: "user",
+      metadata: { newRole },
+    });
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    const errorId = await createPersistentErrorLog(
+      "updateUserRoleAction.unexpected",
+      error as Error,
+      { userId: roleCheck.data.user.id, targetUserId: userId, newRole }
     );
-    return { success: false, error: "No se pudo actualizar el rol." };
+    logger.error(
+      `[AdminActions:updateUserRoleAction] Error inesperado. Log ID: ${errorId}`,
+      { error: error instanceof Error ? error.message : String(error) }
+    );
+    return { success: false, error: "ValidationErrors.error_server_generic" };
   }
-
-  revalidatePath("/dev-console/users");
-
-  await createAuditLog("user_role_updated", {
-    userId: roleCheck.data.user.id,
-    targetEntityId: userId,
-    targetEntityType: "user",
-    metadata: { newRole },
-  });
-
-  return { success: true, data: undefined };
 }
 
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Transacciones de Base de Datos**: ((Vigente)) Para operaciones que involucran múltiples escrituras (ej. `deleteSite` y todas sus campañas asociadas), envolverlas en una transacción (RPC) para garantizar la atomicidad.
- * 2. **Protección Contra Auto-Modificación Crítica**: ((Vigente)) Implementar lógica para impedir que el último administrador/desarrollador sea degradado de rol o que su cuenta sea eliminada, para evitar un bloqueo total del sistema.
- * 3. **Error I18n Keys**: ((Vigente)) En lugar de devolver strings de error codificados (ej. "No puedes cambiar tu propio rol."), devolver claves de internacionalización (ej. "error_cannot_change_own_role") para que la UI pueda mostrar el mensaje traducido.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Firma de Función Alineada**: ((Implementada)) Se ha modificado `impersonateUserAction` para que reciba `FormData`, extrayendo el `userId` internamente. Esto resuelve el error `TS2345` sin requerir cambios en el componente `ImpersonationDialog.tsx`.
+ * 1. **Centralización de Errores (SSoT)**: ((Implementada)) Todos los mensajes de error `hardcodeados` en `impersonateUserAction`, `deleteSiteAsAdminAction` y `updateUserRoleAction` ahora utilizan claves del namespace `shared.ValidationErrors` con prefijos de dominio (`admin_`). Esto consolida la "Única Fuente de Verdad" para los errores de administración.
+ * 2. **Consistencia en el Manejo de Errores**: ((Implementada)) Se ha estandarizado la forma en que los errores son reportados por estas Server Actions, haciendo que el `ActionResult` de error sea más predecible para los componentes consumidores (ej. tablas del Dev Console).
+ * 3. **Full Observabilidad Mejorada**: ((Implementada)) Se han añadido `logger.warn` y `logger.error` contextuales en cada punto de fallo, y se ha integrado `createPersistentErrorLog` para los errores inesperados, proporcionando una trazabilidad completa.
+ * 4. **No Regresión Funcional**: ((Implementada)) La lógica de negocio principal de cada acción se mantiene intacta, con la mejora centrada en la resiliencia y la internacionalización.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Esquemas Zod para Inputs**: ((Vigente)) En lugar de verificar `if (!userId)` o `if (!subdomain)`, estas acciones deberían utilizar esquemas Zod explícitos para validar `FormData`, lo que proporcionaría un tipado más robusto y mensajes de error más detallados (ej. `AdminImpersonationSchema`).
+ * 2. **Transacciones de Base de Datos para Operaciones Críticas**: ((Vigente)) La acción `deleteSiteAsAdminAction` (y `deleteWorkspaceAction` en `workspaces.actions.ts`) podría ser migrada a una función RPC de PostgreSQL para garantizar la atomicidad transaccional al eliminar registros relacionados (sitios, campañas, etc.) en un solo paso de base de datos.
  *
  * =====================================================================
  */
-// src/lib/actions/admin.actions.ts

@@ -4,15 +4,22 @@
  * @description Aparato de configuración de UI atómico y puro. Su única
  *              responsabilidad es actuar como una factoría que construye y
  *              devuelve la definición de columnas para la tabla de usuarios.
- * @author Raz Podestá
- * @version 1.0.0
+ *              Ha sido refactorizado para consumir la SSoT de tipos canónica.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import React from "react";
 import { type useTranslations } from "next-intl";
 import { type ColumnDef } from "@tanstack/react-table";
 
+// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (TS2322) ---
+// Se importa el tipo desde la SSoT del módulo de datos de admin.
+import { type UserProfilesWithEmail } from "@/lib/data/admin";
+// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 import { type Database } from "@/lib/types/database";
-import { type UserProfilesWithEmail } from "@/lib/types/database/views";
 import {
   Select,
   SelectContent,
@@ -22,7 +29,10 @@ import {
 } from "@/components/ui/select";
 import { ImpersonationDialog } from "./ImpersonationDialog";
 
-type ProfileRow = UserProfilesWithEmail["Row"];
+// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (TS2322) ---
+// El tipo `UserProfilesWithEmail` importado ahora es el tipo `Row` directamente.
+type ProfileRow = UserProfilesWithEmail;
+// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 type TFunction = ReturnType<typeof useTranslations>;
 
 export interface GetUsersColumnsParams {
@@ -98,19 +108,24 @@ export const getUsersColumns = ({
     ),
   },
 ];
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-27
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ *
  * @subsection Melhorias Adicionadas
- * 1. **Hiper-Atomicidad (SRP)**: ((Implementada)) Este nuevo aparato aísla la lógica de configuración de la tabla, cumpliendo el Principio de Responsabilidad Única al más alto nivel.
- * 2. **Consistencia Arquitectónica**: ((Implementada)) Replica el patrón de élite de `CampaignsTableColumns`, mejorando la predictibilidad y consistencia de la base de código.
- * 3. **Componente Puro y Testeable**: ((Implementada)) Al ser una función pura, su lógica es extremadamente fácil de validar con pruebas unitarias.
+ * 1. **Sincronización de SSoT de Tipos**: ((Implementada)) Se ha corregido la importación de `UserProfilesWithEmail` para que apunte al manifiesto de tipos del módulo de datos de administración (`@/lib/data/admin`). Esto alinea el componente con la arquitectura de datos atomizada.
+ * 2. **Resolución de Causa Raíz de Error de Tipo**: ((Implementada)) Al consumir el tipo correcto, la definición de `ProfileRow` se simplifica y se resuelve la inconsistencia que causaba el error de compilación `TS2322` en el componente `users-client.tsx`.
  *
  * @subsection Melhorias Futuras
  * 1. **Cabeceras Ordenables**: ((Vigente)) La definición de las cabeceras (`header`) podría ser mejorada para renderizar un componente de botón que, al ser clickeado, invoque un callback `onSort` pasado a través de `GetUsersColumnsParams` para controlar el ordenamiento.
  *
  * =====================================================================
  */
-// src/app/[locale]/dev-console/components/users-table-columns.tsx

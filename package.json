@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Plataforma SaaS Multi-Tenant para Marketing de Afiliados impulsada por IA, con una infraestructura de pruebas canónica y de élite.",
   "author": {
-    "name": "RaZ Podestá",
+    "name": "Raz Podestá",
     "url": "https://raz.metashark.tech"
   },
   "contributors": [
@@ -105,6 +105,7 @@
     "@sentry/webpack-plugin": "^4.0.2",
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/postgrest-js": "^1.21.1",
+    "@tabler/icons-react": "^3.10.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",

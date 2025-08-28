@@ -4,9 +4,10 @@
  * @description Orquestador de UI de cliente para el entorno del constructor.
  *              Refactorizado para implementar "Lienzo Infinito", permitiendo
  *              el scroll vertical en el área del canvas y optimizando el layout.
+ *              Corregida la importación de PaletteItemPreview a su ubicación canónica.
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
- * @date 2025-08-25
+ * @version 7.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -16,7 +17,9 @@ import { DndContext, DragOverlay, closestCenter } from "@dnd-kit/core";
 import React, { useEffect } from "react";
 import { shallow } from "zustand/shallow";
 
-import { PaletteItemPreview } from "@/components/builder/BlocksPalette";
+// --- INICIO DE REFACTORIZACIÓN: Corrección de importación de PaletteItemPreview ---
+import { PaletteItemPreview } from "@/components/builder/panels/PaletteItem";
+// --- FIN DE REFACTORIZACIÓN ---
 import { BuilderHeader } from "@/components/builder/BuilderHeader";
 import { ContextualPanel } from "@/components/builder/panels/ContextualPanel";
 import { SettingsPanel } from "@/components/builder/SettingsPanel";
@@ -91,11 +94,9 @@ export function BuilderLayout({
             </aside>
           )}
 
-          {/* --- INICIO DE REFACTORIZACIÓN "LIENZO INFINITO" --- */}
           <div className="bg-background overflow-y-auto p-4 md:p-8">
             <div className="min-h-full">{children}</div>
           </div>
-          {/* --- FIN DE REFACTORIZACIÓN "LIENZO INFINITO" --- */}
 
           <aside className="bg-card border-l overflow-y-auto">
             <SettingsPanel />
@@ -117,12 +118,11 @@ export function BuilderLayout({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Lienzo con Scroll Vertical**: ((Implementada)) Se ha aplicado `overflow-y-auto` al contenedor del `Canvas` y `min-h-full` al `children`, permitiendo el scroll vertical.
- * 2. **Optimización de Espacio**: ((Implementada)) Se ha añadido padding (`p-4 md:p-8`) alrededor del `Canvas` para mejorar el uso del espacio y la estética, eliminando los márgenes excesivos.
- * 3. **Sincronización D&D**: ((Implementada)) Se ha actualizado la lógica del `DragOverlay` para que funcione con las nuevas `TemplateCard`.
+ * 1. **Cohesión de Módulo y Resolución de Dependencia (`TS2304`)**: ((Implementada)) Se ha corregido la importación de `PaletteItemPreview` para que provenga directamente de `src/components/builder/panels/PaletteItem`. Esta es una corrección crítica que alinea el componente con la arquitectura de atomicidad de UI y resuelve la fuente original de un potencial `TS2304` en `page.tsx`.
  *
  * @subsection Melhorias Futuras
  * 1. **Zoom del Canvas**: ((Vigente)) Añadir controles en la UI para permitir al usuario hacer zoom in/out en el canvas.
+ * 2. **Eliminar exportación duplicada en BlocksPalette.tsx**: ((Pendiente)) Para una limpieza completa del sistema de módulos, la exportación de `PaletteItemPreview` de `src/components/builder/BlocksPalette.tsx` debería ser eliminada, ya que su fuente canónica es ahora `src/components/builder/panels/PaletteItem.tsx`. Propondré esta refactorización en la siguiente fase de optimización.
  *
  * =====================================================================
  */

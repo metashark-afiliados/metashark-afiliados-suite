@@ -4,12 +4,15 @@
  * @description Página de servidor principal del constructor. Es el punto de
  *              entrada y orquestador de datos para el IDE del constructor.
  *              Su arquitectura sigue el patrón de "Carga de Datos en Servidor,
- *              Hidratación Segura en Cliente".
+ * *            Hidratación Segura en Cliente". Refactorizado para incluir metadatos dinámicos.
  * @author Raz Podestá
- * @version 8.0.0
+ * @version 10.0.0
+ * @date 2025-08-28
  */
 import { notFound, redirect } from "next/navigation";
 import React from "react";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 import { BuilderStoreProvider } from "@/components/builder/BuilderStoreProvider";
 import { Canvas } from "@/components/builder/Canvas";
@@ -21,8 +24,9 @@ import { type CampaignConfig } from "@/lib/builder/types.d";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 import { type Tables } from "@/lib/types/database";
-
+// --- INICIO DE REFACTORIZACIÓN: Importación de BuilderLayout ---
 import { BuilderLayout } from "./BuilderLayout";
+// --- FIN DE REFACTORIZACIÓN ---
 
 /**
  * @private
@@ -53,6 +57,55 @@ async function getCreationById(
     );
   }
   return data;
+}
+
+/**
+ * @public
+ * @async
+ * @function generateMetadata
+ * @description Genera los metadatos de la página de forma dinámica, utilizando el nombre de la creación.
+ * @param {object} props - Propiedades para la generación de metadatos, incluyendo los parámetros de la URL.
+ * @returns {Promise<Metadata>} Los metadatos de la página.
+ */
+export async function generateMetadata({
+  params: { creationId, locale },
+}: {
+  params: { creationId: string; locale: string };
+}): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: "pages.BuilderPage" });
+  let creationName = t("metadata_default_title"); // Título por defecto
+
+  try {
+    let creationData: Tables<"creations"> | null = null;
+    if (
+      process.env.DEV_MODE_BOILERPLATE_CREATION === "true" &&
+      creationId === BOILERPLATE_CREATION_ID
+    ) {
+      creationData = getBoilerplateCreation();
+    } else {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        creationData = await getCreationById(creationId, user.id);
+      }
+    }
+
+    if (creationData?.name) {
+      creationName = `${t("metadata_editing_prefix")} ${creationData.name}`;
+    }
+  } catch (error) {
+    logger.error(
+      `[BuilderPage:Metadata] Error al obtener datos para metadata:`,
+      error
+    );
+  }
+
+  return {
+    title: creationName,
+  };
 }
 
 /**
@@ -134,16 +187,19 @@ export default async function BuilderPage({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Hydration Segura en SSR**: ((Implementada)) La página ahora envuelve el layout con `BuilderStoreProvider` y le pasa `initialState` como prop. Este es el patrón canónico que resuelve el error de `setState` en el servidor.
- * 2. **Desacoplamiento Servidor-Cliente**: ((Implementada)) Este Server Component ahora se adhiere estrictamente al SRP: su única responsabilidad es la carga de datos y la seguridad, delegando toda la lógica de UI y estado al cliente.
- * 3. **Full Observabilidad**: ((Implementada)) Se han añadido logs de `trace`, `warn` e `info` para cada punto de decisión del flujo de carga.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 10.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Futuras
- * 1. **Generación de Metadatos Dinámicos**: ((Vigente)) Añadir una función `generateMetadata` a esta página que lea el `creationData.name` para establecer dinámicamente el título de la pestaña del navegador (ej. "Editando: Mi Nueva Landing Page"), mejorando el SEO y la UX.
- * 2. **Esqueleto de Carga (`loading.tsx`)**: ((Vigente)) Crear un archivo `loading.tsx` en este directorio con un esqueleto de carga de alta fidelidad del layout de 3 (o 4) columnas para proporcionar un feedback visual instantáneo al usuario mientras los datos se cargan, mejorando el LCP.
+ * 1. **Esqueleto de Carga (`loading.tsx`)**: ((Vigente)) Crear un archivo `loading.tsx` en este directorio con un esqueleto de carga de alta fidelidad del layout de 3 (o 4) columnas para proporcionar un feedback visual instantáneo al usuario mientras los datos se cargan, mejorando el LCP.
+ * 2. **Internacionalización Completa de Metadata**: ((Vigente)) Las claves de i18n `metadata_default_title` y `metadata_editing_prefix` deben ser añadidas al schema de Zod de `pages.BuilderPage` y a los archivos de mensajes.
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Importación de `BuilderLayout`**: ((Implementada)) Se ha añadido la declaración de importación para `BuilderLayout`, resolviendo el error `TS2304`.
  *
  * =====================================================================
  */

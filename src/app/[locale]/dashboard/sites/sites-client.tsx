@@ -2,10 +2,11 @@
 /**
  * @file sites-client.tsx
  * @description Orquestador de UI. Ha sido refactorizado a un estándar de élite
- *              para sincronizar su API con la del componente `SitesHeader`,
- *              pasando las props requeridas y resolviendo el error de tipo TS2739.
+ *              para consumir el hook soberano `useSitesPage` simplificado,
+ *              alineando la capa de presentación con la nueva arquitectura de
+ *              hooks atómicos.
  * @author Raz Podestá - MetaShark Tech
- * @version 15.3.0
+ * @version 16.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -27,11 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  type SiteSortOption,
-  type SiteStatusFilter,
-  type SiteWithCampaignCount,
-} from "@/lib/data/sites";
+import { type SiteWithCampaignCount } from "@/lib/data/sites";
 import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
 import { useSitesPage } from "@/lib/hooks/useSitesPage";
 import { clientLogger } from "@/lib/logging";
@@ -42,38 +39,36 @@ interface SitesClientProps {
   page: number;
   limit: number;
   initialSearchQuery: string;
-  initialStatusFilter: SiteStatusFilter;
-  initialSortOption: SiteSortOption;
+  initialStatusFilter: "all" | "draft" | "published" | "archived";
+  initialSortOption: "created_at_desc" | "name_asc" | "name_desc";
 }
 
-export function SitesClient({
-  initialSites,
-  totalCount,
-  page,
-  limit,
-  ...initialFilters
-}: SitesClientProps): React.ReactElement {
-  clientLogger.trace("[SitesClient] Renderizando orquestador de lógica puro.");
+/**
+ * @public
+ * @component SitesClient
+ * @description Componente de presentación puro que ensambla la UI para la página "Mis Sitios".
+ * @param {SitesClientProps} props - Propiedades iniciales pasadas desde el cargador del servidor.
+ * @returns {React.ReactElement}
+ */
+export function SitesClient(props: SitesClientProps): React.ReactElement {
+  clientLogger.trace(
+    "[SitesClient] Renderizando orquestador de UI puro y simplificado."
+  );
 
   const { tSitesPage, tErrors } = useSitesPageTranslations();
+
   const {
     sites,
     activeWorkspaceId,
     isPending,
     mutatingId,
-    isSyncing,
     handleDelete,
     isCreateDialogOpen,
     openCreateDialog,
     setCreateDialogOpen,
     handleCreate,
-    viewMode,
-    setViewMode,
-    ...filterProps
-  } = useSitesPage({
-    initialSites,
-    ...initialFilters,
-  });
+    ...headerProps // El resto de las props son para el encabezado
+  } = useSitesPage(props);
 
   if (!activeWorkspaceId) {
     return (
@@ -87,15 +82,7 @@ export function SitesClient({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* --- INICIO DE CORRECCIÓN DE API (TS2739) --- */}
-      <SitesHeader
-        {...filterProps}
-        onCreateSiteClick={openCreateDialog}
-        viewMode={viewMode}
-        onViewChange={setViewMode}
-        isSyncing={isSyncing}
-      />
-      {/* --- FIN DE CORRECCIÓN DE API (TS2739) --- */}
+      <SitesHeader onCreateSiteClick={openCreateDialog} {...headerProps} />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent>
@@ -113,16 +100,16 @@ export function SitesClient({
       </Dialog>
 
       <PaginatedResourceView
-        viewKey={viewMode}
+        viewKey={headerProps.viewMode}
         items={sites}
         emptyStateText={tSitesPage("grid.emptyStateTitle")}
-        page={page}
-        totalCount={totalCount}
-        limit={limit}
+        page={props.page}
+        totalCount={props.totalCount}
+        limit={props.limit}
         basePath="/dashboard/sites"
-        searchQuery={filterProps.searchQuery}
+        searchQuery={headerProps.searchQuery}
         renderView={(currentItems) =>
-          viewMode === "grid" ? (
+          headerProps.viewMode === "grid" ? (
             <SitesGrid
               sites={currentItems}
               onDelete={handleDelete!}
@@ -146,14 +133,10 @@ export function SitesClient({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Resolución de Error de Compilación (TS2739)**: Se han pasado las props `viewMode`, `onViewChange`, y `isSyncing` al componente `SitesHeader`, satisfaciendo su contrato de API y resolviendo el error de compilación.
- * 2. ((Implementada)) **Activación de Funcionalidad de UI**: Esta corrección activa la funcionalidad del `ViewSwitcher` y el estado de carga del `SearchInput` en el `SitesHeaderActions`, mejorando la UX.
  *
  * @subsection Melhorias Futuras
- * 1. **Abstracción de `ResourcePageHeader`**: ((Vigente)) El patrón de `TitleSlot` + `ActionsSlot` en `SitesHeader` es un candidato ideal para ser abstraído a un componente genérico `ResourcePageHeader`, que sería reutilizado en la página de "Campañas" y "Usuarios".
+ * 1. **Contexto de Página (`SitesPageContext`)**: ((Vigente)) Para eliminar completamente el "prop drilling", el `SitesClient` podría actuar como un proveedor de contexto. Proporcionaría el valor de retorno del hook `useSitesPage` a todos sus componentes hijos (`SitesHeader`, `PaginatedResourceView`, etc.), permitiéndoles consumir el estado y las acciones directamente sin necesidad de pasar props.
+ * 2. **Abstracción del Diálogo de Creación**: ((Vigente)) El patrón de `Dialog` y `CreateSiteForm` podría ser encapsulado en su propio componente `CreateSiteDialog` para una mayor cohesión, siguiendo el patrón de los diálogos de workspace.
  *
  * =====================================================================
  */

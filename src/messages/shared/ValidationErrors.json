@@ -1,88 +1,390 @@
-
+// src/messages/shared/ValidationErrors.json
 {
   "en-US": {
-    "invalid_uuid": "Invalid identifier.",
-    "name_required": "Name is required.",
-    "name_too_short": "Name must be at least 3 characters.",
-    "name_too_long": "Name cannot exceed 40 characters.",
-    "subdomain_too_short": "Subdomain must be at least 3 characters.",
-    "subdomain_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed.",
-    "invalid_email": "Please enter a valid email address.",
-    "password_too_short": "Password must be at least 8 characters.",
-    "passwords_do_not_match": "Passwords do not match.",
-    "terms_must_be_accepted": "You must accept the terms and conditions.",
-    "slug_too_short": "Slug must be at least 3 characters.",
-    "slug_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed.",
-    "fingerprint_required": "Client fingerprint is required.",
-    "invalid_ip": "Invalid IP address format.",
-    "icon_required": "Icon is required.",
-    "error_server_generic": "A server error occurred. Please try again.",
-    "error_user_already_exists": "A user with this email already exists.",
-    "error_signup_failed": "Could not create account. Please try again.",
-    "error_unauthenticated": "Authentication required. Please sign in.",
-    "error_permission_denied": "You do not have permission to perform this action.",
-    "error_invalid_data": "The provided data is invalid.",
-    "error_creation_failed": "The creation failed. Please try again.",
-    "error_update_failed": "The update failed. Please try again.",
-    "error_delete_failed": "The deletion failed. Please try again.",
-    "error_last_owner_cannot_delete": "You are the last owner. Please transfer ownership before deleting this workspace.",
-    "error_no_active_workspace": "No active workspace found. Please select or create one to continue."
+    "generic": {
+      "invalid_uuid": "Invalid identifier.",
+      "name_required": "Name is required.",
+      "name_too_short": "Name must be at least 3 characters.",
+      "name_too_long": "Name cannot exceed 40 characters.",
+      "subdomain_too_short": "Subdomain must be at least 3 characters.",
+      "subdomain_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed.",
+      "invalid_email": "Please enter a valid email address.",
+      "password_too_short": "Password must be at least 8 characters.",
+      "passwords_do_not_match": "Passwords do not match.",
+      "terms_must_be_accepted": "You must accept the terms and conditions.",
+      "slug_too_short": "Slug must be at least 3 characters.",
+      "slug_invalid_chars": "Only lowercase letters, numbers, and hyphens are allowed.",
+      "fingerprint_required": "Client fingerprint is required.",
+      "invalid_ip": "Invalid IP address format.",
+      "icon_required": "Icon is required.",
+      "error_server_generic": "A server error occurred. Please try again.",
+      "error_user_already_exists": "A user with this email already exists.",
+      "error_signup_failed": "Could not create account. Please try again.",
+      "error_unauthenticated": "Authentication required. Please sign in.",
+      "error_permission_denied": "You do not have permission to perform this action.",
+      "error_invalid_data": "The provided data is invalid.",
+      "error_creation_failed": "The creation failed. Please try again.",
+      "error_update_failed": "The update failed. Please try again.",
+      "error_delete_failed": "The deletion failed. Please try again.",
+      "error_last_owner_cannot_delete": "You are the last owner. Please transfer ownership before deleting this workspace.",
+      "error_no_active_workspace": "No active workspace found. Please select or create one to continue.",
+      "no_data_available": "No data available"
+    },
+    "auth": {
+      "login_invalid_credentials": "Invalid email or password. Please try again.",
+      "oauth_failed": "OAuth sign-in failed. Please try again or use another method.",
+      "oauth_provider_missing": "OAuth provider information is missing.",
+      "profile_creation_failed": "Profile creation failed. Please try again or contact support."
+    },
+    "admin": {
+      "impersonation_user_id_missing": "User ID is missing for impersonation.",
+      "impersonation_self_impersonation_forbidden": "You cannot impersonate yourself.",
+      "impersonation_user_not_found": "User not found for impersonation.",
+      "impersonation_link_generation_failed": "Failed to generate impersonation link.",
+      "delete_site_subdomain_missing": "Subdomain is missing for site deletion.",
+      "delete_site_failed": "Failed to delete site.",
+      "update_user_role_self_role_change_forbidden": "You cannot change your own role.",
+      "update_user_role_failed": "Failed to update user role."
+    },
+    "invitations": {
+      "send_unauthenticated": "Authentication required to send invitations.",
+      "send_self_invite_forbidden": "You cannot invite yourself to a workspace.",
+      "send_already_invited_or_member": "This user has already been invited or is already a member.",
+      "send_failed": "Failed to send invitation.",
+      "send_invalid_data": "Invalid invitation data provided."
+    },
+    "onboarding": {
+      "unauthenticated": "Authentication required to complete onboarding.",
+      "update_failed": "Failed to update onboarding status."
+    },
+    "password": {
+      "reset_invalid_email": "Please enter a valid email address.",
+      "reset_too_many_requests": "Too many requests. Please try again later.",
+      "update_invalid_data": "Invalid data provided for password update.",
+      "update_expired_link": "The reset link has expired. Please request a new one.",
+      "update_failed": "Failed to update password. Please try again."
+    },
+    "docs_page": {
+      "title_required": "The documentation title is required.",
+      "section_title_required": "A section title in the documentation is required.",
+      "paragraph_required": "Each paragraph in the documentation must not be empty.",
+      "body_content_required": "Each documentation section must have content.",
+      "content_sections_required": "The documentation must contain at least one section."
+    },
+    "legal_notice_page": {
+      "title_required": "The legal notice title is required.",
+      "section_title_required": "A section title in the legal notice is required.",
+      "paragraph_required": "Each paragraph in the legal notice must not be empty.",
+      "body_content_required": "Each legal notice section must have content.",
+      "content_sections_required": "The legal notice must contain at least one section."
+    },
+    "privacy_policy_page": {
+      "title_required": "The privacy policy title is required.",
+      "section_title_required": "A section title in the privacy policy is required.",
+      "paragraph_required": "Each paragraph in the privacy policy must not be empty.",
+      "body_content_required": "Each privacy policy section must have content.",
+      "content_sections_required": "The privacy policy must contain at least one section."
+    },
+    "support_page": {
+      "title_required": "The support page title is required.",
+      "section_title_required": "A section title in the support page is required.",
+      "paragraph_required": "Each paragraph in the support page must not be empty.",
+      "body_content_required": "Each support page section must have content.",
+      "content_sections_required": "The support page must contain at least one section."
+    },
+    "terms_of_service_page": {
+      "title_required": "The terms of service title is required.",
+      "section_title_required": "A section title in the terms of service is required.",
+      "paragraph_required": "Each paragraph in the terms of service must not be empty.",
+      "body_content_required": "Each terms of service section must have content.",
+      "content_sections_required": "The terms of service must contain at least one section."
+    },
+    "unauthorized_page": {
+      "title_required": "The unauthorized page title is required.",
+      "description_required": "The unauthorized page description is required.",
+      "button_required": "The unauthorized page button text is required.",
+      "section_title_required": "A section title in the unauthorized page content is required.",
+      "paragraph_required": "Each paragraph in the unauthorized page content must not be empty.",
+      "body_content_required": "Each unauthorized page section must have content.",
+      "content_sections_required": "The unauthorized page must contain at least one section of content."
+    },
+    "wiki_page": {
+      "title_required": "The wiki page title is required.",
+      "section_title_required": "A section title in the wiki content is required.",
+      "paragraph_required": "Each paragraph in the wiki content must not be empty.",
+      "body_content_required": "Each wiki page section must have content.",
+      "content_sections_required": "The wiki page must contain at least one section of content."
+    },
+    "sites": {
+      "check_subdomain_invalid_input": "Invalid subdomain input. Subdomain must be at least 3 characters and contain only lowercase letters, numbers, and hyphens.",
+      "check_subdomain_server_error": "Server error checking subdomain availability. Please try again.",
+      "subdomain_already_in_use": "This subdomain is already in use. Please choose another one.",
+      "site_create_permission_denied": "You do not have permission to create sites in this workspace.",
+      "site_create_failed": "Failed to create the site. Please try again.",
+      "site_not_found": "The requested site could not be found.",
+      "site_update_permission_denied": "You do not have permission to update this site.",
+      "site_update_failed": "Failed to update the site. Please try again.",
+      "site_delete_permission_denied": "You do not have permission to delete this site.",
+      "site_delete_invalid_id": "Invalid site ID provided for deletion.",
+      "site_delete_failed": "Failed to delete the site. Please try again."
+    }
   },
   "es-ES": {
-    "invalid_uuid": "Identificador inválido.",
-    "name_required": "El nombre es requerido.",
-    "name_too_short": "El nombre debe tener al menos 3 caracteres.",
-    "name_too_long": "El nombre no puede exceder los 40 caracteres.",
-    "subdomain_too_short": "El subdominio debe tener al menos 3 caracteres.",
-    "subdomain_invalid_chars": "Solo se permiten letras minúsculas, números y guiones.",
-    "invalid_email": "Por favor, introduce un correo electrónico válido.",
-    "password_too_short": "La contraseña debe tener al menos 8 caracteres.",
-    "passwords_do_not_match": "Las contraseñas no coinciden.",
-    "terms_must_be_accepted": "Debes aceptar los términos y condiciones.",
-    "slug_too_short": "El slug debe tener al menos 3 caracteres.",
-    "slug_invalid_chars": "Solo se permiten letras minúsculas, números y guiones.",
-    "fingerprint_required": "La huella digital del cliente es requerida.",
-    "invalid_ip": "Formato de dirección IP inválido.",
-    "icon_required": "El ícono es requerido.",
-    "error_server_generic": "Ocurrió un error en el servidor. Por favor, inténtalo de nuevo.",
-    "error_user_already_exists": "Ya existe un usuario con este correo electrónico.",
-    "error_signup_failed": "No se pudo crear la cuenta. Por favor, inténtalo de nuevo.",
-    "error_unauthenticated": "Se requiere autenticación. Por favor, inicia sesión.",
-    "error_permission_denied": "No tienes permiso para realizar esta acción.",
-    "error_invalid_data": "Los datos proporcionados son inválidos.",
-    "error_creation_failed": "La creación falló. Por favor, inténtalo de nuevo.",
-    "error_update_failed": "La actualización falló. Por favor, inténtalo de nuevo.",
-    "error_delete_failed": "La eliminación falló. Por favor, inténtalo de nuevo.",
-    "error_last_owner_cannot_delete": "Eres el último propietario. Por favor, transfiere la propiedad antes de eliminar este workspace.",
-    "error_no_active_workspace": "No se encontró un workspace activo. Por favor, selecciona o crea uno para continuar."
+    "generic": {
+      "invalid_uuid": "Identificador inválido.",
+      "name_required": "El nombre es requerido.",
+      "name_too_short": "El nombre debe tener al menos 3 caracteres.",
+      "name_too_long": "El nombre no puede exceder los 40 caracteres.",
+      "subdomain_too_short": "El subdominio debe tener al menos 3 caracteres.",
+      "subdomain_invalid_chars": "Solo se permiten letras minúsculas, números y guiones.",
+      "invalid_email": "Por favor, introduce un correo electrónico válido.",
+      "password_too_short": "La contraseña debe tener al menos 8 caracteres.",
+      "passwords_do_not_match": "Las contraseñas no coinciden.",
+      "terms_must_be_accepted": "Debes aceptar los términos y condiciones.",
+      "slug_too_short": "El slug debe tener al menos 3 caracteres.",
+      "slug_invalid_chars": "Solo se permiten letras minúsculas, números y guiones.",
+      "fingerprint_required": "La huella digital del cliente es requerida.",
+      "invalid_ip": "Formato de dirección IP inválido.",
+      "icon_required": "El ícono es requerido.",
+      "error_server_generic": "Ocurrió un error en el servidor. Por favor, inténtalo de nuevo.",
+      "error_user_already_exists": "Ya existe un usuario con este correo electrónico.",
+      "error_signup_failed": "No se pudo crear la cuenta. Por favor, inténtalo de nuevo.",
+      "error_unauthenticated": "Se requiere autenticación. Por favor, inicia sesión.",
+      "error_permission_denied": "No tienes permiso para realizar esta acción.",
+      "error_invalid_data": "Los datos proporcionados son inválidos.",
+      "error_creation_failed": "La creación falló. Por favor, inténtalo de nuevo.",
+      "error_update_failed": "La actualización falló. Por favor, inténtalo de nuevo.",
+      "error_delete_failed": "La eliminación falló. Por favor, inténtalo de nuevo.",
+      "error_last_owner_cannot_delete": "Eres el último propietario. Por favor, transfiere la propiedad antes de eliminar este workspace.",
+      "error_no_active_workspace": "No se encontró un workspace activo. Por favor, selecciona o crea uno para continuar.",
+      "no_data_available": "No hay datos disponibles"
+    },
+    "auth": {
+      "login_invalid_credentials": "Email o contraseña inválidos. Por favor, inténtalo de nuevo.",
+      "oauth_failed": "Falló el inicio de sesión con OAuth. Por favor, inténtalo de nuevo o usa otro método.",
+      "oauth_provider_missing": "Falta la información del proveedor de OAuth.",
+      "profile_creation_failed": "La creación del perfil falló. Por favor, intenta de nuevo o contacta a soporte."
+    },
+    "admin": {
+      "impersonation_user_id_missing": "Falta el ID de usuario para la suplantación.",
+      "impersonation_self_impersonation_forbidden": "No puedes suplantarte a ti mismo.",
+      "impersonation_user_not_found": "Usuario no encontrado para la suplantación.",
+      "impersonation_link_generation_failed": "No se pudo generar el enlace de suplantación.",
+      "delete_site_subdomain_missing": "Falta el subdominio para la eliminación del sitio.",
+      "delete_site_failed": "No se pudo eliminar el sitio.",
+      "update_user_role_self_role_change_forbidden": "No puedes cambiar tu propio rol.",
+      "update_user_role_failed": "No se pudo actualizar el rol del usuario."
+    },
+    "invitations": {
+      "send_unauthenticated": "Se requiere autenticación para enviar invitaciones.",
+      "send_self_invite_forbidden": "No puedes invitarte a ti mismo a un workspace.",
+      "send_already_invited_or_member": "Este usuario ya ha sido invitado o ya es miembro.",
+      "send_failed": "No se pudo enviar la invitación.",
+      "send_invalid_data": "Datos de invitación inválidos proporcionados."
+    },
+    "onboarding": {
+      "unauthenticated": "Se requiere autenticación para completar el onboarding.",
+      "update_failed": "No se pudo actualizar el estado de onboarding."
+    },
+    "password": {
+      "reset_invalid_email": "Por favor, introduce un correo electrónico válido.",
+      "reset_too_many_requests": "Demasiadas solicitudes. Por favor, inténtalo de nuevo más tarde.",
+      "update_invalid_data": "Datos inválidos proporcionados para la actualización de contraseña.",
+      "update_expired_link": "El enlace de restablecimiento ha caducado. Por favor, solicita uno nuevo.",
+      "update_failed": "No se pudo actualizar la contraseña. Por favor, inténtalo de nuevo."
+    },
+    "docs_page": {
+      "title_required": "El título de la documentación es requerido.",
+      "section_title_required": "Un título de sección en la documentación es requerido.",
+      "paragraph_required": "Cada párrafo en la documentación no debe estar vacío.",
+      "body_content_required": "Cada sección de la documentación debe tener contenido.",
+      "content_sections_required": "La documentación debe contener al menos una sección."
+    },
+    "legal_notice_page": {
+      "title_required": "El título del aviso legal es requerido.",
+      "section_title_required": "Un título de sección en el aviso legal es requerido.",
+      "paragraph_required": "Cada párrafo en el aviso legal no debe estar vacío.",
+      "body_content_required": "Cada sección del aviso legal debe tener contenido.",
+      "content_sections_required": "El aviso legal debe contener al menos una sección."
+    },
+    "privacy_policy_page": {
+      "title_required": "El título de la política de privacidad es requerido.",
+      "section_title_required": "Un título de sección en la política de privacidad es requerido.",
+      "paragraph_required": "Cada párrafo en la política de privacidad no debe estar vacío.",
+      "body_content_required": "Cada sección de la política de privacidad debe tener contenido.",
+      "content_sections_required": "La política de privacidad debe contener al menos una sección."
+    },
+    "support_page": {
+      "title_required": "El título de la página de soporte es requerido.",
+      "section_title_required": "Un título de sección en la página de soporte es requerido.",
+      "paragraph_required": "Cada párrafo en la página de soporte no debe estar vacío.",
+      "body_content_required": "Cada sección de la página de soporte debe tener contenido.",
+      "content_sections_required": "La página de soporte debe contener al menos una sección."
+    },
+    "terms_of_service_page": {
+      "title_required": "El título de los términos de servicio es requerido.",
+      "section_title_required": "Un título de sección en los términos de servicio es requerido.",
+      "paragraph_required": "Cada párrafo en los términos de servicio no debe estar vacío.",
+      "body_content_required": "Cada sección de los términos de servicio debe tener contenido.",
+      "content_sections_required": "Los términos de servicio deben contener al menos una sección."
+    },
+    "unauthorized_page": {
+      "title_required": "El título de la página no autorizada es requerido.",
+      "description_required": "La descripción de la página no autorizada es requerida.",
+      "button_required": "El texto del botón de la página no autorizada es requerido.",
+      "section_title_required": "Un título de sección en el contenido de la página no autorizada es requerido.",
+      "paragraph_required": "Cada párrafo en el contenido de la página no autorizada no debe estar vacío.",
+      "body_content_required": "Cada sección de la página no autorizada debe tener contenido.",
+      "content_sections_required": "La página no autorizada debe contener al menos una sección de contenido."
+    },
+    "wiki_page": {
+      "title_required": "El título de la página Wiki es requerido.",
+      "section_title_required": "Un título de sección en el contenido Wiki es requerido.",
+      "paragraph_required": "Cada párrafo en el contenido Wiki no debe estar vacío.",
+      "body_content_required": "Cada sección del contenido Wiki debe tener contenido.",
+      "content_sections_required": "La página Wiki debe contener al menos una sección de contenido."
+    },
+    "sites": {
+      "check_subdomain_invalid_input": "Entrada de subdominio inválida. El subdominio debe tener al menos 3 caracteres y contener solo letras minúsculas, números y guiones.",
+      "check_subdomain_server_error": "Error del servidor al verificar la disponibilidad del subdominio. Por favor, inténtalo de nuevo.",
+      "subdomain_already_in_use": "Este subdominio ya está en uso. Por favor, elige otro.",
+      "site_create_permission_denied": "No tienes permiso para crear sitios en este workspace.",
+      "site_create_failed": "No se pudo crear el sitio. Por favor, inténtalo de nuevo.",
+      "site_not_found": "No se pudo encontrar el sitio solicitado.",
+      "site_update_permission_denied": "No tienes permiso para actualizar este sitio.",
+      "site_update_failed": "No se pudo actualizar el sitio. Por favor, inténtalo de nuevo.",
+      "site_delete_permission_denied": "No tienes permiso para eliminar este sitio.",
+      "site_delete_invalid_id": "ID de sitio inválido proporcionado para la eliminación.",
+      "site_delete_failed": "No se pudo eliminar el sitio. Por favor, inténtalo de nuevo."
+    }
   },
   "pt-BR": {
-    "invalid_uuid": "Identificador inválido.",
-    "name_required": "O nome é obrigatório.",
-    "name_too_short": "O nome deve ter pelo menos 3 caracteres.",
-    "name_too_long": "O nome não pode exceder 40 caracteres.",
-    "subdomain_too_short": "O subdomínio deve ter pelo menos 3 caracteres.",
-    "subdomain_invalid_chars": "Apenas letras minúsculas, números e hifens são permitidos.",
-    "invalid_email": "Por favor, insira um e-mail válido.",
-    "password_too_short": "A senha deve ter pelo menos 8 caracteres.",
-    "passwords_do_not_match": "As senhas não coincidem.",
-    "terms_must_be_accepted": "Você deve aceitar os termos e condições.",
-    "slug_too_short": "O slug deve ter pelo menos 3 caracteres.",
-    "slug_invalid_chars": "Apenas letras minúsculas, números e hifens são permitidos.",
-    "fingerprint_required": "A impressão digital do cliente é necessária.",
-    "invalid_ip": "Formato de endereço IP inválido.",
-    "icon_required": "O ícone é obrigatório.",
-    "error_server_generic": "Ocorreu um erro no servidor. Por favor, tente novamente.",
-    "error_user_already_exists": "Já existe um usuário com este e-mail.",
-    "error_signup_failed": "Não foi possível criar a conta. Por favor, tente novamente.",
-    "error_unauthenticated": "Autenticação necessária. Por favor, faça login.",
-    "error_permission_denied": "Você não tem permissão para realizar esta ação.",
-    "error_invalid_data": "Os dados fornecidos são inválidos.",
-    "error_creation_failed": "A criação falhou. Por favor, tente novamente.",
-    "error_update_failed": "A atualização falhou. Por favor, tente novamente.",
-    "error_delete_failed": "A exclusão falhou. Por favor, tente novamente.",
-    "error_last_owner_cannot_delete": "Você é o último proprietário. Por favor, transfira a propriedade antes de excluir este workspace.",
-    "error_no_active_workspace": "Nenhum workspace ativo encontrado. Por favor, selecione ou crie um para continuar."
+    "generic": {
+      "invalid_uuid": "Identificador inválido.",
+      "name_required": "O nome é obrigatório.",
+      "name_too_short": "O nome deve ter pelo menos 3 caracteres.",
+      "name_too_long": "O nome não pode exceder 40 caracteres.",
+      "subdomain_too_short": "O subdomínio deve ter pelo menos 3 caracteres.",
+      "subdomain_invalid_chars": "Apenas letras minúsculas, números e hífens são permitidos.",
+      "invalid_email": "Por favor, insira um e-mail válido.",
+      "password_too_short": "A senha deve ter pelo menos 8 caracteres.",
+      "passwords_do_not_match": "As senhas não coincidem.",
+      "terms_must_be_accepted": "Você deve aceitar os termos e condições.",
+      "slug_too_short": "O slug deve ter pelo menos 3 caracteres.",
+      "slug_invalid_chars": "Apenas letras minúsculas, números e hífens são permitidos.",
+      "fingerprint_required": "A impressão digital do cliente é necessária.",
+      "invalid_ip": "Formato de endereço IP inválido.",
+      "icon_required": "O ícone é obrigatório.",
+      "error_server_generic": "Ocorreu um erro no servidor. Por favor, tente novamente.",
+      "error_user_already_exists": "Já existe um usuário com este e-mail.",
+      "error_signup_failed": "Não foi possível criar a conta. Por favor, tente novamente.",
+      "error_unauthenticated": "Autenticação necessária. Por favor, faça login.",
+      "error_permission_denied": "Você não tem permissão para realizar esta ação.",
+      "error_invalid_data": "Os dados fornecidos são inválidos.",
+      "error_creation_failed": "A criação falhou. Por favor, tente novamente.",
+      "error_update_failed": "A atualização falhou. Por favor, tente novamente.",
+      "error_delete_failed": "A exclusão falhou. Por favor, tente novamente.",
+      "error_last_owner_cannot_delete": "Você é o último proprietário. Por favor, transfira a propriedade antes de excluir este workspace.",
+      "error_no_active_workspace": "Nenhum workspace ativo encontrado. Por favor, selecione ou crie um para continuar.",
+      "no_data_available": "Nenhum dado disponível"
+    },
+    "auth": {
+      "login_invalid_credentials": "E-mail ou senha inválidos. Por favor, tente novamente.",
+      "oauth_failed": "Falha no login com OAuth. Por favor, tente novamente ou use outro método.",
+      "oauth_provider_missing": "Faltam as informações do provedor OAuth.",
+      "profile_creation_failed": "A criação do perfil falhou. Por favor, tente novamente ou contate o suporte."
+    },
+    "admin": {
+      "impersonation_user_id_missing": "ID de usuário ausente para impersonação.",
+      "impersonation_self_impersonation_forbidden": "Você não pode impersonar a si mesmo.",
+      "impersonation_user_not_found": "Usuário não encontrado para impersonação.",
+      "impersonation_link_generation_failed": "Falha ao gerar link de impersonação.",
+      "delete_site_subdomain_missing": "Subdomínio ausente para exclusão do site.",
+      "delete_site_failed": "Falha ao excluir o site.",
+      "update_user_role_self_role_change_forbidden": "Você não pode mudar seu próprio papel.",
+      "update_user_role_failed": "Falha ao atualizar o papel do usuário."
+    },
+    "invitations": {
+      "send_unauthenticated": "Autenticação necessária para enviar convites.",
+      "send_self_invite_forbidden": "Você não pode convidar a si mesmo para um workspace.",
+      "send_already_invited_or_member": "Este usuário já foi convidado ou já é membro.",
+      "send_failed": "Falha ao enviar convite.",
+      "send_invalid_data": "Dados de convite inválidos fornecidos."
+    },
+    "onboarding": {
+      "unauthenticated": "Autenticação necessária para completar o onboarding.",
+      "update_failed": "Falha ao atualizar o status de onboarding."
+    },
+    "password": {
+      "reset_invalid_email": "Por favor, insira um e-mail válido.",
+      "reset_too_many_requests": "Muitas solicitações. Por favor, tente novamente mais tarde.",
+      "update_invalid_data": "Dados inválidos fornecidos para a atualização de senha.",
+      "update_expired_link": "O link de redefinição expirou. Por favor, solicite um novo.",
+      "update_failed": "Falha ao atualizar a senha. Por favor, tente novamente."
+    },
+    "docs_page": {
+      "title_required": "O título da documentação é obrigatório.",
+      "section_title_required": "Um título de seção na documentação é obrigatório.",
+      "paragraph_required": "Cada parágrafo na documentação não deve estar vazio.",
+      "body_content_required": "Cada seção da documentação deve ter conteúdo.",
+      "content_sections_required": "A documentação deve conter pelo menos uma seção."
+    },
+    "legal_notice_page": {
+      "title_required": "O título do aviso legal é obrigatório.",
+      "section_title_required": "Um título de seção no aviso legal é obrigatório.",
+      "paragraph_required": "Cada parágrafo no aviso legal não deve estar vazio.",
+      "body_content_required": "Cada seção do aviso legal deve ter conteúdo.",
+      "content_sections_required": "O aviso legal deve conter pelo menos uma seção."
+    },
+    "privacy_policy_page": {
+      "title_required": "O título da política de privacidade é obrigatório.",
+      "section_title_required": "Um título de seção na política de privacidade é obrigatório.",
+      "paragraph_required": "Cada parágrafo na política de privacidade não deve estar vazio.",
+      "body_content_required": "Cada seção da política de privacidade deve ter conteúdo.",
+      "content_sections_required": "A política de privacidade deve conter ao menos uma seção."
+    },
+    "support_page": {
+      "title_required": "O título da página de suporte é obrigatório.",
+      "section_title_required": "Um título de seção na página de suporte é obrigatório.",
+      "paragraph_required": "Cada parágrafo na página de suporte não deve estar vazio.",
+      "body_content_required": "Cada seção da página de suporte deve ter conteúdo.",
+      "content_sections_required": "A página de suporte deve conter ao menos uma seção."
+    },
+    "terms_of_service_page": {
+      "title_required": "O título dos termos de serviço é obrigatório.",
+      "section_title_required": "Um título de seção nos termos de serviço é obrigatório.",
+      "paragraph_required": "Cada parágrafo nos termos de serviço não deve estar vazio.",
+      "body_content_required": "Cada seção dos termos de serviço deve ter conteúdo.",
+      "content_sections_required": "Os termos de serviço devem conter ao menos uma seção."
+    },
+    "unauthorized_page": {
+      "title_required": "O título da página não autorizada é obrigatório.",
+      "description_required": "A descrição da página não autorizada é obrigatória.",
+      "button_required": "O texto do botão da página não autorizada é obrigatório.",
+      "section_title_required": "Um título de seção no conteúdo da página não autorizada é obrigatório.",
+      "paragraph_required": "Cada parágrafo no conteúdo da página não autorizada não deve estar vazio.",
+      "body_content_required": "Cada seção da página não autorizada deve ter conteúdo.",
+      "content_sections_required": "A página não autorizada deve conter ao menos uma seção de conteúdo."
+    },
+    "wiki_page": {
+      "title_required": "O título da página Wiki é obrigatório.",
+      "section_title_required": "Um título de seção no conteúdo Wiki é obrigatório.",
+      "paragraph_required": "Cada parágrafo no conteúdo Wiki não deve estar vazio.",
+      "body_content_required": "Cada seção do conteúdo Wiki deve ter conteúdo.",
+      "content_sections_required": "A página Wiki deve conter ao menos uma seção de conteúdo."
+    },
+    "sites": {
+      "check_subdomain_invalid_input": "Entrada de subdomínio inválida. O subdomínio deve ter pelo menos 3 caracteres e conter apenas letras minúsculas, números e hífens.",
+      "check_subdomain_server_error": "Erro do servidor ao verificar a disponibilidade do subdomínio. Por favor, tente novamente.",
+      "subdomain_already_in_use": "Este subdomínio já está em uso. Por favor, escolha outro.",
+      "site_create_permission_denied": "Você não tem permissão para criar sites neste workspace.",
+      "site_create_failed": "Falha ao criar o site. Por favor, tente novamente.",
+      "site_not_found": "O site solicitado não pôde ser encontrado.",
+      "site_update_permission_denied": "Você não tem permissão para atualizar este site.",
+      "site_update_failed": "Falha ao atualizar o site. Por favor, tente novamente.",
+      "site_delete_permission_denied": "Você não tem permissão para excluir este site.",
+      "site_delete_invalid_id": "ID de site inválido fornecido para exclusão.",
+      "site_delete_failed": "Falha ao excluir o site. Por favor, tente novamente."
+    }
   }
 }
-

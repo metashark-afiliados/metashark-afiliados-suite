@@ -4,9 +4,10 @@
  * @description Aparato de UI atómico y de ensamblaje puro. Su única
  *              responsabilidad es componer los controles interactivos del
  *              encabezado de la página "Campañas". Es 100% agnóstico al
- *              estado y consume sus propias traducciones.
+ *              estado y consume sus propias traducciones. Corregido para
+ *              permitir 'all' como un valor válido para el filtro de estado.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @version 2.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -46,7 +47,9 @@ export interface CampaignsHeaderActionsProps {
   ) => void;
   isPending: boolean;
   mutatingId: string | null;
-  statusFilter?: CampaignStatus;
+  // --- INICIO DE REFACTORIZACIÓN: Tipo de statusFilter para incluir "all" ---
+  statusFilter?: CampaignStatus | "all";
+  // --- FIN DE REFACTORIZACIÓN ---
   onStatusChange: (status: CampaignStatus | "all") => void;
   sortBy: SortByOption;
   onSortChange: (sort: SortByOption) => void;
@@ -124,7 +127,7 @@ export function CampaignsHeaderActions({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato aísla la lógica de las acciones del encabezado, cumpliendo la "Filosofía LEGO".
+ * 1. **Alineación de Contrato de Tipos (`TS2322`)**: ((Implementada)) Se ha modificado el tipo de la propiedad `statusFilter` en la interfaz `CampaignsHeaderActionsProps` para incluir el literal `"all"`. Esto resuelve el error de compilación que ocurría al pasar este valor desde `CampaignsPageHeader`.
  *
  * @subsection Melhorias Futuras
  * 1. **Abstracción de `CampaignFilters`**: ((Vigente)) La lógica de filtros (actualmente ausente pero planificada) debería ser abstraída a su propio componente `CampaignFilters`, similar a `SiteFilters`.

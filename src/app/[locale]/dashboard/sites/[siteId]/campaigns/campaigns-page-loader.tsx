@@ -5,7 +5,10 @@
  *              blindado con manejo de errores `try/catch`, registro persistente
  *              de errores y se ha corregido su ruta de importación de permisos.
  * @author Raz Podestá
- * @version 3.1.0
+ * @version 4.2.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import React from "react";
 import { getTranslations } from "next-intl/server";
@@ -72,16 +75,18 @@ export async function CampaignsPageLoader({
         sortBy,
       });
 
+    // --- INICIO DE REFACTORIZACIÓN: Corrección de nombres de propiedades ---
     const clientProps = {
       site: { id: site.id, name: site.name, subdomain: site.subdomain },
       initialCampaigns: campaigns,
       totalCount,
       page,
       limit: CAMPAIGNS_PER_PAGE,
-      searchQuery: q || "",
-      status,
-      sortBy,
+      initialSearchQuery: q || "", // Renombrado de 'searchQuery'
+      initialStatus: status, // Renombrado de 'status'
+      initialSortBy: sortBy, // Renombrado de 'sortBy'
     };
+    // --- FIN DE REFACTORIZACIÓN ---
 
     return <CampaignsClient {...clientProps} />;
   } catch (error) {
@@ -102,16 +107,22 @@ export async function CampaignsPageLoader({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Correção de Integridade de Módulo**: ((Implementada)) Corrigida a rota de importação para `requireSitePermission`, resolvendo um erro crítico de compilação.
- * 2. **Arquitectura Resiliente**: ((Vigente)) Toda la lógica está envuelta en `try/catch`. Cualquier fallo en la capa de datos o permisos será capturado.
- * 3. **Observabilidad Persistente**: ((Vigente)) Los errores capturados se registran en la base de datos a través de `createPersistentErrorLog`.
- * 4. **Feedback de Usuario de Élite**: ((Vigente)) En caso de error, se renderiza un `ErrorStateCard` con un mensaje internacionalizado y un ID de error para el soporte.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.2.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Futuras
  * 1. **Logging Granular de Falha de Permissão**: ((Vigente)) No bloco `if (!permissionCheck.success)`, registrar explicitamente o `userId` e o `siteId` para uma auditoria de segurança mais detalhada.
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Correção de Integridade de Módulo**: ((Implementada)) Corrigida a rota de importação para `requireSitePermission`, resolvendo um erro crítico de compilação.
+ * 2. **Arquitectura Resiliente**: ((Vigente)) Toda la lógica está envuelta en `try/catch`. Qualquer falha na camada de dados ou permissões será capturada.
+ * 3. **Observabilidade Persistente**: ((Vigente)) Os erros capturados são registrados na base de dados através de `createPersistentErrorLog`.
+ * 4. **Feedback de Usuário de Élite**: ((Vigente)) Em caso de erro, é renderizado um `ErrorStateCard` com uma mensagem internacionalizada e um ID de erro para o suporte.
+ * 5. **Ajuste de Contrato de Props (`TS2741`)**: ((Implementada)) As propriedades `searchQuery`, `status` e `sortBy` foram renomeadas para `initialSearchQuery`, `initialStatus` e `initialSortBy` para corresponder ao contrato da interface `CampaignsClientProps`, resolvendo o erro de tipo.
  *
  * =====================================================================
  */

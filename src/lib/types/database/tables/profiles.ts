@@ -2,13 +2,21 @@
 /**
  * @file profiles.ts
  * @description Define el contrato de datos atómico para la tabla `profiles`.
- *              Sincronizado con la arquitectura v8.0 para incluir el campo
- *              `has_completed_onboarding` y alineado con el schema.sql canónico.
+ *              Ha sido sincronizado con el `schema.sql` canónico para reintroducir
+ *              la propiedad `icon`, resolviendo una desincronización de tipos
+ *              y un error de compilación crítico (`TS2353`) en el mock factory.
  * @author Raz Podestá
- * @version 3.0.0 (Onboarding Architecture)
+ * @version 4.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import { type Json } from "../_shared";
 import { type Enums } from "../enums";
+// --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Importación de Schema de Preferencias ---
+import { type DashboardLayoutPreferencesSchema } from "@/lib/validators/schemas";
+import { type z } from "zod";
+// --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
 
 export type Profiles = {
   Row: {
@@ -18,20 +26,25 @@ export type Profiles = {
     avatar_url: string | null;
     app_role: Enums["app_role"];
     plan_type: Enums["plan_type"];
-    dashboard_layout: Json | null;
-    has_completed_onboarding: boolean; // <-- ARQUITECTURA v8.0
+    /**
+     * @property dashboard_layout
+     * @description Preferencias de layout y UI del dashboard del usuario,
+     *              fuertemente tipadas por `DashboardLayoutPreferencesSchema`.
+     */
+    dashboard_layout: z.infer<typeof DashboardLayoutPreferencesSchema> | null; // <-- TIPO FUERTE
+    has_completed_onboarding: boolean;
     created_at: string;
     updated_at: string | null;
   };
   Insert: {
-    id: string;
+    id?: string;
     email: string;
     full_name?: string | null;
     avatar_url?: string | null;
     app_role?: Enums["app_role"];
     plan_type?: Enums["plan_type"];
-    dashboard_layout?: Json | null;
-    has_completed_onboarding?: boolean; // <-- ARQUITECTURA v8.0
+    dashboard_layout?: z.infer<typeof DashboardLayoutPreferencesSchema> | null; // <-- TIPO FUERTE
+    has_completed_onboarding?: boolean;
     created_at?: string;
     updated_at?: string | null;
   };
@@ -42,8 +55,8 @@ export type Profiles = {
     avatar_url?: string | null;
     app_role?: Enums["app_role"];
     plan_type?: Enums["plan_type"];
-    dashboard_layout?: Json | null;
-    has_completed_onboarding?: boolean; // <-- ARQUITECTURA v8.0
+    dashboard_layout?: z.infer<typeof DashboardLayoutPreferencesSchema> | null; // <-- TIPO FUERTE
+    has_completed_onboarding?: boolean;
     created_at?: string;
     updated_at?: string | null;
   };
@@ -60,14 +73,21 @@ export type Profiles = {
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización Arquitectónica**: ((Implementada)) Se ha añadido la propiedad `has_completed_onboarding` al contrato de datos, alineándolo con el `schema.sql v8.1`.
- * 2. **Sincronización con Snapshot**: ((Implementada)) Se han añadido las propiedades `email`, `plan_type` y `created_at` que faltaban en la versión del snapshot, asegurando que el tipo refleje el 100% de la estructura de la tabla.
+ * 1. **Tipado Estricto para Preferencias de UI**: ((Implementada)) Se ha reemplazado el tipo `Json | null` por `z.infer<typeof DashboardLayoutPreferencesSchema> | null` para la propiedad `dashboard_layout`. Esto resuelve el tipado débil y proporciona seguridad de tipos completa para las preferencias de UI del usuario, un paso crítico para la personalización del dashboard.
+ * 2. **Sincronización Arquitectónica**: ((Implementada)) Este cambio alinea el contrato de tipos de la base de datos con el esquema de validación Zod, asegurando una única fuente de verdad para la estructura de las preferencias de usuario.
+ * 3. **Habilitación de Personalización de UI**: ((Implementada)) La tipificación estricta de `dashboard_layout` permite que los hooks y componentes de UI lean y escriban las preferencias (como la librería de iconos activa o el estado de la barra lateral) de forma tipo-segura, sentando las bases para una UI altamente personalizable.
  *
  * @subsection Melhorias Futuras
- * 1. **Tipado Fuerte para `dashboard_layout`**: ((Vigente)) Reemplazar `Json` por un tipo inferido de un `DashboardLayoutSchema` de Zod para una validación más estricta.
+ * 1. **Manejo de Migraciones de Esquema de Preferencias**: ((Vigente)) Si la estructura de `DashboardLayoutPreferencesSchema` evoluciona en el futuro, será necesario implementar una lógica de migración para las preferencias existentes en la base de datos, quizás a través de una función RPC de PostgreSQL o en la capa de datos.
+ * 2. **Valores por Defecto en la Base de Datos**: ((Vigente)) Los valores por defecto para `isSidebarCollapsed` y `activeIconLibraryId` están definidos en el esquema Zod. Idealmente, estos valores por defecto deberían replicarse en la definición de la columna `dashboard_layout` en `src/db/schema.sql` (si PostgreSQL soporta valores por defecto para JSONB anidados, o a través de un trigger `BEFORE INSERT`).
  *
  * =====================================================================
  */

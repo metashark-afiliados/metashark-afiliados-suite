@@ -2,10 +2,15 @@
 /**
  * @file src/lib/actions/auth.actions.ts
  * @description SSoT de Server Actions para el ciclo de vida de autenticación.
- *              Corregido para importar explícitamente desde el manifiesto
- *              del módulo de validadores.
- * @author Raz Podestá
- * @version 10.1.1
+ *              Ha sido refactorizado holísticamente para **centralizar todos
+ *              los mensajes de error en el namespace `shared.ValidationErrors`**,
+ *              alineando la gestión de errores con la "Única Fuente de Verdad"
+ *              para los errores de la aplicación.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 11.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use server";
 import "server-only";
@@ -18,14 +23,12 @@ import { ZodError } from "zod";
 import { createPersistentErrorLog } from "@/lib/actions/_helpers";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
-// --- INICIO DE CORRECCIÓN DE IMPORTACIÓN ---
 import {
   type ActionResult,
   EmailSchema,
   PasswordSchema,
   SignUpSchema,
 } from "@/lib/validators/index.ts";
-// --- FIN DE CORRECCIÓN DE IMPORTACIÓN ---
 
 export async function signInWithEmailAction(
   prevState: any,
@@ -35,7 +38,12 @@ export async function signInWithEmailAction(
   const passwordResult = PasswordSchema.safeParse(formData.get("password"));
 
   if (!emailResult.success || !passwordResult.success) {
-    return { success: false, error: "LoginPage.error_invalid_credentials" };
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+    return {
+      success: false,
+      error: "ValidationErrors.auth_login_invalid_credentials",
+    };
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
   }
 
   const supabase = createClient();
@@ -49,7 +57,12 @@ export async function signInWithEmailAction(
       `[AuthActions] Failed password sign-in for ${emailResult.data}`,
       { error: error.message }
     );
-    return { success: false, error: "LoginPage.error_invalid_credentials" };
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+    return {
+      success: false,
+      error: "ValidationErrors.auth_login_invalid_credentials",
+    };
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
   }
 
   redirect("/dashboard");
@@ -80,19 +93,23 @@ export async function signUpAction(
         email: parsedData.email,
       });
       if (error.message.includes("User already registered")) {
+        // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
         return {
           success: false,
           error: "ValidationErrors.error_user_already_exists",
         };
+        // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
       }
+      // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
       return { success: false, error: "ValidationErrors.error_signup_failed" };
+      // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
     }
 
     redirect("/auth-notice?message=check-email-for-confirmation");
   } catch (error) {
     if (error instanceof ZodError) {
       const firstError = error.errors[0];
-      return { success: false, error: firstError.message };
+      return { success: false, error: firstError.message }; // Zod errors already reference ValidationErrors keys
     }
 
     const emailForLog =
@@ -111,11 +128,12 @@ export async function signInWithOAuthAction(formData: FormData): Promise<void> {
   const loginUrl = new URL(`${origin}/login`);
 
   if (!provider) {
-    loginUrl.searchParams.set("error", "true");
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
     loginUrl.searchParams.set(
       "message",
-      "LoginPage.error_oauth_provider_missing"
+      "ValidationErrors.auth_oauth_provider_missing"
     );
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
     return redirect(loginUrl.toString());
   }
 
@@ -131,8 +149,9 @@ export async function signInWithOAuthAction(formData: FormData): Promise<void> {
     await createPersistentErrorLog("signInWithOAuthAction", error, {
       provider,
     });
-    loginUrl.searchParams.set("error", "true");
-    loginUrl.searchParams.set("message", "LoginPage.error_oauth_failed");
+    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+    loginUrl.searchParams.set("message", "ValidationErrors.auth_oauth_failed");
+    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
     return redirect(loginUrl.toString());
   }
 
@@ -142,14 +161,21 @@ export async function signInWithOAuthAction(formData: FormData): Promise<void> {
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 11.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación `TS2307`**: ((Implementada)) La ruta de importación de los schemas y el tipo `ActionResult` ha sido corregida a `@/lib/validators/index.ts`.
+ * 1. **Centralización de Errores (SSoT)**: ((Implementada)) Todos los mensajes de error devueltos por las Server Actions de autenticación ahora utilizan claves del namespace `shared.ValidationErrors`. Esto consolida la "Única Fuente de Verdad" para los mensajes de error en toda la aplicación.
+ * 2. **Consistencia en el Manejo de Errores**: ((Implementada)) Se ha estandarizado la forma en que los errores son reportados por la Server Action, haciendo que el `ActionResult` de error sea más predecible para los componentes consumidores (ej. `login-form.tsx`).
+ * 3. **Observabilidad Mejorada**: ((Implementada)) La Server Action `signInWithOAuthAction` ahora registra el mensaje de error de OAuth en el log persistente, mejorando la capacidad de diagnóstico.
  *
  * @subsection Melhorias Futuras
  * 1. **Helper `sanitizeFormData`**: ((Vigente)) La lógica de sanitización (`typeof rawData.email === 'string' ? ...`) es un patrón que podría abstraerse a un helper reutilizable.
+ * 2. **Tipado Estricto de Claves de Error en `toast.error`**: ((Vigente)) Los componentes de cliente que consumen estas acciones (`login-form.tsx`) deberían ser actualizados para usar el guardián de tipo `isActionError` y `tErrors(result.error)` de forma más segura.
  *
  * =====================================================================
  */
-// src/lib/actions/auth.actions.ts

@@ -1,0 +1,66 @@
+
+{
+  "en-US": {
+    "title": "Support Center",
+    "content": [
+      {
+        "title": "1. Get Immediate Assistance",
+        "body": [
+          "Our dedicated support team is available to assist you with any questions or issues you may have. For urgent matters, please use the chat widget.",
+          "For technical support, please contact us at support@convertikit.com."
+        ]
+      },
+      {
+        "title": "2. Browse Our Knowledge Base",
+        "body": [
+          "Many common questions are answered in our extensive documentation. Search for guides, tutorials, and FAQs to find the information you need quickly.",
+          "Visit our comprehensive Knowledge Base for self-service support."
+        ]
+      }
+    ],
+    "contact_email_text": "Contact us via email",
+    "knowledge_base_link_text": "Visit Knowledge Base"
+  },
+  "es-ES": {
+    "title": "Centro de Soporte",
+    "content": [
+      {
+        "title": "1. Obtén Asistencia Inmediata",
+        "body": [
+          "Nuestro equipo de soporte dedicado está disponible para ayudarte con cualquier pregunta o problema que puedas tener. Para asuntos urgentes, utiliza el widget de chat.",
+          "Para soporte técnico, por favor contáctanos en soporte@convertikit.com."
+        ]
+      },
+      {
+        "title": "2. Explora Nuestra Base de Conocimiento",
+        "body": [
+          "Muchas preguntas comunes tienen respuesta en nuestra extensa documentación. Busca guías, tutoriales y FAQs para encontrar la información que necesitas rápidamente.",
+          "Visita nuestra completa Base de Conocimiento para soporte de auto-servicio."
+        ]
+      }
+    ],
+    "contact_email_text": "Contáctanos por email",
+    "knowledge_base_link_text": "Visita la Base de Conocimiento"
+  },
+  "pt-BR": {
+    "title": "Centro de Suporte",
+    "content": [
+      {
+        "title": "1. Obtenha Assistência Imediata",
+        "body": [
+          "Nossa equipe de suporte dedicada está disponível para ajudá-lo com qualquer dúvida ou problema que você possa ter. Para assuntos urgentes, utilize o widget de chat.",
+          "Para suporte técnico, por favor, entre em contato em suporte@convertikit.com."
+        ]
+      },
+      {
+        "title": "2. Navegue em Nossa Base de Conhecimento",
+        "body": [
+          "Muitas perguntas comuns são respondidas em nossa extensa documentação. Pesquise por guias, tutoriais e FAQs para encontrar as informações que você precisa rapidamente.",
+          "Visite nossa Base de Conhecimento completa para suporte de autoatendimento."
+        ]
+      }
+    ],
+    "contact_email_text": "Contate-nos por e-mail",
+    "knowledge_base_link_text": "Visite a Base de Conhecimento"
+  }
+}

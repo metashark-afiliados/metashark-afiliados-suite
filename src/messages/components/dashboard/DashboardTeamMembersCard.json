@@ -1,17 +1,21 @@
+
 {
   "en-US": {
     "title": "Team Members",
     "description": "Invite your team members to collaborate",
-    "invite_button_aria": "Invite new member"
+    "invite_button_aria": "Invite new member",
+    "no_members_yet": "No members yet. Invite your first!"
   },
   "es-ES": {
     "title": "Miembros del Equipo",
     "description": "Invita a los miembros de tu equipo a colaborar",
-    "invite_button_aria": "Invitar nuevo miembro"
+    "invite_button_aria": "Invitar nuevo miembro",
+    "no_members_yet": "Aún no hay miembros. ¡Invita al primero!"
   },
   "pt-BR": {
     "title": "Membros da Equipe",
     "description": "Convide os membros da sua equipe para colaborar",
-    "invite_button_aria": "Convidar novo membro"
+    "invite_button_aria": "Convidar novo membro",
+    "no_members_yet": "Nenhum membro ainda. Convide o primeiro!"
   }
 }

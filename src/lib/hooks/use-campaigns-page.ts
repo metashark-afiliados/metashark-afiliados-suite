@@ -1,12 +1,11 @@
 // src/lib/hooks/use-campaigns-page.ts
 /**
  * @file use-campaigns-page.ts
- * @description Orquestador de hooks de élite. Ha sido refactorizado
- *              holísticamente para consumir el hook `useUrlStateSync`,
- *              proporcionando una UX de filtros persistentes en la URL y
- *              simplificando su propia lógica de estado.
+ * @description Orquestador de hooks de élite. Ha sido blindado con un contrato
+ *              de props explícito y exportado (`UseCampaignsPageProps`), resolviendo
+ *              el error de módulo TS2724 en su consumidor.
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
+ * @version 8.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -32,29 +31,38 @@ import { clientLogger } from "@/lib/logging";
 type CampaignStatus = "draft" | "published" | "archived";
 type SortByOption = "updated_at_desc" | "name_asc";
 
+type CampaignFiltersState = {
+  q: string;
+  status: CampaignStatus | "all";
+  sort: SortByOption;
+};
+
+// --- INICIO DE CORRECCIÓN DE CONTRATO (TS2724) ---
+export interface UseCampaignsPageProps {
+  initialCampaigns: CampaignMetadata[];
+  initialSearchQuery: string;
+  siteId: string;
+  initialStatus?: CampaignStatus;
+  initialSortBy?: SortByOption;
+}
+// --- FIN DE CORRECCIÓN DE CONTRATO (TS2724) ---
+
 export function useCampaignsPage({
   initialCampaigns,
   initialSearchQuery,
   initialStatus,
   initialSortBy,
   siteId,
-}: {
-  initialCampaigns: CampaignMetadata[];
-  initialSearchQuery: string;
-  siteId: string;
-  initialStatus?: CampaignStatus;
-  initialSortBy?: SortByOption;
-}) {
+}: UseCampaignsPageProps) {
   const t = useTranslations("CampaignsPage");
   const router = useRouter();
   const [isActionPending, startActionTransition] = useTransition();
 
-  // --- INICIO DE REFACTORIZACIÓN: ESTADO EN URL ---
   const {
     state: filters,
     setState: setFilters,
     isSyncing,
-  } = useUrlStateSync({
+  } = useUrlStateSync<CampaignFiltersState>({
     initialState: {
       q: initialSearchQuery,
       status: initialStatus || "all",
@@ -62,7 +70,6 @@ export function useCampaignsPage({
     },
     debounceKeys: ["q"],
   });
-  // --- FIN DE REFACTORIZACIÓN: ESTADO EN URL ---
 
   const createOptimisticCampaign = (formData: FormData): CampaignMetadata => {
     const name = formData.get("name") as string;
@@ -140,30 +147,32 @@ export function useCampaignsPage({
     isSyncing,
     mutatingId,
     searchTerm: filters.q,
-    setSearchTerm: (value: string) => setFilters((f) => ({ ...f, q: value })),
-    statusFilter: filters.status as CampaignStatus,
+    setSearchTerm: (value: string) =>
+      setFilters((f: CampaignFiltersState) => ({ ...f, q: value })),
+    statusFilter: filters.status,
     setStatusFilter: (status?: CampaignStatus | "all") =>
-      setFilters((f) => ({ ...f, status: status || "all" })),
-    sortBy: filters.sort as SortByOption,
-    setSortBy: (sort: SortByOption) => setFilters((f) => ({ ...f, sort })),
+      setFilters((f: CampaignFiltersState) => ({
+        ...f,
+        status: status || "all",
+      })),
+    sortBy: filters.sort,
+    setSortBy: (sort: SortByOption) =>
+      setFilters((f: CampaignFiltersState) => ({ ...f, sort })),
     handleCreateCampaign,
     handleDelete,
     handleArchiveCampaign,
     handleDuplicateCampaign,
   };
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Consistencia de UX (Filtros en URL)**: ((Implementada)) Se ha reemplazado el hook `useCampaignFilters` por `useUrlStateSync`. La página de "Campañas" ahora tiene filtros persistentes y compartibles, igual que la página "Mis Sitios", cumpliendo el objetivo de la ÉPICA 8.
- * 2. **Simplificación de Lógica (DRY)**: ((Implementada)) Al consumir el hook genérico, se ha eliminado la lógica de estado de filtros duplicada que existía en `useCampaignFilters`, haciendo este hook más simple y mantenible.
- * 3. **Feedback de Sincronización de URL**: ((Implementada)) El hook ahora expone el estado `isSyncing` de `useUrlStateSync`, que será consumido por la UI para proporcionar feedback visual al usuario.
- *
  * @subsection Melhorias Futuras
- * 1. **Factoría de Items Optimistas Atómica**: ((Vigente)) La lógica de `createOptimisticCampaign` podría ser extraída a un helper `optimisticItemFactory.ts` para una máxima reutilización.
+ * 1. **Factoría de Items Optimistas Atómica**: ((Vigente)) La lógica de `createOptimisticCampaign` podría ser extraída a un helper `optimisticItemFactory.ts` para una máxima reutilización si otros hooks necesitaran crear campañas optimistas.
+ * 2. **Tipado de Errores con `isActionError`**: ((Vigente)) El `toast.error` en `handleCreateCampaign` utiliza `as any`. Para una seguridad de tipos de élite, se debería usar el guardián de tipo `isActionError` para asegurar que el `result.error` es una clave de i18n válida antes de pasarlo a `t()`.
  *
  * =====================================================================
  */

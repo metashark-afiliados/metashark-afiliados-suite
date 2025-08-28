@@ -2,14 +2,18 @@
 /**
  * @file validators/schemas.ts
  * @description Biblioteca de Schemas de Zod y Única Fuente de Verdad (SSoT) para
- *              la validación de datos en toda la aplicación. Sincronizado para
- *              incluir el nuevo `CreateCreationSchema` para la arquitectura
- *              de creaciones soberanas.
- * @author Raz Podestá
- * @version 6.0.0
+ *              la validación de datos en toda la aplicación. Ha sido refactorizado
+ *              holísticamente para incluir el nuevo `DashboardLayoutPreferencesSchema`,
+ *              un contrato de datos esencial para la personalización de la UI.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 7.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
+import { ICON_LIBRARIES_MANIFEST } from "@/config/icon-libraries.config";
 import { keysToSnakeCase } from "@/lib/helpers/object-case-converter";
 import { slugify } from "@/lib/utils/text";
 
@@ -57,6 +61,28 @@ export const SignUpSchema = z
   });
 
 // --- ESQUEMAS DE ENTIDADES ---
+
+/**
+ * @public
+ * @constant DashboardLayoutPreferencesSchema
+ * @description Define la estructura y los tipos de datos esperados para las
+ *              preferencias de UI del usuario, almacenadas en `profiles.dashboard_layout`.
+ *              Este esquema es crucial para la personalización de la interfaz.
+ */
+export const DashboardLayoutPreferencesSchema = z.object({
+  /**
+   * Indica si la barra lateral (sidebar) está colapsada.
+   * @default false
+   */
+  isSidebarCollapsed: z.boolean().default(false),
+  /**
+   * El ID de la librería de iconos activa seleccionada por el usuario.
+   * @default "lucide"
+   */
+  activeIconLibraryId: z
+    .enum(ICON_LIBRARIES_MANIFEST.map((lib) => lib.id) as [string, ...string[]])
+    .default("lucide"),
+});
 
 export const CreateCreationSchema = z.object({
   name: NameSchema,
@@ -151,19 +177,3 @@ export const ClientEnrichmentSchema = z.object({
   fingerprint: z.string().min(1, { message: "fingerprint_required" }),
   browser_context: z.record(z.any()).nullable().optional(),
 });
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Contrato de `Creation`**: ((Implementada)) Se ha añadido el nuevo `CreateCreationSchema`, proporcionando el contrato de validación necesario para la nueva arquitectura de creaciones soberanas.
- * 2. **Cero Regresiones**: ((Implementada)) Se ha mantenido la totalidad de los schemas existentes del snapshot, garantizando que no haya regresiones en otras partes de la aplicación.
- *
- * @subsection Melhorias Futuras
- * 1. **Tipado Estricto para `type`**: ((Vigente)) El campo `type` en `CreateCreationSchema` es actualmente un `z.string()`. Podría ser refinado a un `z.enum(["landing-page", "doc", ...])` a medida que se definan los tipos de creación soportados, para una seguridad de tipos aún mayor.
- * 2. **Refactorización a Módulos Atómicos**: ((Vigente)) Este archivo está creciendo en tamaño. Una refactorización de élite a futuro sería dividirlo en archivos atómicos por entidad (ej. `schemas/auth.schemas.ts`, `schemas/sites.schemas.ts`) y re-exportarlos desde este `index.ts`.
- *
- * =====================================================================
- */
-// src/lib/validators/schemas.ts

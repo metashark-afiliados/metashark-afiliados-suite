@@ -3,104 +3,37 @@
  * @file BlocksPalette.tsx
  * @description Orquestador de UI que muestra la lista de bloques de construcción
  *              disponibles. Es un componente declarativo que se auto-configura
- *              leyendo el manifiesto `blockEditorDefinitions`. Es la SSoT para
- *              la interfaz de "Añadir Bloques".
- * @author Raz Podestá
- * @version 1.0.0
+ *              leyendo el manifiesto `blockEditorDefinitions`. Ha sido
+ *              refactorizado holísticamente para consumir los aparatos canónicos
+ *              `PaletteItem` y `PaletteItemPreview` (si fuera necesario para DragOverlay)
+ *              desde su ubicación centralizada, eliminando definiciones internas duplicadas.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { useDraggable } from "@dnd-kit/core";
-import { GripVertical } from "lucide-react";
 
-import { blockRegistry } from "@/components/templates";
 import { blockEditorDefinitions } from "@/lib/builder/block-editor-definitions";
-import { initializeNewBlock } from "@/lib/builder/block-initializer.helper";
 import { logger } from "@/lib/logging";
-
-/**
- * @public
- * @component PaletteItemPreview
- * @description Renderiza una previsualización de un bloque cuando está siendo arrastrado
- *              desde la paleta. Es utilizado por el `DragOverlay` en el `BuilderLayout`.
- * @param {object} props - Propiedades del componente.
- * @param {string} props.blockType - El tipo de bloque a previsualizar.
- * @returns {React.ReactElement}
- */
-export function PaletteItemPreview({
-  blockType,
-}: {
-  blockType: string;
-}): React.ReactElement {
-  const t = useTranslations("components.builder.BlocksPalette");
-  const newBlock = initializeNewBlock(blockType);
-
-  logger.trace(
-    "[PaletteItemPreview] Renderizando previsualización de arrastre.",
-    { blockType }
-  );
-
-  if (newBlock) {
-    const BlockComponent = blockRegistry[blockType];
-    if (BlockComponent) {
-      return (
-        <div className="bg-card p-2 rounded-md shadow-lg opacity-70 w-80">
-          {React.createElement(BlockComponent, newBlock.props)}
-        </div>
-      );
-    }
-  }
-
-  return (
-    <div className="flex items-center gap-2 p-2 bg-muted rounded-md cursor-grabbing ring-2 ring-primary">
-      <GripVertical className="h-5 w-5 text-muted-foreground" />
-      <span className="font-medium text-sm">
-        {t("unknown_block_preview", { blockType })}
-      </span>
-    </div>
-  );
-}
-
-/**
- * @private
- * @component PaletteItem
- * @description Renderiza un único ítem arrastrable en la paleta de bloques.
- * @param {object} props - Propiedades del componente.
- * @param {string} props.blockType - El tipo de bloque que este ítem representa.
- * @returns {React.ReactElement}
- */
-function PaletteItem({ blockType }: { blockType: string }): React.ReactElement {
-  const t = useTranslations("components.builder.BlocksPalette");
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id: `palette-${blockType}`,
-    data: {
-      blockType: blockType,
-      fromPalette: true,
-    },
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      className="flex items-center gap-2 p-2 bg-muted rounded-md cursor-grab active:cursor-grabbing hover:bg-accent transition-colors"
-    >
-      <GripVertical className="h-5 w-5 text-muted-foreground" />
-      <span className="font-medium text-sm">
-        {t(`block_name_${blockType}` as any, { defaultValue: blockType })}
-      </span>
-    </div>
-  );
-}
+// --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Consumir aparatos canónicos ---
+import { PaletteItem } from "@/components/builder/panels/PaletteItem";
+// Se asume que PaletteItemPreview también se importa si BlocksPalette necesitara renderizarlo directamente,
+// pero su uso principal es en DragOverlay en BuilderLayout, donde ya se importa canónicamente.
+// Si BlocksPalette.tsx alguna vez necesitara renderizarlo (e.g., para una vista más compleja),
+// la importación sería: import { PaletteItem, PaletteItemPreview } from "@/components/builder/panels/PaletteItem";
+// --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
 
 /**
  * @public
  * @component BlocksPalette
  * @description Orquesta el renderizado de la lista completa de bloques de construcción
  *              disponibles, obtenidos del manifiesto `blockEditorDefinitions`.
+ *              Ahora delega la renderización de cada ítem a su componente atómico `PaletteItem`.
  * @returns {React.ReactElement}
  */
 export function BlocksPalette(): React.ReactElement {
@@ -116,22 +49,33 @@ export function BlocksPalette(): React.ReactElement {
       <h3 className="font-bold text-lg border-b pb-2">{t("title")}</h3>
       <div className="grid grid-cols-2 gap-2">
         {availableBlockTypes.map((type) => (
+          // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Usar PaletteItem canónico ---
           <PaletteItem key={type} blockType={type} />
+          // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
         ))}
       </div>
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Arquitectura Declarativa**: ((Implementada)) El componente es 100% declarativo; su contenido se deriva automáticamente del manifiesto `blockEditorDefinitions`.
+ * 1. **Eliminación de Código Duplicado**: ((Implementada)) Se han eliminado las definiciones internas duplicadas de `PaletteItem` y `PaletteItemPreview` de este archivo, lo que reduce la deuda técnica y mejora la claridad.
+ * 2. **Consumo de Aparatos Canónicos**: ((Implementada)) El componente ahora importa y utiliza la versión canónica de `PaletteItem` desde `src/components/builder/panels/PaletteItem.tsx`. Esto asegura que exista una única fuente de verdad para la lógica y presentación de un ítem de paleta.
+ * 3. **Mayor Atomicidad del Orquestador**: ((Implementada)) `BlocksPalette` ahora es un orquestador más puro, enfocado exclusivamente en orquestar la lista de bloques y delegar la renderización de cada ítem a un subcomponente atómico externo, adhiriéndose mejor al SRP.
  *
  * @subsection Melhorias Futuras
- * 1. **Categorización y Búsqueda**: ((Vigente)) Añadir un `Accordion` para agrupar bloques y un `SearchInput` para filtrarlos.
+ * 1. **Categorización y Búsqueda (UI)**: ((Vigente)) Añadir un `Accordion` para agrupar bloques por categoría y un `SearchInput` para filtrarlos, mejorando la usabilidad de la paleta.
+ * 2. **Integración con DragOverlay (si es necesario)**: ((Pendiente)) Si en el futuro `BlocksPalette.tsx` necesitara renderizar `PaletteItemPreview` (ej., para mostrar una previsualización dentro de su propio panel), se aseguraría que la importación de `PaletteItemPreview` también provenga de `src/components/builder/panels/PaletteItem.tsx`. Por ahora, su uso principal es en `BuilderLayout` para el `DragOverlay`.
  *
  * =====================================================================
  */

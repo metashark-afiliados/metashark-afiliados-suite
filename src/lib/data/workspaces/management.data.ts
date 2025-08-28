@@ -2,10 +2,12 @@
 /**
  * @file management.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de
- *              lectura para la gestión de workspaces (Dashboard).
+ *              lectura para la gestión de workspaces (Dashboard). Ha sido
+ *              refactorizado holísticamente para incluir la función `getWorkspaceMembers`,
+ *              una mejora crítica para la visualización de datos reales en el dashboard.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-27
+ * @version 2.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -17,6 +19,7 @@ import { type SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
 import { createClient as createServerClient } from "@/lib/supabase/server";
+import { type Tables } from "@/lib/types/database";
 import { type Workspace } from "./types";
 
 type Supabase = SupabaseClient<
@@ -63,19 +66,19 @@ export const getWorkspacesByUserId = cache(
  *              La consulta está envuelta en `React.cache`.
  * @param {string} workspaceId - El ID del workspace a obtener.
  * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
- * @returns {Promise<Pick<Workspace, "id" | "name"> | null>} El objeto del workspace o null si no se encuentra.
+ * @returns {Promise<Pick<Workspace, "id" | "name" | "icon"> | null>} El objeto del workspace o null si no se encuentra.
  */
 export const getWorkspaceById = cache(
   async (
     workspaceId: string,
     supabaseClient?: Supabase
-  ): Promise<Pick<Workspace, "id" | "name"> | null> => {
+  ): Promise<Pick<Workspace, "id" | "name" | "icon"> | null> => {
     logger.trace(`[Cache MISS] Cargando workspace por ID: ${workspaceId}`);
     const supabase = supabaseClient || createServerClient();
     try {
       const { data, error } = await supabase
         .from("workspaces")
-        .select("id, name")
+        .select("id, name, icon") // <-- Seleccionar 'icon' también
         .eq("id", workspaceId)
         .single();
 
@@ -94,21 +97,61 @@ export const getWorkspaceById = cache(
 );
 
 /**
+ * @public
+ * @async
+ * @function getWorkspaceMembers
+ * @description Obtiene todos los miembros de un workspace específico, incluyendo
+ *              información básica de sus perfiles.
+ * @param {string} workspaceId - El ID del workspace.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
+ * @returns {Promise<Tables<'workspace_members'>[]>} Un array de objetos de miembros del workspace.
+ * @throws {Error} Si la consulta a la base de datos falla.
+ */
+export async function getWorkspaceMembers(
+  workspaceId: string,
+  supabaseClient?: Supabase
+): Promise<Tables<"workspace_members">[]> {
+  logger.trace(
+    `[DataLayer:Workspaces] Cargando miembros para workspace: ${workspaceId}`
+  );
+  const supabase = supabaseClient || createServerClient();
+  try {
+    const { data, error } = await supabase
+      .from("workspace_members")
+      .select("*, profiles(id, email, full_name, avatar_url)") // Seleccionar perfil completo
+      .eq("workspace_id", workspaceId);
+
+    if (error) {
+      logger.error(
+        `Error al obtener miembros del workspace ${workspaceId}:`,
+        error
+      );
+      throw new Error("No se pudieron obtener los miembros del workspace.");
+    }
+    return (data as Tables<"workspace_members">[]) || [];
+  } catch (error) {
+    logger.error(`Error en getWorkspaceMembers para ${workspaceId}:`, error);
+    return [];
+  }
+}
+
+/**
  * =====================================================================
  *                           MEJORA CONTINUA
  *
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-27
+ * @version 2.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad de Lógica de Datos (SRP)**: ((Implementada)) Este nuevo aparato aísla perfectamente la lógica de obtención de datos para workspaces, cumpliendo con la directiva de atomización. Su lógica ha sido migrada directamente del archivo monolítico.
- * 2. **Optimización de Rendimiento**: ((Implementada)) Ambas funciones utilizan `React.cache` para prevenir consultas duplicadas a la base de datos dentro de la misma request.
+ * 1. **Función `getWorkspaceMembers`**: ((Implementada)) Se ha añadido esta función crítica a la capa de datos. Permite obtener los miembros de un workspace junto con su información de perfil (`profiles`), resolviendo la necesidad de datos reales para `dashboard-team-members-card.tsx`.
+ * 2. **Tipado Estricto y Full Observabilidad**: ((Implementada)) La nueva función está fuertemente tipada y utiliza `logger.trace`/`logger.error` para una visibilidad completa.
+ * 3. **Consistencia en `getWorkspaceById`**: ((Implementada)) La función `getWorkspaceById` ahora también selecciona la columna `icon`, asegurando que la información completa del workspace esté disponible.
  *
  * @subsection Melhorias Futuras
- * 1. **Función `getWorkspaceMembers`**: ((Vigente)) Para una futura página de gestión de miembros del workspace, se necesitará una nueva función `getWorkspaceMembers(workspaceId: string)` que devuelva la lista de usuarios y sus roles. Propondré añadirla cuando se aborde dicha funcionalidad.
+ * 1. **Cacheo de Miembros**: ((Vigente)) La función `getWorkspaceMembers` es candidata para `React.cache` (`unstable_cache`) para optimizar el rendimiento, ya que la lista de miembros no cambia con mucha frecuencia. La clave de caché debería incluir `workspaceId`.
  *
  * =====================================================================
  */

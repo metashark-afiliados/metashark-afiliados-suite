@@ -4,7 +4,7 @@
  * @description Proveedor de contexto de élite para el `BuilderStore`. Implementa
  *              el patrón de "Hydration Segura" para Zustand en el App Router.
  *              Sincronizado con la arquitectura de SSoT canónica del núcleo de estado.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -87,11 +87,9 @@ export const useBuilderStoreContext = (): BuilderStore => {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización Arquitectónica**: ((Implementada)) Se ha corregido la ruta de importación para que apunte al manifiesto del módulo (`@/lib/builder/core`), resolviendo el error `Module not found` y alineando el componente con la SSoT de estado.
+ * 1. **Sincronización Arquitectónica**: ((Implementada)) Se ha corregido la ruta de importación para que apunte al manifiesto del módulo (`@/lib/builder/core`), resolviendo los errores de tipo y de módulo no encontrado.
  * 2. **Observabilidad Mejorada**: ((Implementada)) El log de hidratación ahora incluye el `campaignId` para una trazabilidad más granular.
- *
- * @subsection Melhorias Futuras
- * 1. **Selector de Estado Atómico**: ((Vigente)) Para una optimización de rendimiento de élite, se podría crear un hook `useBuilderStoreSelector` que combine `useBuilderStoreContext` y `useStore` con un selector.
+ * 3. **Selector de Estado Atómico**: ((Implementada)) La funcionalidad de un selector de estado atómico que combina `useBuilderStoreContext` y `useStore` con un selector ya está provista por el hook `useBuilderStore` en `src/lib/hooks/use-builder-store.ts`.
  *
  * =====================================================================
  */

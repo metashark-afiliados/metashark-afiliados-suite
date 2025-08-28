@@ -1,29 +1,42 @@
+
 {
   "en-US": {
     "aria_label": "Chat with L.I.A.",
-    "coming_soon_toast": "Coming Soon: Chat with L.I.A. Affiliate Manager!",
     "interface_title": "Chat with L.I.A.",
     "interface_subtitle": "Your personal affiliate marketing assistant",
     "welcome_message": "Hello! I'm L.I.A. How can I help you today? You can ask me about niche strategies, request ad copy, or analyze one of your landing pages.",
     "input_placeholder": "Ask L.I.A. anything...",
-    "send_button_aria_label": "Send message"
+    "send_button_aria_label": "Send message",
+    "thinking_message": "L.I.A. is thinking...",
+    "error_api_message": "L.I.A. could not process your request. Please try again.",
+    "error_internal_message": "An internal error occurred in L.I.A. Please contact support.",
+    "message_user_role": "You",
+    "message_assistant_role": "L.I.A."
   },
   "es-ES": {
     "aria_label": "Chatear con L.I.A.",
-    "coming_soon_toast": "Próximamente: ¡Chatea con la Asistente L.I.A.!",
     "interface_title": "Chatear con L.I.A.",
     "interface_subtitle": "Tu asistente personal de marketing de afiliados",
     "welcome_message": "¡Hola! Soy L.I.A. ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre estrategias de nicho, pedirme textos para anuncios o que analice una de tus landing pages.",
     "input_placeholder": "Pregúntale cualquier cosa a L.I.A....",
-    "send_button_aria_label": "Enviar mensaje"
+    "send_button_aria_label": "Enviar mensaje",
+    "thinking_message": "L.I.A. está pensando...",
+    "error_api_message": "L.I.A. no pudo procesar tu solicitud. Por favor, inténtalo de nuevo.",
+    "error_internal_message": "Ocurrió un error interno en L.I.A. Por favor, contacta a soporte.",
+    "message_user_role": "Tú",
+    "message_assistant_role": "L.I.A."
   },
   "pt-BR": {
     "aria_label": "Conversar com L.I.A.",
-    "coming_soon_toast": "Em breve: Converse com a L.I.A. Affiliate Manager!",
     "interface_title": "Conversar com L.I.A.",
     "interface_subtitle": "Sua assistente pessoal de marketing de afiliados",
     "welcome_message": "Olá! Eu sou a L.I.A. Como posso te ajudar hoje? Você pode me perguntar sobre estratégias de nicho, pedir para gerar textos, ou analisar uma de suas landing pages.",
     "input_placeholder": "Pergunte qualquer coisa para a L.I.A....",
-    "send_button_aria_label": "Enviar mensagem"
+    "send_button_aria_label": "Enviar mensagem",
+    "thinking_message": "L.I.A. está pensando...",
+    "error_api_message": "L.I.A. não pôde processar sua solicitação. Por favor, tente novamente.",
+    "error_internal_message": "Ocorreu um erro interno na L.I.A. Por favor, contate o suporte.",
+    "message_user_role": "Você",
+    "message_assistant_role": "L.I.A."
   }
 }

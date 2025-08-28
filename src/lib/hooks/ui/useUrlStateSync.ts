@@ -1,29 +1,37 @@
 // src/lib/hooks/ui/useUrlStateSync.ts
 /**
  * @file useUrlStateSync.ts
- * @description Hook de UI de élite, atómico y reutilizable. Ha sido corregido
- *              para consumir las SSoT de importación canónicas para los hooks
- *              de enrutamiento y la librería `microdiff`, resolviendo errores
- *              críticos de resolución de módulos.
+ * @description Hook de UI de élite, atómico y reutilizable. Ha sido blindado
+ *              con un tipo de retorno explícito, resolviendo una inferencia
+ *              de tipo recursiva (`any`) que causaba una cascada de errores
+ *              en los hooks consumidores.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.1.0
- * @date 2025-08-26
+ * @version 2.0.0
+ * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { useState, useEffect, useTransition, useCallback } from "react";
-import { useSearchParams } from "next/navigation"; // <-- CORRECCIÓN: SSoT para searchParams
+import { useSearchParams } from "next/navigation";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { clientLogger } from "@/lib/logging";
 import { usePathname, useRouter } from "@/lib/navigation";
-import isEqual from "microdiff"; // <-- CORRECCIÓN: SSoT para importación por defecto
+import isEqual from "microdiff";
 
 export interface UseUrlStateSyncProps<T extends Record<string, string>> {
   initialState: T;
   debounceKeys?: (keyof T)[];
   debounceMs?: number;
+}
+
+// --- INICIO DE CORRECCIÓN DE TIPO (TS7022) ---
+// Se define un tipo explícito para el valor de retorno del hook.
+export interface UseUrlStateSyncReturn<T> {
+  state: T;
+  setState: React.Dispatch<React.SetStateAction<T>>;
+  isSyncing: boolean;
 }
 
 /**
@@ -32,17 +40,14 @@ export interface UseUrlStateSyncProps<T extends Record<string, string>> {
  * @description Gestiona un estado de objeto y lo sincroniza bidireccionalmente con los `searchParams` de la URL.
  * @template T - La forma del objeto de estado a sincronizar.
  * @param {UseUrlStateSyncProps<T>} options - Opciones de configuración.
- * @returns {{
- *   state: T;
- *   setState: React.Dispatch<React.SetStateAction<T>>;
- *   isSyncing: boolean;
- * }} La API para interactuar con el estado sincronizado.
+ * @returns {UseUrlStateSyncReturn<T>} La API para interactuar con el estado sincronizado.
  */
 export const useUrlStateSync = <T extends Record<string, string>>({
   initialState,
   debounceKeys = [],
   debounceMs = 500,
-}: UseUrlStateSyncProps<T>) => {
+}: UseUrlStateSyncProps<T>): UseUrlStateSyncReturn<T> => {
+  // --- FIN DE CORRECCIÓN DE TIPO (TS7022) ---
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -80,13 +85,10 @@ export const useUrlStateSync = <T extends Record<string, string>>({
       }
     });
 
-    // Ordenar para una comparación canónica
     currentParams.sort();
     newParams.sort();
 
-    // Solo actualiza la URL si ha cambiado para evitar bucles de renderizado
     if (currentParams.toString() !== newParams.toString()) {
-      // Resetear a la primera página si los filtros gestionados cambian
       if (newParams.has("page")) {
         const currentFilters = { ...initialState };
         const newFilters = { ...initialState };
@@ -120,14 +122,10 @@ export const useUrlStateSync = <T extends Record<string, string>>({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Errores de Módulo (`TS2305`, `TS2614`)**: ((Implementada)) Se han corregido las importaciones para `useSearchParams` (ahora desde `next/navigation`) y `isEqual` (ahora como importación por defecto), resolviendo los errores de compilación.
- * 2. **Prevención de Bucles de Renderizado Robusta**: ((Implementada)) La comparación de `URLSearchParams` ahora se realiza después de ordenar los parámetros, garantizando una comparación canónica y previniendo actualizaciones innecesarias.
  *
  * @subsection Melhorias Futuras
- * 1. **Soporte para Tipos de Datos Complejos**: ((Vigente)) El hook está optimizado para valores de tipo string. Podría ser extendido para manejar la serialización y deserialización de arrays o números.
+ * 1. **Soporte para Tipos de Datos Complejos**: ((Vigente)) El hook está optimizado para valores de tipo string. Podría ser extendido para manejar la serialización y deserialización de arrays o números, utilizando `JSON.stringify` y `JSON.parse` para almacenarlos en la URL.
+ * 2. **Tipado de `setState` Callback**: ((Pendiente)) El tipo del callback `setState` aún usa `any` en la implementación. Se podría refinar para una seguridad de tipos aún mayor.
  *
  * =====================================================================
  */

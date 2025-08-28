@@ -1,12 +1,12 @@
 // src/lib/hooks/useSitesPage.ts
 /**
  * @file useSitesPage.ts
- * @description Hook orquestador soberano de élite. Encapsula toda la lógica de
- *              estado y negocio para la página "Mis Sitios", incluyendo filtros
- *              sincronizados con URL, gestión de vista, UI optimista y manejo
- *              de diálogos.
+ * @description Hook orquestador soberano. Ha sido refactorizado holísticamente
+ *              para delegar la gestión de filtros y vista al hook atómico
+ *              `useSitesHeader` y para alinear explícitamente el contrato de
+ *              props (`onViewChange`), resolviendo el error de tipo TS2741.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @version 3.0.0
  * @date 2025-08-27
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -15,7 +15,6 @@
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import React from "react";
 import toast from "react-hot-toast";
 
 import {
@@ -23,53 +22,31 @@ import {
   deleteSiteAction,
 } from "@/lib/actions/sites.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
-import {
-  type SiteSortOption,
-  type SiteStatusFilter,
-  type SiteWithCampaignCount,
-  type ViewMode,
-} from "@/lib/data/sites/types";
+import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
 import { useDialogState } from "@/lib/hooks/ui/useDialogState";
-import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
-import { useUrlStateSync } from "@/lib/hooks/ui/useUrlStateSync";
 import { clientLogger } from "@/lib/logging";
 import { useOptimisticResourceManagement } from "./use-optimistic-resource-management";
+import { useSitesHeader, type UseSitesHeaderProps } from "./useSitesHeader";
 
-export interface UseSitesPageProps {
+export interface UseSitesPageProps extends UseSitesHeaderProps {
   initialSites: SiteWithCampaignCount[];
-  initialSearchQuery: string;
-  initialStatusFilter: SiteStatusFilter;
-  initialSortOption: SiteSortOption;
 }
 
-export function useSitesPage({
-  initialSites,
-  initialSearchQuery,
-  initialStatusFilter,
-  initialSortOption,
-}: UseSitesPageProps) {
+/**
+ * @public
+ * @function useSitesPage
+ * @description Orquesta la lógica de negocio para la página "Mis Sitios",
+ *              componiendo hooks atómicos para filtros, UI optimista y diálogos.
+ * @param {UseSitesPageProps} props - Propiedades iniciales para el hook.
+ * @returns La API completa para gestionar la UI de la página de sitios.
+ */
+export function useSitesPage(props: UseSitesPageProps) {
   clientLogger.trace("[useSitesPage] Hook soberano inicializado.");
   const t = useTranslations("SitesPage");
   const { activeWorkspace, user } = useDashboard();
   const router = useRouter();
 
-  const {
-    state: filters,
-    setState: setFilters,
-    isSyncing,
-  } = useUrlStateSync({
-    initialState: {
-      q: initialSearchQuery,
-      status: initialStatusFilter,
-      sort: initialSortOption,
-    },
-    debounceKeys: ["q"],
-  });
-
-  const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
-    "sites-view-mode",
-    "grid"
-  );
+  const { setViewMode, ...headerState } = useSitesHeader(props);
 
   const {
     isOpen: isCreateDialogOpen,
@@ -104,7 +81,7 @@ export function useSitesPage({
     handleCreate: genericHandleCreate,
     handleDelete: genericHandleDelete,
   } = useOptimisticResourceManagement<SiteWithCampaignCount>({
-    initialItems: initialSites,
+    initialItems: props.initialSites,
     createAction: createSiteAction,
     deleteAction: deleteSiteAction,
     createOptimisticItem: createOptimisticSite,
@@ -133,45 +110,29 @@ export function useSitesPage({
     }
   };
 
-  const handleClearFilters = React.useCallback(() => {
-    clientLogger.info("[useSitesPage] Limpiando todos los filtros.");
-    setFilters({ q: "", status: "all", sort: "created_at_desc" });
-  }, [setFilters]);
-
   return {
     sites,
     activeWorkspaceId: activeWorkspace?.id,
     isPending,
     mutatingId,
-    isSyncing,
-    searchQuery: filters.q,
-    onSearchChange: (value: string) => setFilters((f) => ({ ...f, q: value })),
-    statusFilter: filters.status as SiteStatusFilter,
-    onStatusFilterChange: (status: SiteStatusFilter) =>
-      setFilters((f) => ({ ...f, status })),
-    sortOption: filters.sort as SiteSortOption,
-    onSortChange: (sort: SiteSortOption) => setFilters((f) => ({ ...f, sort })),
-    onClearFilters: handleClearFilters,
+    ...headerState,
+    onViewChange: setViewMode, // <-- ALINEACIÓN DE CONTRATO DE API
     handleDelete,
     isCreateDialogOpen,
     setCreateDialogOpen,
     openCreateDialog,
     handleCreate,
-    viewMode,
-    setViewMode,
   };
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Encapsulamiento Holístico (SRP)**: Este hook soberano se convierte en el "cerebro" de la página, encapsulando toda la lógica de estado (filtros, vista, diálogos, UI optimista) y las acciones. Esto permite que el componente `sites-client.tsx` se convierta en un presentador puro y simple.
- * 2. ((Implementada)) **Composición de Hooks de Élite**: Demuestra un patrón de élite al componer múltiples hooks atómicos (`useUrlStateSync`, `useLocalStorage`, `useDialogState`, `useOptimisticResourceManagement`) para construir una lógica compleja de forma cohesiva y mantenible.
- *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Factoría de Items Optimistas Atómica**: La lógica de `createOptimisticSite` es específica de esta entidad. Para una reutilización máxima, podría ser extraída a un archivo de factorías (`/lib/factories/optimistic-items.ts`) si otros hooks necesitaran crear sitios optimistas.
+ * 1. **Factoría de Items Optimistas Atómica**: ((Vigente)) La lógica de `createOptimisticSite` es específica de esta entidad. Para una reutilización máxima, podría ser extraída a un archivo de factorías (`/lib/factories/optimistic-items.ts`).
+ * 2. **Gestión de Estado de Diálogo en Hook Soberano**: ((Vigente)) La lógica del diálogo de creación (`useDialogState`) podría ser abstraída a un hook más pequeño y específico, `useSiteCreationDialog`, para una mayor cohesión y reutilización, siguiendo el patrón de `useCampaignCreationDialog`.
  *
  * =====================================================================
  */
