@@ -2,11 +2,13 @@
 /**
  * @file src/middleware/handlers/auth/index.ts
  * @description Motor de reglas de autorización de élite para el middleware.
- *              Ha sido refactorizado para implementar un bypass de seguridad
- *              controlado por la variable de entorno `DEV_MODE_AUTH_BYPASS`.
+ *              Ha sido refactorizado holísticamente para consumir la nueva API de
+ *              `getAuthDataForMiddleware`, garantizando que el objeto `response`
+ *              con las cookies de sesión actualizadas se propague correctamente
+ *              a través del pipeline y resolviendo el error 500 de Vercel.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-26
+ * @version 4.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -90,24 +92,27 @@ export async function handleAuth(
   const { pathname } = request.nextUrl;
   logger.trace("==> [AUTH_HANDLER] START <==", { path: pathname });
 
-  // --- INICIO DE MEJORA DE ÉLITE: BYPASS CONTROLADO POR ENV ---
   if (process.env.DEV_MODE_AUTH_BYPASS === "true") {
     logger.warn(
       "[AUTH_HANDLER] MODO BYPASS ACTIVO. Se omitirá toda la lógica de autenticación y autorización."
     );
-    logger.trace("[AUTH_HANDLER] DECISION: PASS (Bypass de seguridad activo).");
     return response;
   }
-  // --- FIN DE MEJORA DE ÉLITE ---
 
-  const authData = await getAuthDataForMiddleware(request, response);
-  const locale = response.headers.get("x-app-locale") || "pt-BR";
+  // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA (Flujo de Response) ---
+  const { authData, response: supabaseResponse } =
+    await getAuthDataForMiddleware(request);
+  // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
+
+  const locale =
+    supabaseResponse.headers.get("x-app-locale") ||
+    response.headers.get("x-app-locale") ||
+    "pt-BR";
   const pathnameWithoutLocale =
     pathname.replace(new RegExp(`^/${locale}`), "") || "/";
 
   let rule = findMatchingRouteRule(pathnameWithoutLocale);
   if (!rule) {
-    // Si no hay una regla explícita, se asume 'protected' por defecto (fail-safe).
     rule = { path: pathnameWithoutLocale, classification: "protected" };
   }
 
@@ -129,21 +134,21 @@ export async function handleAuth(
     action: redirectResponse ? "REDIRECT" : "PASS",
   });
 
-  return redirectResponse || response;
+  return redirectResponse || supabaseResponse;
 }
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Bypass de Seguridad Controlado y Seguro:** La lógica de bypass ahora es controlada por la variable de entorno `DEV_MODE_AUTH_BYPASS`, eliminando el riesgo de desplegar un bypass a producción.
- * 2. ((Implementada)) **Cero Nuevas Dependencias:** La solución no requiere la instalación de ningún paquete nuevo, manteniendo el proyecto ligero.
- * 3. ((Implementada)) **Full Observabilidad:** Se ha añadido un `logger.warn` de alta visibilidad para que sea inmediatamente obvio en los logs cuando el modo de bypass está activo.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Manifiesto de Bypass en `.env.example`:** Actualizar el archivo `.env.example` para incluir la variable `DEV_MODE_AUTH_BYPASS=false` y una descripción de su propósito.
- *
+ * 1. **Manifiesto de Bypass en `.env.example`**: Actualizar el archivo `.env.example` para incluir la variable `DEV_MODE_AUTH_BYPASS=false` y una descripción de su propósito para mejorar la DX de nuevos desarrolladores.
+ * 2. **Factoría de Reglas de Ruta**: La función `findMatchingRouteRule` podría ser optimizada para manejar rutas con parámetros dinámicos si fuera necesario en el futuro, utilizando una lógica de coincidencia de patrones más avanzada.
+ * 3. **Logging de Headers**: Para una depuración más profunda, el log de `[AUTH_HANDLER] END` podría incluir las cabeceras (`headers`) de la respuesta final para verificar la correcta propagación de cookies y otras cabeceras.
  * =====================================================================
  */
-// src/middleware/handlers/auth/index.ts
