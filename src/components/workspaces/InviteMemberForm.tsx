@@ -1,20 +1,24 @@
 // src/components/workspaces/InviteMemberForm.tsx
-import { useTransition } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
-import { zodResolver } from "@hookform/resolvers/zod";
+/**
+ * @file InviteMemberForm.tsx
+ * @description Aparato de ensamblaje de UI puro. Ha sido refactorizado a un
+ *              estándar de élite para consumir el hook soberano `useInviteMemberForm`,
+ *              delegando toda la lógica y resolviendo el error de tipo TS2339
+ *              de forma definitiva.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
+"use client";
+
 import { Loader2 } from "lucide-react";
-import type { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { invitations as invitationActions } from "@/lib/actions";
-import { clientLogger } from "@/lib/logging";
-import { InvitationClientSchema } from "@/lib/validators";
+import { useInviteMemberForm } from "@/lib/hooks/useInviteMemberForm";
 import { EmailInputField } from "./form-fields/EmailInputField";
 import { RoleSelectField } from "./form-fields/RoleSelectField";
-
-type FormData = z.infer<typeof InvitationClientSchema>;
 
 interface InviteMemberFormProps {
   workspaceId: string;
@@ -25,7 +29,8 @@ interface InviteMemberFormProps {
  * @public
  * @component InviteMemberForm
  * @description Formulario ensamblador para invitar a un nuevo miembro. Orquesta
- *              componentes de campo atómicos y gestiona el flujo de envío.
+ *              componentes de campo atómicos y gestiona el flujo de envío
+ *              consumiendo el hook `useInviteMemberForm`.
  * @param {InviteMemberFormProps} props - Propiedades del componente.
  * @returns {React.ReactElement}
  */
@@ -33,49 +38,17 @@ export function InviteMemberForm({
   workspaceId,
   onSuccess,
 }: InviteMemberFormProps): React.ReactElement {
-  const t = useTranslations("WorkspaceSwitcher");
-  const tErrors = useTranslations("ValidationErrors");
-  const [isPending, startTransition] = useTransition();
+  const { form, isLoading, processSubmit, t, tErrors } = useInviteMemberForm({
+    workspaceId,
+    onSuccess,
+  });
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<FormData>({
-    resolver: zodResolver(InvitationClientSchema),
-    defaultValues: {
-      workspaceId,
-      role: "member",
-      email: "",
-    },
-  });
-
-  const processSubmit: SubmitHandler<FormData> = (data) => {
-    clientLogger.trace("[InviteMemberForm] Enviando invitación.", data);
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append("email", data.email);
-      formData.append("role", data.role);
-      formData.append("workspaceId", data.workspaceId);
-
-      const result =
-        await invitationActions.sendWorkspaceInvitationAction(formData);
-
-      if (result.success) {
-        toast.success(result.data.message);
-        reset();
-        onSuccess();
-      } else {
-        toast.error(
-          tErrors(result.error as any, { defaultValue: result.error })
-        );
-      }
-    });
-  };
-
-  const isLoading = isSubmitting || isPending;
+    formState: { errors },
+  } = form;
 
   return (
     <form onSubmit={handleSubmit(processSubmit)} className="space-y-4 relative">
@@ -105,14 +78,15 @@ export function InviteMemberForm({
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Ensamblaje (LEGO)**: ((Implementada)) El formulario ahora es un orquestador puro que compone los átomos `EmailInputField` y `RoleSelectField`. Esto reduce drásticamente su complejidad y mejora la legibilidad.
- * 2. **Máxima Cohesión**: ((Implementada)) La responsabilidad del formulario está ahora claramente definida: gestionar el estado del formulario y orquestar sus componentes hijos.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Futuras
- * 1. **Abstracción de Botón de Envío**: ((Vigente)) El `Button` de envío con su lógica de estado `isLoading` es un patrón repetido. Podría ser abstraído a un componente `SubmitButton` genérico.
- *
+ * 1. **Abstracción de Botón de Envío**: El `Button` de envío con su lógica de estado `isLoading` es un patrón repetido. Podría ser abstraído a un componente `SubmitButton` genérico para una máxima adhesión al principio DRY.
+ * 2. **Componente de Feedback de Error a Nivel de Formulario**: En lugar de mostrar solo toasts, se podría añadir un componente `FormError` en la parte superior del formulario que muestre un resumen de los errores devueltos por la Server Action.
+ * 3. **Estado de "Éxito" Visual**: Tras un envío exitoso, se podría mostrar un mensaje de éxito dentro del modal antes de cerrarlo, proporcionando un feedback de UI más integrado que el `toast`.
  * =====================================================================
  */
-// src/components/workspaces/InviteMemberForm.tsx

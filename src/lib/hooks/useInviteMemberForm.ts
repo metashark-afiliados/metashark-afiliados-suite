@@ -5,8 +5,7 @@
  *              de invitación de miembros. Ha sido refactorizado holísticamente para
  *              consumir correctamente el contrato de feedback de la Server Action,
  *              utilizando `messageKey` y `messageArgs` para un feedback de
- *              usuario completamente internacionalizado y dinámico, resolviendo el
- *              error de tipo TS2339.
+ *              usuario completamente internacionalizado y dinámico.
  * @author Raz Podestá - MetaShark Tech
  * @version 4.0.0
  * @date 2025-08-29
@@ -68,7 +67,7 @@ export function useInviteMemberForm({
   } = form;
 
   const processSubmit: SubmitHandler<FormData> = (data) => {
-    clientLogger.trace("[InviteMemberForm] Enviando invitación.", data);
+    clientLogger.trace("[useInviteMemberForm] Enviando invitación.", data);
     startTransition(async () => {
       const formData = new FormData();
       formData.append("email", data.email);
@@ -79,11 +78,9 @@ export function useInviteMemberForm({
         await invitationActions.sendWorkspaceInvitationAction(formData);
 
       if (result.success) {
-        // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA (TS2339) ---
         toast.success(
           tErrors(result.data.messageKey as any, result.data.messageArgs)
         );
-        // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
         reset();
         onSuccess();
       } else if (isActionError(result)) {
