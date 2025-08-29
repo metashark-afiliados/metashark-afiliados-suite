@@ -6,9 +6,8 @@
  *              sin un prefijo de dominio.
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-28
+ * @date 2025-08-29
  * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
@@ -23,19 +22,10 @@ export const WikiPageErrorsSchema = z.object({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato encapsula los errores específicos de la página Wiki, mejorando la modularidad.
- * 2. **Consistencia con Prefijos**: ((Implementada)) Las claves se definen sin prefijo, lo que permite que el ensamblador `ValidationErrors.schema.ts` aplique el prefijo `wiki_page_` de forma consistente.
- *
+ * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Errores de Búsqueda/Categorización**: ((Vigente)) Si la página Wiki tiene funcionalidad de búsqueda o categorización, se añadirán aquí los errores relacionados.
- *
+ * 1. **Errores de Búsqueda y Categorización**: Si la página Wiki implementa una funcionalidad de búsqueda o categorización, se añadirán aquí las claves de error relacionadas (ej. `search_no_results`, `invalid_category`).
+ * 2. **Errores de Carga de Artículos**: Añadir una clave `article_load_failed` para manejar casos en los que un artículo específico de la wiki no se pueda obtener desde la capa de datos.
  * =====================================================================
  */
+// src/lib/validators/i18n/errors/WikiPageErrors.schema.ts

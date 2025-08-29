@@ -3,9 +3,10 @@
  * @file campaigns.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de
  *              lectura de alto privilegio para la gestión de campañas.
+ *              Esta es la SSoT para obtener datos de campañas en el Dev Console.
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-27
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -21,39 +22,49 @@ import { type CampaignWithSiteInfo } from "./types";
  * @async
  * @function getAllCampaignsWithSiteInfo
  * @description Obtiene todas las campañas de la plataforma, uniendo la información del
- *              subdominio del sitio al que pertenecen.
+ *              subdominio del sitio al que pertenecen. Utiliza el cliente de
+ *              administrador para eludir las políticas de RLS, para uso exclusivo
+ *              en el Dev Console.
  * @returns {Promise<CampaignWithSiteInfo[]>} Un array de todas las campañas.
- * @throws {Error} Si la consulta a la base de datos falla.
+ * @throws {Error} Si la consulta a la base de datos falla, se registra el error
+ *                 y se relanza la excepción para ser manejada por la capa superior.
  */
 export async function getAllCampaignsWithSiteInfo(): Promise<
   CampaignWithSiteInfo[]
 > {
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("campaigns")
-    .select(`*, sites (subdomain)`)
-    .order("created_at", { ascending: false });
+  logger.trace(
+    "[DataLayer:AdminCampaigns] Iniciando obtención de todas las campañas."
+  );
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from("campaigns")
+      .select(`*, sites (subdomain)`)
+      .order("created_at", { ascending: false });
 
-  if (error) {
+    if (error) {
+      throw error;
+    }
+
+    // El casteo es seguro aquí porque la consulta `select` garantiza la forma.
+    return (data as CampaignWithSiteInfo[]) || [];
+  } catch (error) {
     logger.error(
-      `[DataLayer:AdminCampaigns] Error al obtener todas las campañas:`,
+      `[DataLayer:AdminCampaigns] Error crítico al obtener todas las campañas:`,
       error
     );
     throw new Error("No se pudieron obtener los datos de las campañas.");
   }
-
-  return (data as CampaignWithSiteInfo[]) || [];
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato tiene la única y clara responsabilidad de gestionar el acceso a los datos de las campañas, mejorando la cohesión. Su lógica ha sido migrada directamente desde el monolito `admin.ts`.
- *
+ * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Paginación y Búsqueda**: ((Vigente)) Para escalar a miles de campañas, esta función debe ser refactorizada a `getPaginatedCampaigns` y aceptar opciones de paginación (`page`, `limit`) y búsqueda (`query`), similar a `getPaginatedUsersWithRoles`. Propondré esta mejora una vez completada la atomización.
- *
+ * 1. **Paginación y Búsqueda**: ((Vigente)) Para escalar a miles de campañas, esta función debe ser refactorizada a `getPaginatedCampaigns` y aceptar opciones de paginación (`page`, `limit`) y búsqueda (`query`), similar a `getPaginatedUsersWithRoles`.
+ * 2. **Cacheo de Datos**: ((Vigente)) Para dashboards de administración con mucho tráfico, se podría envolver esta función en `React.cache` con una revalidación basada en etiquetas (`revalidateTag`) para optimizar el rendimiento.
+ * 3. **Tipado de Retorno Estricto**: ((Vigente)) En lugar de un casteo `as`, se podría construir un schema de Zod para el tipo de retorno y usar `.parse()` para garantizar la forma de los datos en tiempo de ejecución.
  * =====================================================================
  */
 // src/lib/data/admin/campaigns.data.ts

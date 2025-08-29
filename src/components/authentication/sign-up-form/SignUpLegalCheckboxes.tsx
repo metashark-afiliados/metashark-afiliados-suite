@@ -1,12 +1,13 @@
 // src/components/authentication/sign-up-form/SignUpLegalCheckboxes.tsx
 /**
- * @file SignUpLegalCheckboxes.tsx
- * @description Aparato de UI atómico y de presentación puro. Encapsula los
- *              checkboxes de consentimiento legal y de marketing. Ha sido
- *              refactorizado para consumir el namespace de i18n canónico.
+ * @file src/components/authentication/sign-up-form/SignUpLegalCheckboxes.tsx
+ * @description Aparato de UI atómico y de presentación puro. Renderiza los
+ *              checkboxes para la aceptación de términos y la suscripción al
+ *              boletín, utilizando el patrón `Controller` para una integración
+ *              de élite con `react-hook-form`.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-25
+ * @version 2.1.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -19,6 +20,8 @@ import { type z } from "zod";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Label } from "@/components/ui/label";
 import { SmartLink } from "@/components/ui/SmartLink";
+import { useTypedTranslations } from "@/lib/i18n/hooks";
+import { clientLogger } from "@/lib/logging";
 import { type SignUpSchema } from "@/lib/validators";
 
 type FormData = z.infer<typeof SignUpSchema>;
@@ -32,8 +35,11 @@ export interface SignUpLegalCheckboxesProps {
 /**
  * @public
  * @component SignUpLegalCheckboxes
- * @description Renderiza los checkboxes para términos y newsletter.
- * @param {SignUpLegalCheckboxesProps} props - Propiedades para conectar con react-hook-form.
+ * @description Renderiza los checkboxes de consentimiento legal. Utiliza el
+ *              componente `Controller` de react-hook-form, que es el patrón
+ *              canónico para integrar componentes de UI controlados (como
+ *              nuestro `Checkbox` de Shadcn) en el ecosistema del formulario.
+ * @param {SignUpLegalCheckboxesProps} props - Propiedades para conectar con el formulario padre.
  * @returns {React.ReactElement}
  */
 export function SignUpLegalCheckboxes({
@@ -42,7 +48,11 @@ export function SignUpLegalCheckboxes({
   isPending,
 }: SignUpLegalCheckboxesProps): React.ReactElement {
   const t = useTranslations("app.[locale].signup.page");
-  const tErrors = useTranslations("shared.ValidationErrors");
+  const tErrors = useTypedTranslations("shared.ValidationErrors");
+
+  clientLogger.trace(
+    "[SignUpLegalCheckboxes] Renderizando componente de checkboxes."
+  );
 
   return (
     <div className="space-y-4 pt-2">
@@ -109,18 +119,20 @@ export function SignUpLegalCheckboxes({
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Cumplimiento Legal: Garantiza que la aceptación de términos se gestione correctamente para el cumplimiento de GDPR/LGPD.
- * 2. ((Implementada)) Soporte para `Controller`: Demuestra la integración de élite con `react-hook-form` para componentes que no son nativos (como `Checkbox` de Radix).
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.1.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) El texto de la etiqueta para los términos (`legalNotice`) utiliza la funcionalidad `t.rich` con interpolación de enlaces. Esto podría ser abstraído en un componente aún más puro.
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Feedback Visual de Error en Checkbox:** El componente `Checkbox` subyacente (`@/components/ui/Checkbox.tsx`) podría ser mejorado para aceptar una prop `hasError: boolean`. Si es `true`, podría aplicar un estilo visual de error (ej., un borde rojo o un anillo) para indicar más claramente qué campo requiere atención.
  *
  * =====================================================================
  */
+// src/components/authentication/sign-up-form/SignUpLegalCheckboxes.tsx

@@ -1,17 +1,13 @@
-// src/app/[locale]/login/page.tsx
 /**
- * @file page.tsx
- * @description Orquestador de UI para la página de inicio de sesión. Refactorizado
- *              a un estándar de élite para ser declarado explícitamente como
- *              dinámico, resolviendo el conflicto de renderizado estático en Vercel.
  * @author Raz Podestá - MetaShark Tech
  * @version 7.0.0
- * @date 2025-08-27
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
+import React from "react";
 import { useTranslations } from "next-intl";
 import { unstable_setRequestLocale } from "next-intl/server";
 
@@ -23,19 +19,22 @@ import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { clientLogger } from "@/lib/logging";
 
-// --- INICIO DE CORRECCIÓN DE BUILD (VERCEL) ---
-// Declara explícitamente que esta ruta debe ser renderizada dinámicamente.
-// Esto resuelve el conflicto entre el `headers()` del layout y la generación estática.
-export const dynamic = "force-dynamic";
-// --- FIN DE CORRECCIÓN DE BUILD (VERCEL) ---
-
+/**
+ * @public
+ * @page LoginPage
+ * @description Orquesta la UI para la página de inicio de sesión.
+ *              Es un Client Component que obtiene las traducciones necesarias y
+ *              las inyecta en los componentes de presentación puros.
+ * @param {object} props - Propiedades de la página, incluyendo el `locale`.
+ * @returns {React.ReactElement}
+ */
 export default function LoginPage({
   params: { locale },
 }: {
   params: { locale: string };
 }): React.ReactElement {
   unstable_setRequestLocale(locale);
-  clientLogger.trace("[LoginPage] Renderizando orquestador de UI.");
+  clientLogger.trace("[LoginPage] Renderizando página de inicio de sesión.");
   const t = useTranslations("app.[locale].login.page");
 
   const bottomLink = t.rich("dontHaveAccount", {
@@ -56,7 +55,6 @@ export default function LoginPage({
     signInButton_pending: t("signInButton_pending"),
     signInWith: t("signInWith"),
     signInWithProvider: t("signInWithProvider"),
-    error_invalid_credentials: t("error_invalid_credentials"),
   };
 
   return (
@@ -71,12 +69,8 @@ export default function LoginPage({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Resolución de Error Crítico de Build**: Se ha añadido `export const dynamic = 'force-dynamic'`. Esta directiva instruye a Next.js a no intentar la generación estática de esta página, resolviendo la causa raíz del fallo de despliegue en Vercel.
- *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) El patrón de `AuthCardLayout` y `bottomLink` se repetirá en la página de registro. Se podría abstraer a un componente `AuthPageLayout`.
+ * 1. **Abstracción a `AuthPageLayout`**: ((Vigente)) El patrón de `AuthCardLayout` y `bottomLink` es similar entre `LoginPage` y `SignupPage`. Podría ser abstraído a un componente `AuthPageLayout` para una máxima adhesión al principio DRY.
  *
  * =====================================================================
  */
-// src/app/[locale]/login/page.tsx

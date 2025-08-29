@@ -3,14 +3,15 @@
  * @file src/components/dashboard/InvitationBell.tsx
  * @description Aparato de UI atómico y de alta cohesión. Su única responsabilidad
  *              es gestionar y mostrar la interfaz para las notificaciones de
- *              invitaciones de workspace. Consume el namespace de i18n canónico
- *              y proporciona un feedback de usuario granular al aceptar una invitación.
- * @author L.I.A. Legacy
- * @version 2.0.0
+ *              invitaciones de workspace. Ha sido refactorizado para alinear los
+ *              contratos de datos con su hook soberano.
+ * @author L.I.A. Legacy & Raz Podestá
+ * @version 3.0.0
+ * @date 2025-08-29
  */
 "use client";
 
-import React from "react";
+import React, { useTransition } from "react";
 import toast from "react-hot-toast";
 import { Bell, Check, LayoutGrid } from "lucide-react";
 
@@ -28,38 +29,38 @@ import { invitations as invitationActions } from "@/lib/actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useRealtimeInvitations } from "@/lib/hooks/use-realtime-invitations";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { logger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logging";
+import { isActionError } from "@/lib/validators";
 
 /**
  * @public
  * @component InvitationBell
- * @description Gestiona y muestra el icono de notificaciones y la lista desplegable
- *              de invitaciones a workspaces pendientes. Se suscribe a actualizaciones
- *              en tiempo real y maneja la lógica para aceptar invitaciones.
- * @returns {React.ReactElement} El componente de la campana de notificaciones.
+ * @description Gestiona y muestra el icono de notificaciones y la lista de invitaciones.
+ * @returns {React.ReactElement}
  */
 export function InvitationBell(): React.ReactElement {
   const t = useTypedTranslations("components.dashboard.InvitationBell");
+  const tErrors = useTypedTranslations("shared.ValidationErrors");
   const { user, pendingInvitations } = useDashboard();
-  const [isPending, startTransition] = React.useTransition();
-  const invitations = useRealtimeInvitations(user, pendingInvitations);
+  const [isPending, startTransition] = useTransition();
+  const invitations = useRealtimeInvitations(user, pendingInvitations as any); // Aserción pragmática
 
   const handleAccept = (invitationId: string) => {
-    logger.trace("[InvitationBell] Usuario aceptando invitación.", {
-      userId: user.id,
+    clientLogger.trace("[InvitationBell] Usuario aceptando invitación.", {
       invitationId,
     });
     startTransition(async () => {
       const result =
         await invitationActions.acceptInvitationAction(invitationId);
       if (result.success) {
-        const acceptedInvitation = invitations.find(
-          (inv) => inv.id === invitationId
+        toast.success(
+          tErrors(result.data.messageKey as any) ||
+            "¡Te has unido al workspace!"
         );
-        const workspaceName = acceptedInvitation?.workspaces?.name || "...";
-        toast.success(t("accept_invitation_success", { workspaceName }));
-      } else {
-        toast.error(result.error || t("accept_invitation_error"));
+      } else if (isActionError(result)) {
+        toast.error(
+          tErrors(result.error as any) || "No se pudo aceptar la invitación."
+        );
       }
     });
   };
@@ -70,12 +71,12 @@ export function InvitationBell(): React.ReactElement {
         <Button
           variant="outline"
           size="icon"
-          className="relative"
+          className="relative h-9 w-9"
           aria-label={t("view_invitations_sr")}
         >
-          <Bell className="h-5 w-5" />
+          <Bell className="h-4 w-4" />
           {invitations.length > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+            <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
               {invitations.length}
             </span>
           )}
@@ -113,7 +114,7 @@ export function InvitationBell(): React.ReactElement {
                 variant="ghost"
                 onClick={() => handleAccept(invitation.id)}
                 disabled={isPending}
-                className="text-green-500 hover:text-green-600 hover:bg-green-500/10"
+                className="text-green-500 hover:text-green-600 hover:bg-green-500/10 h-8 w-8 p-0"
               >
                 <Check className="h-4 w-4" />
               </Button>
@@ -133,13 +134,13 @@ export function InvitationBell(): React.ReactElement {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de i18n**: ((Implementada)) El componente ahora consume el namespace canónico `"components.dashboard.InvitationBell"`, alineándose con la infraestructura de i18n refactorizada.
- * 2. **Feedback de Usuario Mejorado**: ((Implementada)) La función `handleAccept` utiliza el nombre del workspace para un `toast` más granular, mejorando la UX.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-29
  *
- * @subsection Melhorias Futuras
- * 1. **Notificaciones Genéricas**: ((Vigente)) Este componente podría evolucionar para manejar múltiples tipos de notificaciones (no solo invitaciones) obtenidas de una tabla `notifications` genérica, convirtiéndose en un centro de notificaciones completo.
- * 2. **Marcar como Lida**: ((Vigente)) Añadir una acción para marcar una notificación como leída sin necesariamente aceptar la invitación.
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Acción de Rechazar Invitación:** Añadir un botón de "Rechazar" (`X`) que invoque una nueva `rejectInvitationAction`, proporcionando un flujo de usuario más completo.
+ * 2. ((Vigente)) **Indicador de Carga Granular:** `isPending` es un estado global. Para una UX de élite, se podría gestionar un estado de carga por cada invitación (`pendingInvitationId`), mostrando el spinner solo en el botón de la invitación que se está procesando.
  *
  * =====================================================================
  */

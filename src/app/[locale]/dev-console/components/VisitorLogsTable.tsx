@@ -1,14 +1,7 @@
-// src/app/[locale]/dev-console/components/VisitorLogsTable.tsx
 /**
- * @file VisitorLogsTable.tsx
- * @description Componente de cliente para mostrar los registros de telemetría en el Dev Console.
- *              Ha sido refactorizado holísticamente para extraer el `JsonViewerDialog` a
- *              su propio aparato atómico, mejorando la modularidad y la reutilización.
- *              Además, se han corregido las importaciones de los componentes de UI de Shadcn/UI
- *              (`Card`, `Table`, etc.) que faltaban, resolviendo los errores de compilación `TS2304`.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.1
- * @date 2025-08-28
+ * @version 2.1.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -17,17 +10,15 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { Eye, Globe, MoreHorizontal, User } from "lucide-react";
 
-import { type Json } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Importaciones de UI faltantes ---
 import {
-  Card,
   Table,
   TableBody,
   TableCell,
@@ -35,9 +26,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-// --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
-import { JsonViewerDialog } from "./JsonViewerDialog"; // <-- Importación holística
 import { clientLogger } from "@/lib/logging";
+import { type Json } from "@/lib/types/database";
+import { JsonViewerDialog } from "@/components/dev-console/components/JsonViewerDialog";
 
 export type VisitorLogRow = {
   id: string;
@@ -53,8 +44,8 @@ export type VisitorLogRow = {
 /**
  * @public
  * @component VisitorLogsTable
- * @description Renderiza una tabla que muestra los logs de visitantes.
- *              Proporciona acciones para ver los detalles de los datos GeoIP y UTM.
+ * @description Renderiza una tabla que muestra los logs de visitantes. Ha sido refactorizado
+ *              para consumir el `JsonViewerDialog` atómico y corregir sus importaciones.
  * @param {object} props - Propiedades del componente.
  * @param {VisitorLogRow[]} props.logs - El array de logs de visitantes a mostrar.
  * @returns {React.ReactElement}
@@ -169,22 +160,12 @@ export function VisitorLogsTable({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.1
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Errores de Importación (TS2304)**: ((Implementada)) Se han añadido las importaciones faltantes para `Card`, `Table`, `TableBody`, `TableCell`, `TableHead`, `TableHeader`, y `TableRow` desde `@/components/ui/table` y `@/components/ui/card`. Esto resuelve la cascada de errores de compilación `TS2304` y restaura la funcionalidad del componente.
- * 2. **Integridad de Módulo**: ((Implementada)) La importación del `JsonViewerDialog` desde `./JsonViewerDialog` es correcta, y la adición de las importaciones de UI restantes completa la coherencia del módulo.
- * 3. **Full Observabilidad**: ((Implementada)) El `clientLogger.trace` se mantiene y es contextual al componente.
+ * =====================================================================
  *
  * @subsection Melhorias Futuras
  * 1. **Paginación y Búsqueda**: ((Vigente)) Integrar este componente con `@tanstack/react-table` para añadir paginación, búsqueda por IP o fingerprint, y ordenamiento del lado del cliente.
- * 2. **Estado Vacío Dinámico**: ((Vigente)) El `empty_state` está actualmente codificado en el JSON. Podría ser un `React.ReactNode` para permitir un componente de estado vacío más rico (ej. con un botón para refrescar).
+ * 2. **Estado Vacío Dinámico**: ((Vigente)) El `empty_state` es actualmente una simple cadena de texto. Podría ser un `React.ReactNode` para permitir un componente de estado vacío más rico (ej. con un botón para refrescar).
+ * 3. **Visualización de Geo Datos Mejorada**: ((Vigente)) En lugar de mostrar solo `city` y `country`, se podría renderizar un pequeño mapa estático o un enlace a Google Maps utilizando las coordenadas de `geo_data`.
  *
  * =====================================================================
  */
-// src/app/[locale]/dev-console/components/VisitorLogsTable.tsx

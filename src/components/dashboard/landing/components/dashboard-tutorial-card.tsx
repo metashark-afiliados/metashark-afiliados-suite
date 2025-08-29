@@ -1,18 +1,21 @@
+// src/components/dashboard/landing/components/dashboard-tutorial-card.tsx
 /**
  * @file dashboard-tutorial-card.tsx
  * @description Componente de UI atómico y de presentación 100% puro.
  *              Ha sido refactorizado a un estándar de élite para ser
  *              completamente agnóstico al contenido y para corregir un
+ *
  *              error de composición (TS2322) con el componente `SmartLink`.
  * @author Raz Podestá - MetaShark Tech
  * @version 2.1.0
- * @date 2025-08-25
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { ArrowUpRight } from "lucide-react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,7 +49,9 @@ export function DashboardTutorialCard({
   buttonText,
   buttonHref,
 }: DashboardTutorialCardProps): React.ReactElement {
-  clientLogger.trace("[DashboardTutorialCard] Renderizando componente.");
+  clientLogger.trace(
+    "[DashboardTutorialCard] Renderizando componente de presentación puro."
+  );
 
   return (
     <Card className={"bg-background/50 backdrop-blur-[24px] border-border p-6"}>
@@ -84,20 +89,18 @@ export function DashboardTutorialCard({
     </Card>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación (TS2322)**: ((Implementada)) Se ha corregido el patrón de composición del componente `SmartLink`. El icono `ArrowUpRight` ahora se pasa como parte de la prop `label`, en lugar de como `children`, alineando el uso con el contrato de la API de `SmartLink` y resolviendo el error de tipo.
- * 2. **Componente de Presentación Puro**: ((Implementada)) El componente ahora es 100% agnóstico al contenido, adhiriéndose a la "Filosofía LEGO".
- * 3. **Full Internacionalización**: ((Implementada)) Se ha eliminado todo el texto codificado en duro, resolviendo la brecha de internacionalización.
- * 4. **Full Observabilidad**: ((Implementada)) Se ha añadido `clientLogger` para trazar el renderizado del componente.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.1.0
+ * @date 2025-08-29
  *
- * @subsection Melhorias Futuras
- * 1. **Icono Dinámico**: ((Vigente)) El icono `ArrowUpRight` está codificado. El componente podría ser mejorado para aceptar una prop `iconName: LucideIconName` y renderizarlo con `DynamicIcon` para una mayor flexibilidad.
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Icono Dinámico:** El icono `ArrowUpRight` está codificado en duro. El componente podría ser mejorado para aceptar una prop `buttonIconName: LucideIconName` y renderizarlo con `DynamicIcon` para una mayor flexibilidad y consistencia con el resto de la UI.
  *
  * =====================================================================
  */
+// src/components/dashboard/landing/components/dashboard-tutorial-card.tsx

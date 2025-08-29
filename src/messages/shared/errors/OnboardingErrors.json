@@ -1,0 +1,16 @@
+
+{
+  "en-US": {
+    "unauthenticated": "Authentication required to complete onboarding.",
+    "update_failed": "Failed to update onboarding status. Please try again."
+  },
+  "es-ES": {
+    "unauthenticated": "Se requiere autenticación para completar el onboarding.",
+    "update_failed": "No se pudo actualizar el estado de onboarding."
+  },
+  "pt-BR": {
+    "unauthenticated": "Autenticação necessária para completar o onboarding.",
+    "update_failed": "Falha ao atualizar o status de onboarding."
+  }
+}
+

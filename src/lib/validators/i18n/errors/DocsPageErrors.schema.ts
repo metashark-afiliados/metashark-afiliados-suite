@@ -3,12 +3,12 @@
  * @file DocsPageErrors.schema.ts
  * @description Aparato de validación atómico. Define el contrato de datos para
  *              mensajes de error de validación específicos de la página de
- *              Documentación sin un prefijo de dominio.
+ *              Documentación sin un prefijo de dominio. Esta es la SSoT para los
+ *              errores de validación de contenido de la página de Documentación.
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-28
+ * @date 2025-08-29
  * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
@@ -23,19 +23,11 @@ export const DocsPageErrorsSchema = z.object({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato encapsula los errores específicos de la página de documentación, mejorando la modularidad.
- * 2. **Consistencia con Prefijos**: ((Implementada)) Las claves se definen sin prefijo, lo que permite que el ensamblador `ValidationErrors.schema.ts` aplique el prefijo `docs_page_` de forma consistente.
- *
+ * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Errores de Búsqueda/Filtrado**: ((Vigente)) Si la página de documentación tiene funcionalidad de búsqueda o filtrado, se añadirán aquí los errores relacionados.
+ * 1. **Errores de Búsqueda/Filtrado**: ((Vigente)) Si la página de documentación en el futuro implementa una funcionalidad de búsqueda o filtrado, las claves de error relacionadas (ej. `search_query_too_short`, `no_results_found`) se añadirán a este schema para mantener la cohesión del dominio.
+ * 2. **Errores de Carga de Contenido**: ((Vigente)) Se podría añadir una clave `content_load_failed` para manejar casos en los que el contenido de la documentación no se pueda obtener desde la capa de datos.
  *
  * =====================================================================
  */
+// src/lib/validators/i18n/errors/DocsPageErrors.schema.ts

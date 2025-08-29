@@ -1,13 +1,14 @@
+// src/lib/validators/i18n/WelcomeHero.schema.ts
 /**
  * @file WelcomeHero.schema.ts
  * @description Define el contrato de datos para el namespace 'components.dashboard.WelcomeHero'.
  *              Este aparato atómico de validación garantiza la seguridad de tipos
  *              para la internacionalización del componente WelcomeHero.
+ *              **Actualizado para incluir la estructura de `search`**.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-26
+ * @version 2.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
@@ -25,19 +26,25 @@ export const WelcomeHeroSchema = z.object({
     templates: z.string().describe("Etiqueta para la pestaña 'Plantillas'."),
     aiTools: z.string().describe("Etiqueta para la pestaña 'Herramientas IA'."),
   }),
+  search: z.object({
+    clear_aria: z
+      .string()
+      .describe("Texto accesible para el botón de limpiar búsqueda."),
+  }),
 });
 
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Contrato de UI Atómico**: ((Implementada)) Este nuevo schema crea un contrato de datos robusto y explícito para el componente, sentando las bases para su refactorización a un consumo de i18n soberano.
- * 2. **Documentación Embebida**: ((Implementada)) Se han añadido descripciones a cada propiedad para mejorar la DX y facilitar el trabajo de traducción.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
  *
- * @subsection Melhorias Futuras
+ * @subsection Melhorias Novas
  * 1. **Validación de Parámetros**: ((Vigente)) El schema para `title` podría ser mejorado para validar la presencia del marcador de posición `{username}`, garantizando que los archivos de mensajes no lo omitan accidentalmente.
  *
  * =====================================================================
  */
+// src/lib/validators/i18n/WelcomeHero.schema.ts

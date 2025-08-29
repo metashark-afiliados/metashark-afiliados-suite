@@ -2,10 +2,10 @@
 /**
  * @file InvitationErrors.schema.ts
  * @description Aparato de validación atómico. Define el contrato de datos para
- *              mensajes de error de acciones de invitaciones (enviar, aceptar)
- *              sin un prefijo de dominio.
+ *              mensajes de feedback de acciones de invitaciones (enviar, aceptar)
+ *              sin un prefijo de dominio. **Actualizado para incluir claves de éxito.**
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @version 2.0.0
  * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -21,6 +21,16 @@ export const InvitationErrorsSchema = z.object({
   accept_unauthenticated: z.string(),
   accept_processing_failed: z.string(),
   accept_failed: z.string(),
+  // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Claves de éxito ---
+  send_success: z
+    .string()
+    .describe(
+      "Mensaje de éxito al enviar una invitación. Placeholder: {email}"
+    ),
+  accept_success: z
+    .string()
+    .describe("Mensaje de éxito al aceptar una invitación."),
+  // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
 });
 
 /**
@@ -28,17 +38,14 @@ export const InvitationErrorsSchema = z.object({
  *                           MEJORA CONTINUA
  *
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @version 2.0.0
  * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato encapsula los errores de invitaciones, mejorando la modularidad.
- * 2. **Consistencia con Prefijos**: ((Implementada)) Las claves se definen sin prefijo, lo que permite que el ensamblador `ValidationErrors.schema.ts` aplique el prefijo `invitations_` de forma consistente.
- *
- * @subsection Melhorias Futuras
- * 1. **Errores Específicos de Revocación/Reenvío**: ((Vigente)) Si se añaden acciones para revocar o reenviar invitaciones, se añadirán aquí los errores asociados.
+ * @subsection Melhorias Novas
+ * 1. **Contratos de Feedback Completos**: ((Vigente)) El schema podría ser extendido para incluir claves de feedback para acciones futuras como `revoke_success` o `resend_success`.
  *
  * =====================================================================
  */
+// src/lib/validators/i18n/errors/InvitationErrors.schema.ts

@@ -1,3 +1,4 @@
+
 {
   "en-US": {
     "entityName": "Site",
@@ -29,7 +30,8 @@
       "deleteSiteAriaLabel": "Delete site {subdomain}",
       "openSiteAriaLabel": "Open site in a new tab",
       "popoverTitle": "Quick Preview",
-      "popoverDescription": "A preview of the site will appear here. (Feature in development)."
+      "popoverDescription": "A preview of the site will appear here. (Feature in development).",
+      "emptySiteNamePlaceholder": "Untitled Site"
     },
     "deleteDialog": {
       "title": "Are you sure?",
@@ -82,7 +84,8 @@
       "deleteSiteAriaLabel": "Eliminar sitio {subdomain}",
       "openSiteAriaLabel": "Abrir sitio en una nueva pestaña",
       "popoverTitle": "Previsualización Rápida",
-      "popoverDescription": "Una previsualización del sitio aparecerá aquí. (Funcionalidad en desarrollo)."
+      "popoverDescription": "Una previsualización del sitio aparecerá aquí. (Funcionalidad en desarrollo).",
+      "emptySiteNamePlaceholder": "Sitio sin título"
     },
     "deleteDialog": {
       "title": "¿Estás seguro?",
@@ -135,7 +138,8 @@
       "deleteSiteAriaLabel": "Excluir site {subdomain}",
       "openSiteAriaLabel": "Abrir site em uma nova aba",
       "popoverTitle": "Visualização Rápida",
-      "popoverDescription": "Uma prévia do site aparecerá aqui. (Funcionalidade em desenvolvimento)."
+      "popoverDescription": "Uma prévia do site aparecerá aqui. (Funcionalidade em desenvolvimento).",
+      "emptySiteNamePlaceholder": "Site sem título"
     },
     "deleteDialog": {
       "title": "Você tem certeza?",

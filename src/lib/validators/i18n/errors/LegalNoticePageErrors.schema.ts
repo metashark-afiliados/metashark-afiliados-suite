@@ -3,12 +3,12 @@
  * @file LegalNoticePageErrors.schema.ts
  * @description Aparato de validación atómico. Define el contrato de datos para
  *              mensajes de error de validación específicos de la página de
- *              Aviso Legal sin un prefijo de dominio.
+ *              Aviso Legal sin un prefijo de dominio. Esta es la SSoT para los
+ *              errores de validación de contenido de la página de Aviso Legal.
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-28
+ * @date 2025-08-29
  * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
@@ -23,19 +23,16 @@ export const LegalNoticePageErrorsSchema = z.object({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
+ * =====================================================================
  *
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-28
+ * @date 2025-08-29
  * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato encapsula los errores específicos de la página de aviso legal, mejorando la modularidad.
- * 2. **Consistencia con Prefijos**: ((Implementada)) Las claves se definen sin prefijo, lo que permite que el ensamblador `ValidationErrors.schema.ts` aplique el prefijo `legal_notice_page_` de forma consistente.
  *
  * @subsection Melhorias Futuras
- * 1. **Errores Específicos de Contenido Legal**: ((Vigente)) Si el contenido legal tiene validaciones específicas (ej. verificación de formato de email en texto), se añadirán aquí los errores relacionados.
+ * 1. **Errores de Contenido Específico**: ((Vigente)) Si en el futuro el contenido del Aviso Legal requiere validaciones más específicas (por ejemplo, validar que un email de contacto en el texto sea un email válido), las claves de error correspondientes (`contact_email_invalid`) se añadirán a este schema.
  *
  * =====================================================================
  */
+// src/lib/validators/i18n/errors/LegalNoticePageErrors.schema.ts

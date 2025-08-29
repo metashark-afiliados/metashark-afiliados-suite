@@ -1,13 +1,7 @@
-// src/components/authentication/login-form.tsx
 /**
- * @file login-form.tsx
- * @description Componente de cliente soberano para el formulario de inicio de sesión.
- *              Refactorizado a un estándar de élite para ser un componente de
- *              presentación puro que recibe todos sus textos a través de props,
- *              cumpliendo con el Manifiesto IMAS v3.0.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-25
+ * @version 4.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -17,12 +11,15 @@ import React from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { signInWithEmailAction } from "@/lib/actions/auth.actions";
 import { Link } from "@/lib/navigation";
+import { type ActionResult, isActionError } from "@/lib/validators";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
   OAuthButtonGroup,
   type OAuthButtonGroupProps,
@@ -53,7 +50,6 @@ export interface LoginFormTexts {
   signInButton_pending: string;
   signInWith: string;
   signInWithProvider: string;
-  error_invalid_credentials: string;
 }
 
 export interface LoginFormProps {
@@ -61,18 +57,23 @@ export interface LoginFormProps {
 }
 
 export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
-  const [state, formAction] = useFormState(signInWithEmailAction, {
-    success: false,
-    error: "",
-  });
+  const tErrors = useTranslations("shared.ValidationErrors");
+  const [state, formAction] = useFormState<ActionResult<never>, FormData>(
+    signInWithEmailAction,
+    {
+      success: false,
+      error: "",
+    }
+  );
 
   React.useEffect(() => {
-    if (!state.success && state.error) {
-      const errorMessage =
-        texts[state.error as keyof LoginFormTexts] || state.error;
+    if (isActionError(state)) {
+      const errorMessage = tErrors(state.error as any, {
+        defaultValue: state.error,
+      });
       toast.error(errorMessage);
     }
-  }, [state, texts]);
+  }, [state, tErrors]);
 
   const oauthButtonGroupTexts: OAuthButtonGroupProps["texts"] = {
     signInWithProvider: texts.signInWithProvider,
@@ -126,13 +127,9 @@ export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Componente de Presentación Puro: Se ha eliminado `useTranslations`. El componente ahora es 100% agnóstico al contenido y es controlado por su padre (`login/page.tsx`), cumpliendo la "Filosofía LEGO".
- * 2. ((Implementada)) Inyección de Dependencia Textual (IDT): El componente ahora construye el objeto de `props` para `OAuthButtonGroup` y se lo inyecta, cumpliendo con el Manifiesto IMAS.
- * 3. ((Implementada)) Consistencia Visual: Se ha añadido el `padding` (`p-6`) que faltaba, alineando el formulario con el diseño de referencia.
- *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) La aserción `state.error as keyof LoginFormTexts` podría ser eliminada si el `ActionResult` se tipara con un `enum` de las claves de error válidas.
+ * 1. **Tipado Estricto de Claves de Error**: ((Vigente)) El `as any` al pasar `state.error` a `tErrors` persiste. Se podría refinar el tipo `ActionResult` para que `error` sea un genérico `TErrorKey extends keyof ValidationErrors`, permitiendo una validación más estricta.
+ * 2. **Formulario Controlado con `react-hook-form`**: ((Vigente)) Migrar este formulario para que utilice `react-hook-form` (como el de registro) proporcionaría validación del lado del cliente en tiempo real y una gestión de estado más robusta.
  *
  * =====================================================================
  */

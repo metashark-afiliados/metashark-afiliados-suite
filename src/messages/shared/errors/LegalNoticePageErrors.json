@@ -1,0 +1,25 @@
+
+{
+  "en-US": {
+    "title_required": "The legal notice title is required and cannot be empty.",
+    "section_title_required": "A section title in the legal notice is required and cannot be empty.",
+    "paragraph_required": "Each paragraph in the legal notice must not be empty.",
+    "body_content_required": "Each legal notice section must have at least one paragraph.",
+    "content_sections_required": "The legal notice must contain at least one content section."
+  },
+  "es-ES": {
+    "title_required": "El título del aviso legal es requerido y no puede estar vacío.",
+    "section_title_required": "Un título de sección en el aviso legal es requerido y no puede estar vacío.",
+    "paragraph_required": "Cada párrafo en el aviso legal no debe estar vacío.",
+    "body_content_required": "Cada sección del aviso legal debe tener al menos un párrafo.",
+    "content_sections_required": "El aviso legal debe contener al menos una sección de contenido."
+  },
+  "pt-BR": {
+    "title_required": "O título do aviso legal é obrigatório e não pode estar vazio.",
+    "section_title_required": "O título de uma seção no aviso legal é obrigatório e não pode estar vazio.",
+    "paragraph_required": "Cada parágrafo no aviso legal não deve estar vazio.",
+    "body_content_required": "Cada seção do aviso legal deve ter pelo menos um parágrafo.",
+    "content_sections_required": "O aviso legal deve conter pelo menos uma seção de conteúdo."
+  }
+}
+

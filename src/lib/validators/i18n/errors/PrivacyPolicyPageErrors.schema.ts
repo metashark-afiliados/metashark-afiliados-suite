@@ -6,9 +6,8 @@
  *              Política de Privacidad sin un prefijo de dominio.
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-28
+ * @date 2025-08-29
  * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
@@ -23,19 +22,10 @@ export const PrivacyPolicyPageErrorsSchema = z.object({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato encapsula los errores específicos de la página de política de privacidad, mejorando la modularidad.
- * 2. **Consistencia con Prefijos**: ((Implementada)) Las claves se definen sin prefijo, lo que permite que el ensamblador `ValidationErrors.schema.ts` aplique el prefijo `privacy_policy_page_` de forma consistente.
- *
+ * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Errores de Consentimiento**: ((Vigente)) Si se introduce un sistema de gestión de consentimiento de datos, se añadirán aquí los errores relacionados (ej. `consent_required`).
+ * 1. **Errores de Consentimiento**: ((Vigente)) Si se introduce un sistema de gestión de consentimiento de datos más complejo, se añadirán aquí los errores relacionados (ej. `consent_version_mismatch`).
  *
  * =====================================================================
  */
+// src/lib/validators/i18n/errors/PrivacyPolicyPageErrors.schema.ts

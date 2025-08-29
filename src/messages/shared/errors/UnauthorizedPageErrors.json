@@ -1,0 +1,31 @@
+
+{
+  "en-US": {
+    "title_required": "The unauthorized page title is required and cannot be empty.",
+    "description_required": "The unauthorized page description is required and cannot be empty.",
+    "button_required": "The unauthorized page button text is required and cannot be empty.",
+    "section_title_required": "A section title in the unauthorized page content is required and cannot be empty.",
+    "paragraph_required": "Each paragraph in the unauthorized page content must not be empty.",
+    "body_content_required": "Each unauthorized page section must have at least one paragraph.",
+    "content_sections_required": "The unauthorized page must contain at least one content section."
+  },
+  "es-ES": {
+    "title_required": "El título de la página no autorizada es requerido y no puede estar vacío.",
+    "description_required": "La descripción de la página no autorizada es requerida y no puede estar vacía.",
+    "button_required": "El texto del botón de la página no autorizada es requerido y no puede estar vacío.",
+    "section_title_required": "Un título de sección en el contenido de la página no autorizada es requerido y no puede estar vacío.",
+    "paragraph_required": "Cada párrafo en el contenido de la página no autorizada no debe estar vacío.",
+    "body_content_required": "Cada sección de la página no autorizada debe tener al menos un párrafo.",
+    "content_sections_required": "La página no autorizada debe contener al menos una sección de contenido."
+  },
+  "pt-BR": {
+    "title_required": "O título da página não autorizada é obrigatório e não pode estar vazio.",
+    "description_required": "A descrição da página não autorizada é obrigatória e não pode estar vazia.",
+    "button_required": "O texto do botão da página não autorizada é obrigatório e não pode estar vazio.",
+    "section_title_required": "O título de uma seção no conteúdo da página não autorizada é obrigatório e não pode estar vazio.",
+    "paragraph_required": "Cada parágrafo no conteúdo da página não autorizada não deve estar vazio.",
+    "body_content_required": "Cada seção da página não autorizada deve ter pelo menos um parágrafo.",
+    "content_sections_required": "A página não autorizada deve conter pelo menos uma seção de conteúdo."
+  }
+}
+

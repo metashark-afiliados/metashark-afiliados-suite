@@ -1,0 +1,34 @@
+
+{
+  "en-US": {
+    "impersonation_user_id_missing": "User ID is missing for impersonation.",
+    "impersonation_self_impersonation_forbidden": "You cannot impersonate yourself.",
+    "impersonation_user_not_found": "User not found for impersonation.",
+    "impersonation_link_generation_failed": "Failed to generate impersonation link.",
+    "delete_site_subdomain_missing": "Subdomain is missing for site deletion.",
+    "delete_site_failed": "Failed to delete site.",
+    "update_user_role_self_role_change_forbidden": "You cannot change your own role.",
+    "update_user_role_failed": "Failed to update user role."
+  },
+  "es-ES": {
+    "impersonation_user_id_missing": "Falta el ID de usuario para la suplantación.",
+    "impersonation_self_impersonation_forbidden": "No puedes suplantarte a ti mismo.",
+    "impersonation_user_not_found": "Usuario no encontrado para la suplantación.",
+    "impersonation_link_generation_failed": "No se pudo generar el enlace de suplantación.",
+    "delete_site_subdomain_missing": "Falta el subdominio para la eliminación del sitio.",
+    "delete_site_failed": "No se pudo eliminar el sitio.",
+    "update_user_role_self_role_change_forbidden": "No puedes cambiar tu propio rol.",
+    "update_user_role_failed": "No se pudo actualizar el rol del usuario."
+  },
+  "pt-BR": {
+    "impersonation_user_id_missing": "ID de usuário ausente para impersonação.",
+    "impersonation_self_impersonation_forbidden": "Você não pode impersonar a si mesmo.",
+    "impersonation_user_not_found": "Usuário não encontrado para impersonação.",
+    "impersonation_link_generation_failed": "Falha ao gerar link de impersonação.",
+    "delete_site_subdomain_missing": "Subdomínio ausente para exclusão do site.",
+    "delete_site_failed": "Falha ao excluir o site.",
+    "update_user_role_self_role_change_forbidden": "Você não pode mudar seu próprio papel.",
+    "update_user_role_failed": "Falha ao atualizar o papel do usuário."
+  }
+}
+

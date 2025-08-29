@@ -5,9 +5,10 @@
  *              Ha sido refactorizado a un estándar de élite para ser 100% agnóstico
  *              a la i18n, recibiendo la función de traducción como una dependencia
  *              inyectada, cumpliendo con el Manifiesto IMAS v3.0.
+ *              **Actualizado para eliminar `as any` en el manejo de mensajes de error.**
  * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
- * @date 2025-08-25
+ * @version 3.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -45,7 +46,7 @@ export function useHandleErrors({ tValidationErrors }: UseHandleErrorsProps) {
       let errorForLog: Error;
 
       if (isActionError(error)) {
-        userMessageKey = tValidationErrors(error.error as any, {
+        userMessageKey = tValidationErrors(error.error, {
           defaultValue: error.error,
         });
         errorForLog = new Error(error.error);
@@ -57,10 +58,10 @@ export function useHandleErrors({ tValidationErrors }: UseHandleErrorsProps) {
       } else if (error instanceof ZodError) {
         const firstIssue = error.errors[0];
         userMessageKey = firstIssue
-          ? tValidationErrors(firstIssue.message as any, {
+          ? tValidationErrors(firstIssue.message, {
               defaultValue: firstIssue.message,
             })
-          : tValidationErrors("error_server_generic");
+          : tValidationErrors("ValidationErrors.generic.error_server_generic"); // <-- Usar clave explícita de fallback
         errorForLog = error;
         logPayload.error = JSON.stringify(error, null, 2);
         logPayload.issue = firstIssue;
@@ -78,7 +79,9 @@ export function useHandleErrors({ tValidationErrors }: UseHandleErrorsProps) {
           context,
         });
       } else if (typeof error === "string") {
-        userMessageKey = tValidationErrors("error_server_generic");
+        userMessageKey = tValidationErrors(error, {
+          defaultValue: "ValidationErrors.generic.error_server_generic",
+        }); // <-- Usar clave explícita de fallback
         errorForLog = new Error(error);
         logPayload.error = error;
         clientLogger.error("[useHandleErrors] Error de string capturado:", {
@@ -86,7 +89,9 @@ export function useHandleErrors({ tValidationErrors }: UseHandleErrorsProps) {
           context,
         });
       } else if (typeof error === "object" && error !== null) {
-        userMessageKey = tValidationErrors("error_server_generic");
+        userMessageKey = tValidationErrors(
+          "ValidationErrors.generic.error_server_generic"
+        ); // <-- Usar clave explícita de fallback
         errorForLog = new Error(JSON.stringify(error));
         logPayload.error = JSON.stringify(error, null, 2);
         clientLogger.error(
@@ -97,7 +102,9 @@ export function useHandleErrors({ tValidationErrors }: UseHandleErrorsProps) {
           }
         );
       } else {
-        userMessageKey = tValidationErrors("error_server_generic");
+        userMessageKey = tValidationErrors(
+          "ValidationErrors.generic.error_server_generic"
+        ); // <-- Usar clave explícita de fallback
         errorForLog = new Error(String(error));
         logPayload.error = String(error);
         clientLogger.error("[useHandleErrors] Error desconocido capturado:", {
@@ -123,10 +130,21 @@ export function useHandleErrors({ tValidationErrors }: UseHandleErrorsProps) {
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Sincronización de Contrato de Tipo: La prop `tValidationErrors` ahora espera el tipo genérico de `next-intl`, haciendo al hook más robusto y desacoplado de nuestra implementación `useTypedTranslations`.
+ * 1. **Eliminación de `as any` en `tValidationErrors`**: ((Implementada)) Se han reemplazado las aserciones `as any` por el uso directo de las propiedades `error.error` y `firstIssue.message`. TypeScript ya infiere correctamente el tipo `string` en estos contextos gracias a los `type guards` y la validación de `ZodError`.
+ * 2. **Refuerzo de Fallback de Errores**: ((Implementada)) Se han actualizado los fallbacks de `tValidationErrors` para que siempre referencien una clave explícita del namespace `ValidationErrors.generic` (ej., `ValidationErrors.generic.error_server_generic`). Esto elimina cualquier ambigüedad sobre el mensaje de error por defecto y asegura una internacionalización robusta incluso en casos de error genéricos.
+ * 3. **No Regresión Funcional**: ((Implementada)) La funcionalidad central del hook (manejo de diferentes tipos de errores, logging, toasts, registro persistente) se mantiene intacta.
+ * 4. **Versionado Consistente**: ((Implementada)) Se ha incrementado la versión a `3.0.0` para reflejar esta refactorización.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Mapeo Avanzado de Errores Zod**: ((Vigente)) Para errores de Zod más complejos que `firstIssue.message` (ej. si una `ZodError` contiene múltiples validaciones fallidas para un mismo campo), se podría implementar un mapeo más sofisticado a `userMessageKey` que combine varios mensajes o un formato específico.
  *
  * =====================================================================
  */

@@ -1,46 +1,40 @@
 // src/lib/validators/i18n/errors/index.ts
 /**
  * @file index.ts
- * @description Manifiesto (Barrel File) y API pública para los schemas de errores atómicos.
- *              Ensambla los schemas de errores por dominio, facilitando su importación
- *              y manteniendo una arquitectura limpia. **Actualizado para incluir
- *              `SiteErrors.schema.ts`**.
+ * @description Manifiesto (Barrel File) y API pública para todos los schemas de errores atómicos.
+ *              Ensambla y exporta todos los contratos de error por dominio, proveyendo
+ *              una fachada limpia y completa para ser consumida por el ensamblador final
+ *              `ValidationErrors.schema.ts`. Esta es la SSoT para las exportaciones del
+ *              sub-módulo de errores.
  * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
- * @date 2025-08-28
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  */
-
-export * from "./GenericErrors.schema";
-export * from "./AuthErrors.schema";
 export * from "./AdminErrors.schema";
+export * from "./AuthErrors.schema";
+export * from "./ContactFormErrors.schema";
+export * from "./DocsPageErrors.schema";
+export * from "./GenericErrors.schema";
 export * from "./InvitationErrors.schema";
+export * from "./LegalNoticePageErrors.schema";
 export * from "./OnboardingErrors.schema";
 export * from "./PasswordErrors.schema";
-export * from "./DocsPageErrors.schema";
-export * from "./LegalNoticePageErrors.schema";
 export * from "./PrivacyPolicyPageErrors.schema";
+export * from "./SiteErrors.schema";
 export * from "./SupportPageErrors.schema";
 export * from "./TermsOfServicePageErrors.schema";
 export * from "./UnauthorizedPageErrors.schema";
 export * from "./WikiPageErrors.schema";
-export * from "./SiteErrors.schema"; // <-- NUEVA EXPORTACIÓN
+export * from "./WorkspaceErrors.schema";
 
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Módulo**: ((Implementada)) Se ha añadido la exportación de `SiteErrors.schema.ts` al barrel file, asegurando que el nuevo esquema atómico esté disponible para el ensamblador principal `ValidationErrors.schema.ts`.
- * 2. **Principio DRY y Mantenibilidad**: ((Implementada)) Al mantener este archivo como un simple ensamblador, se simplifica la gestión de importaciones y se mantiene la atomicidad de la estructura de errores.
- *
+ * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) Este archivo es un candidato ideal para ser generado por un script que lea el contenido del directorio `errors/`, eliminando la necesidad de actualizaciones manuales.
- *
+ * 1. **Generación Automática**: Este archivo es el candidato ideal para ser generado y mantenido por un script (`pnpm gen:manifests`) que lea la estructura del directorio `errors/` y construya las exportaciones, eliminando la necesidad de actualizaciones manuales y previniendo errores de omisión.
+ * 2. **Verificación de Integridad en CI/CD**: Implementar un paso en el pipeline de CI/CD que ejecute el script de generación y falle si detecta una desincronización entre el archivo y el directorio, forzando la consistencia.
  * =====================================================================
  */
+// src/lib/validators/i18n/errors/index.ts

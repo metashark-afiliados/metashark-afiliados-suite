@@ -1,11 +1,15 @@
 // src/lib/hooks/useInviteMemberForm.ts
 /**
  * @file useInviteMemberForm.ts
- * @description Hook soberano que encapsula toda la lógica de estado y negocio para el
- *              formulario de invitación de miembros.
- * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
- * @version 3.0.2
- * @date 2025-08-25
+ * @description Hook soberano que encapsula la lógica completa para el formulario
+ *              de invitación de miembros. Ha sido refactorizado holísticamente para
+ *              consumir correctamente el contrato de feedback de la Server Action,
+ *              utilizando `messageKey` y `messageArgs` para un feedback de
+ *              usuario completamente internacionalizado y dinámico, resolviendo el
+ *              error de tipo TS2339.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -24,11 +28,7 @@ import type { z } from "zod";
 
 import { invitations as invitationActions } from "@/lib/actions";
 import { clientLogger } from "@/lib/logging";
-import { InvitationClientSchema } from "@/lib/validators";
-// --- INICIO DE REFACTORIZACIÓN: Rutas de Importación Canónicas ---
-import { EmailInputField } from "@/components/workspaces/form-fields/EmailInputField";
-import { RoleSelectField } from "@/components/workspaces/form-fields/RoleSelectField";
-// --- FIN DE REFACTORIZACIÓN ---
+import { InvitationClientSchema, isActionError } from "@/lib/validators";
 
 type FormData = z.infer<typeof InvitationClientSchema>;
 
@@ -37,11 +37,6 @@ interface UseInviteMemberFormProps {
   onSuccess: () => void;
 }
 
-/**
- * @public
- * @interface UseInviteMemberFormReturn
- * @description Define el contrato de tipo para el objeto retornado por el hook `useInviteMemberForm`.
- */
 interface UseInviteMemberFormReturn {
   form: UseFormReturn<FormData>;
   isLoading: boolean;
@@ -50,21 +45,11 @@ interface UseInviteMemberFormReturn {
   tErrors: ReturnType<typeof useTranslations>;
 }
 
-/**
- * @public
- * @function useInviteMemberForm
- * @description Hook soberano que encapsula toda la lógica de estado y negocio para el
- *              formulario de invitación de miembros.
- * @param {UseInviteMemberFormProps} props - Las dependencias del hook.
- * @returns {UseInviteMemberFormReturn} Un objeto con la instancia del formulario, el estado de carga y el
- *          manejador de envío para ser consumidos por un componente de
- *          presentación puro.
- */
 export function useInviteMemberForm({
   workspaceId,
   onSuccess,
 }: UseInviteMemberFormProps): UseInviteMemberFormReturn {
-  const t = useTranslations("WorkspaceSwitcher");
+  const t = useTranslations("components.workspaces.WorkspaceSwitcher");
   const tErrors = useTranslations("shared.ValidationErrors");
   const [isPending, startTransition] = useTransition();
 
@@ -94,10 +79,14 @@ export function useInviteMemberForm({
         await invitationActions.sendWorkspaceInvitationAction(formData);
 
       if (result.success) {
-        toast.success(result.data.message);
+        // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA (TS2339) ---
+        toast.success(
+          tErrors(result.data.messageKey as any, result.data.messageArgs)
+        );
+        // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
         reset();
         onSuccess();
-      } else {
+      } else if (isActionError(result)) {
         toast.error(
           tErrors(result.error as any, { defaultValue: result.error })
         );
@@ -108,9 +97,7 @@ export function useInviteMemberForm({
   const isLoading = isSubmitting || isPending;
 
   return {
-    // --- INICIO DE REFACTORIZACIÓN: Propiedad 'form' explícita ---
-    form: form,
-    // --- FIN DE REFACTORIZACIÓN ---
+    form,
     isLoading,
     processSubmit,
     t,
@@ -121,13 +108,10 @@ export function useInviteMemberForm({
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error Crítico (TS2307)**: ((Implementada)) Se han corregido las rutas de importación de `EmailInputField` y `RoleSelectField` a sus alias absolutos canónicos, resolviendo el error de módulo no encontrado.
- * 2. **Resolución de Error Crítico (TS18004)**: ((Implementada)) Se ha modificado el objeto de retorno del hook `useInviteMemberForm` para incluir explícitamente `form: form`, alineándolo con la interfaz `UseInviteMemberFormReturn` y resolviendo el error de propiedad abreviada.
- *
  * @subsection Melhorias Futuras
- * 1. **Manejo de Estado Offline**: ((Vigente)) El hook podría ser mejorado para encolar la acción si el usuario está offline y ejecutarla automáticamente al recuperar la conexión.
- *
+ * 1. **Invitaciones Múltiples**: El formulario y este hook podrían ser extendidos para aceptar un campo de texto de múltiples líneas (`<Textarea>`) donde el usuario pueda ingresar varios correos electrónicos a la vez, cada uno en una nueva línea, para invitar a miembros en lote.
+ * 2. **Feedback de Invitación Pendiente**: En lugar de simplemente mostrar un toast de éxito, el hook podría devolver los datos de la invitación recién creada para que la UI pueda añadirla a una lista de "Invitaciones Pendientes" sin necesidad de una recarga completa.
+ * 3. **Gestión de Foco**: Tras un envío exitoso, el foco podría ser devuelto programáticamente al botón que abrió el modal para una mejor accesibilidad y experiencia de usuario.
+ * 4. **Tipado de Claves de Error**: La aserción `as any` en `tErrors` puede ser eliminada si el tipo `ActionResult` es refinado para que la propiedad `error` sea un genérico `TErrorKey extends keyof ValidationErrorsMessages`, proporcionando una seguridad de tipos aún mayor.
  * =====================================================================
  */

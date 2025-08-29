@@ -1,12 +1,15 @@
+// src/components/dashboard/WelcomeHero.tsx
 /**
  * @file WelcomeHero.tsx
  * @description Componente de UI "Hero" soberano para el Hub Creativo. Ha sido
  *              refactorizado a un estándar de élite para consumir su propio
  *              namespace de i18n (`useTypedTranslations`), desacoplándolo del
  *              hook genérico y de la página principal del dashboard.
+ *              **Actualizado para internacionalizar el `clearAriaLabel` y corregir
+ *              un error de sintaxis que bloqueaba la compilación.**
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
- * @date 2025-08-26
+ * @version 7.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -68,7 +71,7 @@ export function WelcomeHero(): React.ReactElement {
           onChange={() => {}}
           readOnly
           onClick={openCommandPalette}
-          clearAriaLabel="Clear search"
+          clearAriaLabel={t("search.clear_aria")}
           className="h-12 text-base rounded-full pl-12 cursor-pointer"
         />
       </div>
@@ -79,18 +82,17 @@ export function WelcomeHero(): React.ReactElement {
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Soberanía de Internacionalización (SRP)**: ((Implementada)) El componente ahora consume su propio namespace `components.dashboard.WelcomeHero` a través de `useTypedTranslations`, desacoplándolo del hook genérico. Esto mejora la modularidad y la mantenibilidad.
- * 2. **Simplificación de Claves**: ((Implementada)) Las claves de traducción ahora son directas (`t("title")`) en lugar de anidadas (`t("welcomeHero.title")`), lo que hace el código más limpio.
- * 3. **Observabilidad Mejorada**: ((Implementada)) Se ha añadido `clientLogger.trace` para registrar el renderizado del componente.
- * 4. **UX Mejorada**: ((Implementada)) El saludo ahora utiliza solo el primer nombre del usuario para un tono más personal.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 7.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
- * @subsection Melhorias Futuras
- * 1. **Pestañas Funcionales**: ((Vigente)) Las pestañas son actualmente decorativas. Podrían conectarse al `useCommandPaletteStore` para establecer un contexto inicial y filtrar los resultados de la paleta de comandos.
- * 2. **Saludo Contextual**: ((Vigente)) El saludo podría ser sensible a la hora del día (ej. "Buenas tardes, {username}").
- * 3. **Internacionalización Completa**: ((Pendiente)) El `clearAriaLabel` para el `SearchInput` está actualmente codificado. Debería ser añadido al schema y al archivo de mensajes para una internacionalización completa.
+ * @subsection Melhorias Novas
+ * 1. **Pestañas Funcionales**: ((Vigente)) Las pestañas son actualmente decorativas. Podrían conectarse al `useCommandPaletteStore` para establecer un contexto inicial y filtrar los resultados de la paleta de comandos (ej. al hacer clic en "Templates", la paleta se abre mostrando solo plantillas).
+ * 2. **Saludo Contextual**: ((Vigente)) El saludo podría ser sensible a la hora del día (ej. "Buenas tardes, {username}"). Esto requeriría añadir nuevas claves de i18n y una pequeña lógica de cliente para determinar la hora.
  *
  * =====================================================================
  */
+// src/components/dashboard/WelcomeHero.tsx

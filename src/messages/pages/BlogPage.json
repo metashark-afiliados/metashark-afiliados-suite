@@ -26,7 +26,10 @@
         "author": "Raz Podestá",
         "date": "August 10, 2025"
       }
-    ]
+    ],
+    "readMore": "Read More",
+    "featuredPostTitle": "Featured Post",
+    "readFullStory": "Read Full Story"
   },
   "es-ES": {
     "hero": {
@@ -54,7 +57,10 @@
         "author": "Raz Podestá",
         "date": "10 de Agosto, 2025"
       }
-    ]
+    ],
+    "readMore": "Leer Más",
+    "featuredPostTitle": "Artículo Destacado",
+    "readFullStory": "Leer Historia Completa"
   },
   "pt-BR": {
     "hero": {
@@ -82,7 +88,9 @@
         "author": "Raz Podestá",
         "date": "10 de Agosto, 2025"
       }
-    ]
+    ],
+    "readMore": "Ler Mais",
+    "featuredPostTitle": "Artigo em Destaque",
+    "readFullStory": "Ler História Completa"
   }
 }
-

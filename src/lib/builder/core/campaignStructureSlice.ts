@@ -4,8 +4,9 @@
  * @description Slice de Zustand atómico. Su única responsabilidad es gestionar
  *              las mutaciones ESTRUCTURALES del array de bloques de la campaña.
  *              Declarado como módulo de cliente por su dependencia de `@dnd-kit`.
+ *              **Refactorizado para incluir la acción `updateCampaignName`**.
  * @author Raz Podestá
- * @version 2.0.0
+ * @version 3.0.0
  */
 "use client";
 
@@ -27,6 +28,12 @@ export interface CampaignStructureSlice {
   moveBlock: (activeId: string, overId: string) => void;
   moveBlockByStep: (blockId: string, direction: "up" | "down") => void;
   duplicateBlock: (blockId: string) => void;
+  /**
+   * @action updateCampaignName
+   * @description Actualiza el nombre de la campaña en la configuración.
+   * @param {string} newName - El nuevo nombre de la campaña.
+   */
+  updateCampaignName: (newName: string) => void; // <-- NUEVA ACCIÓN
 }
 
 export const createCampaignStructureSlice: StateCreator<
@@ -140,16 +147,39 @@ export const createCampaignStructureSlice: StateCreator<
       const newConfig = { ...state.campaignConfig, blocks: newBlocks };
       return { campaignConfig: newConfig };
     }),
+
+  updateCampaignName: (newName) =>
+    set((state) => {
+      logger.trace("[CampaignStructureSlice] Actualizando nombre de campaña.", {
+        oldName: state.campaignConfig?.name,
+        newName,
+      });
+      if (!state.campaignConfig) return {};
+      const newConfig = {
+        ...state.campaignConfig,
+        name: newName,
+      };
+      return { campaignConfig: newConfig };
+    }),
 });
 
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `TypeError`**: ((Implementada)) Se ha añadido la directiva `"use client"`, continuando con la resolución del fallo de renderizado del servidor.
+ * 1. **Acción `updateCampaignName` (SRP)**: ((Implementada)) Se ha añadido la acción `updateCampaignName` al slice. Su única responsabilidad es modificar el nombre de la campaña, lo cual es una pieza fundamental para la edición en línea del título del constructor.
+ * 2. **Full Observabilidad**: ((Implementada)) La nueva acción incluye `logger.trace` para registrar los cambios de nombre, mejorando la visibilidad del estado del store.
+ * 3. **No Regresión**: ((Implementada)) Se ha mantenido toda la funcionalidad existente del slice, garantizando que no se introduzcan regresiones.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Integración con Immer**: ((Vigente)) Para simplificar aún más la lógica de actualización inmutable, se podría integrar el middleware `immer` de Zustand. Esto permitiría escribir código de mutación más directo y legible para objetos anidados.
  *
  * =====================================================================
  */
-// src/lib/builder/core/campaignStructureSlice.ts

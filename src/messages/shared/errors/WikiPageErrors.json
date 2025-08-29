@@ -1,0 +1,23 @@
+{
+  "en-US": {
+    "title_required": "The wiki page title is required and cannot be empty.",
+    "section_title_required": "A section title in the wiki content is required and cannot be empty.",
+    "paragraph_required": "Each paragraph in the wiki content must not be empty.",
+    "body_content_required": "Each wiki page section must have at least one paragraph.",
+    "content_sections_required": "The wiki page must contain at least one content section."
+  },
+  "es-ES": {
+    "title_required": "El título de la página Wiki es requerido y no puede estar vacío.",
+    "section_title_required": "Un título de sección en el contenido Wiki es requerido y no puede estar vacío.",
+    "paragraph_required": "Cada párrafo en el contenido Wiki no debe estar vacío.",
+    "body_content_required": "Cada sección de la página Wiki debe tener al menos un párrafo.",
+    "content_sections_required": "La página Wiki debe contener al menos una sección de contenido."
+  },
+  "pt-BR": {
+    "title_required": "O título da página Wiki é obrigatório e não pode estar vazio.",
+    "section_title_required": "O título de uma seção no conteúdo da Wiki é obrigatório e não pode estar vazio.",
+    "paragraph_required": "Cada parágrafo no conteúdo da Wiki não deve estar vazio.",
+    "body_content_required": "Cada seção da página Wiki deve ter pelo menos um parágrafo.",
+    "content_sections_required": "A página Wiki deve conter pelo menos uma seção de conteúdo."
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "en-US": {
+    "title_required": "The privacy policy title is required and cannot be empty.",
+    "section_title_required": "A section title in the privacy policy is required and cannot be empty.",
+    "paragraph_required": "Each paragraph in the privacy policy must not be empty.",
+    "body_content_required": "Each privacy policy section must have at least one paragraph.",
+    "content_sections_required": "The privacy policy must contain at least one content section."
+  },
+  "es-ES": {
+    "title_required": "El título de la política de privacidad es requerido y no puede estar vacío.",
+    "section_title_required": "Un título de sección en la política de privacidad es requerido y no puede estar vacío.",
+    "paragraph_required": "Cada párrafo en la política de privacidad no debe estar vacío.",
+    "body_content_required": "Cada sección de la política de privacidad debe tener al menos un párrafo.",
+    "content_sections_required": "La política de privacidad debe contener al menos una sección de contenido."
+  },
+  "pt-BR": {
+    "title_required": "O título da política de privacidade é obrigatório e não pode estar vazio.",
+    "section_title_required": "O título de uma seção na política de privacidade é obrigatório e não pode estar vazio.",
+    "paragraph_required": "Cada parágrafo na política de privacidade не deve estar vazio.",
+    "body_content_required": "Cada seção da política de privacidade deve ter pelo menos um parágrafo.",
+    "content_sections_required": "A política de privacidade deve conter pelo menos uma seção de conteúdo."
+  }
+}

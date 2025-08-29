@@ -2,15 +2,22 @@
 /**
  * @file BlogPostCard.tsx
  * @description Componente de presentación atómico para una tarjeta de artículo de blog.
- * @author Raz Podestá
- * @version 1.0.0
+ *              Ha sido refactorizado holísticamente para consumir sus textos visibles
+ *              desde la capa de internacionalización, cumpliendo con el protocolo
+ *              `Full Internacionalización`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import Image from "next/image";
-import Link from "next/link"; // Usar Link de Next.js para rutas internas
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl"; // <-- Añadido useTranslations
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -26,6 +33,8 @@ export interface Post {
 }
 
 export function BlogPostCard({ post }: { post: Post }) {
+  const t = useTranslations("pages.BlogPage"); // <-- Consumir namespace de BlogPage
+
   return (
     <motion.div
       whileHover={{ y: -5 }}
@@ -60,7 +69,7 @@ export function BlogPostCard({ post }: { post: Post }) {
             href={`/blog/${post.slug}`}
             className="text-primary font-semibold mt-4 inline-flex items-center group"
           >
-            Read More
+            {t("readMore")} {/* <-- Texto internacionalizado */}
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </CardContent>
@@ -72,11 +81,19 @@ export function BlogPostCard({ post }: { post: Post }) {
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Puro y Atómico**: ((Implementada)) Encapsula la presentación de un artículo.
+ * 1. **Full Internacionalización (Textos)**: ((Implementada)) El texto "Read More" ha sido reemplazado por `t("readMore")`, consumiendo una clave de traducción desde el namespace `pages.BlogPage`. Esto resuelve la brecha de textos hardcodeados.
+ * 2. **Componente Puro y Atómico**: ((Implementada)) El componente mantiene su responsabilidad única de presentar un artículo del blog, ahora con soporte completo para i18n.
+ *
  * @subsection Melhorias Futuras
- * 1. **Hover Effect**: ((Vigente)) Añadir un efecto de zoom sutil a la imagen al pasar el cursor.
+ * 1. **Hover Effect en Imagen**: ((Vigente)) Añadir un efecto de zoom sutil a la imagen al pasar el cursor, similar al que ya se aplica en `FeaturedPost.tsx`.
+ *
  * =====================================================================
  */
-// src/components/blog/BlogPostCard.tsx

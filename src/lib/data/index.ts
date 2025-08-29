@@ -17,7 +17,7 @@ import * as modules from "./modules";
 import * as notifications from "./notifications";
 import * as permissions from "./permissions";
 import * as sites from "./sites";
-import * as workspaces from "./workspaces"; // Esta línea ahora resuelve al nuevo módulo atomizado.
+import * as workspaces from "./workspaces";
 
 export {
   admin,
@@ -39,12 +39,8 @@ export {
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  *
- * @subsection Melhorias Adicionadas
- * 1. **Consumo de Módulo Atómico**: ((Implementada)) Al eliminar el archivo monolítico `workspaces.ts`, la importación `import * as workspaces from "./workspaces"` ahora resuelve correctamente al nuevo manifiesto de módulo `workspaces/index.ts`. Esto completa la integración de la nueva arquitectura.
- * 2. **Consistencia Arquitectónica**: ((Implementada)) Toda la capa de datos ahora sigue un patrón consistente de módulos atomizados y re-exportación namespaced, mejorando drásticamente la mantenibilidad.
- *
- * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) Este archivo sigue siendo un candidato ideal para ser mantenido por un script que lea la estructura de directorios y genere las exportaciones, previniendo errores de omisión manual a medida que se atomizan otros módulos como `admin`.
+ * @subsection Melhorias Novas
+ * 1. **Generación Automática**: ((Vigente)) Este archivo manifiesto es un candidato ideal para ser generado y mantenido por un script que lea la estructura de directorios y genere las exportaciones, previniendo errores de omisión manual a medida que se atomizan otros módulos como `admin`.
  *
  * =====================================================================
  */

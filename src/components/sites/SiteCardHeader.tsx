@@ -1,59 +1,62 @@
-// src/components/sites/SiteCardHeader.tsx
 /**
- * @file SiteCardHeader.tsx
- * @description Componente de presentación soberano. Ha sido refactorizado para
- *              alinearse con la arquitectura de datos atómica, consumiendo sus
- *              tipos desde la SSoT canónica y resolviendo el error de módulo TS2306.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-27
+ * @version 8.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import React from "react";
-import { ExternalLink, ShieldAlert, Trash2 } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
-import { useDialogState } from "@/lib/hooks/ui/useDialogState";
-import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
-// --- INICIO DE CORRECCIÓN DE MÓDULO (TS2306) ---
-import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
-// --- FIN DE CORRECCIÓN DE MÓDULO (TS2306) ---
-import { Link } from "@/lib/navigation";
-import { protocol, rootDomain } from "@/lib/utils";
-import { clientLogger } from "@/lib/logging";
+import { EditableText } from "@/components/builder/ui/EditableText";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   CardHeader as CardHeaderPrimitive,
   CardTitle,
 } from "@/components/ui/card";
-import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
+import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
+import { clientLogger } from "@/lib/logging";
+import { Link } from "@/lib/navigation";
+import { protocol, rootDomain } from "@/lib/utils";
+import { DeleteSiteDialog } from "./DeleteSiteDialog";
 
 export interface SiteCardHeaderProps {
   site: SiteWithCampaignCount;
   onDelete: (formData: FormData) => void;
   isPending: boolean;
   deletingSiteId: string | null;
+  handleUpdateSiteName: (siteId: string, newName: string) => Promise<void>;
+  isUpdatingName: boolean;
+  updatingSiteNameId: string | null;
 }
 
+/**
+ * @public
+ * @component SiteCardHeader
+ * @description Renderiza la cabecera de una tarjeta de sitio, incluyendo el nombre
+ *              del sitio (ahora editable en línea), el subdominio y botones de acción.
+ * @param {SiteCardHeaderProps} props - Propiedades para configurar la cabecera de la tarjeta.
+ * @returns {React.ReactElement}
+ */
 export function SiteCardHeader({
   site,
   onDelete,
   isPending,
   deletingSiteId,
+  handleUpdateSiteName,
+  isUpdatingName,
+  updatingSiteNameId,
 }: SiteCardHeaderProps): React.ReactElement {
   clientLogger.trace(`[SiteCardHeader] Renderizando para sitio: ${site.id}`);
-  const { tSitesPage, tDialogs } = useSitesPageTranslations();
-  const {
-    isOpen: isDeleteDialogOpen,
-    open: openDeleteDialog,
-    setIsOpen: setIsDeleteDialogOpen,
-  } = useDialogState();
+  const { tSitesPage } = useSitesPageTranslations();
 
   const siteUrl = `${protocol}://${site.subdomain}.${rootDomain}`;
+  const isThisSiteNameUpdating =
+    isUpdatingName && updatingSiteNameId === site.id;
 
   return (
     <CardHeaderPrimitive className="flex-row items-start justify-between gap-4">
@@ -70,7 +73,18 @@ export function SiteCardHeader({
           </AvatarFallback>
         </Avatar>
         <div>
-          <CardTitle className="group-hover:underline">{site.name}</CardTitle>
+          <EditableText
+            tag="h3"
+            value={site.name || tSitesPage("card.emptySiteNamePlaceholder")}
+            onSave={(newName) => handleUpdateSiteName(site.id, newName)}
+            className="text-lg font-semibold truncate hover:underline cursor-pointer"
+            placeholder={tSitesPage("card.emptySiteNamePlaceholder")}
+            // La prop `disabled` se maneja internamente en EditableText.
+            // Para deshabilitar la edición, controlamos `onDoubleClick`.
+            onDoubleClick={
+              isThisSiteNameUpdating ? (e) => e.preventDefault() : undefined
+            }
+          />
           <p className="text-sm text-muted-foreground font-mono">
             {site.subdomain}
           </p>
@@ -86,50 +100,21 @@ export function SiteCardHeader({
             subdomain: site.subdomain,
           })}
         >
-          <Button variant="ghost" size="icon" className="h-9 w-9">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9"
+            onClick={(e) => e.stopPropagation()}
+          >
             <ExternalLink className="h-4 w-4" />
           </Button>
         </a>
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive h-9 w-9"
-              onClick={(e) => {
-                e.stopPropagation();
-                openDeleteDialog();
-              }}
-              aria-label={tSitesPage("card.deleteSiteAriaLabel", {
-                subdomain: site.subdomain,
-              })}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <ConfirmationDialogContent
-            icon={ShieldAlert}
-            title={tSitesPage("deleteDialog.title")}
-            description={tSitesPage.rich("deleteDialog.description", {
-              subdomain: site.subdomain,
-              strong: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
-            })}
-            confirmButtonText={tSitesPage("deleteDialog.confirmButton")}
-            cancelButtonText={tDialogs("generic_cancelButton")}
-            onConfirm={onDelete}
-            onClose={() => setIsDeleteDialogOpen(false)}
-            isPending={isPending && deletingSiteId === site.id}
-            hiddenInputs={{ siteId: site.id }}
-            confirmationText={site.subdomain || ""}
-            confirmationLabel={tSitesPage.rich(
-              "deleteDialog.confirmation_label",
-              {
-                subdomain: site.subdomain,
-                strong: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
-              }
-            )}
-          />
-        </Dialog>
+        <DeleteSiteDialog
+          site={site}
+          onDelete={onDelete}
+          isPending={isPending && deletingSiteId === site.id}
+          onClick={(e) => e.stopPropagation()}
+        />
       </div>
     </CardHeaderPrimitive>
   );
@@ -140,12 +125,8 @@ export function SiteCardHeader({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Módulo (TS2306)**: ((Implementada)) Se ha corregido la ruta de importación para que apunte a la SSoT de tipos `.../sites/types.ts`, resolviendo el error de compilación.
- *
  * @subsection Melhorias Futuras
- * 1. **Edición en Línea del Nombre**: ((Vigente)) El `CardTitle` es un candidato ideal para ser reemplazado por un componente `EditableText`.
+ * 1. **Selector de Iconos para el Sitio**: ((Vigente)) El `AvatarFallback` podría ser un `EditableIcon` que, al hacer clic, abra un selector de emojis o una `AssetLibrary` para cambiar el icono del sitio.
  *
  * =====================================================================
  */
-// src/components/sites/SiteCardHeader.tsx

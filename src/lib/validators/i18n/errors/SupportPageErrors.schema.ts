@@ -6,9 +6,8 @@
  *              Soporte sin un prefijo de dominio.
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-28
+ * @date 2025-08-29
  * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
@@ -23,19 +22,9 @@ export const SupportPageErrorsSchema = z.object({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato encapsula los errores específicos de la página de soporte, mejorando la modularidad.
- * 2. **Consistencia con Prefijos**: ((Implementada)) Las claves se definen sin prefijo, lo que permite que el ensamblador `ValidationErrors.schema.ts` aplique el prefijo `support_page_` de forma consistente.
- *
+ * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Errores de Formulario de Soporte**: ((Vigente)) Si la página de soporte incluye un formulario de contacto, se añadirán aquí los errores de validación específicos de ese formulario.
- *
+ * 1. **Errores de Formulario de Soporte**: ((Vigente)) Si la página de soporte incluye un formulario de contacto, se añadirán aquí los errores de validación específicos de ese formulario (ej. `ticket_subject_required`).
  * =====================================================================
  */
+// src/lib/validators/i18n/errors/SupportPageErrors.schema.ts

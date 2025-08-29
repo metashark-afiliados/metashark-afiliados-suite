@@ -1,11 +1,9 @@
-// src/app/[locale]/reset-password/page.tsx
 /**
- * @file page.tsx
- * @description Página y formulario para que los usuarios establezcan una nueva contraseña.
- *              Corregido para alinear el estado inicial de `useFormState` con el
- *              contrato de tipo de unión discriminada `ActionResult`.
- * @author Raz Podestá
- * @version 2.1.0
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -15,17 +13,22 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
 
 import { updatePasswordAction } from "@/lib/actions/password.actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { type ActionResult } from "@/lib/validators";
+import { PasswordStrengthMeter } from "@/components/authentication/PasswordStrengthMeter";
+import { type ActionResult, isActionError } from "@/lib/validators";
+import { clientLogger } from "@/lib/logging";
 
-type UpdatePasswordFormState = ActionResult<null>;
+/**
+ * @type UpdatePasswordFormState
+ * @description Define el tipo de estado para el formulario, alineado con el
+ *              contrato de retorno de `updatePasswordAction`.
+ */
+type UpdatePasswordFormState = ActionResult<{ messageKey: string }>;
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -38,72 +41,31 @@ function SubmitButton() {
   );
 }
 
-const PasswordStrengthMeter = ({ score }: { score: number }) => {
-  const strengthLevels = [
-    { color: "bg-destructive" },
-    { color: "bg-destructive" },
-    { color: "bg-yellow-500" },
-    { color: "bg-green-500" },
-    { color: "bg-green-500" },
-  ];
-  return (
-    <div className="flex gap-2 pt-1">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div
-          key={i}
-          className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden"
-        >
-          <motion.div
-            className={cn(
-              "h-full",
-              score > i ? strengthLevels[score].color : "bg-muted"
-            )}
-            initial={{ width: "0%" }}
-            animate={{ width: score > i ? "100%" : "0%" }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-};
-
 export default function ResetPasswordPage() {
+  clientLogger.trace("[ResetPasswordPage] Renderizando página.");
   const t = useTranslations("pages.ResetPasswordPage");
+  const tValidation = useTranslations("shared.ValidationErrors");
   const router = useRouter();
   const [password, setPassword] = useState("");
-  const [strength, setStrength] = useState(0);
 
   const [state, formAction] = useFormState<UpdatePasswordFormState, FormData>(
     updatePasswordAction,
-    {
-      success: false,
-      error: "",
-    }
+    { success: false, error: "" }
   );
 
   useEffect(() => {
-    if (state && !state.success && state.error) {
-      toast.error(state.error);
+    if (isActionError(state)) {
+      const errorMessage = tValidation(state.error as any, {
+        defaultValue: state.error,
+      });
+      toast.error(errorMessage);
     }
-    if (state && state.success) {
-      toast.success(t("successToast"));
-      setTimeout(() => router.push("/auth/login"), 3000);
+    if (state.success) {
+      const successMessage = tValidation(state.data.messageKey as any);
+      toast.success(successMessage);
+      setTimeout(() => router.push("/login"), 3000);
     }
-  }, [state, router, t]);
-
-  useEffect(() => {
-    let score = 0;
-    if (!password) {
-      setStrength(0);
-      return;
-    }
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-    setStrength(score);
-  }, [password]);
+  }, [state, router, tValidation]);
 
   return (
     <div className="w-full max-w-md">
@@ -113,7 +75,7 @@ export default function ResetPasswordPage() {
         </CardHeader>
         <CardContent>
           <form action={formAction} className="space-y-4">
-            <div>
+            <div className="space-y-1">
               <Label htmlFor="password">{t("newPasswordLabel")}</Label>
               <Input
                 id="password"
@@ -124,11 +86,9 @@ export default function ResetPasswordPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              {password.length > 0 && (
-                <PasswordStrengthMeter score={strength} />
-              )}
+              <PasswordStrengthMeter password={password} />
             </div>
-            <div>
+            <div className="space-y-1">
               <Label htmlFor="confirmPassword">
                 {t("confirmPasswordLabel")}
               </Label>
@@ -147,13 +107,15 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Tipos**: ((Implementada)) Se ha eliminado la propiedad `data: null` del estado inicial del `useFormState` cuando `success` es `false`, resolviendo el error `TS2353` y alineando el estado con el contrato de tipo `ActionResult`.
+ * @subsection Melhorias Futuras
+ * 1. **Feedback de Requisitos en Tiempo Real**: ((Vigente)) Además del medidor de fortaleza, se podría añadir un `Popover` que muestre en tiempo real qué requisitos se han cumplido (ej. "✓ 8 caracteres", "✗ Una mayúscula") para una UX de élite.
+ * 2. **Desacoplamiento con `react-hook-form`**: ((Vigente)) Migrar este formulario a `react-hook-form` con `zodResolver` proporcionaría validación del lado del cliente en tiempo real y una gestión de estado más robusta, alineándolo con el formulario de registro.
  *
+ * =====================================================================
  */
-// src/app/[locale]/reset-password/page.tsx

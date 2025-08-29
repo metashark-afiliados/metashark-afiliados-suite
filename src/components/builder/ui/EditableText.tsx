@@ -1,12 +1,12 @@
 // src/components/builder/ui/EditableText.tsx
 /**
  * @file EditableText.tsx
- * @description Aparato de UI polimórfico, pragmático y de élite. Utiliza
- *              una unión de tipos explícita para su prop `tag`, resolviendo
- *              todos los errores de tipo y manteniendo la flexibilidad necesaria.
+ * @description Aparato de UI polimórfico y de élite. Ha sido refactorizado
+ *              holísticamente para aceptar una prop `disabled`, resolviendo
+ *              errores de tipo en sus consumidores y mejorando su reutilización.
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
- * @date 2025-08-24
+ * @version 7.0.0
+ * @date 2025-08-29
  */
 "use client";
 
@@ -14,7 +14,6 @@ import * as React from "react";
 import { clientLogger } from "@/lib/logging";
 import { cn } from "@/lib/utils";
 
-// --- INICIO DE REFACTORIZACIÓN DE TIPOS DE ÉLITE ---
 type AllowedTags =
   | "h1"
   | "h2"
@@ -32,18 +31,31 @@ export interface EditableTextProps
   value: string;
   onSave: (newValue: string) => void;
   placeholder?: string;
+  /**
+   * Si es `true`, deshabilita la edición en vivo y aplica estilos de deshabilitado.
+   * @default false
+   */
+  disabled?: boolean;
 }
-// --- FIN DE REFACTORIZACIÓN DE TIPOS DE ÉLITE ---
 
 export const EditableText = React.forwardRef<HTMLElement, EditableTextProps>(
   (
-    { tag: Component, value, onSave, placeholder, className, ...props },
+    {
+      tag: Component,
+      value,
+      onSave,
+      placeholder,
+      className,
+      disabled = false,
+      ...props
+    },
     ref
   ) => {
     const [isEditing, setIsEditing] = React.useState(false);
     const textRef = React.useRef<HTMLElement | null>(null);
 
     const handleDoubleClick = (e: React.MouseEvent<HTMLElement>) => {
+      if (disabled) return;
       e.stopPropagation();
       setIsEditing(true);
     };
@@ -71,7 +83,7 @@ export const EditableText = React.forwardRef<HTMLElement, EditableTextProps>(
 
     React.useLayoutEffect(() => {
       const element = textRef.current;
-      if (isEditing && element) {
+      if (isEditing && !disabled && element) {
         element.focus();
         const range = document.createRange();
         range.selectNodeContents(element);
@@ -79,7 +91,7 @@ export const EditableText = React.forwardRef<HTMLElement, EditableTextProps>(
         selection?.removeAllRanges();
         selection?.addRange(range);
       }
-    }, [isEditing]);
+    }, [isEditing, disabled]);
 
     const displayValue = !value && placeholder ? placeholder : value;
 
@@ -95,16 +107,18 @@ export const EditableText = React.forwardRef<HTMLElement, EditableTextProps>(
           }
         }}
         onDoubleClick={handleDoubleClick}
-        onBlur={isEditing ? handleBlur : undefined}
-        onKeyDown={isEditing ? handleKeyDown : undefined}
-        contentEditable={isEditing}
+        onBlur={isEditing && !disabled ? handleBlur : undefined}
+        onKeyDown={isEditing && !disabled ? handleKeyDown : undefined}
+        contentEditable={isEditing && !disabled}
         suppressContentEditableWarning={true}
         className={cn(
           "transition-all outline-none",
-          isEditing
-            ? "ring-2 ring-primary ring-offset-2 ring-offset-background cursor-text"
-            : "cursor-pointer",
+          isEditing &&
+            !disabled &&
+            "ring-2 ring-primary ring-offset-2 ring-offset-background cursor-text",
+          !disabled && "cursor-pointer",
           !value && "text-muted-foreground italic",
+          disabled && "cursor-not-allowed opacity-70",
           className
         )}
       >
@@ -120,10 +134,9 @@ EditableText.displayName = "EditableText";
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución Definitiva de Errores de Tipo**: ((Implementada)) La simplificación del patrón polimórfico resuelve todos los errores de tipo.
- *
+ * @subsection Melhorias Futuras
+ * 1. **Feedback Visual de Edición**: ((Vigente)) Añadir un pequeño icono de "lápiz" que aparezca al pasar el cursor (`onHover`) cuando el componente no está deshabilitado, para comunicar más claramente su capacidad de edición.
+ * 2. **Modo de Edición con Clic Simple**: ((Vigente)) Añadir una prop opcional `editMode: 'click' | 'doubleClick'` para permitir la activación de la edición con un solo clic, lo cual puede ser más intuitivo en ciertos contextos de UI.
  * =====================================================================
  */
 // src/components/builder/ui/EditableText.tsx

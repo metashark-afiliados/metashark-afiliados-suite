@@ -1,0 +1,43 @@
+
+{
+  "en-US": {
+    "name_required": "Name is required.",
+    "name_too_short": "Name must be at least 2 characters.",
+    "email_required": "Email is required.",
+    "email_invalid": "Please enter a valid email address.",
+    "inquiry_type_required": "Please select a type of inquiry.",
+    "inquiry_type_invalid": "Invalid inquiry type selected.",
+    "message_required": "Message is required.",
+    "message_too_short": "Message must be at least 10 characters.",
+    "send_email_failed": "Failed to send your message. Please try again later.",
+    "invalid_data": "The data provided is invalid. Please check the form.",
+    "success_toast": "Your message has been sent successfully! We'll get back to you soon."
+  },
+  "es-ES": {
+    "name_required": "El nombre es requerido.",
+    "name_too_short": "El nombre debe tener al menos 2 caracteres.",
+    "email_required": "El correo electrónico es requerido.",
+    "email_invalid": "Por favor, introduce una dirección de correo electrónico válida.",
+    "inquiry_type_required": "Por favor, selecciona un tipo de consulta.",
+    "inquiry_type_invalid": "Tipo de consulta seleccionado inválido.",
+    "message_required": "El mensaje es requerido.",
+    "message_too_short": "El mensaje debe tener al menos 10 caracteres.",
+    "send_email_failed": "No se pudo enviar tu mensaje. Por favor, inténtalo de nuevo más tarde.",
+    "invalid_data": "Los datos proporcionados son inválidos. Por favor, revisa el formulario.",
+    "success_toast": "¡Tu mensaje ha sido enviado con éxito! Nos pondremos en contacto contigo pronto."
+  },
+  "pt-BR": {
+    "name_required": "O nome é obrigatório.",
+    "name_too_short": "O nome deve ter pelo menos 2 caracteres.",
+    "email_required": "O e-mail é obrigatório.",
+    "email_invalid": "Por favor, insira um endereço de e-mail válido.",
+    "inquiry_type_required": "Por favor, selecione um tipo de consulta.",
+    "inquiry_type_invalid": "Tipo de consulta selecionado inválido.",
+    "message_required": "A mensagem é obrigatória.",
+    "message_too_short": "A mensagem deve ter pelo menos 10 caracteres.",
+    "send_email_failed": "Falha ao enviar sua mensagem. Por favor, tente novamente mais tarde.",
+    "invalid_data": "Os dados fornecidos são inválidos. Por favor, verifique o formulário.",
+    "success_toast": "Sua mensagem foi enviada com sucesso! Entraremos em contato em breve."
+  }
+}
+

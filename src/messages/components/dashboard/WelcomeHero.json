@@ -1,3 +1,4 @@
+
 {
   "en-US": {
     "title": "What will we design today, {username}?",
@@ -6,6 +7,9 @@
       "myDesigns": "My Designs",
       "templates": "Templates",
       "aiTools": "AI Tools"
+    },
+    "search": {
+      "clear_aria": "Clear search"
     }
   },
   "es-ES": {
@@ -15,6 +19,9 @@
       "myDesigns": "Mis Diseños",
       "templates": "Plantillas",
       "aiTools": "Herramientas IA"
+    },
+    "search": {
+      "clear_aria": "Limpiar búsqueda"
     }
   },
   "pt-BR": {
@@ -24,6 +31,9 @@
       "myDesigns": "Meus Designs",
       "templates": "Modelos",
       "aiTools": "Ferramentas de IA"
+    },
+    "search": {
+      "clear_aria": "Limpar busca"
     }
   }
 }

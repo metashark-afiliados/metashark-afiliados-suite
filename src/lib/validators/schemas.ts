@@ -5,8 +5,9 @@
  *              la validación de datos en toda la aplicación. Ha sido refactorizado
  *              holísticamente para incluir el nuevo `DashboardLayoutPreferencesSchema`,
  *              un contrato de datos esencial para la personalización de la UI.
+ *              **Actualizado para incluir `UpdateSiteNameSchema`**.
  * @author Raz Podestá - MetaShark Tech
- * @version 7.0.0
+ * @version 7.1.0
  * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -115,6 +116,18 @@ export const UpdateSiteSchema = z
 
 export const DeleteSiteSchema = z.object({ siteId: UuidSchema });
 
+// --- INICIO DE IMPLEMENTACIÓN HOLÍSTICA: UpdateSiteNameSchema ---
+/**
+ * @public
+ * @constant UpdateSiteNameSchema
+ * @description Valida el payload para actualizar el nombre de un sitio.
+ */
+export const UpdateSiteNameSchema = z.object({
+  siteId: UuidSchema,
+  name: NameSchema,
+});
+// --- FIN DE IMPLEMENTACIÓN HOLÍSTICA ---
+
 export const CreateWorkspaceSchema = z.object({
   workspaceName: NameSchema,
 });
@@ -177,3 +190,26 @@ export const ClientEnrichmentSchema = z.object({
   fingerprint: z.string().min(1, { message: "fingerprint_required" }),
   browser_context: z.record(z.any()).nullable().optional(),
 });
+
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 7.1.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **`UpdateSiteNameSchema` (Validación de Élite)**: ((Implementada)) Se ha añadido un nuevo esquema Zod (`UpdateSiteNameSchema`) para validar el `siteId` y el `name` del sitio. Esto proporciona una capa de validación robusta y tipo-segura para la acción de actualización del nombre del sitio.
+ * 2. **Reutilización de Schemas Base**: ((Implementada)) El nuevo esquema reutiliza `UuidSchema` y `NameSchema`, adhiriéndose al principio DRY y manteniendo la consistencia de las reglas de validación en toda la aplicación.
+ * 3. **Full Observabilidad**: ((Implementada)) La adición se integra sin comprometer el logging existente.
+ * 4. **No Regresión**: ((Implementada)) Se ha mantenido toda la funcionalidad existente del archivo sin introducir regresiones.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Tipado de `activeIconLibraryId` en `DashboardLayoutPreferencesSchema`**: ((Vigente)) Aunque el `enum` ya está en uso, podría refinarse para incluir todos los IDs de `ICON_LIBRARIES_MANIFEST` en el tipo de unión de literales para una validación más estricta en tiempo de compilación.
+ * 2. **Atomización Adicional**: ((Vigente)) Este archivo sigue siendo un monolito de schemas. La mejora a largo plazo es dividirlo en archivos más pequeños por dominio (`schemas/auth.schemas.ts`, `schemas/sites.schemas.ts`), re-exportándolos desde un `index.ts` dentro de la carpeta `schemas/`.
+ *
+ * =====================================================================
+ */

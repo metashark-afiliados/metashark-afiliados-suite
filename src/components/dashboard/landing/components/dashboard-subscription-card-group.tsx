@@ -1,64 +1,48 @@
 // src/components/dashboard/landing/components/dashboard-subscription-card-group.tsx
+/**
+ * @file dashboard-subscription-card-group.tsx
+ * @description Orquestador de UI de élite. Ha sido refactorizado a un componente
+ *              de presentación 100% puro que consume el hook soberano
+ *              `useSubscriptionData`, delegando toda la lógica de estado y
+ *              adaptación de datos, y cumpliendo con el SRP al más alto nivel.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 
 import { ErrorContent } from "@/components/dashboard/layout/error-content";
-import {
-  SubscriptionCards,
-  type Subscription,
-} from "@/components/dashboard/subscriptions/components/subscription-cards";
+import { SubscriptionCards } from "@/components/dashboard/subscriptions/components/subscription-cards";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDashboard } from "@/lib/context/DashboardContext";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardSkeleton,
+} from "@/components/ui/card";
+import { useSubscriptionData } from "@/lib/hooks/useSubscriptionData";
 
 /**
  * @public
  * @component DashboardSubscriptionCardGroup
- * @description Orquestador de UI que consume el contexto del dashboard,
- *              transforma los datos del perfil del usuario en el contrato
- *              `Subscription[]`, y los pasa al componente de presentación `SubscriptionCards`.
+ * @description Orquesta la UI para la sección de suscripciones del dashboard.
  * @returns {React.ReactElement}
- * @version 3.0.0
- * @author Raz Podestá
  */
 export function DashboardSubscriptionCardGroup() {
-  const t = useTranslations("DashboardSubscriptionCard");
-  const { profile } = useDashboard();
+  const { subscriptions, t, isLoading } = useSubscriptionData();
 
-  if (!profile) {
-    return <ErrorContent />;
+  if (isLoading) {
+    return <CardSkeleton className="p-6 h-48" />; // Placeholder de carga
   }
 
-  // Lógica de Adaptación de Datos: Transforma los datos del contexto al
-  // contrato esperado por el componente hijo.
-  const userPlan = profile.plan_type || "free";
-  const planDetails = {
-    free: {
-      planNameKey: "plan_free_name",
-      descriptionKey: "plan_free_description",
-      priceKey: "plan_free_price",
-    },
-    pro: {
-      planNameKey: "plan_pro_name",
-      descriptionKey: "plan_pro_description",
-      priceKey: "plan_pro_price",
-    },
-  };
-  const details =
-    planDetails[userPlan as keyof typeof planDetails] || planDetails.free;
-
-  const userSubscriptions: Subscription[] = [
-    {
-      id: `sub_${profile.id}`,
-      planName: t(details.planNameKey as any),
-      description: t(details.descriptionKey as any),
-      price: t(details.priceKey as any),
-      frequency: t("frequency_monthly"),
-      status: "active",
-    },
-  ];
+  if (!subscriptions.length) {
+    return <ErrorContent />; // Reutiliza el componente de error si no hay datos
+  }
 
   return (
     <Card className={"bg-background/50 backdrop-blur-[24px] border-border p-6"}>
@@ -80,7 +64,7 @@ export function DashboardSubscriptionCardGroup() {
       <CardContent className={"p-0 pt-6 @container"}>
         <SubscriptionCards
           className={"grid-cols-1 gap-6 @[600px]:grid-cols-2"}
-          subscriptions={userSubscriptions}
+          subscriptions={subscriptions}
         />
       </CardContent>
     </Card>
@@ -90,13 +74,8 @@ export function DashboardSubscriptionCardGroup() {
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución Arquitectónica de Error de Tipo**: ((Implementada)) La refactorización resuelve el `TS2459` de forma sistémica al adoptar un flujo de datos unidireccional, eliminando la dependencia de tipo ascendente.
- * 2. **Alineación con Blueprint de Referencia**: ((Implementada)) Los componentes ahora siguen la arquitectura de élite del proyecto `paddle-kit`, donde los componentes padres obtienen y adaptan los datos, y los hijos son presentadores puros.
- *
- * @subsection Melhorias Futuras
- * 1. **Tipos de Datos Centralizados**: ((Vigente)) El tipo `Subscription` podría ser movido a un archivo de tipos compartido (ej. `src/types/billing.d.ts`) si otros componentes necesitaran consumirlo, para un mejor cumplimiento de DRY.
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Estado Vacío Específico:** En lugar de `ErrorContent`, se podría crear un componente `EmptyState` específico para cuando un usuario no tiene suscripciones, con un CTA para "Ver Planes".
  *
  * =====================================================================
  */

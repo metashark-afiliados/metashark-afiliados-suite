@@ -1,149 +1,100 @@
 // src/components/sites/SitesTable.tsx
 /**
  * @file SitesTable.tsx
- * @description Componente de ensamblaje soberano y de alto rendimiento. Ha sido
- *              refactorizado a un estándar de élite para implementar virtualización
- *              de filas con `@tanstack/react-virtual`, garantizando una
- *              renderización óptima de la tabla a cualquier escala.
+ * @description Aparato de UI de ensamblaje puro y de presentación. Su única
+ *              responsabilidad es componer el `PaginatedDataTable` con la
+ *              configuración de columnas específica para la entidad 'sites',
+ *              obtenida de la factoría `getSitesTableColumns`.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-27
+ * @version 1.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  type ColumnDef,
-  type Row,
-} from "@tanstack/react-table";
+import React from "react";
+import { useFormatter, useTranslations } from "next-intl";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
+import { PaginatedDataTable } from "@/components/shared/PaginatedDataTable";
+import { type SiteWithCampaignCount } from "@/lib/data/sites";
 import { clientLogger } from "@/lib/logging";
 import { getSitesTableColumns } from "./SitesTableColumns";
 
-interface SitesTableProps {
+export interface SitesTableProps {
   sites: SiteWithCampaignCount[];
   onDelete: (formData: FormData) => void;
   isPending: boolean;
   deletingSiteId: string | null;
+  handleUpdateSiteName: (siteId: string, newName: string) => Promise<void>;
+  isUpdatingName: boolean;
+  updatingSiteNameId: string | null;
+  page: number;
+  totalCount: number;
+  limit: number;
+  basePath: string;
+  searchQuery?: string;
 }
 
-const SitesTableComponent = ({
-  sites,
-  onDelete,
-  isPending,
-  deletingSiteId,
-}: SitesTableProps) => {
+/**
+ * @public
+ * @component SitesTable
+ * @description Renderiza la vista de tabla para la página "Mis Sitios".
+ * @param {SitesTableProps} props - Propiedades para configurar la tabla.
+ * @returns {React.ReactElement}
+ */
+export function SitesTable(props: SitesTableProps): React.ReactElement {
   clientLogger.trace(
-    "[SitesTable] Renderizando componente de tabla soberano y virtualizado."
+    "[SitesTable] Renderizando ensamblador de tabla de sitios."
   );
   const t = useTranslations("SitesPage");
-  const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const scroller = document.getElementById("main-content-scroller");
-    setScrollElement(scroller);
-  }, []);
 
   const columns = React.useMemo(
-    () => getSitesTableColumns({ onDelete, isPending, deletingSiteId }),
-    [onDelete, isPending, deletingSiteId]
+    () =>
+      getSitesTableColumns({
+        onDelete: props.onDelete,
+        isPending: props.isPending,
+        deletingSiteId: props.deletingSiteId,
+        handleUpdateSiteName: props.handleUpdateSiteName,
+        isUpdatingName: props.isUpdatingName,
+        updatingSiteNameId: props.updatingSiteNameId,
+      }),
+    [
+      props.onDelete,
+      props.isPending,
+      props.deletingSiteId,
+      props.handleUpdateSiteName,
+      props.isUpdatingName,
+      props.updatingSiteNameId,
+    ]
   );
-
-  const table = useReactTable({
-    data: sites,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  const { rows } = table.getRowModel();
-  const rowVirtualizer = useVirtualizer({
-    count: rows.length,
-    getScrollElement: () => scrollElement,
-    estimateSize: () => 65, // Altura estimada de una fila
-    overscan: 10,
-  });
 
   return (
-    <div className="rounded-md border">
-      <Table style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
-        <TableHeader
-          style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 1,
-            background: "hsl(var(--card))",
-          }}
-        >
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody style={{ position: "relative" }}>
-          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-            const row = rows[virtualRow.index] as Row<SiteWithCampaignCount>;
-            return (
-              <TableRow
-                key={row.id}
-                data-index={virtualRow.index}
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  transform: `translateY(${virtualRow.start}px)`,
-                }}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+    <PaginatedDataTable
+      columns={columns}
+      data={props.sites}
+      noResultsText={t("grid.emptyStateTitle")}
+      page={props.page}
+      totalCount={props.totalCount}
+      limit={props.limit}
+      basePath={props.basePath}
+      searchQuery={props.searchQuery}
+    />
   );
-};
-
-export const SitesTable = React.memo(SitesTableComponent);
+}
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Virtualización de Filas de Alto Rendimiento**: ((Implementada)) El componente ahora utiliza `useVirtualizer` para renderizar solo las filas de la tabla visibles en el viewport. Esto garantiza un rendimiento de renderizado instantáneo y un uso de memoria bajo, sin importar el número de sitios.
- * 2. **Cabecera Adhesiva (Sticky Header)**: ((Implementada)) Se ha añadido `position: "sticky"` al `TableHeader`. Esta es una mejora de UX de élite que mantiene las cabeceras de la tabla visibles mientras el usuario se desplaza, proporcionando contexto constante.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 1.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
- * @subsection Melhorias Futuras
- * 1. **Carga Infinita (Infinite Scrolling)**: ((Vigente)) Para una escalabilidad máxima, la virtualización puede ser combinada con "infinite scrolling". A medida que el usuario se acerca al final de la lista, el hook `useVirtualizer` podría invocar un callback para cargar la siguiente página de datos desde el servidor.
+ * @subsection Melhorias Novas
+ * 1. **Filtros en Cabecera de Tabla**: ((Vigente)) Para una UX de élite, las cabeceras de la tabla (`TableHead`) podrían ser interactivas, permitiendo al usuario hacer clic para ordenar los datos por esa columna. Esto requeriría pasar callbacks de ordenamiento a `getSitesTableColumns`.
+ * 2. **Acciones en Lote (Bulk Actions)**: ((Vigente)) Se podría añadir una columna de `Checkbox` a la tabla, permitiendo la selección de múltiples sitios para realizar acciones en lote, como "Archivar Seleccionados" o "Eliminar Seleccionados".
  *
  * =====================================================================
  */

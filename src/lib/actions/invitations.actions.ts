@@ -2,15 +2,12 @@
 /**
  * @file src/lib/actions/invitations.actions.ts
  * @description Aparato de orquestación de acciones atómico para el ciclo de vida de
- *              invitaciones. Contiene la lógica de negocio para enviar y aceptar
- *              invitaciones de workspace, validando permisos y datos, y auditando
- *              cada operación. Ha sido refactorizado holísticamente para
- *              **centralizar todos los mensajes de error en el namespace
- *              `shared.ValidationErrors`**, alineando la gestión de errores
- *              con la "Única Fuente de Verdad" para los errores de la aplicación.
+ *              invitaciones. Ha sido refactorizado holísticamente para **centralizar
+ *              TODOS los mensajes de feedback (éxito y error) en el namespace
+ *              `shared.ValidationErrors`**, y para corregir errores de tipo.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-28
+ * @version 3.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -23,53 +20,41 @@ import { ZodError } from "zod";
 import { requireWorkspacePermission } from "@/lib/auth/user-permissions";
 import * as invitationsData from "@/lib/data/invitations";
 import { logger } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/server";
 import { type ActionResult, InvitationServerSchema } from "@/lib/validators";
 
-import { createAuditLog, createPersistentErrorLog } from "./_helpers";
+import {
+  createAuditLog,
+  createPersistentErrorLog,
+  getAuthenticatedUser,
+} from "./_helpers";
 
 export async function sendWorkspaceInvitationAction(
   formData: FormData
-): Promise<ActionResult<{ message: string }>> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+): Promise<
+  ActionResult<{ messageKey: string; messageArgs?: Record<string, any> }>
+> {
+  const authResult = await getAuthenticatedUser();
+  if ("error" in authResult) return authResult.error;
+  const { user } = authResult;
 
-  if (!user) {
-    logger.warn(
-      "[InvitationsAction:sendWorkspaceInvitationAction] Intento no autorizado para enviar invitación."
-    );
-    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
-    return {
-      success: false,
-      error: "ValidationErrors.invitations_send_unauthenticated",
-    };
-    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
-  }
+  const rawData = Object.fromEntries(formData);
 
   try {
-    const parsedData = InvitationServerSchema.parse(
-      Object.fromEntries(formData.entries())
-    );
+    const parsedData = InvitationServerSchema.parse(rawData);
     const { invitee_email, role, workspace_id } = parsedData;
 
     if (invitee_email === user.email) {
-      // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
       return {
         success: false,
-        error: "ValidationErrors.invitations_send_self_invite_forbidden",
+        error: "ValidationErrors.invitations.send_self_invite_forbidden",
       };
-      // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
     }
 
     const permissionCheck = await requireWorkspacePermission(workspace_id, [
       "owner",
       "admin",
     ]);
-    if (!permissionCheck.success) {
-      return { success: false, error: permissionCheck.error }; // Ya es una clave i18n
-    }
+    if (!permissionCheck.success) return permissionCheck;
 
     const result = await invitationsData.createInvitation({
       ...parsedData,
@@ -78,23 +63,18 @@ export async function sendWorkspaceInvitationAction(
 
     if (!result.success) {
       if (result.error?.code === "23505") {
-        // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
         return {
           success: false,
-          error: "ValidationErrors.invitations_send_already_invited_or_member",
+          error: "ValidationErrors.invitations.send_already_invited_or_member",
         };
-        // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
       }
-      logger.error(
-        "[InvitationsAction:sendWorkspaceInvitationAction] Error de base de datos al crear invitación.",
-        { code: result.error?.code, message: result.error?.message }
-      );
-      // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+      logger.error("[InvitationsAction] DB error al crear invitación.", {
+        ...result.error,
+      });
       return {
         success: false,
-        error: "ValidationErrors.invitations_send_failed",
+        error: "ValidationErrors.invitations.send_failed",
       };
-      // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
     }
 
     await createAuditLog("workspace_invitation_sent", {
@@ -105,85 +85,56 @@ export async function sendWorkspaceInvitationAction(
     });
 
     revalidateTag(`invitations:${invitee_email}`);
-    logger.info(
-      "[InvitationsAction:sendWorkspaceInvitationAction] Invitación enviada con éxito.",
-      {
-        inviterId: user.id,
-        inviteeEmail: invitee_email,
-        workspaceId: workspace_id,
-      }
-    );
     return {
       success: true,
-      data: { message: `Invitación enviada a ${invitee_email}.` }, // Este mensaje es para el toast específico, puede mantenerse como string o ser clave i18n si se necesita traducir en el toast.
+      data: {
+        messageKey: "ValidationErrors.invitations.send_success",
+        messageArgs: { email: invitee_email },
+      },
     };
   } catch (error) {
     if (error instanceof ZodError) {
-      logger.warn(
-        "[InvitationsAction:sendWorkspaceInvitationAction] Payload de invitación inválido.",
-        {
-          errors: error.flatten(),
-        }
-      );
-      // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
-      return {
-        success: false,
-        error: "ValidationErrors.invitations_send_invalid_data",
-      };
-      // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
+      logger.warn("[InvitationsAction] Payload de invitación inválido.", {
+        errors: error.flatten(),
+      });
+      return { success: false, error: error.errors[0].message };
     }
-    const errorId = await createPersistentErrorLog(
-      "sendWorkspaceInvitationAction.unexpected",
+    await createPersistentErrorLog(
+      "sendWorkspaceInvitationAction",
       error as Error,
-      { userId: user.id, payload: Object.fromEntries(formData) }
+      { userId: user.id, payload: rawData }
     );
-    logger.error(
-      `[InvitationsAction:sendWorkspaceInvitationAction] Error inesperado. Log ID: ${errorId}`,
-      { error }
-    );
-    return { success: false, error: "ValidationErrors.error_server_generic" };
+    logger.error(`[InvitationsAction] Error inesperado.`, { error });
+    return {
+      success: false,
+      error: "ValidationErrors.generic.error_server_generic",
+    };
   }
 }
 
 export async function acceptInvitationAction(
   invitationId: string
-): Promise<ActionResult<{ message: string }>> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
-    return {
-      success: false,
-      error: "ValidationErrors.invitations_accept_unauthenticated",
-    };
-    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
-  }
+): Promise<ActionResult<{ messageKey: string }>> {
+  const authResult = await getAuthenticatedUser();
+  if ("error" in authResult) return authResult.error;
+  const { user } = authResult;
 
   try {
     const result = await invitationsData.acceptInvitation(
       invitationId,
       user.id
     );
-
     if (!result.success) {
-      logger.error(
-        "[InvitationsAction:acceptInvitationAction] RPC falló al aceptar invitación.",
-        {
-          invitationId,
-          rpcError: result.error,
-        }
-      );
-      // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Error centralizado ---
+      logger.error("[InvitationsAction] RPC falló al aceptar invitación.", {
+        invitationId,
+        rpcError: result.error,
+      });
       return {
         success: false,
         error:
           result.error ||
-          "ValidationErrors.invitations_accept_processing_failed",
+          "ValidationErrors.invitations.accept_processing_failed",
       };
-      // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
     }
 
     await createAuditLog("workspace_invitation_accepted", {
@@ -194,57 +145,41 @@ export async function acceptInvitationAction(
 
     if (user.email) {
       revalidateTag(`invitations:${user.email}`);
-    } else {
-      logger.warn(
-        `[InvitationsAction:acceptInvitationAction] No se pudo revalidar la caché de invitaciones por email para el usuario ${user.id} porque el email no está disponible.`
-      );
     }
     revalidateTag(`workspaces:${user.id}`);
     revalidatePath("/dashboard", "layout");
 
-    logger.info(
-      "[InvitationsAction:acceptInvitationAction] Invitación aceptada con éxito.",
-      {
-        userId: user.id,
-        invitationId,
-      }
-    );
     return {
       success: true,
-      data: { message: result.message || "Invitación aceptada con éxito." },
-    }; // Mantener este mensaje para el toast específico
+      data: { messageKey: "ValidationErrors.invitations.accept_success" },
+    };
   } catch (error) {
-    const errorId = await createPersistentErrorLog(
-      "acceptInvitationAction.unexpected",
-      error as Error,
-      { userId: user.id, invitationId }
-    );
-    logger.error(
-      `[InvitationsAction:acceptInvitationAction] Error inesperado. Log ID: ${errorId}`,
-      { error }
-    );
-    return { success: false, error: "ValidationErrors.error_server_generic" };
+    await createPersistentErrorLog("acceptInvitationAction", error as Error, {
+      userId: user.id,
+      invitationId,
+    });
+    logger.error(`[InvitationsAction] Error inesperado.`, { error });
+    return {
+      success: false,
+      error: "ValidationErrors.generic.error_server_generic",
+    };
   }
 }
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
+ * =====================================================================
  *
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-28
+ * @version 3.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  *
- * @subsection Melhorias Adicionadas
- * 1. **Centralización de Errores (SSoT)**: ((Implementada)) Todos los mensajes de error `hardcodeados` en `sendWorkspaceInvitationAction` y `acceptInvitationAction` ahora utilizan claves del namespace `shared.ValidationErrors`. Esto consolida la "Única Fuente de Verdad" para los errores de invitaciones.
- * 2. **Clasificación de Errores por Dominio**: ((Implementada)) La adición de errores prefijados con `invitations_` formaliza el patrón de clasificación de errores por dominio, mejorando la organización y mantenibilidad.
- * 3. **Full Observabilidad Mejorada**: ((Implementada)) Se han añadido `logger.warn` y `logger.error` contextuales en cada punto de fallo, y se ha integrado `createPersistentErrorLog` para los errores inesperados, proporcionando una trazabilidad completa.
- * 4. **No Regresión Funcional**: ((Implementada)) La lógica de negocio principal de cada acción se mantiene intacta, con la mejora centrada en la resiliencia y la internacionalización.
- *
- * @subsection Melhorias Futuras
- * 1. **Revocar Invitación**: ((Vigente)) Crear una `revokeInvitationAction(invitationId)` que permita a los administradores cancelar una invitación pendiente, cambiando su estado a 'revoked'.
- * 2. **Reenviar Invitación**: ((Vigente)) Añadir una `resendInvitationAction(invitationId)` que vuelva a enviar el correo de invitación, con limitación de tasa.
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Revocar Invitación:** Implementar una `revokeInvitationAction(invitationId)` que permita a los administradores del workspace cancelar una invitación pendiente, cambiando su estado a 'revoked' y registrando la acción en el log de auditoría.
+ * 2. ((Vigente)) **Reenviar Invitación:** Añadir una `resendInvitationAction(invitationId)` que vuelva a disparar la notificación por correo electrónico. Esta acción debe estar protegida por un `rate-limiter` para prevenir abuso.
  *
  * =====================================================================
  */
+// src/lib/actions/invitations.actions.ts

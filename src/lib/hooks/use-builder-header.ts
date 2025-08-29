@@ -6,9 +6,10 @@
  *              de élite para integrar la API del historial de estado de `zundo`,
  *              exponiendo la funcionalidad de deshacer/rehacer y la lógica
  *              de "estado sucio" (dirty state).
+ *              **Actualizado para exponer `updateCampaignName`**.
  * @author Raz Podestá - MetaShark Tech
- * @version 7.0.0
- * @date 2025-08-25
+ * @version 8.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -31,6 +32,7 @@ import { logger } from "@/lib/logging";
  * @public
  * @function useBuilderHeader
  * @description Hook soberano que provee toda la lógica y el estado necesarios para el componente `BuilderHeader`.
+ *              **Ahora incluye `updateCampaignName` para la edición en línea del título.**
  * @returns Un objeto con el estado computado y los manejadores de eventos.
  */
 export function useBuilderHeader() {
@@ -45,6 +47,7 @@ export function useBuilderHeader() {
     devicePreview,
     setDevicePreview,
     campaignConfig,
+    updateCampaignName, // <--- AÑADIDO: Consumir la nueva acción del store
   } = useBuilderStore(
     (state) => ({
       isSaving: state.isSaving,
@@ -53,18 +56,17 @@ export function useBuilderHeader() {
       devicePreview: state.devicePreview,
       setDevicePreview: state.setDevicePreview,
       campaignConfig: state.campaignConfig,
+      updateCampaignName: state.updateCampaignName, // <--- AÑADIDO: Seleccionar la acción
     }),
     shallow
   );
 
-  // --- INICIO DE INTEGRACIÓN CON ZUNDO ---
   // Se consume reactivamente el estado del historial desde la API de zundo.
   const { pastStates, futureStates, undo, redo, clear } = useStore(
     storeApi.temporal
   );
   // El "estado sucio" ahora se deriva directamente de la existencia de estados pasados.
   const isDirty = pastStates.length > 0;
-  // --- FIN DE INTEGRACIÓN CON ZUNDO ---
 
   const handleSave = useCallback(() => {
     if (!campaignConfig) {
@@ -100,22 +102,29 @@ export function useBuilderHeader() {
     isUndoDisabled: pastStates.length === 0,
     isRedoDisabled: futureStates.length === 0,
     handleSave,
+    updateCampaignName, // <--- EXPUESTO: La acción se devuelve para su uso en la UI
+    campaignConfig, // <--- EXPUESTO: campaignConfig se devuelve para acceder al nombre
     t,
   };
 }
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 8.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Funcionalidad de Historial Completa**: ((Implementada)) El hook ahora se suscribe a la API `temporal` de `zundo` y expone las funciones `undo` y `redo`, así como los estados `isUndoDisabled` y `isRedoDisabled`. Esto completa la conexión lógica entre el estado y la UI.
- * 2. **Lógica de "Estado Sucio" (Dirty State) Robusta**: ((Implementada)) El estado `isDirty` ahora se deriva directamente de la longitud del array `pastStates`, que es la SSoT para determinar si hay cambios sin guardar.
- * 3. **Integridad de Puntos de Guardado**: ((Implementada)) La función `handleSave` ahora invoca `clear()` del store `temporal` tras un guardado exitoso. Esta es una lógica de negocio crítica que previene que el usuario pueda "deshacer" cambios más allá de un punto de guardado, garantizando la integridad de los datos.
+ * 1. **Integración de Acción `updateCampaignName`**: ((Implementada)) El hook ahora consume la acción `updateCampaignName` del `campaignStructureSlice` del `BuilderStore` y la expone en su API de retorno. Esto es un paso crucial para habilitar la edición en línea del título de la campaña en el `BuilderHeader`.
+ * 2. **Exposición de `campaignConfig`**: ((Implementada)) Se ha añadido `campaignConfig` al objeto de retorno del hook para que el `BuilderHeader` pueda acceder al nombre de la campaña.
+ * 3. **Full Observabilidad**: ((Implementada)) La adición se ha integrado manteniendo el logging contextual existente.
+ * 4. **No Regresión**: ((Implementada)) Se ha mantenido toda la funcionalidad previa del hook, incluyendo la lógica de historial y guardado, sin introducir regresiones.
  *
  * @subsection Melhorias Futuras
  * 1. **Atajos de Teclado**: ((Vigente)) Se podría implementar un `useEffect` en este hook para registrar listeners de eventos de teclado (`keydown`) que invoquen `undo()` y `redo()` con `Ctrl+Z` y `Ctrl+Y`, proporcionando una UX de escritorio de élite.
  *
  * =====================================================================
  */
-// src/lib/hooks/use-builder-header.ts

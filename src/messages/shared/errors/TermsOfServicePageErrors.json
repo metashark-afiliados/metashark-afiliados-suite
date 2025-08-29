@@ -1,0 +1,25 @@
+
+{
+  "en-US": {
+    "title_required": "The terms of service title is required and cannot be empty.",
+    "section_title_required": "A section title in the terms of service is required and cannot be empty.",
+    "paragraph_required": "Each paragraph in the terms of service must not be empty.",
+    "body_content_required": "Each terms of service section must have at least one paragraph.",
+    "content_sections_required": "The terms of service must contain at least one content section."
+  },
+  "es-ES": {
+    "title_required": "El título de los términos de servicio es requerido y no puede estar vacío.",
+    "section_title_required": "Un título de sección en los términos de servicio es requerido y no puede estar vacío.",
+    "paragraph_required": "Cada párrafo en los términos de servicio no debe estar vacío.",
+    "body_content_required": "Cada sección de los términos de servicio debe tener al menos un párrafo.",
+    "content_sections_required": "Los términos de servicio deben contener al menos una sección de contenido."
+  },
+  "pt-BR": {
+    "title_required": "O título dos termos de serviço é obrigatório e не pode estar vazio.",
+    "section_title_required": "O título de uma seção nos termos de serviço é obrigatório e не pode estar vazio.",
+    "paragraph_required": "Cada parágrafo nos termos de serviço не deve estar vazio.",
+    "body_content_required": "Cada seção dos termos de serviço deve ter pelo menos um parágrafo.",
+    "content_sections_required": "Os termos de serviço devem conter pelo menos uma seção de conteúdo."
+  }
+}
+

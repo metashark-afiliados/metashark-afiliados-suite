@@ -1,76 +1,82 @@
 // src/components/dashboard/layout/dashboard-layout.tsx
 /**
  * @file dashboard-layout.tsx
- * @description Componente de cliente que actúa como el ensamblador principal para
- *              la estructura visual del dashboard. Define la rejilla de layout y
- *              compone los componentes de la barra lateral para vistas de escritorio y móvil.
- * @author Raz Podestá (adaptado de paddle-nextjs-starter-kit)
- * @version 1.0.0
+ * @description Ensamblador de UI de élite para el "Workspace Creativo". Ha sido
+ *              refactorizado holísticamente para consumir los componentes de
+ *              sidebar soberanos y correctos (`PrimarySidebar`, `DashboardSidebar`),
+ *              resolviendo un error crítico de módulo no encontrado e implementando
+ *              la nueva arquitectura de layout de dos columnas anidadas.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { type ReactNode } from "react";
+import React, { type ReactNode } from "react";
 
-import { DashboardGradient } from "@/components/gradients/dashboard-gradient";
-import { Sidebar } from "@/components/dashboard/layout/sidebar";
-import { SidebarUserInfo } from "@/components/dashboard/layout/sidebar-user-info";
-import "@/styles/dashboard.css";
+import { DashboardHeader } from "@/components/layout/DashboardHeader";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { PrimarySidebar } from "@/components/layout/sidebar/PrimarySidebar";
+import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
+import { useSyncDashboardPrefs } from "@/lib/hooks/use-sync-dashboard-prefs";
+import { clientLogger } from "@/lib/logging";
+import { cn } from "@/lib/utils";
 
-interface Props {
-  children: ReactNode;
-}
+/**
+ * @public
+ * @component DashboardLayout
+ * @description Ensambla la estructura visual completa del dashboard.
+ * @param {{ children: ReactNode }} props - El contenido de la página a renderizar.
+ * @returns {React.ReactElement}
+ */
+export function DashboardLayout({ children }: { children: ReactNode }) {
+  clientLogger.trace(
+    "[DashboardLayout:Client] Ensamblando UI de Workspace Creativo."
+  );
 
-export function DashboardLayout({ children }: Props) {
+  useSyncDashboardPrefs();
+  const { isSidebarCollapsed } = useDashboardUIStore();
+
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] relative overflow-hidden">
-      <DashboardGradient />
-
-      {/* --- Sidebar para Escritorio --- */}
-      <div className="hidden border-r bg-card/50 backdrop-blur-sm md:flex md:flex-col">
-        <div className="flex h-full max-h-screen flex-col gap-2">
-          <div className="flex h-[60px] items-center border-b px-6">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 font-semibold"
-            >
-              <Image
-                src="/images/logo.png"
-                alt="ConvertiKit Logo"
-                width={32}
-                height={32}
-                priority
-              />
-              <span className="text-lg font-bold text-foreground">
-                ConvertiKit
-              </span>
-            </Link>
-          </div>
-          <div className="flex flex-col grow overflow-y-auto">
-            <Sidebar />
-            <SidebarUserInfo />
-          </div>
+    <div className="flex min-h-screen w-full bg-muted/40">
+      <PrimarySidebar />
+      <div className="flex flex-1 pl-20">
+        <aside
+          className={cn(
+            "hidden md:flex flex-col transition-all duration-300 ease-in-out bg-card",
+            isSidebarCollapsed ? "w-0" : "w-64 border-r"
+          )}
+        >
+          {!isSidebarCollapsed && <DashboardSidebar />}
+        </aside>
+        <div className="flex flex-1 flex-col">
+          <DashboardHeader />
+          <main
+            id="main-content-scroller"
+            className="flex-1 overflow-y-auto p-4 sm:p-6"
+          >
+            {children}
+          </main>
         </div>
       </div>
-
-      {/* --- Contenido Principal --- */}
-      <div className="flex flex-col">{children}</div>
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Arquitectura de Ensamblaje (LEGO)**: ((Implementada)) Este componente es un ejemplo canónico de un ensamblador, componiendo múltiples átomos (`Sidebar`, `SidebarUserInfo`) en una estructura cohesiva.
- * 2. **Layout Responsivo**: ((Implementada)) Utiliza clases de Tailwind (`hidden`, `md:flex`) para renderizar la barra lateral solo en vistas de escritorio. La `MobileSidebar` será añadida en el `DashboardPageHeader`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-29
  *
- * @subsection Melhorias Futuras
- * 1. **Sidebar Colapsable**: ((Vigente)) Se podría introducir un estado (`isCollapsed`) en este componente y pasarlo a `Sidebar` para que renderice una versión compacta (solo iconos).
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Layouts Personalizables por Usuario:** El estado `isSidebarCollapsed` podría ser parte de un objeto de preferencias de layout más grande en `useDashboardUIStore` (y persistido en `profiles.dashboard_layout`). Esto permitiría al usuario personalizar no solo el estado de la barra lateral, sino también la disposición de los widgets en el dashboard.
+ * 2. ((Vigente)) **Contexto de Scroll:** Para una solución de virtualización aún más desacoplada, se podría crear un `ScrollContext` que exponga la referencia (`ref`) al elemento `<main>`, eliminando la dependencia de un ID de DOM estático.
  *
  * =====================================================================
  */
+// src/components/dashboard/layout/dashboard-layout.tsx

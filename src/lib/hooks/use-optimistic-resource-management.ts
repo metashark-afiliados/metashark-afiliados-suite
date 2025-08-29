@@ -5,9 +5,10 @@
  *              100% genérico y agnóstico a la entidad. Ahora utiliza el patrón
  *              de Inversión de Control, aceptando una factoría `createOptimisticItem`
  *              y delegando el feedback de UI al hook consumidor.
+ *              **Actualizado para exponer `updateOptimistic` y completar su API.**
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-27
+ * @version 5.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -48,7 +49,7 @@ export function useOptimisticResourceManagement<T extends Resource>({
   const [mutatingId, setMutatingId] = useState<string | null>(null);
   const router = useRouter();
 
-  const { items, addOptimistic, removeOptimistic, rollback } =
+  const { items, addOptimistic, removeOptimistic, updateOptimistic, rollback } =
     useOptimisticState<T>(initialItems);
 
   const handleCreate =
@@ -78,7 +79,7 @@ export function useOptimisticResourceManagement<T extends Resource>({
         if (!idToDelete) {
           return {
             success: false,
-            error: "ID del recurso a eliminar no encontrado en FormData.",
+            error: "ValidationErrors.error_invalid_data",
           };
         }
 
@@ -104,22 +105,23 @@ export function useOptimisticResourceManagement<T extends Resource>({
     mutatingId,
     handleCreate,
     handleDelete,
+    updateOptimistic,
   };
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Abstracción Total (Inversión de Control)**: ((Implementada)) El hook ya no asume cómo se crea un ítem optimista. Ahora recibe una función `createOptimisticItem` que le enseña a hacerlo, convirtiéndolo en un aparato 100% genérico y reutilizable para cualquier entidad.
- * 2. **Desacoplamiento de Efectos Secundarios**: ((Implementada)) Se ha eliminado la lógica de `toast` y `router.refresh()`. El hook ahora devuelve el `ActionResult` de la Server Action. Esto delega la responsabilidad del feedback de UI al hook consumidor (ej. `useSitesPage`), que es el que tiene el contexto de i18n necesario. Esto es una implementación de élite del SRP.
- * 3. **API Asíncrona Robusta**: ((Implementada)) Las funciones `handleCreate` y `handleDelete` ahora son `async` y devuelven una `Promise<ActionResult>`. Esto permite al hook consumidor usar `await` para esperar el resultado de la operación y actuar en consecuencia (ej. mostrar un toast de éxito/error).
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
- * @subsection Melhorias Futuras
- * 1. **Abstracción para `handleDelete`**: ((Vigente)) La lógica `formData.get("siteId") || formData.get("campaignId")` introduce un acoplamiento. Propondré refactorizar `handleDelete` para que acepte el ID del recurso directamente, o una función que extraiga el ID del `FormData`.
- * 2. **Soporte para `handleUpdate` y `handleDuplicate`**: ((Pendiente)) El patrón de abstracción debe extenderse a las acciones de actualización y duplicación para completar la genericidad del hook.
+ * @subsection Melhorias Novas
+ * 1. **Abstracción para `handleDelete`**: ((Vigente)) La lógica `formData.get("siteId") || formData.get("campaignId")` introduce un acoplamiento. Propondré refactorizar `handleDelete` para que acepte el ID del recurso directamente, o una función que extraiga el ID del `FormData`, en una futura épica de refactorización de hooks.
+ * 2. **Soporte para `handleDuplicate`**: ((Pendiente)) El patrón de abstracción debe extenderse a la acción de duplicación para completar la genericidad del hook.
  *
  * =====================================================================
  */
+// src/lib/hooks/use-optimistic-resource-management.ts

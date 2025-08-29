@@ -4,8 +4,9 @@
  * @description Define el contrato de datos para el namespace 'components.builder.BuilderHeader'.
  *              Este aparato atómico de validación garantiza la seguridad de tipos
  *              para la cabecera del constructor.
+ *              **Actualizado para incluir la clave `empty_campaign_name_placeholder`**.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 1.1.0
  */
 import { z } from "zod";
 
@@ -34,16 +35,28 @@ export const BuilderHeaderSchema = z.object({
     save_error_no_config: z.string(),
     save_error_default: z.string(),
   }),
+  // --- INICIO DE IMPLEMENTACIÓN HOLÍSTICA: Nueva clave de i18n ---
+  empty_campaign_name_placeholder: z.string(),
+  // --- FIN DE IMPLEMENTACIÓN HOLÍSTICA ---
 });
 
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
+ *
+ * @author Raz Podestá - MetaShark Tech
+ * @version 1.1.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Restauración de Integridad**: ((Implementada)) La creación de este schema resuelve otra dependencia crítica para la infraestructura de i18n.
+ * 1. **Clave de i18n para Placeholder**: ((Implementada)) Se ha añadido la clave `empty_campaign_name_placeholder` al esquema `BuilderHeaderSchema`. Esto es esencial para internacionalizar el texto del `EditableText` cuando el nombre de la campaña es nulo, garantizando el cumplimiento del protocolo de i18n.
+ * 2. **Integridad de Contrato**: ((Implementada)) El esquema ahora refleja con precisión el contrato de i18n de los componentes de la cabecera del constructor.
+ * 3. **Versionado Consistente**: ((Implementada)) Se ha incrementado la versión a `1.1.0` para reflejar esta adición.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Validación de Placeholders**: ((Vigente)) El esquema podría ser mejorado para validar la presencia de placeholders (`{username}`) si estos fueran necesarios en el futuro, utilizando `.describe("Placeholder: {username}")`.
  *
  * =====================================================================
  */
-// src/lib/validators/i18n/BuilderHeader.schema.ts

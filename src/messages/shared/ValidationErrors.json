@@ -1,4 +1,4 @@
-// src/messages/shared/ValidationErrors.json
+
 {
   "en-US": {
     "generic": {
@@ -127,6 +127,20 @@
       "site_delete_permission_denied": "You do not have permission to delete this site.",
       "site_delete_invalid_id": "Invalid site ID provided for deletion.",
       "site_delete_failed": "Failed to delete the site. Please try again."
+    },
+    "workspaces": {
+      "unauthenticated": "Authentication required to perform workspace actions.",
+      "create_invalid_data": "Invalid data provided for workspace creation.",
+      "create_failed": "Failed to create the workspace. Please try again.",
+      "update_name_permission_denied": "You do not have permission to rename this workspace.",
+      "update_name_failed": "Failed to update workspace name. Please try again.",
+      "delete_permission_denied": "You do not have permission to delete this workspace.",
+      "delete_last_owner_cannot_delete": "You are the last owner of this workspace. Transfer ownership or remove other members before deleting.",
+      "delete_failed": "Failed to delete the workspace. Please try again.",
+      "workspace_name_required": "Workspace name is required.",
+      "workspace_name_too_short": "Workspace name must be at least 3 characters.",
+      "workspace_name_too_long": "Workspace name cannot exceed 40 characters.",
+      "workspace_name_invalid_chars": "Workspace name can only contain letters, numbers, spaces, and hyphens."
     }
   },
   "es-ES": {
@@ -256,6 +270,20 @@
       "site_delete_permission_denied": "No tienes permiso para eliminar este sitio.",
       "site_delete_invalid_id": "ID de sitio inválido proporcionado para la eliminación.",
       "site_delete_failed": "No se pudo eliminar el sitio. Por favor, inténtalo de nuevo."
+    },
+    "workspaces": {
+      "unauthenticated": "Se requiere autenticación para realizar acciones en el workspace.",
+      "create_invalid_data": "Datos inválidos proporcionados para la creación del workspace.",
+      "create_failed": "No se pudo crear el workspace. Por favor, inténtalo de nuevo.",
+      "update_name_permission_denied": "No tienes permiso para renombrar este workspace.",
+      "update_name_failed": "No se pudo actualizar el nombre del workspace. Por favor, inténtalo de nuevo.",
+      "delete_permission_denied": "No tienes permiso para eliminar este workspace.",
+      "delete_last_owner_cannot_delete": "Eres el último propietario de este workspace. Transfiere la propiedad o elimina otros miembros antes de eliminarlo.",
+      "delete_failed": "No se pudo eliminar el workspace. Por favor, inténtalo de nuevo.",
+      "workspace_name_required": "El nombre del workspace es requerido.",
+      "workspace_name_too_short": "El nombre del workspace debe tener al menos 3 caracteres.",
+      "workspace_name_too_long": "El nombre del workspace no puede exceder los 40 caracteres.",
+      "workspace_name_invalid_chars": "El nombre del workspace solo puede contener letras, números, espacios y guiones."
     }
   },
   "pt-BR": {
@@ -385,6 +413,20 @@
       "site_delete_permission_denied": "Você não tem permissão para excluir este site.",
       "site_delete_invalid_id": "ID de site inválido fornecido para exclusão.",
       "site_delete_failed": "Falha ao excluir o site. Por favor, tente novamente."
+    },
+    "workspaces": {
+      "unauthenticated": "Autenticação necessária para realizar ações no workspace.",
+      "create_invalid_data": "Dados inválidos fornecidos para a criação do workspace.",
+      "create_failed": "Falha ao criar o workspace. Por favor, tente novamente.",
+      "update_name_permission_denied": "Você não tem permissão para renomear este workspace.",
+      "update_name_failed": "Falha ao atualizar o nome do workspace. Por favor, tente novamente.",
+      "delete_permission_denied": "Você não tem permissão para excluir este workspace.",
+      "delete_last_owner_cannot_delete": "Você é o último proprietário deste workspace. Transfira a propriedade ou remova outros membros antes de excluir.",
+      "delete_failed": "Falha ao excluir o workspace. Por favor, tente novamente.",
+      "workspace_name_required": "O nome do workspace é obrigatório.",
+      "workspace_name_too_short": "O nome do workspace deve ter pelo menos 3 caracteres.",
+      "workspace_name_too_long": "O nome do workspace não pode exceder 40 caracteres.",
+      "workspace_name_invalid_chars": "O nome do workspace pode conter apenas letras, números, espaços e hífens."
     }
   }
 }

@@ -1,13 +1,12 @@
-// src/lib/data/campaigns/management.data.ts
 /**
  * @file src/lib/data/campaigns/management.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de lectura
- *              y escritura para la gestión de campañas. Ha sido refactorizado para
- *              manejar correctamente el tipo de retorno de la relación `sites`,
- *              resolviendo el error de tipo TS2339.
- * @author Raz Podestá
- * @version 3.2.0
- * @date 2025-08-27
+ *              y escritura para la gestión de campañas. Ha sido refactorizado holísticamente
+ *              para manejar correctamente los tipos de retorno de las relaciones de Supabase,
+ *              restaurar la función `getRecentCampaignsByWorkspaceId`, y corregir la API de `React.cache`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.1.0
+ * @date 2025-08-29
  */
 "use server";
 import "server-only";
@@ -17,7 +16,7 @@ import { type SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
 import { createClient as createServerClient } from "@/lib/supabase/server";
-import { type TablesInsert } from "@/lib/types/database";
+import { type Tables, type TablesInsert } from "@/lib/types/database";
 
 import { type CampaignMetadata, type CampaignSiteInfo } from "./types";
 
@@ -84,13 +83,11 @@ export const getCampaignSiteInfoById = cache(
     const supabase = createServerClient();
     const { data, error } = await supabase
       .from("campaigns")
-      .select(`site_id, sites (workspace_id)`)
+      .select(`site_id, sites!inner(workspace_id)`)
       .eq("id", campaignId)
       .single();
 
-    // --- INICIO DE CORRECCIÓN DE TIPO (TS2339) ---
-    // La relación `sites` devuelve un array. Accedemos al primer elemento.
-    const siteInfo = data?.sites?.[0];
+    const siteInfo = Array.isArray(data?.sites) ? data.sites[0] : data?.sites;
 
     if (error || !data || !siteInfo) {
       if (error && error.code !== "PGRST116") {
@@ -106,7 +103,42 @@ export const getCampaignSiteInfoById = cache(
       site_id: data.site_id,
       workspace_id: siteInfo.workspace_id,
     };
-    // --- FIN DE CORRECCIÓN DE TIPO (TS2339) ---
+  }
+);
+
+export const getRecentCampaignsByWorkspaceId = cache(
+  async (
+    workspaceId: string,
+    limit: number,
+    supabaseClient?: Supabase
+  ): Promise<
+    Pick<
+      Tables<"campaigns">,
+      "id" | "name" | "updated_at" | "created_at" | "creation_id"
+    >[]
+  > => {
+    const supabase = supabaseClient || createServerClient();
+    logger.trace(
+      `[Cache MISS] Cargando campañas recientes para workspace: ${workspaceId}`
+    );
+
+    const { data, error } = await supabase
+      .from("campaigns")
+      .select(
+        "id, name, updated_at, created_at, creation_id, sites!inner(workspace_id)"
+      )
+      .eq("sites.workspace_id", workspaceId)
+      .order("updated_at", { ascending: false, nullsFirst: false })
+      .limit(limit);
+
+    if (error) {
+      logger.error(
+        `[DataLayer:Campaigns] Error al obtener campañas recientes para workspace ${workspaceId}:`,
+        error
+      );
+      return [];
+    }
+    return data || [];
   }
 );
 
@@ -134,17 +166,14 @@ export async function insertCampaignRecord(
   );
   return newCampaign;
 }
+
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Resolución de Error de Tipo (`TS2339`)**: Se ha corregido la lógica para acceder a `data.sites[0]` y se ha añadido una verificación de existencia (`!siteInfo`), resolviendo el error de compilación de forma robusta.
- *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Tipos Derivados de Consulta**: Para una seguridad de tipos de élite, el tipo de `data` podría ser inferido directamente de la consulta de Supabase, eliminando la necesidad de manejar manualmente la diferencia entre objeto y array.
+ * 1. **Vista Materializada para `recent_campaigns`**: ((Vigente)) Para un rendimiento de élite a gran escala, se podría crear una vista materializada en la base de datos que pre-calcule las campañas recientes por workspace, y esta función consultaría esa vista.
  *
  * =====================================================================
  */
-// src/lib/data/campaigns/management.data.ts

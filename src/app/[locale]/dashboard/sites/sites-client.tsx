@@ -1,13 +1,14 @@
 // src/app/[locale]/dashboard/sites/sites-client.tsx
 /**
  * @file sites-client.tsx
- * @description Orquestador de UI. Ha sido refactorizado a un estándar de élite
- *              para consumir el hook soberano `useSitesPage` simplificado,
- *              alineando la capa de presentación con la nueva arquitectura de
- *              hooks atómicos.
+ * @description Orquestador de UI de élite. Ha sido refactorizado holísticamente
+ *              para consumir el hook soberano `useSitesPage`, alinear todas sus
+ *              importaciones con la arquitectura de módulos atomizada, y propagar
+ *              correctamente la lógica de edición en línea, resolviendo una cascada
+ *              de errores de tipo y de módulo.
  * @author Raz Podestá - MetaShark Tech
- * @version 16.0.0
- * @date 2025-08-27
+ * @version 18.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -21,14 +22,14 @@ import { PaginatedResourceView } from "@/components/shared/PaginatedResourceView
 import { CreateSiteForm } from "@/components/sites/CreateSiteForm";
 import { SitesGrid } from "@/components/sites/SitesGrid";
 import { SitesHeader } from "@/components/sites/SitesHeader";
-import { SitesTable } from "@/components/sites/SitesTable";
+import { SitesTable } from "@/components/sites/SitesTable"; // <-- CORRECCIÓN: Importación ahora válida
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { type SiteWithCampaignCount } from "@/lib/data/sites";
+import { type SiteWithCampaignCount } from "@/lib/data/sites"; // <-- CORRECCIÓN: Ruta de tipo canónica
 import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
 import { useSitesPage } from "@/lib/hooks/useSitesPage";
 import { clientLogger } from "@/lib/logging";
@@ -52,7 +53,7 @@ interface SitesClientProps {
  */
 export function SitesClient(props: SitesClientProps): React.ReactElement {
   clientLogger.trace(
-    "[SitesClient] Renderizando orquestador de UI puro y simplificado."
+    "[SitesClient] Renderizando orquestador de UI refactorizado."
   );
 
   const { tSitesPage, tErrors } = useSitesPageTranslations();
@@ -67,15 +68,18 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
     openCreateDialog,
     setCreateDialogOpen,
     handleCreate,
-    ...headerProps // El resto de las props son para el encabezado
+    handleUpdateSiteName,
+    ...headerProps
   } = useSitesPage(props);
 
   if (!activeWorkspaceId) {
     return (
       <ErrorStateCard
         icon={AlertTriangle}
-        title={tErrors("error_unauthenticated")}
-        description={tErrors("error_no_active_workspace")}
+        // --- INICIO DE CORRECCIÓN DE I18N (TS2345) ---
+        title={tErrors("generic.error_unauthenticated")}
+        description={tErrors("generic.error_no_active_workspace")}
+        // --- FIN DE CORRECCIÓN DE I18N (TS2345) ---
       />
     );
   }
@@ -115,6 +119,11 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
               onDelete={handleDelete!}
               isPending={isPending}
               deletingSiteId={mutatingId}
+              handleUpdateSiteName={handleUpdateSiteName}
+              isUpdatingName={
+                isPending && !mutatingId?.startsWith("optimistic-")
+              }
+              updatingSiteNameId={mutatingId}
             />
           ) : (
             <SitesTable
@@ -122,6 +131,16 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
               onDelete={handleDelete!}
               isPending={isPending}
               deletingSiteId={mutatingId}
+              handleUpdateSiteName={handleUpdateSiteName}
+              isUpdatingName={
+                isPending && !mutatingId?.startsWith("optimistic-")
+              }
+              updatingSiteNameId={mutatingId}
+              page={props.page}
+              totalCount={props.totalCount}
+              limit={props.limit}
+              basePath="/dashboard/sites"
+              searchQuery={headerProps.searchQuery}
             />
           )
         }
@@ -129,14 +148,18 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  *
- * @subsection Melhorias Futuras
- * 1. **Contexto de Página (`SitesPageContext`)**: ((Vigente)) Para eliminar completamente el "prop drilling", el `SitesClient` podría actuar como un proveedor de contexto. Proporcionaría el valor de retorno del hook `useSitesPage` a todos sus componentes hijos (`SitesHeader`, `PaginatedResourceView`, etc.), permitiéndoles consumir el estado y las acciones directamente sin necesidad de pasar props.
- * 2. **Abstracción del Diálogo de Creación**: ((Vigente)) El patrón de `Dialog` y `CreateSiteForm` podría ser encapsulado en su propio componente `CreateSiteDialog` para una mayor cohesión, siguiendo el patrón de los diálogos de workspace.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 18.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ *
+ * @subsection Melhorias Novas
+ * 1. **Contexto de Página (`SitesPageContext`)**: ((Vigente)) Para eliminar completamente el "prop drilling", este componente podría actuar como un proveedor de contexto, haciendo que el valor de retorno del hook `useSitesPage` esté disponible para todos sus componentes hijos sin necesidad de pasar props explícitamente.
  *
  * =====================================================================
  */

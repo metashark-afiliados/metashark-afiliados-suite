@@ -4,9 +4,10 @@
  * @description Aparato de configuración de UI puro. Factoría que construye y
  *              devuelve la definición de columnas para la vista de tabla de sitios,
  *              reutilizando componentes soberanos para las celdas.
+ *              **Actualizado para integrar `EditableText` en la columna del nombre del sitio.**
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-26
+ * @version 2.0.0
+ * @date 2025-08-28
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -16,15 +17,25 @@ import React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useFormatter, useTranslations } from "next-intl";
 
+import { EditableText } from "@/components/builder/ui/EditableText";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { Link } from "@/lib/navigation";
 import { clientLogger } from "@/lib/logging";
 import { SiteCardFooter } from "./SiteCardFooter";
 
-interface GetSitesTableColumnsProps {
+/**
+ * @public
+ * @interface GetSitesTableColumnsProps
+ * @description Contrato de props para la factoría de columnas. Define todas las
+ *              dependencias (funciones de traducción, manejadores de acciones, estado)
+ *              que se pasarán a los componentes de celda atómicos.
+ */
+export interface GetSitesTableColumnsProps {
   onDelete: (formData: FormData) => void;
   isPending: boolean;
   deletingSiteId: string | null;
+  handleUpdateSiteName: (siteId: string, newName: string) => Promise<void>;
+  isUpdatingName: boolean;
+  updatingSiteNameId: string | null;
 }
 
 /**
@@ -32,19 +43,23 @@ interface GetSitesTableColumnsProps {
  * @function getSitesTableColumns
  * @description Factoría de configuración pura. Construye y devuelve el array de
  *              definiciones de columna para la tabla de sitios.
- * @param {GetSitesTableColumnsProps} props - Dependencias para las celdas de acción.
+ *              **Ahora incluye `EditableText` para el nombre del sitio.**
+ * @param {GetSitesTableColumnsProps} props - Dependencias para las celdas de acción y edición.
  * @returns {ColumnDef<SiteWithCampaignCount>[]} El array de configuración de columnas.
  */
 export const getSitesTableColumns = ({
   onDelete,
   isPending,
   deletingSiteId,
+  handleUpdateSiteName,
+  isUpdatingName,
+  updatingSiteNameId,
 }: GetSitesTableColumnsProps): ColumnDef<SiteWithCampaignCount>[] => {
   const t = useTranslations("SitesPage");
   const format = useFormatter();
 
   clientLogger.trace(
-    "[SitesTableColumns] Construyendo definiciones de columnas."
+    "[SitesTableColumns] Construyendo definiciones de columnas con EditableText."
   );
 
   return [
@@ -53,15 +68,14 @@ export const getSitesTableColumns = ({
       header: t("table.header_name"),
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <Link
-            href={{
-              pathname: "/dashboard/sites/[siteId]/campaigns",
-              params: { siteId: row.original.id },
-            }}
-            className="font-semibold hover:underline"
-          >
-            {row.original.name}
-          </Link>
+          <EditableText
+            tag="p"
+            value={row.original.name || t("card.emptySiteNamePlaceholder")}
+            onSave={(newName) => handleUpdateSiteName(row.original.id, newName)}
+            className="font-semibold text-lg hover:underline cursor-pointer"
+            placeholder={t("card.emptySiteNamePlaceholder")}
+            disabled={isUpdatingName && updatingSiteNameId === row.original.id}
+          />
           <span className="text-xs text-muted-foreground font-mono">
             {row.original.subdomain}
           </span>
@@ -107,15 +121,16 @@ export const getSitesTableColumns = ({
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Definición de Vista de Tabla:** Este aparato establece la estructura para la nueva vista de tabla, un requisito fundamental para la mejora de UX.
- * 2. ((Implementada)) **Reutilización de Componentes (LEGO):** La celda de "Acciones" reutiliza el componente `SiteCardFooter`, demostrando una composición de élite y un cumplimiento estricto del principio DRY.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-28
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Cabeceras Ordenables:** Las cabeceras (`header`) podrían ser refactorizadas para renderizar un componente de botón que, al ser clickeado, invoque un `callback` para controlar el ordenamiento de los datos en `useSitesPage`.
- * 2. ((Vigente)) **Inline Editing:** El campo de nombre podría convertirse en un componente de edición en línea (similar al `WorkspaceTrigger`) para permitir la edición rápida sin navegar a otra página.
+ * @subsection Melhorias Novas
+ * 1. **Edición en Línea del Subdominio**: ((Vigente)) La columna `subdomain` también podría ser un candidato para `EditableText` con validación de disponibilidad en tiempo real (similar a `SubdomainInput`), pero esto es una funcionalidad más compleja que requiere su propia Server Action.
+ * 2. **Cabeceras Ordenables**: ((Vigente)) Las cabeceras (`header`) podrían ser refactorizadas para renderizar un componente de botón que, al ser clickeado, invoque un `callback` para controlar el ordenamiento de los datos en `useSitesPage`.
  *
  * =====================================================================
  */

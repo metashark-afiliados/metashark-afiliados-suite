@@ -1,53 +1,40 @@
 // src/components/authentication/sign-up-form.tsx
 /**
- * @file sign-up-form.tsx
- * @description Orquestador de UI soberano para el formulario de registro.
- *              Refactorizado a un estándar de élite para ser un componente de
- *              presentación más puro, recibiendo textos de OAuth vía props y
- *              resolviendo dependencias cruzadas de i18n que causaban errores de build.
+ * @file src/components/authentication/sign-up-form.tsx
+ * @description Orquestador de UI y lógica para el formulario de registro.
+ *              Ha sido refactorizado holísticamente para eliminar la colisión
+ *              entre `useFormState` y `react-hook-form`, adoptando `useTransition`
+ *              para una gestión de estado de Server Action robusta y tipo-segura.
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-25
+ * @version 3.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
-import React from "react";
+import React, { useTransition } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useFormState, useFormStatus } from "react-dom";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import type { z } from "zod";
+import { type z } from "zod";
 
-import { signUpAction } from "@/lib/actions/auth.actions";
-import { SignUpSchema } from "@/lib/validators";
+import { OAuthButtonGroup } from "@/components/authentication";
 import { Button } from "@/components/ui/button";
+import { signUpAction } from "@/lib/actions/auth.actions";
+import { useTypedTranslations } from "@/lib/i18n/hooks";
+import { clientLogger } from "@/lib/logging";
+import { isActionError, SignUpSchema } from "@/lib/validators";
 import {
-  SignUpEmailField,
-  SignUpPasswordField,
   SignUpConfirmPasswordField,
+  SignUpEmailField,
   SignUpLegalCheckboxes,
-} from "./sign-up-form/index";
-import {
-  OAuthButtonGroup,
-  type OAuthButtonGroupProps,
-} from "./OAuthButtonGroup";
+  SignUpPasswordField,
+} from "./sign-up-form/";
 
 type FormData = z.infer<typeof SignUpSchema>;
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  const t = useTranslations("app.[locale].signup.page");
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {pending ? t("signUpButton_pending") : t("signUpButton")}
-    </Button>
-  );
-}
 
 export interface SignupFormProps {
   texts: {
@@ -58,17 +45,23 @@ export interface SignupFormProps {
   };
 }
 
-export function SignupForm({ texts }: SignupFormProps) {
-  const tErrors = useTranslations("shared.ValidationErrors");
-  const [state, formAction] = useFormState(signUpAction, {
-    success: false,
-    error: "",
-  });
+/**
+ * @public
+ * @component SignupForm
+ * @description Orquesta la UI y la lógica para el formulario de registro.
+ * @param {SignupFormProps} props - Propiedades para configurar los textos del componente.
+ * @returns {React.ReactElement}
+ */
+export function SignupForm({ texts }: SignupFormProps): React.ReactElement {
+  clientLogger.trace("[SignupForm] Renderizando orquestador de UI.");
+  const t = useTranslations("app.[locale].signup.page");
+  const tErrors = useTypedTranslations("shared.ValidationErrors");
+  const [isPending, startTransition] = useTransition();
 
   const {
     register,
-    handleSubmit,
     control,
+    handleSubmit,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
@@ -76,86 +69,93 @@ export function SignupForm({ texts }: SignupFormProps) {
     mode: "onTouched",
     defaultValues: {
       termsAccepted: false,
-      newsletterSubscribed: false,
+      newsletterSubscribed: true,
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
-  const password = watch("password");
-
-  React.useEffect(() => {
-    if (!state.success && state.error) {
-      toast.error(tErrors(state.error as any));
-    }
-  }, [state, tErrors]);
+  const passwordValue = watch("password");
 
   const processSubmit: SubmitHandler<FormData> = (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, String(value));
+    startTransition(async () => {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, String(value));
+      });
+
+      const result = await signUpAction(null, formData);
+
+      if (isActionError(result)) {
+        const errorMessage = tErrors(result.error as any, {
+          defaultValue: result.error,
+        });
+        toast.error(errorMessage);
+      }
     });
-    formAction(formData);
   };
 
-  const isPending = useFormStatus().pending || isSubmitting;
-
-  const oauthButtonGroupTexts: OAuthButtonGroupProps["texts"] = {
-    signInWithProvider: texts.oauth.signInWithProvider,
-  };
+  const isLoading = isSubmitting || isPending;
 
   return (
-    <form onSubmit={handleSubmit(processSubmit)} className="space-y-4 p-6">
-      <SignUpEmailField
-        register={register}
-        errors={errors}
-        isPending={isPending}
-      />
-      <SignUpPasswordField
-        register={register}
-        errors={errors}
-        isPending={isPending}
-        passwordValue={password}
-      />
-      <SignUpConfirmPasswordField
-        register={register}
-        errors={errors}
-        isPending={isPending}
-      />
-      <SignUpLegalCheckboxes
-        control={control}
-        errors={errors}
-        isPending={isPending}
-      />
-      <SubmitButton />
-      <div className="relative my-2">
+    <div className="space-y-4 p-6">
+      <OAuthButtonGroup providers={["google"]} texts={texts.oauth} />
+      <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
-            {texts.oauth.signInWith}
+            {t("signInWith")}
           </span>
         </div>
       </div>
-      <OAuthButtonGroup
-        providers={["google", "apple"]}
-        texts={oauthButtonGroupTexts}
-      />
-    </form>
+      <form onSubmit={handleSubmit(processSubmit)} className="space-y-4">
+        <SignUpEmailField
+          register={register}
+          errors={errors}
+          isPending={isLoading}
+        />
+        <SignUpPasswordField
+          register={register}
+          errors={errors}
+          isPending={isLoading}
+          passwordValue={passwordValue}
+        />
+        <SignUpConfirmPasswordField
+          register={register}
+          errors={errors}
+          isPending={isLoading}
+        />
+        <SignUpLegalCheckboxes
+          control={control}
+          errors={errors}
+          isPending={isLoading}
+        />
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isLoading ? t("signUpButton_pending") : t("signUpButton")}
+        </Button>
+      </form>
+    </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Arquitectura de Orquestador Atómico: El componente ahora ensambla los campos atómicos, cumpliendo perfectamente con la "Filosofía LEGO".
- * 2. ((Implementada)) Resolución de Dependencia Cruzada: Al recibir los textos de OAuth vía `props`, se elimina la dependencia cruzada de namespaces que causaba el `FORMATTING_ERROR`.
- * 3. ((Implementada)) Formulario Soberano: La integración con `react-hook-form`, `zodResolver` y `useFormState` representa una implementación de élite para la gestión de formularios en React.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) Para una pureza de élite, todas las llamadas a `useTranslations` (incluyendo `tErrors` y la del `SubmitButton`) podrían ser eliminadas y sus textos requeridos pasados a través de `props` desde la página orquestadora.
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Hook `useSignUpForm`:** Para una pureza arquitectónica de élite, toda la lógica de `useForm`, `useTransition` y `processSubmit` podría ser abstraída a un hook soberano `useSignUpForm`. Esto convertiría a `SignupForm` en un componente de presentación 100% puro, enfocado exclusivamente en el ensamblaje de la UI.
+ * 2. ((Vigente)) **Feedback Visual en `isPending`:** El estado `isPending` se pasa a los campos, pero se podría mejorar el feedback visual en los `Inputs` y `Checkboxes` (no solo `disabled`) para indicar que el formulario se está procesando, por ejemplo, con un overlay semitransparente.
  *
  * =====================================================================
  */
+// src/components/authentication/sign-up-form.tsx

@@ -1,0 +1,40 @@
+
+{
+  "en-US": {
+    "send_unauthenticated": "Authentication required to send invitations.",
+    "send_self_invite_forbidden": "You cannot invite yourself to a workspace.",
+    "send_already_invited_or_member": "This user has already been invited or is already a member.",
+    "send_failed": "Failed to send invitation. Please try again.",
+    "send_invalid_data": "Invalid invitation data provided.",
+    "accept_unauthenticated": "Authentication required to accept an invitation.",
+    "accept_processing_failed": "Could not process the invitation. It may be invalid or expired.",
+    "accept_failed": "Failed to accept the invitation. Please try again.",
+    "send_success": "Invitation sent successfully to {email}!",
+    "accept_success": "Welcome to the team! You have successfully joined the workspace."
+  },
+  "es-ES": {
+    "send_unauthenticated": "Se requiere autenticación para enviar invitaciones.",
+    "send_self_invite_forbidden": "No puedes invitarte a ti mismo a un workspace.",
+    "send_already_invited_or_member": "Este usuario ya ha sido invitado o ya es miembro.",
+    "send_failed": "No se pudo enviar la invitación. Por favor, inténtalo de nuevo.",
+    "send_invalid_data": "Datos de invitación inválidos proporcionados.",
+    "accept_unauthenticated": "Se requiere autenticación para aceptar una invitación.",
+    "accept_processing_failed": "No se pudo procesar la invitación. Puede que sea inválida o haya expirado.",
+    "accept_failed": "No se pudo aceptar la invitación. Por favor, inténtalo de nuevo.",
+    "send_success": "¡Invitación enviada con éxito a {email}!",
+    "accept_success": "¡Bienvenido al equipo! Te has unido al workspace con éxito."
+  },
+  "pt-BR": {
+    "send_unauthenticated": "Autenticação necessária para enviar convites.",
+    "send_self_invite_forbidden": "Você не pode convidar a si mesmo para um workspace.",
+    "send_already_invited_or_member": "Este usuário já foi convidado ou já é membro.",
+    "send_failed": "Falha ao enviar convite. Por favor, tente novamente.",
+    "send_invalid_data": "Dados de convite inválidos fornecidos.",
+    "accept_unauthenticated": "Autenticação necessária para aceitar um convite.",
+    "accept_processing_failed": "Não foi possível processar o convite. Ele pode ser inválido ou ter expirado.",
+    "accept_failed": "Falha ao aceitar o convite. Por favor, tente novamente.",
+    "send_success": "Convite enviado com sucesso para {email}!",
+    "accept_success": "Bem-vindo à equipe! Você se juntou ao workspace com sucesso."
+  }
+}
+

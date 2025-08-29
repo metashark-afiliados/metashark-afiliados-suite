@@ -4,21 +4,21 @@
  * @description Manifiesto principal de la API de Acciones del Servidor. Ha sido
  *              refactorizado para eliminar la directiva "server-only", resolviendo
  *              un error de build crítico al permitir importaciones atómicas desde
- *              el cliente, y **ahora incluye la Server Action de L.I.A.**
- * @author Raz Podestá
- * @version 8.0.0
+ *              el cliente, y **ahora incluye las Server Actions de L.I.A. y Contacto**.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 9.0.0
  * @date 2025-08-28
  * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 import * as admin from "./admin.actions";
 import * as auth from "./auth.actions";
 import * as builder from "./builder.actions";
 import * as campaigns from "./campaigns.actions";
-import * as invitations from "./invitations.actions";
-// --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Importación de L.I.A. Actions ---
-import * as lia from "./lia.actions";
+// --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Importación de Contact Actions ---
+import * as contact from "./contact.actions";
 // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
+import * as invitations from "./invitations.actions";
+import * as lia from "./lia.actions";
 import * as newsletter from "./newsletter.actions";
 import * as onboarding from "./onboarding.actions";
 import * as password from "./password.actions";
@@ -34,8 +34,9 @@ export {
   auth,
   builder,
   campaigns,
+  contact, // <-- NUEVA EXPORTACIÓN
   invitations,
-  lia, // <-- NUEVA EXPORTACIÓN
+  lia,
   newsletter,
   onboarding,
   password,
@@ -51,13 +52,13 @@ export {
  *                           MEJORA CONTINUA
  *
  * @author Raz Podestá - MetaShark Tech
- * @version 8.0.0
+ * @version 9.0.0
  * @date 2025-08-28
  * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Manifiesto**: ((Implementada)) Se ha añadido la exportación del nuevo módulo `lia.actions.ts`. Esto garantiza que la Server Action de IA esté disponible para el consumo en el cliente y mantiene el manifiesto como la SSoT para las acciones.
+ * 1. **Sincronización de Manifiesto**: ((Implementada)) Se ha añadido la exportación del nuevo módulo `contact.actions.ts`. Esto garantiza que la Server Action de contacto esté disponible para el consumo en el cliente y mantiene el manifiesto como la SSoT para las acciones.
+ * 2. **Versionado Consistente**: ((Implementada)) Se ha incrementado la versión a `9.0.0` para reflejar esta adición significativa.
  *
  * @subsection Melhorias Futuras
  * 1. **Generación Automática**: ((Vigente)) Este archivo manifiesto es un candidato ideal para ser generado y mantenido por un script que lea la estructura del directorio `actions`, eliminando la necesidad de actualizaciones manuales.

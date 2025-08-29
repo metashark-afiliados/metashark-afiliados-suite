@@ -3,12 +3,11 @@
  * @file dashboard-team-members-card.tsx
  * @description Componente de UI que renderiza una tarjeta mostrando los miembros
  *              del equipo. Ha sido refactorizado holísticamente a un estándar
- *              de élite: ahora es full internacionalizado y está conectado al sistema
- *              de estado global para invocar el diálogo de invitación, y lo más
- *              importante, **consume datos reales del `useDashboard` hook**.
+ *              de élite para consumir datos reales del `useDashboard` hook,
+ *              eliminando por completo los datos mockeados.
  * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
- * @date 2025-08-28
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -23,26 +22,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useWorkspaceDialogStore } from "@/lib/hooks/useWorkspaceDialogStore";
 import { clientLogger } from "@/lib/logging";
-import { type Tables } from "@/lib/types/database";
-
-// --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Eliminación de datos mockeados ---
-// Los datos de los miembros ahora provienen de `useDashboard`.
-// --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
 
 /**
  * @public
  * @component DashboardTeamMembersCard
  * @description Renderiza la tarjeta de miembros del equipo en el Hub Creativo.
- *              Ahora consume datos reales de los miembros del workspace activo
- *              a través del `useDashboard` hook.
+ *              Consume datos reales de los miembros del workspace activo.
  * @returns {React.ReactElement}
  */
 export function DashboardTeamMembersCard(): React.ReactElement {
   const t = useTranslations("components.dashboard.DashboardTeamMembersCard");
   const openInviteDialog = useWorkspaceDialogStore((state) => state.open);
-  // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Consumo de datos reales ---
   const { workspaceMembers } = useDashboard();
-  // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
+
+  clientLogger.trace(
+    "[DashboardTeamMembersCard] Renderizando con datos reales.",
+    { memberCount: workspaceMembers?.length ?? 0 }
+  );
 
   const handleInviteClick = () => {
     clientLogger.info(
@@ -93,8 +89,7 @@ export function DashboardTeamMembersCard(): React.ReactElement {
                     {member.profiles?.full_name?.charAt(0).toUpperCase() ||
                       member.profiles?.email?.charAt(0).toUpperCase() || (
                         <UserIcon className="h-4 w-4" />
-                      )}{" "}
-                    {/* Fallback Icon */}
+                      )}
                   </AvatarFallback>
                 </Avatar>
                 <div className={"flex flex-col gap-1"}>
@@ -106,17 +101,17 @@ export function DashboardTeamMembersCard(): React.ReactElement {
                   <span className={"text-sm leading-5 text-muted-foreground"}>
                     {member.profiles?.email}
                   </span>
-                  {/* --- INICIO DE MEJORA HOLÍSTICA: Mostrar el rol --- */}
-                  <span className={"text-xs leading-4 text-primary"}>
+                  <span
+                    className={"text-xs leading-4 text-primary font-semibold"}
+                  >
                     {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                   </span>
-                  {/* --- FIN DE MEJORA HOLÍSTICA --- */}
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground pt-4">
             {t("no_members_yet")}
           </p>
         )}
@@ -124,28 +119,19 @@ export function DashboardTeamMembersCard(): React.ReactElement {
     </Card>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
+ * =====================================================================
  *
  * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @date 2025-08-29
  *
- * @subsection Melhorias Adicionadas
- * 1. **Conexión a Datos Dinámicos (Prioridad ALTA)**: ((Implementada)) El componente ahora consume la lista `workspaceMembers` del `useDashboard()` hook, resolviendo la brecha de datos mockeados y mostrando información real de los miembros del equipo.
- * 2. **Visualización de Roles**: ((Implementada)) Se ha añadido la visualización del `role` de cada miembro, que se traduce y muestra con capitalización inicial.
- * 3. **Gestión de Avatar Robusta**: ((Implementada)) El `AvatarImage` y `AvatarFallback` ahora manejan de forma robusta la ausencia de `avatar_url` o `full_name`, mostrando el inicial del email o un icono genérico.
- * 4. **Estado Vacío Internacionalizado**: ((Implementada)) Se ha utilizado la nueva clave de i18n `no_members_yet` para mostrar un mensaje cuando no hay miembros en el equipo.
- * 5. **Full Observabilidad**: ((Implementada)) Se mantiene el `clientLogger` para trazar el renderizado del componente.
- *
- * @subsection Melhorias Futuras
- * 1. **Acciones por Miembro**: ((Vigente)) Una mejora de élite sería añadir un `DropdownMenu` para cada miembro que permita acciones como "Cambiar Rol", "Eliminar Miembro" o "Ver Perfil".
- * 2. **Paginación de Miembros**: ((Vigente)) Para workspaces con muchos miembros, este componente podría integrarse con paginación o virtualización para un rendimiento óptimo.
- * 3. **Internacionalización de Roles**: ((Vigente)) Los nombres de roles (ej. "Owner") se muestran capitalizados. Para una internacionalización completa, se debería usar `t(member.role as any)` si los roles estuvieran definidos en el JSON de i18n.
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Acciones por Miembro:** Añadir un `DropdownMenu` ("...") junto a cada miembro para permitir acciones contextuales como "Cambiar Rol" o "Eliminar Miembro". Esto requeriría nuevas Server Actions y diálogos de confirmación.
+ * 2. ((Vigente)) **Internacionalización de Roles:** Los nombres de roles (ej. "Owner") se muestran capitalizados directamente desde la base de datos. Para una internacionalización completa, se debería usar `t(member.role as any)` si los roles estuvieran definidos en el JSON de i18n, o un mapeo dedicado.
+ * 3. ((Vigente)) **Paginación/Virtualización:** Para workspaces con un gran número de miembros, la lista podría ser paginada o virtualizada para garantizar un rendimiento óptimo a escala.
  *
  * =====================================================================
  */

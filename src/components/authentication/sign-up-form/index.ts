@@ -1,12 +1,12 @@
 // src/components/authentication/sign-up-form/index.ts
 /**
- * @file index.ts
- * @description Manifiesto (Barrel File) y API pública para el ecosistema
- *              atómico del formulario de registro. Define una fachada cohesiva
- *              para el módulo, exportando todos sus componentes de campo.
+ * @file src/components/authentication/sign-up-form/index.ts
+ * @description Manifiesto (Barrel File) y API pública para los componentes de campo
+ *              atómicos del formulario de registro. Centraliza las exportaciones,
+ *              adhiriéndose a la "Filosofía LEGO" para una máxima modularidad.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-25
+ * @version 2.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -20,8 +20,8 @@ export * from "./SignUpLegalCheckboxes";
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Cohesión de Módulo (LEGO)**: ((Implementada)) Este manifiesto agrupa todos los aparatos del ecosistema de formulario de registro en un único módulo cohesivo.
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Generación Automática de Manifiestos:** Para una mantenibilidad de élite a largo plazo, este tipo de archivo "barrel" es un candidato ideal para ser generado y mantenido por un script (`pnpm gen:manifests`) que lea la estructura del directorio. Esto eliminaría la necesidad de actualizaciones manuales y prevendría errores de omisión.
  *
  * =====================================================================
  */

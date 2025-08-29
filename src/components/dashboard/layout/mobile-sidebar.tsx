@@ -2,21 +2,36 @@
 /**
  * @file mobile-sidebar.tsx
  * @description Componente de cliente que ensambla la barra lateral para la vista móvil.
- *              Utiliza el componente `Sheet` para crear un menú desplegable que contiene
- *              la navegación principal y la información del usuario.
- * @author Raz Podestá (adaptado de paddle-nextjs-starter-kit)
- * @version 1.0.0
+ *              Ha sido refactorizado holísticamente para consumir el componente
+ *              soberano `DashboardSidebar`, resolviendo un error crítico de módulo
+ *              no encontrado y completando la arquitectura de layout del dashboard.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { Menu } from "lucide-react";
 
-import { Sidebar } from "@/components/dashboard/layout/sidebar";
-import { SidebarUserInfo } from "@/components/dashboard/layout/sidebar-user-info";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { clientLogger } from "@/lib/logging";
 
-export function MobileSidebar() {
+/**
+ * @public
+ * @component MobileSidebar
+ * @description Ensambla la barra lateral para la vista móvil, utilizando el
+ *              componente `Sheet` para crear un menú desplegable.
+ * @returns {React.ReactElement}
+ */
+export function MobileSidebar(): React.ReactElement {
+  clientLogger.trace(
+    "[MobileSidebar] Renderizando ensamblador de sidebar móvil."
+  );
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -25,26 +40,25 @@ export function MobileSidebar() {
           <span className="sr-only">Toggle navigation menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="flex flex-col p-0">
-        {/* Aquí se ensamblan los componentes atómicos ya creados */}
-        <Sidebar />
-        <SidebarUserInfo />
+      <SheetContent side="left" className="flex flex-col p-0 bg-card">
+        <DashboardSidebar />
       </SheetContent>
     </Sheet>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Adicionadas
- * 1. **Experiencia Responsiva**: ((Implementada)) Este aparato proporciona la base para una navegación móvil de élite, una pieza clave de la UX moderna.
- * 2. **Composición Atómica**: ((Implementada)) Ensambla los componentes `Sidebar` y `SidebarUserInfo`, demostrando la reutilización y la "Filosofía LEGO".
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-29
  *
- * @subsection Melhorias Futuras
- * 1. **Cierre Automático de `Sheet`**: ((Vigente)) Se podría pasar el estado de apertura/cierre (`isOpen`, `setIsOpen`) del `Sheet` al componente `Sidebar` para que, al hacer clic en un enlace de navegación, el menú se cierre automáticamente.
+ * @section Melhorias Futuras
+ * 1. ((Vigente)) **Cierre Automático al Navegar:** El `Sheet` podría ser controlado por un estado local (`isOpen`). Este estado se pasaría al `DashboardSidebar`, que a su vez lo pasaría a sus `NavLink`. Al hacer clic en un enlace, se invocaría `setIsOpen(false)` para cerrar automáticamente el menú, mejorando la UX móvil.
+ * 2. ((Vigente)) **Animación de Contenido:** El contenido dentro del `SheetContent` (`DashboardSidebar`) podría ser animado con `framer-motion` para aparecer de forma escalonada, proporcionando una transición más fluida.
  *
  * =====================================================================
  */
+// src/components/dashboard/layout/mobile-sidebar.tsx

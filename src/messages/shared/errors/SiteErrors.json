@@ -1,0 +1,43 @@
+
+{
+  "en-US": {
+    "check_subdomain_invalid_input": "Invalid subdomain. It must be at least 3 characters and contain only lowercase letters, numbers, and hyphens.",
+    "check_subdomain_server_error": "Server error checking subdomain availability. Please try again.",
+    "subdomain_already_in_use": "This subdomain is already in use. Please choose another one.",
+    "create_permission_denied": "You do not have permission to create sites in this workspace.",
+    "create_failed": "Failed to create the site. Please try again.",
+    "not_found": "The requested site could not be found.",
+    "update_permission_denied": "You do not have permission to update this site.",
+    "update_failed": "Failed to update the site. Please try again.",
+    "delete_permission_denied": "You do not have permission to delete this site.",
+    "delete_invalid_id": "Invalid site ID provided for deletion.",
+    "delete_failed": "Failed to delete the site. Please try again."
+  },
+  "es-ES": {
+    "check_subdomain_invalid_input": "Subdominio inválido. Debe tener al menos 3 caracteres y contener solo letras minúsculas, números y guiones.",
+    "check_subdomain_server_error": "Error del servidor al verificar la disponibilidad del subdominio. Por favor, inténtalo de nuevo.",
+    "subdomain_already_in_use": "Este subdominio ya está en uso. Por favor, elige otro.",
+    "create_permission_denied": "No tienes permiso para crear sitios en este workspace.",
+    "create_failed": "No se pudo crear el sitio. Por favor, inténtalo de nuevo.",
+    "not_found": "No se pudo encontrar el sitio solicitado.",
+    "update_permission_denied": "No tienes permiso para actualizar este sitio.",
+    "update_failed": "No se pudo actualizar el sitio. Por favor, inténtalo de nuevo.",
+    "delete_permission_denied": "No tienes permiso para eliminar este sitio.",
+    "delete_invalid_id": "ID de sitio inválido proporcionado para la eliminación.",
+    "delete_failed": "No se pudo eliminar el sitio. Por favor, inténtalo de nuevo."
+  },
+  "pt-BR": {
+    "check_subdomain_invalid_input": "Subdomínio inválido. Deve ter pelo menos 3 caracteres e conter apenas letras minúsculas, números e hífens.",
+    "check_subdomain_server_error": "Erro do servidor ao verificar a disponibilidade do subdomínio. Por favor, tente novamente.",
+    "subdomain_already_in_use": "Este subdomínio já está em uso. Por favor, escolha outro.",
+    "create_permission_denied": "Você não tem permissão para criar sites neste workspace.",
+    "create_failed": "Falha ao criar o site. Por favor, tente novamente.",
+    "not_found": "O site solicitado não pôde ser encontrado.",
+    "update_permission_denied": "Você não tem permissão para atualizar este site.",
+    "update_failed": "Falha ao atualizar o site. Por favor, tente novamente.",
+    "delete_permission_denied": "Você não tem permissão para excluir este site.",
+    "delete_invalid_id": "ID de site inválido fornecido para exclusão.",
+    "delete_failed": "Falha ao excluir o site. Por favor, tente novamente."
+  }
+}
+

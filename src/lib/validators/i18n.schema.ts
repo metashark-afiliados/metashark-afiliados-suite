@@ -2,14 +2,12 @@
 /**
  * @file i18n.schema.ts
  * @description Manifiesto de Tipos y SSoT para el contrato de i18n. Ha sido
- *              actualizado holísticamente para ensamblar todos los schemas atómicos,
- *              resolviendo la desincronización de tipos y completando la
- *              cascada de correcciones. Ahora refleja los cambios en `ValidationErrors`
- *              para los mensajes de autenticación, administración, invitaciones,
- *              onboarding, contraseñas y sitios, **incluyendo la corrección de errores `TS2339`**.
+ *              actualizado holísticamente para ensamblar el nuevo schema atómico
+ *              `DashboardSubscriptionCardSchema`, completando el contrato de
+ *              datos para la refactorización del Hub Creativo.
  * @author Raz Podestá - MetaShark Tech
- * @version 41.0.0
- * @date 2025-08-28
+ * @version 48.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  */
 import { z } from "zod";
@@ -17,6 +15,7 @@ import { z } from "zod";
 // --- Importaciones de Schemas Atómicos (Ensamblaje "LEGO") ---
 import { AboutPageSchema } from "./i18n/AboutPage.schema";
 import { ActionDockSchema } from "./i18n/ActionDock.schema";
+import { AdminDashboardSchema } from "./i18n/AdminDashboard.schema";
 import { AuthLayoutSchema } from "./i18n/AuthLayout.schema";
 import { AuthNoticePageSchema } from "./i18n/AuthNoticePage.schema";
 import { BlocksPaletteSchema } from "./i18n/BlocksPalette.schema";
@@ -33,6 +32,10 @@ import { CookiePolicyPageSchema } from "./i18n/CookiePolicyPage.schema";
 import { DashboardHeaderSchema } from "./i18n/DashboardHeader.schema";
 import { DashboardPageSchema } from "./i18n/DashboardPage.schema";
 import { DashboardSidebarSchema } from "./i18n/DashboardSidebar.schema";
+import { DashboardSubscriptionCardSchema } from "./i18n/DashboardSubscriptionCard.schema";
+import { DashboardTeamMembersCardSchema } from "./i18n/DashboardTeamMembersCard.schema";
+import { DashboardTutorialCardSchema } from "./i18n/DashboardTutorialCard.schema";
+import { DashboardUsageCardGroupSchema } from "./i18n/DashboardUsageCardGroup.schema";
 import { DevConsoleSidebarSchema } from "./i18n/DevConsoleSidebar.schema";
 import { DialogsSchema } from "./i18n/Dialogs.schema";
 import { DisclaimerPageSchema } from "./i18n/DisclaimerPage.schema";
@@ -98,6 +101,12 @@ export const i18nSchema = z.object({
   "components.builder.Canvas": CanvasSchema,
   "components.builder.SettingsPanel": SettingsPanelSchema,
   "components.builder.SiteAssignmentControl": SiteAssignmentControlSchema,
+  "components.dashboard.DashboardSubscriptionCard":
+    DashboardSubscriptionCardSchema,
+  "components.dashboard.DashboardTeamMembersCard":
+    DashboardTeamMembersCardSchema,
+  "components.dashboard.DashboardTutorialCard": DashboardTutorialCardSchema,
+  "components.dashboard.DashboardUsageCardGroup": DashboardUsageCardGroupSchema,
   "components.dashboard.InvitationBell": InvitationBellSchema,
   "components.dashboard.RecentActivity": RecentActivitySchema,
   "components.dashboard.WelcomeHero": WelcomeHeroSchema,
@@ -133,7 +142,6 @@ export const i18nSchema = z.object({
   "pages.ContactPage": ContactPageSchema,
   "pages.CookiePolicyPage": CookiePolicyPageSchema,
   "pages.DisclaimerPage": DisclaimerPageSchema,
-  "pages.DocsPage": DocsPageSchema,
   "pages.ForgotPasswordPage": ForgotPasswordPageSchema,
   "pages.IconGalleryPage": IconGalleryPageSchema,
   "pages.LegalNoticePage": LegalNoticePageSchema,
@@ -146,28 +154,16 @@ export const i18nSchema = z.object({
   "shared.ValidationErrors": ValidationErrorsSchema,
   "shared.WelcomeModal": WelcomeModalSchema,
   "pages.WikiPage": WikiPageSchema,
-  "workspaces.WorkspaceSwitcher": WorkspaceSwitcherSchema,
 });
 
 export type Messages = z.infer<typeof i18nSchema>;
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 41.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Schema Actualizada**: ((Implementada)) Se ha actualizado la versión de `ValidationErrorsSchema` en la importación y su ensamblaje para reflejar la inclusión de los nuevos errores de `sites`. Este cambio asegura que el ensamblador principal siempre use la definición más reciente.
- * 2. **Versionado Consistente**: ((Implementada)) Se ha incrementado la versión a `41.0.0` para reflejar esta corrección significativa y la estabilización del sistema de schemas.
- * 3. **Integridad Holística**: ((Implementada)) Este cambio completa la alineación de los schemas de i18n para la centralización de errores de sitios y la corrección de errores de compilación `TS2339` en `ValidationErrors.schema.ts`.
- *
+ * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Generación Automática de `i18n.schema.ts`**: ((Vigente)) El script `pnpm gen:i18n:schema` debe ser actualizado y ejecutado para que este archivo se mantenga sincronizado automáticamente con todos los schemas de `src/lib/validators/i18n`. Esta refactorización manual es un paso intermedio para facilitar la transición.
- * 2. **Revisión Final de `manifest.ts`**: ((Pendiente)) El archivo `src/messages/manifest.ts` también debe ser revisado y actualizado (posiblemente a través de un script de generación) para incluir la referencia al nuevo archivo `src/messages/components/dev-console/JsonViewerDialog.json`. Esto es crucial para mantener la consistencia del sistema de i18n.
- *
+ * 1. **Generación Automática de `i18n.schema.ts`**: El script `pnpm gen:i18n:schema` debe ser actualizado para leer el `manifest.ts` y generar este archivo ensamblador automáticamente, eliminando la necesidad de actualizaciones manuales y garantizando una sincronización perfecta.
+ * 2. **Revisión Final de `manifest.ts`**: El archivo `src/messages/manifest.ts` debe ser revisado y actualizado para incluir la referencia a los nuevos archivos JSON (`DashboardSubscriptionCard.json`, etc.) para mantener la consistencia del sistema de i18n.
+ * 3. **Consolidación de Namespaces**: Para una máxima adhesión al principio DRY, se deben consolidar los namespaces duplicados o redundantes (ej. `app.[locale].login.page` vs. `components.auth.LoginForm`) en una SSoT única por dominio lógico.
  * =====================================================================
  */

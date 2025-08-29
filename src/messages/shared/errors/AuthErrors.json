@@ -1,0 +1,22 @@
+
+{
+  "en-US": {
+    "login_invalid_credentials": "Invalid email or password. Please try again.",
+    "oauth_failed": "OAuth sign-in failed. Please try again or use another method.",
+    "oauth_provider_missing": "OAuth provider information is missing.",
+    "profile_creation_failed": "Profile creation failed. Please try again or contact support."
+  },
+  "es-ES": {
+    "login_invalid_credentials": "Email o contraseña inválidos. Por favor, inténtalo de nuevo.",
+    "oauth_failed": "Falló el inicio de sesión con OAuth. Por favor, inténtalo de nuevo o usa otro método.",
+    "oauth_provider_missing": "Falta la información del proveedor de OAuth.",
+    "profile_creation_failed": "La creación del perfil falló. Por favor, intenta de nuevo o contacta a soporte."
+  },
+  "pt-BR": {
+    "login_invalid_credentials": "E-mail ou senha inválidos. Por favor, tente novamente.",
+    "oauth_failed": "Falha no login com OAuth. Por favor, tente novamente ou use outro método.",
+    "oauth_provider_missing": "Faltam as informações do provedor OAuth.",
+    "profile_creation_failed": "A criação do perfil falhou. Por favor, tente novamente ou contate o suporte."
+  }
+}
+
