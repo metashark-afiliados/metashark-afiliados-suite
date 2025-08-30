@@ -1,17 +1,17 @@
 // src/middleware.ts
 /**
  * @file src/middleware.ts
- * @description Orquestador de Middleware de Élite. Refactorizado para ser
- *              completamente asíncrono y manejar correctamente el encadenamiento
- *              de promesas y la propagación inmutable de objetos de respuesta
- *              a través de sus handlers, resolviendo la causa raíz del fallo
- *              de despliegue en Vercel.
+ * @description Orquestador de Middleware de Élite. Ha sido refactorizado
+ *              holísticamente a un estándar de producción, implementando un
+ *              manejo de errores centralizado para máxima resiliencia y logging
+ *              de rendimiento granular para una observabilidad completa.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 5.0.0
  * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
+import { performance } from "perf_hooks";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/logging";
@@ -25,42 +25,81 @@ import {
 } from "@/middleware/handlers";
 
 /**
- * @public
+ * @private
  * @async
- * @function middleware
- * @description Punto de entrada principal para el middleware de la aplicación.
- *              Ejecuta una cadena de manejadores en un orden específico.
- * @param {NextRequest} request - La petición entrante.
- * @returns {Promise<NextResponse>} La respuesta final modificada.
+ * @function withPerformanceLogging
+ * @description Wrapper de alto orden que mide y registra el tiempo de ejecución
+ *              de un handler de middleware asíncrono.
+ * @param {string} name - El nombre del handler para el logging.
+ * @param {Function} handler - La función del handler a ejecutar.
+ * @param {any[]} args - Los argumentos a pasar al handler.
+ * @returns {Promise<any>} El resultado del handler.
  */
+async function withPerformanceLogging<
+  T extends (...args: any[]) => Promise<any>,
+>(name: string, handler: T, ...args: Parameters<T>): Promise<ReturnType<T>> {
+  const startTime = performance.now();
+  const result = await handler(...args);
+  const endTime = performance.now();
+  const duration = (endTime - startTime).toFixed(2);
+  logger.trace(`[PERF] Handler '${name}' ejecutado en ${duration}ms.`);
+  return result;
+}
+
 export async function middleware(request: NextRequest): Promise<NextResponse> {
-  logger.trace("==> [MIDDLEWARE_PIPELINE] START <==", {
-    path: request.nextUrl.pathname,
-  });
+  const { pathname } = request.nextUrl;
+  logger.trace("==> [MIDDLEWARE_PIPELINE] START <==", { path: pathname });
+  const pipelineStartTime = performance.now();
 
-  // --- Handlers Síncronos (Early Exit) ---
-  const redirectResponse = handleRedirects(request);
-  if (redirectResponse) return redirectResponse;
+  try {
+    const redirectResponse = handleRedirects(request);
+    if (redirectResponse) return redirectResponse;
 
-  const maintenanceResponse = handleMaintenance(request);
-  if (maintenanceResponse) return maintenanceResponse;
+    const maintenanceResponse = handleMaintenance(request);
+    if (maintenanceResponse) return maintenanceResponse;
 
-  // --- Pipeline de Handlers Asíncronos Encadenados ---
-  // Cada handler asíncrono recibe la petición y la respuesta del handler anterior.
-  let response = await handleI18n(request);
-  response = await handleMultitenancy(request, response);
-  response = await handleAuth(request, response);
+    let response = await withPerformanceLogging("I18n", handleI18n, request);
+    response = await withPerformanceLogging(
+      "Multitenancy",
+      handleMultitenancy,
+      request,
+      response
+    );
+    response = await withPerformanceLogging(
+      "Auth",
+      handleAuth,
+      request,
+      response
+    );
+    await withPerformanceLogging(
+      "Telemetry",
+      handleTelemetry,
+      request,
+      response
+    );
 
-  // handleTelemetry es "fire-and-forget" y no necesita modificar la respuesta,
-  // pero se le pasa para que tenga acceso a headers como x-app-locale si es necesario.
-  await handleTelemetry(request, response);
+    const pipelineEndTime = performance.now();
+    const totalDuration = (pipelineEndTime - pipelineStartTime).toFixed(2);
+    logger.info(`[PERF] Pipeline completo ejecutado en ${totalDuration}ms.`, {
+      path: pathname,
+    });
 
-  logger.trace("==> [MIDDLEWARE_PIPELINE] END <==", {
-    path: request.nextUrl.pathname,
-    finalStatus: response.status,
-  });
-
-  return response;
+    return response;
+  } catch (error) {
+    const errorId = `mw-err-${Date.now()}`;
+    logger.error(
+      `[MIDDLEWARE_PIPELINE] FALLO CRÍTICO IRRECUPERABLE. Error ID: ${errorId}`,
+      {
+        path: pathname,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      }
+    );
+    return new NextResponse(
+      `Internal Server Error. Please report this issue with ID: ${errorId}`,
+      { status: 500 }
+    );
+  }
 }
 
 export const config = {
@@ -71,10 +110,8 @@ export const config = {
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Factoría de Pipeline de Middlewares**: Para una escalabilidad de élite y un código más declarativo, la lógica de encadenamiento podría ser abstraída a una función `createMiddlewarePipeline([...handlers])`. Esta factoría recibiría un array de handlers y devolvería la función `middleware` final, gestionando automáticamente la propagación del objeto `response`.
- * 2. **Logging de Rendimiento por Handler**: Implementar un wrapper para cada handler que mida su tiempo de ejecución (`performance.now()`). Esto permitiría identificar cuellos de botella en el pipeline del middleware y optimizar el rendimiento.
- * 3. **Gestión de Errores Centralizada**: Envolver el pipeline completo en un bloque `try/catch` para capturar cualquier error inesperado de los handlers. Esto permitiría registrar un error persistente y devolver una página de error genérica (`/_error`), mejorando la resiliencia.
- * 4. **Configuración de Matcher Dinámica**: El `matcher` de la configuración podría ser generado dinámicamente a partir de una lista de rutas públicas y protegidas en el `ROUTE_MANIFEST` para una sincronización más robusta.
+ * 1. **Factoría de Pipeline de Middlewares**: ((Vigente)) La lógica de encadenamiento podría ser abstraída a una función `createMiddlewarePipeline([...handlers])` para un código más declarativo y una gestión de rendimiento aún más centralizada.
+ * 2. **Configuración de Matcher Dinámica**: ((Vigente)) El `matcher` podría ser generado dinámicamente a partir del `ROUTE_MANIFEST` para una sincronización más robusta.
  * =====================================================================
  */
 // src/middleware.ts

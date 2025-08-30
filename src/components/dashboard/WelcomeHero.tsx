@@ -1,15 +1,14 @@
 // src/components/dashboard/WelcomeHero.tsx
 /**
  * @file WelcomeHero.tsx
- * @description Componente de UI "Hero" soberano para el Hub Creativo. Ha sido
- *              refactorizado a un estándar de élite para consumir su propio
- *              namespace de i18n (`useTypedTranslations`), desacoplándolo del
- *              hook genérico y de la página principal del dashboard.
- *              **Actualizado para internacionalizar el `clearAriaLabel` y corregir
- *              un error de sintaxis que bloqueaba la compilación.**
+ * @description Componente de UI "Hero" de presentación puro para el Hub Creativo.
+ *              Ha sido refactorizado a un estándar de élite para ser un
+ *              ensamblador 100% agnóstico a la lógica de negocio, consumiendo
+ *              el hook soberano `useWelcomeHero` para obtener todo su estado y
+ *              contenido.
  * @author Raz Podestá - MetaShark Tech
- * @version 7.0.0
- * @date 2025-08-28
+ * @version 8.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -20,20 +19,23 @@ import React from "react";
 
 import { SearchInput } from "@/components/ui/SearchInput";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useDashboard } from "@/lib/context/DashboardContext";
-import { useCommandPaletteStore } from "@/lib/hooks/use-command-palette";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
+import { useWelcomeHero } from "@/lib/hooks/useWelcomeHero";
 import { clientLogger } from "@/lib/logging";
 
+/**
+ * @public
+ * @component WelcomeHero
+ * @description Ensambla la sección de bienvenida del "Hub Creativo". Es un
+ *              componente de presentación puro que delega toda su lógica al
+ *              hook `useWelcomeHero`.
+ * @returns {React.ReactElement}
+ */
 export function WelcomeHero(): React.ReactElement {
-  clientLogger.trace("[WelcomeHero] Renderizando componente soberano.");
+  clientLogger.trace(
+    "[WelcomeHero] Renderizando componente de presentación puro."
+  );
 
-  const { user } = useDashboard();
-  const t = useTypedTranslations("components.dashboard.WelcomeHero");
-  const openCommandPalette = useCommandPaletteStore((state) => state.open);
-
-  const username =
-    user.user_metadata?.full_name?.split(" ")[0] || user.email || "User";
+  const { t, username, openCommandPalette } = useWelcomeHero();
 
   const FADE_UP = {
     hidden: { opacity: 0, y: 10 },
@@ -78,21 +80,16 @@ export function WelcomeHero(): React.ReactElement {
     </motion.section>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 7.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Novas
- * 1. **Pestañas Funcionales**: ((Vigente)) Las pestañas son actualmente decorativas. Podrían conectarse al `useCommandPaletteStore` para establecer un contexto inicial y filtrar los resultados de la paleta de comandos (ej. al hacer clic en "Templates", la paleta se abre mostrando solo plantillas).
- * 2. **Saludo Contextual**: ((Vigente)) El saludo podría ser sensible a la hora del día (ej. "Buenas tardes, {username}"). Esto requeriría añadir nuevas claves de i18n y una pequeña lógica de cliente para determinar la hora.
- *
+ * =====================================================================
+ * @subsection Melhorias Futuras
+ * 1. **Pestañas (Tabs) Funcionales**: Conectar los `TabsTrigger` a una función expuesta por `useWelcomeHero` que establezca un contexto inicial en la `CommandPalette` al abrirla (ej. al hacer clic en "Templates", la paleta se abre mostrando solo plantillas).
+ * 2. **Esqueleto de Carga (Skeleton)**: Si `useWelcomeHero` llegara a implementar un estado de carga, este componente debería renderizar un esqueleto de UI (`<Skeleton>`) para el título y las pestañas, mejorando la UX percibida.
+ * 3. **Animación de Pestañas**: Añadir una animación sutil con `framer-motion` (`layoutId`) al indicador de la pestaña activa en `TabsList` para una transición más fluida.
+ * 4. **Pruebas Unitarias Aisladas**: Este componente ahora es fácilmente testeable con Vitest y React Testing Library, mockeando el hook `useWelcomeHero` para proveer diferentes estados (diferentes nombres de usuario, idiomas, etc.) y haciendo aserciones sobre la UI renderizada.
+ * 5. **Componente `HeroSearch` Atómico**: La `div` que contiene el `SearchInput` podría ser extraída a su propio componente atómico (`HeroSearch.tsx`) si este patrón de búsqueda se reutilizara en otras secciones "Hero" de la aplicación.
  * =====================================================================
  */
 // src/components/dashboard/WelcomeHero.tsx

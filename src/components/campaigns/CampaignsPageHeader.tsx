@@ -2,13 +2,11 @@
 /**
  * @file CampaignsPageHeader.tsx
  * @description Orquestador de UI de élite para el encabezado de "Campañas".
- *              Ha sido refactorizado holísticamente para consumir el componente
- *              de layout abstracto `ResourcePageHeader`, delegando toda la
- *              lógica de layout y cumpliendo el principio DRY al más alto nivel.
- *              Corregido para aceptar 'all' como un valor válido para el filtro de estado.
+ *              Consume el componente de layout abstracto `ResourcePageHeader`,
+ *              delegando toda la lógica de layout y cumpliendo el principio DRY.
  * @author Raz Podestá - MetaShark Tech
  * @version 6.0.0
- * @date 2025-08-27
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -38,9 +36,7 @@ export interface CampaignsPageHeaderProps {
   ) => void;
   isPending: boolean;
   mutatingId: string | null;
-  // --- INICIO DE REFACTORIZACIÓN: Tipo de statusFilter ---
   statusFilter?: CampaignStatus | "all";
-  // --- FIN DE REFACTORIZACIÓN ---
   onStatusChange: (status: CampaignStatus | "all") => void;
   sortBy: SortByOption;
   onSortChange: (sort: SortByOption) => void;
@@ -51,8 +47,7 @@ export interface CampaignsPageHeaderProps {
  * @component CampaignsPageHeader
  * @description Orquesta y ensambla la UI del encabezado de la página de campañas.
  *              Delega la lógica de layout al componente genérico `ResourcePageHeader`,
- *              actuando como un ensamblador puro que compone sus aparatos hijos
- *              (`CampaignsPageTitle` y `CampaignsHeaderActions`).
+ *              actuando como un ensamblador puro que compone sus aparatos hijos.
  * @param {CampaignsPageHeaderProps} props - Propiedades para configurar el encabezado.
  * @returns {React.ReactElement}
  */
@@ -71,16 +66,13 @@ export function CampaignsPageHeader({
     />
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
+ * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Hook `useCampaignsHeader`**: ((Vigente)) Para una pureza de élite, la gestión de las numerosas props de este componente podría ser encapsulada en un hook `useCampaignsHeader`. Este hook proveería los datos y callbacks a través de un contexto, simplificando la firma del componente y desacoplándolo aún más. Propondré esta refactorización si la complejidad de las props aumenta.
- *
- * @subsection Melhorias Adicionadas
- * 1. **Alineación de Contrato de Tipos (`TS2322`)**: ((Implementada)) Se ha modificado el tipo de la propiedad `statusFilter` en la interfaz `CampaignsPageHeaderProps` para incluir el literal `"all"`. Esto resuelve el error de compilación al permitir que el componente acepte el valor `statusFilter` de `campaigns-client.tsx`.
- *
+ * 1. **Hook `useCampaignsHeader`**: ((Vigente)) Para una pureza de élite, la gestión de las numerosas props de este componente podría ser encapsulada en un hook `useCampaignsHeader`. Este hook proveería los datos y callbacks a través de un contexto, simplificando la firma del componente y desacoplándolo aún más.
+ * 2. **Integración de Breadcrumbs**: ((Vigente)) El `ResourcePageHeader` acepta un `breadcrumbsSlot`. Este componente podría ser mejorado para construir y pasar un componente `Breadcrumbs` dinámico, mostrando la ruta completa "Dashboard / Sites / {siteName}".
  * =====================================================================
  */
 // src/components/campaigns/CampaignsPageHeader.tsx

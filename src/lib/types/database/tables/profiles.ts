@@ -2,21 +2,22 @@
 /**
  * @file profiles.ts
  * @description Define el contrato de datos atómico para la tabla `profiles`.
- *              Ha sido sincronizado con el `schema.sql` canónico para reintroducir
- *              la propiedad `icon`, resolviendo una desincronización de tipos
- *              y un error de compilación crítico (`TS2353`) en el mock factory.
- * @author Raz Podestá
- * @version 4.0.0
- * @date 2025-08-28
+ *              Ha sido refactorizado holísticamente para consumir el schema
+ *              `DashboardLayoutPreferencesSchema` desde la nueva SSoT
+ *              atómica (`@/lib/validators/schemas`), resolviendo el error de
+ *              módulo no encontrado (`TS2305`) y aplicando un tipado estricto
+ *              a la columna JSONB `dashboard_layout`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 5.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
+import { type z } from "zod";
+
+import { type DashboardLayoutPreferencesSchema } from "@/lib/validators/schemas";
 import { type Json } from "../_shared";
 import { type Enums } from "../enums";
-// --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Importación de Schema de Preferencias ---
-import { type DashboardLayoutPreferencesSchema } from "@/lib/validators/schemas";
-import { type z } from "zod";
-// --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
 
 export type Profiles = {
   Row: {
@@ -31,7 +32,7 @@ export type Profiles = {
      * @description Preferencias de layout y UI del dashboard del usuario,
      *              fuertemente tipadas por `DashboardLayoutPreferencesSchema`.
      */
-    dashboard_layout: z.infer<typeof DashboardLayoutPreferencesSchema> | null; // <-- TIPO FUERTE
+    dashboard_layout: z.infer<typeof DashboardLayoutPreferencesSchema> | null;
     has_completed_onboarding: boolean;
     created_at: string;
     updated_at: string | null;
@@ -43,7 +44,7 @@ export type Profiles = {
     avatar_url?: string | null;
     app_role?: Enums["app_role"];
     plan_type?: Enums["plan_type"];
-    dashboard_layout?: z.infer<typeof DashboardLayoutPreferencesSchema> | null; // <-- TIPO FUERTE
+    dashboard_layout?: z.infer<typeof DashboardLayoutPreferencesSchema> | null;
     has_completed_onboarding?: boolean;
     created_at?: string;
     updated_at?: string | null;
@@ -55,7 +56,7 @@ export type Profiles = {
     avatar_url?: string | null;
     app_role?: Enums["app_role"];
     plan_type?: Enums["plan_type"];
-    dashboard_layout?: z.infer<typeof DashboardLayoutPreferencesSchema> | null; // <-- TIPO FUERTE
+    dashboard_layout?: z.infer<typeof DashboardLayoutPreferencesSchema> | null;
     has_completed_onboarding?: boolean;
     created_at?: string;
     updated_at?: string | null;
@@ -73,22 +74,13 @@ export type Profiles = {
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Tipado Estricto para Preferencias de UI**: ((Implementada)) Se ha reemplazado el tipo `Json | null` por `z.infer<typeof DashboardLayoutPreferencesSchema> | null` para la propiedad `dashboard_layout`. Esto resuelve el tipado débil y proporciona seguridad de tipos completa para las preferencias de UI del usuario, un paso crítico para la personalización del dashboard.
- * 2. **Sincronización Arquitectónica**: ((Implementada)) Este cambio alinea el contrato de tipos de la base de datos con el esquema de validación Zod, asegurando una única fuente de verdad para la estructura de las preferencias de usuario.
- * 3. **Habilitación de Personalización de UI**: ((Implementada)) La tipificación estricta de `dashboard_layout` permite que los hooks y componentes de UI lean y escriban las preferencias (como la librería de iconos activa o el estado de la barra lateral) de forma tipo-segura, sentando las bases para una UI altamente personalizable.
- *
+ * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Manejo de Migraciones de Esquema de Preferencias**: ((Vigente)) Si la estructura de `DashboardLayoutPreferencesSchema` evoluciona en el futuro, será necesario implementar una lógica de migración para las preferencias existentes en la base de datos, quizás a través de una función RPC de PostgreSQL o en la capa de datos.
- * 2. **Valores por Defecto en la Base de Datos**: ((Vigente)) Los valores por defecto para `isSidebarCollapsed` y `activeIconLibraryId` están definidos en el esquema Zod. Idealmente, estos valores por defecto deberían replicarse en la definición de la columna `dashboard_layout` en `src/db/schema.sql` (si PostgreSQL soporta valores por defecto para JSONB anidados, o a través de un trigger `BEFORE INSERT`).
- *
+ * 1. **`last_active_at` Timestamp**: Añadir un campo `last_active_at: string | null` que se actualice a través de un trigger o middleware en cada petición autenticada. Esto permitiría implementar lógicas de negocio basadas en la actividad del usuario (ej. campañas de re-engagement).
+ * 2. **Preferencias de Notificación**: Incluir una columna `notification_preferences: Json | null` y un schema Zod asociado (`NotificationPreferencesSchema`) para permitir a los usuarios controlar qué notificaciones por correo electrónico desean recibir.
+ * 3. **Relación con `subscriptions`**: Añadir la relación con la tabla `subscriptions` a la sección `Relationships` para una integridad referencial completa en el sistema de tipos.
+ * 4. **Manejo de Zonas Horarias**: Incluir una columna `timezone: string | null` para almacenar la zona horaria del usuario, permitiendo mostrar fechas y horas en su formato local en toda la aplicación.
+ * 5. **`user_metadata` JSONB**: Considerar añadir una columna `metadata: Json | null` para almacenar datos de perfil adicionales y no estructurados, proporcionando flexibilidad para futuras características sin necesidad de migraciones de esquema.
  * =====================================================================
  */
 // src/lib/types/database/tables/profiles.ts

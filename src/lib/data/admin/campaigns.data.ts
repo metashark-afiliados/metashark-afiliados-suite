@@ -62,9 +62,11 @@ export async function getAllCampaignsWithSiteInfo(): Promise<
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Paginación y Búsqueda**: ((Vigente)) Para escalar a miles de campañas, esta función debe ser refactorizada a `getPaginatedCampaigns` y aceptar opciones de paginación (`page`, `limit`) y búsqueda (`query`), similar a `getPaginatedUsersWithRoles`.
- * 2. **Cacheo de Datos**: ((Vigente)) Para dashboards de administración con mucho tráfico, se podría envolver esta función en `React.cache` con una revalidación basada en etiquetas (`revalidateTag`) para optimizar el rendimiento.
- * 3. **Tipado de Retorno Estricto**: ((Vigente)) En lugar de un casteo `as`, se podría construir un schema de Zod para el tipo de retorno y usar `.parse()` para garantizar la forma de los datos en tiempo de ejecución.
+ * 1. **Paginación y Búsqueda**: Para escalar a miles de campañas, esta función debe ser refactorizada a `getPaginatedCampaigns` y aceptar opciones de paginación (`page`, `limit`) y búsqueda (`query`), similar a `getPaginatedUsersWithRoles`.
+ * 2. **Cacheo de Datos**: Para dashboards de administración con mucho tráfico, se podría envolver esta función en `React.cache` con una revalidación basada en etiquetas (`revalidateTag`) para optimizar el rendimiento.
+ * 3. **Tipado de Retorno Estricto**: En lugar de un casteo `as`, se podría construir un schema de Zod para el tipo de retorno y usar `.parse()` para garantizar la forma de los datos en tiempo de ejecución.
+ * 4. **Filtros Avanzados**: Extender la función para aceptar parámetros de filtro por `status` de campaña o por `site_id` para una gestión más granular en el Dev Console.
+ * 5. **Ordenamiento Dinámico**: Añadir un parámetro `sort` para permitir ordenar los resultados por diferentes columnas (ej. `name`, `created_at`, `sites.subdomain`).
  * =====================================================================
  */
 // src/lib/data/admin/campaigns.data.ts

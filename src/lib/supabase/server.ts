@@ -1,30 +1,36 @@
 // src/lib/supabase/server.ts
+/**
+ * @file src/lib/supabase/server.ts
+ * @description Factoría para clientes Supabase en el entorno de servidor (Server
+ *              Components, Server Actions). Ha sido refactorizado holísticamente
+ *              para ser agnóstico al entorno, eliminando la lógica de fallback
+ *              a variables `INTEGRATION_` y dependiendo únicamente de las variables
+ *              canónicas del proyecto.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 10.0.0
+ * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
 import "server-only";
 
-import { cookies } from "next/headers";
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 import { type Database } from "@/lib/types/database";
 
 /**
  * @public
  * @function createClient
- * @description Factoría para crear una instancia del cliente Supabase para el entorno de servidor (Server Components, Server Actions).
- *              Implementa una estrategia de fallback en cascada para las variables de entorno,
- *              priorizando las inyectadas por Vercel (`INTEGRATION_...`) y recurriendo a las
- *              estándar (`NEXT_PUBLIC_...`) para el desarrollo local.
+ * @description Factoría para crear una instancia del cliente Supabase para el entorno de servidor.
  * @returns Un cliente Supabase de servidor con gestión de cookies.
- * @author Raz Podestá
- * @version 9.0.0
  */
 export function createClient() {
   const cookieStore = cookies();
 
   return createServerClient<Database>(
-    process.env.INTEGRATION_NEXT_PUBLIC_SUPABASE_URL ||
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.INTEGRATION_NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -53,20 +59,14 @@ export function createClient() {
  * @public
  * @function createAdminClient
  * @description Factoría para crear un cliente Supabase de servidor con privilegios de administrador (service_role).
- *              Utilizado para operaciones que deben eludir las políticas de Row Level Security (RLS).
- *              También implementa la estrategia de fallback en cascada para las variables de entorno.
  * @returns Un cliente Supabase de servidor con rol de servicio.
- * @author Raz Podestá
- * @version 9.0.0
  */
 export function createAdminClient() {
   const cookieStore = cookies();
 
   return createServerClient<Database>(
-    process.env.INTEGRATION_NEXT_PUBLIC_SUPABASE_URL ||
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.INTEGRATION_SUPABASE_SERVICE_ROLE_KEY ||
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -76,14 +76,14 @@ export function createAdminClient() {
           try {
             cookieStore.set({ name, value, ...options });
           } catch (error) {
-            // Ignorar errores en contextos de solo lectura.
+            // Ignorar.
           }
         },
         remove(name: string, options: CookieOptions) {
           try {
             cookieStore.set({ name, value: "", ...options });
           } catch (error) {
-            // Ignorar errores en contextos de solo lectura.
+            // Ignorar.
           }
         },
       },
@@ -91,20 +91,15 @@ export function createAdminClient() {
     }
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Estrategia de Fallback en Cascada**: ((Implementada)) Las factorías ahora utilizan `process.env.INTEGRATION_... || process.env.STANDARD_...`, haciendo que el código sea agnóstico al entorno y restaurando la funcionalidad de desarrollo local. Esta es una implementación de élite que garantiza la resiliencia del proyecto.
- * 2. **Cero Regresiones**: ((Implementada)) Se ha preservado la lógica de gestión de cookies y la configuración del cliente de administrador, garantizando que no se pierda funcionalidad.
- * 3. **Documentación TSDoc de Élite**: ((Implementada)) Se ha actualizado la documentación para reflejar la nueva arquitectura de variables de entorno y el propósito de cada factoría.
- *
  * @subsection Melhorias Futuras
- * 1. **Centralización de la Lógica de Cookies**: ((Vigente)) La lógica de `cookies` se repite en ambas funciones. Podría ser abstraída a un helper `getServerCookieOptions()` para un código más DRY.
- *
+ * 1. **Centralización de Lógica de Cookies**: La lógica del objeto `cookies` se repite en ambas funciones (`createClient` y `createAdminClient`). Podría ser abstraída a un helper `getServerCookieOptions(cookieStore)` para un código más DRY.
+ * 2. **Observabilidad en Cliente Admin**: Añadir un `logger.warn` cuando se instancia el `createAdminClient` en un entorno de desarrollo para alertar sobre el uso de un cliente con privilegios elevados.
+ * 3. **Manejo de Errores en Cookies**: Los bloques `catch` en los manejadores `set` y `remove` de cookies actualmente ignoran los errores de forma silenciosa. Podrían ser mejorados para registrar una advertencia (`logger.warn`) cuando ocurra un error, proporcionando una mayor visibilidad durante la depuración de flujos de solo lectura que intenten modificar cookies.
+ * 4. **Tipado de Nombres de Cookie**: Implementar un tipo `CanonicalCookieName` y usarlo en la firma de `get`, `set`, y `remove` para garantizar la consistencia en el manejo de cookies.
  * =====================================================================
  */
 // src/lib/supabase/server.ts

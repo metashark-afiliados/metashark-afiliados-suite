@@ -1,13 +1,12 @@
 // src/lib/hooks/useSubscriptionData.ts
 /**
- * @file useSubscriptionData.ts
+ * @file src/lib/hooks/useSubscriptionData.ts
  * @description Hook soberano y de élite. Es la Única Fuente de Verdad (SSoT) para
- *              obtener y transformar los datos de suscripción del usuario. Ha sido
- *              refactorizado holísticamente para consumir el namespace de i18n
- *              canónico y para alinearse con el contrato de datos `plan_type`
- *              de la base de datos, resolviendo todos los errores de tipo.
+ *              obtener y transformar los datos de suscripción del usuario. Consume
+ *              el contexto del dashboard y el namespace de i18n para construir el
+ *              modelo de presentación que requiere la UI.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 1.0.0
  * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -30,7 +29,7 @@ import { type Enums } from "../types/database";
  *          de suscripciones listas para renderizar, la función de traducción y el estado de carga.
  */
 export function useSubscriptionData() {
-  clientLogger.trace("[useSubscriptionData] Inicializando hook soberano.");
+  clientLogger.trace("[useSubscriptionData] Hook soberano inicializado.");
 
   const t = useTypedTranslations(
     "components.dashboard.DashboardSubscriptionCard"
@@ -53,18 +52,18 @@ export function useSubscriptionData() {
         descriptionKey: "plan_free_description",
         priceKey: "plan_free_price",
       },
+      basic: {
+        planNameKey: "plan_pro_name", // Placeholder
+        descriptionKey: "plan_pro_description",
+        priceKey: "plan_pro_price",
+      },
       pro: {
         planNameKey: "plan_pro_name",
         descriptionKey: "plan_pro_description",
         priceKey: "plan_pro_price",
       },
-      basic: {
-        planNameKey: "plan_pro_name",
-        descriptionKey: "plan_pro_description",
-        priceKey: "plan_pro_price",
-      },
       enterprise: {
-        planNameKey: "plan_pro_name",
+        planNameKey: "plan_pro_name", // Placeholder
         descriptionKey: "plan_pro_description",
         priceKey: "plan_pro_price",
       },
@@ -79,7 +78,7 @@ export function useSubscriptionData() {
         description: t(details.descriptionKey as any),
         price: t(details.priceKey as any),
         frequency: t("frequency_monthly"),
-        status: "active",
+        status: "active", // Placeholder
       },
     ];
   }, [profile, t]);
@@ -95,9 +94,11 @@ export function useSubscriptionData() {
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Integración con Datos de Stripe**: La mejora de élite sigue siendo la integración con una Server Action `getSubscriptionData` que obtenga datos reales de la tabla `subscriptions`, la cual estaría sincronizada con Stripe.
- * 2. **Tipado Estricto de Claves de Plan**: El `as any` en las llamadas a `t()` puede ser eliminado si el tipo de `planDetailsMap` se define de forma que TypeScript pueda inferir que sus claves son válidas para el namespace `components.dashboard.DashboardSubscriptionCard`, o si se utiliza un helper de i18n para construir las claves dinámicamente.
- * 3. **Manejo de Estados de Suscripción**: El estado `status` está codificado como "active". Una vez integrado con Stripe, este valor debería reflejar el estado real de la suscripción (`trialing`, `past_due`, etc.).
- * 4. **Soporte para Múltiples Suscripciones**: El hook actualmente solo modela una suscripción. Debería ser extendido para manejar un array de suscripciones si el modelo de negocio lo permite.
+ * 1. **Integración con Datos de Stripe**: La mejora de élite es reemplazar la lógica de simulación actual por una llamada a una Server Action `getSubscriptionData` que obtenga datos reales de la tabla `subscriptions` (sincronizada con Stripe), incluyendo el estado real (`trialing`, `past_due`, etc.).
+ * 2. **Tipado Estricto de Claves de i18n**: Las aserciones `as any` en `t()` son pragmáticas. Se podrían refinar los tipos, o crear un helper de i18n que construya las claves de forma dinámica y segura (ej. `t(getPlanI18nKey(userPlan, 'name'))`), para eliminar el `any`.
+ * 3. **Manejo de Múltiples Suscripciones**: El hook actualmente solo modela una suscripción. Debería ser extendido para manejar un array de suscripciones si el modelo de negocio lo permite.
+ * 4. **Manejo de Errores de Contexto**: Añadir un bloque `try/catch` alrededor de `useDashboard` para manejar el caso en que el hook se use fuera de su proveedor, devolviendo un estado de error explícito.
+ * 5. **Abstracción de `planDetailsMap`**: La lógica de mapeo de planes podría ser extraída a un manifiesto de configuración (`src/config/plans.config.ts`) si se reutiliza en otras partes de la aplicación (ej. en la página de precios).
  * =====================================================================
  */
+// src/lib/hooks/useSubscriptionData.ts

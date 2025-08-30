@@ -6,7 +6,7 @@
  *              sus controles de paginación, adhiriéndose estrictamente al principio DRY.
  * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-27
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -106,20 +106,14 @@ export function PaginatedResourceView<T>({
     </>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Abstracción Arquitectónica (DRY)**: Este nuevo componente encapsula un patrón de UI repetido, eliminando la duplicación de código y mejorando drásticamente la mantenibilidad.
- * 2. ((Implementada)) **Flexibilidad con Render Props (Inversión de Control)**: El uso de una `renderView` prop es una implementación de élite que hace al componente completamente agnóstico a cómo se renderizan los datos, permitiéndole manejar cuadrículas, tablas, o cualquier otra estructura de vista.
- * 3. ((Implementada)) **Animación Integrada**: La lógica de `AnimatePresence` y `motion.div` está ahora centralizada, garantizando transiciones consistentes entre vistas (ej. de cuadrícula a lista) para cualquier recurso.
- *
  * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Slot para Estado Vacío**: En lugar de un simple `emptyStateText`, el componente podría aceptar un `emptyStateSlot: React.ReactNode` para permitir un renderizado de estado vacío completamente personalizado (ej. con un botón de "Crear Primer Recurso").
- *
+ * 1. **Slot para Estado Vacío**: ((Vigente)) En lugar de un simple `emptyStateText`, el componente podría aceptar un `emptyStateSlot: React.ReactNode` para permitir un renderizado de estado vacío completamente personalizado (ej. con un botón de "Crear Primer Recurso").
+ * 2. **Layout de Paginación Configurable**: ((Vigente)) Añadir una prop `paginationPosition: 'top' | 'bottom' | 'both'` para permitir al consumidor controlar dónde se renderizan los `PaginationControls`.
+ * 3. **Componente de Esqueleto de Carga**: ((Vigente)) Integrar una prop `isLoading: boolean` y un `skeletonSlot: React.ReactNode` para manejar de forma centralizada la visualización de estados de carga, haciendo el componente aún más completo.
  * =====================================================================
  */
 // src/components/shared/PaginatedResourceView.tsx

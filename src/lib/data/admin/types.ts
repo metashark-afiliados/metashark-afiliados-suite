@@ -46,9 +46,9 @@ export type CampaignWithSiteInfo = Tables<"campaigns"> & {
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Renombrar Helper Genérico**: ((Vigente)) Para una DX de élite y para prevenir confusiones, el helper genérico `Views<T>` en `_shared.ts` podría ser renombrado a `ViewRow<T>` para que su propósito (extraer el tipo `Row`) sea semánticamente explícito.
- * 2. **Generación Automática de Vistas**: ((Vigente)) Continuar monitorizando las actualizaciones de la CLI de Supabase para la eventual generación automática de tipos de Vistas, lo que haría este archivo obsoleto y garantizaría una sincronización perfecta.
- * 3. **Schemas Zod para Vistas**: ((Vigente)) Crear schemas de Zod correspondientes a cada tipo de vista para permitir la validación en tiempo de ejecución de los datos devueltos por la base de datos, añadiendo una capa extra de robustez.
+ * 1. **Renombrar Helper Genérico**: Para una DX de élite y para prevenir confusiones, el helper genérico `Views<T>` en `_shared.ts` podría ser renombrado a `ViewRow<T>` para que su propósito (extraer el tipo `Row`) sea semánticamente explícito.
+ * 2. **Generación Automática de Vistas**: Continuar monitorizando las actualizaciones de la CLI de Supabase para la eventual generación automática de tipos de Vistas, lo que haría este archivo obsoleto y garantizaría una sincronización perfecta.
+ * 3. **Schemas Zod para Vistas**: Crear schemas de Zod correspondientes a cada tipo de vista para permitir la validación en tiempo de ejecución de los datos devueltos por la base de datos, añadiendo una capa extra de robustez.
  * =====================================================================
  */
 // src/lib/data/admin/types.ts

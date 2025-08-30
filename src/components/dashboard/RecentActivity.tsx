@@ -1,13 +1,14 @@
+// src/components/dashboard/RecentActivity.tsx
 /**
  * @file RecentActivity.tsx
- * @description Componente de UI soberano para mostrar diseños recientes. Ha sido
- *              refactorizado a un estándar de élite para ser completamente
- *              autocontenido en su consumo de i18n, implementar una UI mejorada
- *              con un enlace "Ver Todo", y alinearse con la arquitectura de
- *              "Creaciones Soberanas" para el enrutamiento.
+ * @description Componente de UI de presentación puro para mostrar diseños recientes.
+ *              Ha sido refactorizado a un estándar de élite para ser un
+ *              ensamblador 100% agnóstico a la lógica de negocio, consumiendo
+ *              el hook soberano `useRecentActivity` para obtener todo su estado
+ *              y contenido.
  * @author Raz Podestá - MetaShark Tech
- * @version 12.0.0
- * @date 2025-08-26
+ * @version 13.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -15,7 +16,6 @@
 
 import { motion } from "framer-motion";
 import { FileText, ArrowRight } from "lucide-react";
-import { useFormatter } from "next-intl";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -25,50 +25,31 @@ import {
   CardDescription,
   CardTitle,
 } from "@/components/ui/card";
-import { useDashboard } from "@/lib/context/DashboardContext";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { Link, useRouter } from "@/lib/navigation";
+import { useRecentActivity } from "@/lib/hooks/useRecentActivity";
+import { Link } from "@/lib/navigation";
 import { clientLogger } from "@/lib/logging";
 
-export function RecentActivity() {
+/**
+ * @public
+ * @component RecentActivity
+ * @description Ensambla la sección de "Actividad Reciente" del "Hub Creativo".
+ *              Es un componente de presentación puro que delega toda su lógica
+ *              al hook `useRecentActivity`.
+ * @returns {React.ReactElement | null}
+ */
+export function RecentActivity(): React.ReactElement | null {
   clientLogger.trace(
-    "[RecentActivity] Renderizando componente de actividad reciente soberano."
+    "[RecentActivity] Renderizando componente de presentación puro."
   );
 
-  const { recentCampaigns } = useDashboard();
-  const t = useTypedTranslations("components.dashboard.RecentActivity");
-  const tFormatter = useFormatter();
-  const router = useRouter();
+  const { recentCampaigns, t, tFormatter, handleNavigate, animationVariants } =
+    useRecentActivity();
 
   if (!recentCampaigns || recentCampaigns.length === 0) {
-    // En un estado vacío, no se renderiza nada para mantener la UI limpia.
     return null;
   }
 
-  const STAGGER_CONTAINER = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.07,
-      },
-    },
-  };
-  const FADE_UP = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-  };
-
-  const handleNavigate = (creationId: string) => {
-    clientLogger.trace(
-      "[RecentActivity] Navegando al builder para la creación.",
-      { creationId }
-    );
-    router.push({
-      pathname: "/builder/[creationId]",
-      params: { creationId },
-    });
-  };
+  const { STAGGER_CONTAINER, FADE_UP } = animationVariants;
 
   return (
     <motion.section
@@ -117,7 +98,6 @@ export function RecentActivity() {
               >
                 <CardContent className="p-3">
                   <div className="flex h-24 items-center justify-center rounded-md bg-muted mb-3 overflow-hidden">
-                    {/* Placeholder para la previsualización de la campaña */}
                     <FileText className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <CardTitle className="text-base truncate font-semibold">
@@ -138,24 +118,17 @@ export function RecentActivity() {
     </motion.section>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Soberanía de Internacionalización**: ((Implementada)) El componente ahora consume su propio namespace `components.dashboard.RecentActivity` a través de `useTypedTranslations`, completando su refactorización a un aparato soberano y resolviendo la causa raíz del error `TS2345`.
- * 2. **Enlace "Ver Todo"**: ((Implementada)) Se ha añadido un encabezado a la sección que incluye el título y un enlace "Ver Todo", mejorando la navegabilidad y la UX.
- * 3. **Corrección de Enrutamiento**: ((Implementada)) El `onClick` de la tarjeta ahora redirige utilizando `campaign.creation_id`, alineándose con la arquitectura de "Creaciones Soberanas" donde `creation_id` es la SSoT para el editor.
- * 4. **Accesibilidad (a11y) Mejorada**: ((Implementada)) La tarjeta ahora es completamente operable por teclado (`onKeyDown`) y tiene un `aria-label` descriptivo.
- *
  * @subsection Melhorias Futuras
- * 1. **Implementación de Previsualizaciones**: ((Vigente)) La mejora de élite para este componente es reemplazar el icono `FileText` con una previsualización de imagen real. Esto requiere:
- *    - Una Server Action `generateCampaignPreview(creationId)` que use una librería de browser headless (como Playwright) para tomar una captura de pantalla del `content` de la `Creation`.
- *    - Guardar la imagen en Supabase Storage y almacenar la URL en un nuevo campo `preview_image_url` en la tabla `creations`.
- *    - Actualizar la capa de datos para que `recentCampaigns` incluya esta URL. Propondré esta épica de infraestructura en la siguiente fase.
- * 2. **Lazy Loading de Imágenes**: ((Pendiente)) Una vez implementadas las previsualizaciones, las imágenes deben ser cargadas de forma diferida (`loading="lazy"`) para optimizar el LCP de la página.
- *
+ * 1. **Implementación de Previsualizaciones**: La mejora de élite sigue siendo reemplazar el icono `FileText` con una previsualización de imagen real de la campaña. Esto requiere una Server Action `generateCampaignPreview` y la actualización de la capa de datos.
+ * 2. **Lazy Loading de Imágenes**: Una vez implementadas las previsualizaciones, el componente `<img>` o `<Image>` debe usar `loading="lazy"` para optimizar el LCP de la página.
+ * 3. **Componente `RecentActivityCard` Atómico**: La `motion.div` que renderiza cada tarjeta podría ser extraída a su propio componente `RecentActivityCard.tsx` para una máxima atomicidad y limpieza del JSX en este orquestador.
+ * 4. **Scroll Horizontal Mejorado**: Añadir botones de "scroll left/right" que aparezcan en hover en los extremos del carrusel para mejorar la navegabilidad en dispositivos de escritorio sin trackpad.
+ * 5. **Estado Vacío Explícito**: Si `recentCampaigns` está vacío, en lugar de renderizar `null`, se podría mostrar un componente `EmptyState` que invite al usuario a crear su primer diseño.
+ * 6. **Accesibilidad de Carrusel**: Implementar `aria-roledescription="carousel"` en el contenedor y `aria-label` en los botones de navegación (si se añaden) para una accesibilidad de élite.
  * =====================================================================
  */
+// src/components/dashboard/RecentActivity.tsx

@@ -1,24 +1,32 @@
+// src/lib/data/campaigns/management.data.ts
 /**
  * @file src/lib/data/campaigns/management.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de lectura
  *              y escritura para la gestión de campañas. Ha sido refactorizado holísticamente
- *              para manejar correctamente los tipos de retorno de las relaciones de Supabase,
- *              restaurar la función `getRecentCampaignsByWorkspaceId`, y corregir la API de `React.cache`.
+ *              para consumir su propio contrato de tipo de ordenamiento (`CampaignSortOption`),
+ *              resolviendo un error crítico de tipo (TS2305) y reforzando la
+ *              soberanía de su dominio de datos.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.1.0
+ * @version 8.0.0
  * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use server";
 import "server-only";
 
-import { cache } from "react";
+import { unstable_cache as cache } from "next/cache";
 import { type SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { type Tables, type TablesInsert } from "@/lib/types/database";
-
-import { type CampaignMetadata, type CampaignSiteInfo } from "./types";
+import {
+  type CampaignMetadata,
+  type CampaignSiteInfo,
+  type CampaignSortOption,
+  CAMPAIGN_SORT_OPTIONS,
+} from "./types";
 
 type Database = import("@/lib/types/database").Database;
 type Supabase = SupabaseClient<Database, "public">;
@@ -30,7 +38,7 @@ export async function getCampaignsMetadataBySiteId(
     limit: number;
     query?: string;
     status?: "draft" | "published" | "archived";
-    sortBy?: "updated_at_desc" | "name_asc";
+    sortBy?: CampaignSortOption;
   },
   supabaseClient?: Supabase
 ): Promise<{ campaigns: CampaignMetadata[]; totalCount: number }> {
@@ -56,9 +64,13 @@ export async function getCampaignsMetadataBySiteId(
     queryBuilder = queryBuilder.eq("status", status);
   }
 
-  const sortMap = {
+  const sortMap: Record<
+    CampaignSortOption,
+    { column: string; ascending: boolean }
+  > = {
     updated_at_desc: { column: "updated_at", ascending: false },
     name_asc: { column: "name", ascending: true },
+    name_desc: { column: "name", ascending: false },
   };
   const sort = sortMap[sortBy || "updated_at_desc"];
   queryBuilder = queryBuilder.order(sort.column, {
@@ -103,7 +115,9 @@ export const getCampaignSiteInfoById = cache(
       site_id: data.site_id,
       workspace_id: siteInfo.workspace_id,
     };
-  }
+  },
+  ["campaign-site-info"],
+  { tags: ["campaigns"] }
 );
 
 export const getRecentCampaignsByWorkspaceId = cache(
@@ -166,14 +180,20 @@ export async function insertCampaignRecord(
   );
   return newCampaign;
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
  * @subsection Melhorias Futuras
- * 1. **Vista Materializada para `recent_campaigns`**: ((Vigente)) Para un rendimiento de élite a gran escala, se podría crear una vista materializada en la base de datos que pre-calcule las campañas recientes por workspace, y esta función consultaría esa vista.
- *
+ * 1. **Tipado de Retorno con Zod**: En lugar de la aserción `as CampaignMetadata[]`, se podría crear un `CampaignMetadataSchema` y usar `z.array(...).parse(data)` para una validación en tiempo de ejecución.
+ * 2. **Abstracción del Query Builder**: La lógica de construcción de la consulta en `getCampaignsMetadataBySiteId` podría ser extraída a una función helper pura para mejorar la legibilidad y testeabilidad.
+ * 3. **Vista Materializada para `recent_campaigns`**: Para un rendimiento de élite a gran escala, se podría crear una vista materializada en la base de datos que pre-calcule las campañas recientes por workspace, y `getRecentCampaignsByWorkspaceId` consultaría esa vista.
+ * 4. **Inyección de Dependencias para Pruebas**: Para una testeabilidad de élite, las funciones de esta capa de datos podrían aceptar una instancia del cliente Supabase como parámetro opcional, facilitando la inyección de mocks.
+ * 5. **Abstracción de Lógica de Paginación**: La lógica para calcular `from` y `to` es un patrón repetido. Podría ser abstraído a un helper `getPaginationRange(page, limit)`.
+ * 6. **Revalidación de Caché por Etiqueta**: Las Server Actions que modifican campañas deben invocar `revalidateTag('campaigns')` para invalidar activamente los cachés de `getCampaignSiteInfoById` y `getRecentCampaignsByWorkspaceId`.
+ * 7. **Manejo de Errores Granular**: La función `getCampaignsMetadataBySiteId` podría devolver un `Result` (ej. `{ data, error }`) en lugar de un array vacío en caso de error, para dar más contexto a la capa superior.
+ * 8. **Índices de Búsqueda (GIN)**: Para optimizar el rendimiento de la búsqueda `ILIKE` en un gran volumen de datos, se deben crear índices GIN con la extensión `pg_trgm` en las columnas `name` y `slug` de la tabla `campaigns`.
+ * 9. **Consistencia de `sortMap`**: El `sortMap` podría ser generado dinámicamente a partir de la constante `CAMPAIGN_SORT_OPTIONS` para garantizar que siempre estén sincronizados, adhiriéndose al principio DRY al más alto nivel.
  * =====================================================================
  */
+// src/lib/data/campaigns/management.data.ts

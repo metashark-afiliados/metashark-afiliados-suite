@@ -2,9 +2,9 @@
 /**
  * @file src/middleware/handlers/auth/index.ts
  * @description Motor de reglas de autorización de élite para el middleware.
- *              Ha sido refactorizado holísticamente para abstraer la lógica
- *              de redirección a un helper atómico, y para enriquecer la
- *              observabilidad con el logging de headers de respuesta.
+ *              Ha sido refactorizado holísticamente para consumir el nuevo aparato
+ *              soberano `permissions-edge.ts`, desacoplándolo de la capa de datos
+ *              del servidor y resolviendo el `TypeError` de runtime.
  * @author Raz Podestá - MetaShark Tech
  * @version 5.0.0
  * @date 2025-08-29
@@ -56,7 +56,6 @@ function createRedirectResponse(
 function findMatchingRouteRule(
   pathname: string
 ): RouteSecurityRule | undefined {
-  // Mejora futura: implementar lógica de coincidencia de patrones para rutas dinámicas.
   return ROUTE_MANIFEST.find((rule) => pathname.startsWith(rule.path));
 }
 

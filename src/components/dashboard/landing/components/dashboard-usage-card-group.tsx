@@ -1,40 +1,35 @@
 // src/components/dashboard/landing/components/dashboard-usage-card-group.tsx
 /**
  * @file dashboard-usage-card-group.tsx
- * @description Componente de UI atómico y de presentación puro.
- *              Ha sido refactorizado holísticamente a un estándar de élite para
- *              consumir datos reales del `useDashboard()` hook y renderizar
- *              un grupo de tarjetas con métricas de uso clave. Incluye un
- *              `AnimatedCounter` para valores dinámicos y es completamente
- *              internacionalizado y optimizado con animaciones.
+ * @description Componente de UI de presentación puro. Ha sido refactorizado
+ *              holísticamente a un estándar de élite para ser un ensamblador
+ *              100% agnóstico a la lógica de negocio, consumiendo el hook soberano
+ *              `useUsageCardGroup` para obtener todos sus datos y estado.
+ *              Incluye un `AnimatedCounter` para valores dinámicos y es
+ *              completamente internacionalizado y animado.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 4.0.0
  * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
-import { useTranslations } from "next-intl";
+import React, { useEffect, useRef } from "react";
 import { animate, motion, useInView } from "framer-motion";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import { useDashboard } from "@/lib/context/DashboardContext";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
+import { useUsageCardGroup } from "@/lib/hooks/useUsageCardGroup";
 import { clientLogger } from "@/lib/logging";
-import { type Enums } from "@/lib/types/database";
-import { type LucideIconName } from "@/config/lucide-icon-names";
 
-export interface UsageCardData {
-  title: string;
-  iconName: LucideIconName;
-  iconColorClass: string;
-  value: number;
-  change: string;
-}
-
+/**
+ * @private
+ * @component AnimatedCounter
+ * @description Sub-componente atómico que anima un número de 0 hasta el valor objetivo.
+ * @param {{ to: number }} props - El valor final al que animar.
+ * @returns {React.ReactElement}
+ */
 const AnimatedCounter = ({ to }: { to: number }) => {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
@@ -56,83 +51,35 @@ const AnimatedCounter = ({ to }: { to: number }) => {
   return <span ref={ref} />;
 };
 
+/**
+ * @public
+ * @component DashboardUsageCardGroup
+ * @description Ensambla la cuadrícula de tarjetas de métricas de uso. Es un
+ *              componente de presentación puro que delega toda su lógica al
+ *              hook `useUsageCardGroup`.
+ * @returns {React.ReactElement}
+ */
 export function DashboardUsageCardGroup(): React.ReactElement {
   clientLogger.trace(
-    "[DashboardUsageCardGroup] Renderizando componente con datos reales."
+    "[DashboardUsageCardGroup] Renderizando componente de presentación puro."
   );
 
-  const t = useTypedTranslations(
-    "components.dashboard.DashboardUsageCardGroup"
-  );
-  const {
-    activeSitesCount,
-    publishedCampaignsCount,
-    uniqueVisitors30d,
-    aiCreditsRemaining,
-    profile,
-    maxSitesAllowed,
-  } = useDashboard();
+  const { cards, isLoading, animationVariants } = useUsageCardGroup();
 
-  const cards: UsageCardData[] = useMemo(() => {
-    const userPlanType = profile.plan_type as Enums<"plan_type">;
+  if (isLoading) {
+    return (
+      <div className={"grid gap-6 sm:grid-cols-2 lg:grid-cols-2"}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card
+            key={i}
+            className="bg-background/50 backdrop-blur-[24px] border-border p-6 h-[122px] animate-pulse"
+          />
+        ))}
+      </div>
+    );
+  }
 
-    return [
-      {
-        title: t("sites_active_title"),
-        iconName: "LayoutGrid",
-        iconColorClass: "text-green-500",
-        value: activeSitesCount,
-        change:
-          userPlanType === "free"
-            ? t("sites_active_change_free_plan", { count: maxSitesAllowed })
-            : t("sites_active_change_pro_plan"),
-      },
-      {
-        title: t("campaigns_published_title"),
-        iconName: "Rocket",
-        iconColorClass: "text-indigo-500",
-        value: publishedCampaignsCount,
-        change: t("campaigns_published_change", { percent: 15 }),
-      },
-      {
-        title: t("visitors_30d_title"),
-        iconName: "Users",
-        iconColorClass: "text-yellow-500",
-        value: uniqueVisitors30d,
-        change: t("visitors_30d_change", { percent: 10 }),
-      },
-      {
-        title: t("ai_credits_title"),
-        iconName: "Bot",
-        iconColorClass: "text-primary",
-        value: aiCreditsRemaining,
-        change:
-          aiCreditsRemaining === 0
-            ? t("ai_credits_change_renews")
-            : t("ai_credits_change_remaining", { count: aiCreditsRemaining }),
-      },
-    ];
-  }, [
-    activeSitesCount,
-    publishedCampaignsCount,
-    uniqueVisitors30d,
-    aiCreditsRemaining,
-    t,
-    profile.plan_type,
-    maxSitesAllowed,
-  ]);
-
-  const STAGGER_CONTAINER = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-  const FADE_UP = {
-    hidden: { opacity: 0, y: 10 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
+  const { STAGGER_CONTAINER, FADE_UP } = animationVariants;
 
   return (
     <motion.div
@@ -180,16 +127,12 @@ export function DashboardUsageCardGroup(): React.ReactElement {
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-29
- *
- * @section Melhorias Futuras
- * 1. ((Vigente)) **Tooltips Explicativos:** Añadir un `Tooltip` a cada tarjeta que ofrezca una explicación más detallada de la métrica (ej. "Número de sitios que no están archivados"), mejorando la usabilidad.
- * 2. ((Vigente)) **Animación de Tendencia:** Para las métricas con porcentajes de cambio, se podría añadir un icono `ArrowUp` o `ArrowDown` junto al texto de "change", animado con `framer-motion` para indicar la tendencia positiva o negativa.
- * 3. ((Vigente)) **Lógica de Colores Dinámica:** El color del texto "change" podría cambiar dinámicamente a verde o rojo para reflejar si el cambio porcentual es positivo o negativo.
- *
+ * @subsection Melhorias Futuras
+ * 1. **Tooltips Explicativos**: Añadir un `Tooltip` a cada tarjeta que ofrezca una explicación más detallada de la métrica (ej. "Número de sitios que no están archivados"), consumiendo este texto desde el `useUsageCardGroup` hook.
+ * 2. **Animación de Tendencia**: Para las métricas con porcentajes de cambio, añadir un icono `ArrowUp` o `ArrowDown` junto al texto de "change", animado con `framer-motion` para indicar la tendencia.
+ * 3. **Lógica de Colores Dinámica**: El color del texto "change" podría cambiar dinámicamente a verde o rojo para reflejar si el cambio es positivo o negativo, basado en datos provistos por el hook.
+ * 4. **Pruebas Unitarias**: Este componente, ahora puro, es ideal para pruebas unitarias con Vitest, mockeando el hook `useUsageCardGroup` para proveer diferentes conjuntos de `cards` y verificar que la UI se renderiza correctamente.
+ * 5. **Componente `UsageCard` Atómico**: La `motion.div` que renderiza cada tarjeta podría ser extraída a su propio componente `UsageCard.tsx` para una máxima atomicidad y limpieza del JSX en este orquestador.
  * =====================================================================
  */
 // src/components/dashboard/landing/components/dashboard-usage-card-group.tsx

@@ -75,9 +75,11 @@ export async function getAllSites({
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Búsqueda y Filtrado**: ((Vigente)) Para una funcionalidad de administración completa, esta función debería ser extendida para aceptar un `query` y otros parámetros de filtro (ej. por `status` o `owner_id`) para permitir la búsqueda en el Dev Console.
- * 2. **Cacheo de Datos**: ((Vigente)) Para dashboards de administración con mucho tráfico, se podría envolver esta función en `React.cache` con una revalidación basada en etiquetas para optimizar el rendimiento.
- * 3. **Consumo de Vista Materializada**: ((Vigente)) Asegurar que la vista `sites_with_campaign_counts` esté implementada y sea materializada en la base de datos para garantizar que esta consulta de alto rendimiento no degrade el rendimiento de la base de datos principal.
+ * 1. **Búsqueda y Filtrado**: Para una funcionalidad de administración completa, esta función debería ser extendida para aceptar un `query` y otros parámetros de filtro (ej. por `status` o `owner_id`) para permitir la búsqueda en el Dev Console.
+ * 2. **Cacheo de Datos**: Para dashboards de administración con mucho tráfico, se podría envolver esta función en `React.cache` con una revalidación basada en etiquetas para optimizar el rendimiento.
+ * 3. **Consumo de Vista Materializada**: Asegurar que la vista `sites_with_campaign_counts` esté implementada y sea materializada en la base de datos para garantizar que esta consulta de alto rendimiento no degrade el rendimiento de la base de datos principal.
+ * 4. **Tipado de Retorno con Zod**: En lugar de la aserción `as`, crear un `SiteWithCampaignsCountSchema` y usar `.parse()` para garantizar la forma de los datos en tiempo de ejecución.
+ * 5. **Ordenamiento Dinámico**: Añadir un parámetro `sort` para permitir ordenar los resultados por diferentes columnas (ej. `name`, `campaign_count`, `created_at`).
  * =====================================================================
  */
 // src/lib/data/admin/sites.data.ts

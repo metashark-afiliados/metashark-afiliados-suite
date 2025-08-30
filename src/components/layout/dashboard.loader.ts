@@ -2,12 +2,14 @@
 /**
  * @file dashboard.loader.ts
  * @description Aparato de carga de datos de élite. Ha sido refactorizado
- *              holísticamente para alinear su contrato de retorno `DashboardLayoutData`
- *              con la forma real de los datos que provee, resolviendo la cascada de
- *              errores de tipo TS2322.
+ *              holísticamente para consumir la API de datos atomizada y namespaced,
+ *              y para fortalecer su contrato de retorno `DashboardLayoutData`,
+ *              resolviendo la cascada de errores de tipo TS2339 y TS7006.
  * @author Raz Podestá & L.I.A. Legacy
  * @version 8.0.0
  * @date 2025-08-29
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use server";
 
@@ -23,12 +25,12 @@ import {
   workspaces as workspacesData,
 } from "@/lib/data";
 import { type Invitation } from "@/lib/data/notifications";
+import { type SiteWithCampaignCount } from "@/lib/data/sites";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 import { type Enums, type Tables } from "@/lib/types/database";
 import { rootDomain } from "@/lib/utils";
 
-// --- INICIO DE REFACTORIZACIÓN HOLÍSTICA: Sincronización de Contratos ---
 type RecentCampaign = Pick<
   Tables<"campaigns">,
   "id" | "name" | "updated_at" | "created_at" | "creation_id"
@@ -40,13 +42,13 @@ export interface DashboardLayoutData {
   workspaces: Tables<"workspaces">[];
   activeWorkspace: Tables<"workspaces"> | null;
   activeWorkspaceRole: Enums<"workspace_role"> | null;
-  pendingInvitations: Invitation[]; // <-- TIPO CORREGIDO
+  pendingInvitations: Invitation[];
   modules: ReturnType<
     typeof modulesData.getFeatureModulesForUser
   > extends Promise<infer T>
     ? T
     : never;
-  recentCampaigns: RecentCampaign[]; // <-- TIPO CORREGIDO
+  recentCampaigns: RecentCampaign[];
   workspaceMembers: (Tables<"workspace_members"> & {
     profiles: Tables<"profiles"> | null;
   })[];
@@ -56,7 +58,6 @@ export interface DashboardLayoutData {
   aiCreditsRemaining: number;
   maxSitesAllowed: number;
 }
-// --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -172,7 +173,15 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
         .from("campaigns")
         .select("id", { count: "exact", head: true })
         .eq("status", "published")
-        .eq("sites.workspace_id", activeWorkspace.id),
+        .in(
+          "site_id",
+          (
+            await supabase
+              .from("sites")
+              .select("id")
+              .eq("workspace_id", activeWorkspace.id)
+          ).data?.map((s) => s.id) || []
+        ),
       supabase
         .from("user_tokens")
         .select("balance")
@@ -199,7 +208,7 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
         .in(
           "landing_page",
           allSitesInWorkspace.sites.map(
-            (site) => `${site.subdomain}.${rootDomain}`
+            (site: SiteWithCampaignCount) => `${site.subdomain}.${rootDomain}`
           )
         )
         .gte("created_at", thirtyDaysAgo.toISOString());
@@ -215,7 +224,10 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
       pendingInvitations,
       modules,
       recentCampaigns,
-      workspaceMembers: workspaceMembers as any,
+      workspaceMembers:
+        (workspaceMembers as (Tables<"workspace_members"> & {
+          profiles: Tables<"profiles"> | null;
+        })[]) || [],
       activeSitesCount: activeSitesResult.count || 0,
       publishedCampaignsCount: publishedCampaignsResult.count || 0,
       uniqueVisitors30d,
@@ -234,19 +246,14 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
     return null;
   }
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- * @author Raz Podestá - MetaShark Tech
- * @version 8.0.0
- * @date 2025-08-29
- *
  * @subsection Melhorias Futuras
- * 1. **Abstracción de Métricas a la Capa de Datos**: ((Vigente)) La lógica para calcular las métricas (`activeSitesCount`, `publishedCampaignsCount`, `uniqueVisitors30d`) reside actualmente en el loader. Para una arquitectura de élite, esta lógica debería ser migrada a un nuevo aparato atómico `src/lib/data/metrics/dashboard.data.ts`, manteniendo el loader como un orquestador puro.
- * 2. **Tipado de `workspaceMembers`**: ((Vigente)) La aserción de tipo `as any` en `workspaceMembers` es una solución pragmática. La solución de élite sería refinar la función `getWorkspaceMembers` para que su tipo de retorno sea explícitamente `(Tables<'workspace_members'> & { profiles: Tables<'profiles'> | null; })[]`.
- *
+ * 1. **Abstracción de Métricas a la Capa de Datos**: La lógica para calcular las métricas (`activeSitesCount`, etc.) reside en el loader. Para una arquitectura de élite, esta lógica debería migrar a un nuevo aparato `src/lib/data/metrics/dashboard.data.ts`.
+ * 2. **Tipado de `workspaceMembers`**: La aserción de tipo en `workspaceMembers` es pragmática. La solución de élite es refinar `getWorkspaceMembers` para que su tipo de retorno sea explícito y seguro.
+ * 3. **Optimización de Consulta de Campañas Publicadas**: La subconsulta para obtener los `site_id` dentro de la consulta de campañas publicadas puede ser ineficiente. Una vista de base de datos o una función RPC sería más performante.
  * =====================================================================
  */
 // src/components/layout/dashboard.loader.ts

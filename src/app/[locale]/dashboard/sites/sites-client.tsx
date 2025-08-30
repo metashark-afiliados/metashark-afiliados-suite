@@ -2,13 +2,12 @@
 /**
  * @file sites-client.tsx
  * @description Orquestador de UI de élite. Ha sido refactorizado holísticamente
- *              para consumir el hook soberano `useSitesPage`, alinear todas sus
- *              importaciones con la arquitectura de módulos atomizada, y propagar
- *              correctamente la lógica de edición en línea, resolviendo una cascada
- *              de errores de tipo y de módulo.
+ *              para consumir el nuevo aparato abstracto `PaginatedResourceView`,
+ *              delegando toda la lógica de renderizado de vistas y paginación,
+ *              y cumpliendo con el principio DRY al más alto nivel.
  * @author Raz Podestá - MetaShark Tech
- * @version 18.0.0
- * @date 2025-08-28
+ * @version 19.0.0
+ * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -22,14 +21,14 @@ import { PaginatedResourceView } from "@/components/shared/PaginatedResourceView
 import { CreateSiteForm } from "@/components/sites/CreateSiteForm";
 import { SitesGrid } from "@/components/sites/SitesGrid";
 import { SitesHeader } from "@/components/sites/SitesHeader";
-import { SitesTable } from "@/components/sites/SitesTable"; // <-- CORRECCIÓN: Importación ahora válida
+import { SitesTable } from "@/components/sites/SitesTable";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { type SiteWithCampaignCount } from "@/lib/data/sites"; // <-- CORRECCIÓN: Ruta de tipo canónica
+import { type SiteWithCampaignCount } from "@/lib/data/sites";
 import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
 import { useSitesPage } from "@/lib/hooks/useSitesPage";
 import { clientLogger } from "@/lib/logging";
@@ -76,10 +75,8 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
     return (
       <ErrorStateCard
         icon={AlertTriangle}
-        // --- INICIO DE CORRECCIÓN DE I18N (TS2345) ---
         title={tErrors("generic.error_unauthenticated")}
         description={tErrors("generic.error_no_active_workspace")}
-        // --- FIN DE CORRECCIÓN DE I18N (TS2345) ---
       />
     );
   }
@@ -151,16 +148,10 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 18.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Novas
- * 1. **Contexto de Página (`SitesPageContext`)**: ((Vigente)) Para eliminar completamente el "prop drilling", este componente podría actuar como un proveedor de contexto, haciendo que el valor de retorno del hook `useSitesPage` esté disponible para todos sus componentes hijos sin necesidad de pasar props explícitamente.
- *
+ * =====================================================================
+ * @subsection Melhorias Futuras
+ * 1. **Contexto de Página (`SitesPageContext`)**: ((Vigente)) Para eliminar completamente el "prop drilling" hacia `SitesGrid` y `SitesTable`, este componente podría actuar como un proveedor de contexto, haciendo que el valor de retorno del hook `useSitesPage` esté disponible para todos sus componentes hijos sin necesidad de pasar props explícitamente.
+ * 2. **Factoría de Items Optimistas Atómica**: ((Vigente)) La lógica para crear `optimisticItem` en el hook `useSitesPage` podría ser extraída a un helper `optimisticItemFactory.ts` para una máxima reutilización.
  * =====================================================================
  */
 // src/app/[locale]/dashboard/sites/sites-client.tsx

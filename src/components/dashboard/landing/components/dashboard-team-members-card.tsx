@@ -1,12 +1,12 @@
 // src/components/dashboard/landing/components/dashboard-team-members-card.tsx
 /**
  * @file dashboard-team-members-card.tsx
- * @description Componente de UI que renderiza una tarjeta mostrando los miembros
- *              del equipo. Ha sido refactorizado holísticamente a un estándar
- *              de élite para consumir datos reales del `useDashboard` hook,
- *              eliminando por completo los datos mockeados.
+ * @description Componente de UI de presentación puro. Ha sido refactorizado
+ *              a un estándar de élite para ser un ensamblador 100% agnóstico a la
+ *              lógica de negocio, consumiendo el hook soberano `useTeamMembersCard`
+ *              para obtener todo su estado y contenido.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
+ * @version 4.0.0
  * @date 2025-08-29
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -14,38 +14,27 @@
 "use client";
 
 import { Plus, User as UserIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDashboard } from "@/lib/context/DashboardContext";
-import { useWorkspaceDialogStore } from "@/lib/hooks/useWorkspaceDialogStore";
+import { useTeamMembersCard } from "@/lib/hooks/useTeamMembersCard";
 import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
  * @component DashboardTeamMembersCard
- * @description Renderiza la tarjeta de miembros del equipo en el Hub Creativo.
- *              Consume datos reales de los miembros del workspace activo.
+ * @description Ensambla la tarjeta de miembros del equipo en el Hub Creativo.
+ *              Es un componente de presentación puro que delega toda su lógica
+ *              al hook `useTeamMembersCard`.
  * @returns {React.ReactElement}
  */
 export function DashboardTeamMembersCard(): React.ReactElement {
-  const t = useTranslations("components.dashboard.DashboardTeamMembersCard");
-  const openInviteDialog = useWorkspaceDialogStore((state) => state.open);
-  const { workspaceMembers } = useDashboard();
-
   clientLogger.trace(
-    "[DashboardTeamMembersCard] Renderizando con datos reales.",
-    { memberCount: workspaceMembers?.length ?? 0 }
+    "[DashboardTeamMembersCard] Renderizando componente de presentación puro."
   );
 
-  const handleInviteClick = () => {
-    clientLogger.info(
-      "[DashboardTeamMembersCard] El usuario inició el flujo para invitar a un miembro."
-    );
-    openInviteDialog("invite");
-  };
+  const { t, workspaceMembers, handleInviteClick } = useTeamMembersCard();
 
   return (
     <Card className={"bg-background/50 backdrop-blur-[24px] border-border p-6"}>
@@ -95,8 +84,9 @@ export function DashboardTeamMembersCard(): React.ReactElement {
                 <div className={"flex flex-col gap-1"}>
                   <span className={"text-base leading-4 font-medium"}>
                     {member.profiles?.full_name ||
-                      member.profiles?.email ||
-                      t("unknown_member")}
+                      t("unknown_member", {
+                        defaultValue: member.profiles?.email,
+                      })}
                   </span>
                   <span className={"text-sm leading-5 text-muted-foreground"}>
                     {member.profiles?.email}
@@ -123,16 +113,12 @@ export function DashboardTeamMembersCard(): React.ReactElement {
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-29
- *
- * @section Melhorias Futuras
- * 1. ((Vigente)) **Acciones por Miembro:** Añadir un `DropdownMenu` ("...") junto a cada miembro para permitir acciones contextuales como "Cambiar Rol" o "Eliminar Miembro". Esto requeriría nuevas Server Actions y diálogos de confirmación.
- * 2. ((Vigente)) **Internacionalización de Roles:** Los nombres de roles (ej. "Owner") se muestran capitalizados directamente desde la base de datos. Para una internacionalización completa, se debería usar `t(member.role as any)` si los roles estuvieran definidos en el JSON de i18n, o un mapeo dedicado.
- * 3. ((Vigente)) **Paginación/Virtualización:** Para workspaces con un gran número de miembros, la lista podría ser paginada o virtualizada para garantizar un rendimiento óptimo a escala.
- *
+ * @subsection Melhorias Futuras
+ * 1. **Componente `TeamMemberRow` Atómico**: La `div` que renderiza cada miembro dentro del `.map()` podría ser extraída a su propio componente `TeamMemberRow.tsx` para una máxima atomicidad y limpieza del JSX en este orquestador.
+ * 2. **Esqueleto de Carga (Skeleton)**: Si `useTeamMembersCard` implementa un estado `isLoading`, este componente debería renderizar una lista de `Skeleton` `div`s para mejorar la UX de carga.
+ * 3. **Internacionalización de Roles**: El rol del miembro (`member.role`) se capitaliza directamente. Para una internacionalización completa, se debería usar `t('role_' + member.role)`, lo cual requeriría añadir estas claves al `DashboardTeamMembersCard.json`.
+ * 4. **Accesibilidad de la Lista**: La lista de miembros podría ser envuelta en una `<ul>` y cada miembro en un `<li>` para una mejor semántica HTML y accesibilidad.
+ * 5. **Acciones por Miembro**: Integrar un `DropdownMenu` con acciones contextuales (Cambiar Rol, Eliminar) para cada miembro, consumiendo nuevas funciones que serían expuestas por el hook `useTeamMembersCard`.
  * =====================================================================
  */
 // src/components/dashboard/landing/components/dashboard-team-members-card.tsx

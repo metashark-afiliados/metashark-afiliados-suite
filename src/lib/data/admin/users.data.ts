@@ -84,9 +84,11 @@ export async function getPaginatedUsersWithRoles({
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Índices de Búsqueda (GIN)**: ((Vigente)) Para optimizar el rendimiento de la búsqueda `ILIKE` en un gran número de usuarios, se deben crear índices GIN con la extensión `pg_trgm` en las columnas `email` y `full_name` de la tabla `profiles`.
- * 2. **Filtros por Rol**: ((Vigente)) Extender la función para aceptar un parámetro `role: AppRole` que permita filtrar a los usuarios por su `app_role`, una funcionalidad esencial para la gestión de usuarios.
- * 3. **Ordenamiento Dinámico**: ((Vigente)) Añadir un parámetro `sort` para permitir ordenar los resultados por diferentes columnas (ej. `email`, `full_name`, `created_at`).
+ * 1. **Índices de Búsqueda (GIN)**: Para optimizar el rendimiento de la búsqueda `ILIKE` en un gran número de usuarios, se deben crear índices GIN con la extensión `pg_trgm` en las columnas `email` y `full_name` de la tabla `profiles`.
+ * 2. **Filtros por Rol**: Extender la función para aceptar un parámetro `role: AppRole` que permita filtrar a los usuarios por su `app_role`, una funcionalidad esencial para la gestión de usuarios.
+ * 3. **Ordenamiento Dinámico**: Añadir un parámetro `sort` para permitir ordenar los resultados por diferentes columnas (ej. `email`, `full_name`, `created_at`).
+ * 4. **Cacheo de Datos**: Para dashboards de administración con mucho tráfico, envolver esta función en `React.cache` con una revalidación basada en etiquetas para optimizar el rendimiento.
+ * 5. **Tipado de Retorno con Zod**: En lugar de la aserción `as UserProfilesWithEmail[]`, crear un `UserProfilesWithEmailSchema` y usar `z.array(...).parse(profiles)` para una validación en tiempo de ejecución.
  * =====================================================================
  */
 // src/lib/data/admin/users.data.ts

@@ -26,22 +26,29 @@ import {
   CardSkeleton,
 } from "@/components/ui/card";
 import { useSubscriptionData } from "@/lib/hooks/useSubscriptionData";
+import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
  * @component DashboardSubscriptionCardGroup
  * @description Orquesta la UI para la sección de suscripciones del dashboard.
+ *              Es un componente de presentación puro que delega toda su lógica
+ *              al hook `useSubscriptionData`.
  * @returns {React.ReactElement}
  */
 export function DashboardSubscriptionCardGroup() {
+  clientLogger.trace(
+    "[DashboardSubscriptionCardGroup] Renderizando componente de presentación puro."
+  );
+
   const { subscriptions, t, isLoading } = useSubscriptionData();
 
   if (isLoading) {
-    return <CardSkeleton className="p-6 h-48" />; // Placeholder de carga
+    return <CardSkeleton className="p-6 h-48" />;
   }
 
   if (!subscriptions.length) {
-    return <ErrorContent />; // Reutiliza el componente de error si no hay datos
+    return <ErrorContent />;
   }
 
   return (
@@ -74,9 +81,12 @@ export function DashboardSubscriptionCardGroup() {
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
- * @section Melhorias Futuras
- * 1. ((Vigente)) **Estado Vacío Específico:** En lugar de `ErrorContent`, se podría crear un componente `EmptyState` específico para cuando un usuario no tiene suscripciones, con un CTA para "Ver Planes".
- *
+ * @subsection Melhorias Futuras
+ * 1. **Estado Vacío Específico**: En lugar de `ErrorContent`, crear un componente `EmptyState` específico para cuando un usuario no tiene suscripciones, con un CTA claro para "Ver Planes" o "Actualizar Plan".
+ * 2. **Pruebas Unitarias Aisladas**: Este componente ahora es ideal para pruebas unitarias. Se puede mockear el hook `useSubscriptionData` para devolver diferentes escenarios (cargando, sin suscripciones, con suscripción Pro) y verificar que la UI se renderiza correctamente en cada caso.
+ * 3. **Animación de Entrada**: Envolver la `Card` principal en `motion.div` de Framer Motion para añadir una animación de entrada sutil, en línea con el resto de los componentes del "Hub Creativo".
+ * 4. **Componente `CardHeaderAction` Atómico**: El `CardTitle` con el botón "Ver Todo" es un patrón reutilizable. Podría ser extraído a un componente `CardHeaderAction` que acepte `title` y `actionSlot` como props.
+ * 5. **Accesibilidad de Enlace**: El `Link` de "Ver Todo" debería tener un `aria-label` más descriptivo, ej. "Ver todas las suscripciones", que podría ser provisto por el hook.
  * =====================================================================
  */
 // src/components/dashboard/landing/components/dashboard-subscription-card-group.tsx

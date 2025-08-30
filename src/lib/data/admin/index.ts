@@ -26,9 +26,11 @@ export * from "./types";
  *                           MEJORA CONTINUA
  * =====================================================================
  * @subsection Melhorias Futuras
- * 1. **Generación Automática de Manifiestos**: ((Vigente)) Para una mantenibilidad de élite a largo plazo, este tipo de archivo "barrel" es un candidato ideal para ser generado y mantenido por un script (`pnpm gen:manifests`). Esto eliminaría la necesidad de actualizaciones manuales y prevendría errores de omisión de exportación.
- * 2. **Módulo de Auditoría**: ((Vigente)) Se podría crear un módulo `audit.data.ts` en este directorio para albergar la lógica de consulta de `audit_logs` para el Dev Console, y exportarlo aquí como `admin.audit`.
- * 3. **Módulo de Errores del Sistema**: ((Vigente)) De manera similar, se podría crear un `system_errors.data.ts` para consultar la tabla `system_errors` y exportarlo como `admin.systemErrors`.
+ * 1. **Generación Automática de Manifiestos**: Para una mantenibilidad de élite a largo plazo, este tipo de archivo "barrel" es un candidato ideal para ser generado y mantenido por un script (`pnpm gen:manifests`). Esto eliminaría la necesidad de actualizaciones manuales y prevendría errores de omisión de exportación.
+ * 2. **Módulo de Auditoría**: Se podría crear un módulo `audit.data.ts` en este directorio para albergar la lógica de consulta de `audit_logs` para el Dev Console, y exportarlo aquí como `admin.audit`.
+ * 3. **Módulo de Errores del Sistema**: De manera similar, se podría crear un `system_errors.data.ts` para consultar la tabla `system_errors` y exportarlo como `admin.systemErrors`.
+ * 4. **Exportaciones Nombradas Explícitas**: Para una claridad máxima de la API, se podría refactorizar para usar exportaciones nombradas explícitas (`export { users } from './users.data'`) en lugar de `import * as`.
+ * 5. **Documentación de API**: Añadir comentarios TSDoc a cada exportación para describir el propósito de cada sub-módulo (`users`, `campaigns`, etc.).
  * =====================================================================
  */
 // src/lib/data/admin/index.ts
