@@ -32,11 +32,6 @@ Este aislamiento es una decisión arquitectónica crítica que previene la conta
  * 3.  **Tipado de `app_metadata` en `User`**: Modificar el trigger `handle_new_user_setup` en `schema.sql` para que popule `raw_app_meta_data`. Esto permitiría extender el tipo `User` para incluir el rol, eliminando la consulta a `profiles`.
  * 4.  **Helper Genérico de Cacheo Edge**: La lógica de cacheo en `getUserAppRole` podría ser abstraída a un helper `cacheInEdge(key, ttl, fetchDataFn)` para ser reutilizada.
  * 5.  **Logging de Latencia de Caché**: Medir y registrar la latencia de las operaciones de caché (get/set) para monitorear el rendimiento de Vercel KV.
- * 6.  **Fallback de Caché**: Si Vercel KV falla, la lógica podría tener un fallback para proceder sin cacheo, en lugar de potencialmente fallar.
- * 7.  **Configuración de TTL Centralizada**: El `CACHE_TTL_SECONDS` debería ser definido en una variable de entorno para una configuración flexible por entorno.
- * 8.  **Benchmarking**: Añadir benchmarks con `vitest.bench` para medir la diferencia de rendimiento entre un `cache hit` y un `cache miss`.
- * 9.  **Guardia de Tipo `isUserAuthData`**: Exportar un guardián de tipo para validar la forma del objeto `authData`.
- * 10. **Documentación de Estrategia de Caché**: Expandir el TSDoc para explicar la estrategia de invalidación de caché y por qué se eligió un TTL.
  * =====================================================================
  */
 // .docs-espejo/middleware/lib/permissions-edge.md

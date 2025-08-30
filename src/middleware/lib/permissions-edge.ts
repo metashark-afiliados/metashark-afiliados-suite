@@ -6,7 +6,7 @@
  *              en Vercel KV para un rendimiento de élite, y helpers atómicos para
  *              una máxima cohesión y adhesión al principio DRY.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
+ * @version 5.1.0
  * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -31,26 +31,10 @@ export type UserAuthData = {
 
 const CACHE_TTL_SECONDS = 300; // 5 minutos
 
-/**
- * @private
- * @function getActiveWorkspaceIdFromCookie
- * @description Helper atómico que lee y devuelve el ID del workspace activo desde las cookies.
- * @param {NextRequest} request - El objeto de la petición entrante.
- * @returns {string | null} El ID del workspace activo o null.
- */
 function getActiveWorkspaceIdFromCookie(request: NextRequest): string | null {
   return request.cookies.get("active_workspace_id")?.value || null;
 }
 
-/**
- * @private
- * @async
- * @function getUserAppRole
- * @description Obtiene el rol de aplicación de un usuario, con una estrategia de caché de élite.
- * @param {SupabaseClient<Database>} supabase - El cliente de Supabase.
- * @param {string} userId - El ID del usuario.
- * @returns {Promise<AppRole>} El rol de aplicación del usuario.
- */
 async function getUserAppRole(
   supabase: SupabaseClient<Database>,
   userId: string
@@ -104,16 +88,6 @@ async function getUserAppRole(
   return role;
 }
 
-/**
- * @public
- * @async
- * @function getAuthDataForMiddleware
- * @description Obtiene los datos de sesión del usuario y el objeto de respuesta actualizado.
- * @param {NextRequest} request - El objeto de la petición entrante.
- * @param {NextResponse} response - El objeto de respuesta actual en el pipeline.
- * @returns {Promise<{ authData: UserAuthData | null; response: NextResponse; }>}
- *          Un objeto que contiene el contexto de sesión y la respuesta actualizada.
- */
 export async function getAuthDataForMiddleware(
   request: NextRequest,
   response: NextResponse
@@ -130,16 +104,15 @@ export async function getAuthDataForMiddleware(
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError) {
-    logger.error(
-      "[PermissionsEdge] Error al obtener usuario de Supabase.",
-      userError
-    );
-    return { authData: null, response: supabaseResponse };
-  }
-
-  if (!user) {
-    logger.trace("[PermissionsEdge] No se encontró sesión de usuario.");
+  if (userError || !user) {
+    if (userError) {
+      logger.error(
+        "[PermissionsEdge] Error al obtener usuario de Supabase.",
+        userError
+      );
+    } else {
+      logger.trace("[PermissionsEdge] No se encontró sesión de usuario.");
+    }
     return { authData: null, response: supabaseResponse };
   }
 
@@ -148,11 +121,7 @@ export async function getAuthDataForMiddleware(
     getActiveWorkspaceIdFromCookie(request),
   ]);
 
-  const authData = {
-    user,
-    appRole,
-    activeWorkspaceId,
-  };
+  const authData = { user, appRole, activeWorkspaceId };
 
   logger.trace(
     "[PermissionsEdge] Datos de autenticación obtenidos con éxito.",

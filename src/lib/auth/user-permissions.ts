@@ -1,11 +1,11 @@
 // src/lib/auth/user-permissions.ts
 /**
  * @file user-permissions.ts
- * @description Guardián de seguridad de élite. Ha sido refactorizado
- *              para reemplazar `React.cache` por `unstable_cache`, resolviendo el
- *              error de runtime y alineándolo con la SSoT de cacheo de Next.js.
+ * @description Guardián de seguridad de élite. Ha sido refactorizado para
+ *              extraer la llamada a `cookies()` fuera del ámbito de `unstable_cache`,
+ *              resolviendo un error crítico de build en Vercel.
  * @author Raz Podestá
- * @version 3.0.0
+ * @version 6.0.0
  * @date 2025-08-30
  */
 "use server";
@@ -42,9 +42,9 @@ type AuthResultError =
 
 export type AuthResult<T> = AuthResultSuccess<T> | AuthResultError;
 
-export const getAuthenticatedUserAuthData = cache(
-  async (): Promise<UserAuthData | null> => {
-    logger.trace("[AuthCache] Miss: Obteniendo datos de sesión del usuario.");
+const getCachedUserAndProfile = cache(
+  async (sessionId: string | undefined) => {
+    logger.trace("[AuthCache] Miss: Obteniendo datos de usuario y perfil.");
     const supabase = createServerClient();
     const {
       data: { user },
@@ -54,7 +54,6 @@ export const getAuthenticatedUserAuthData = cache(
       return null;
     }
 
-    const cookieStore = cookies();
     const { data: profile } = await supabase
       .from("profiles")
       .select("app_role")
@@ -64,12 +63,32 @@ export const getAuthenticatedUserAuthData = cache(
     return {
       user,
       appRole: profile?.app_role || "user",
-      activeWorkspaceId: cookieStore.get("active_workspace_id")?.value || null,
     };
   },
-  ["authenticated-user-auth-data"],
+  ["user-profile-cache"],
   { tags: ["auth-data"], revalidate: 60 }
 );
+
+export async function getAuthenticatedUserAuthData(): Promise<UserAuthData | null> {
+  const cookieStore = cookies();
+  const sessionId = cookieStore.get(
+    `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split(".")[0].replace("https://", "")}-auth-token`
+  )?.value;
+
+  const cachedData = await getCachedUserAndProfile(sessionId);
+
+  if (!cachedData) {
+    return null;
+  }
+
+  const activeWorkspaceId =
+    cookieStore.get("active_workspace_id")?.value || null;
+
+  return {
+    ...cachedData,
+    activeWorkspaceId,
+  };
+}
 
 export async function requireAppRole(
   requiredRoles: AppRole[]
@@ -80,7 +99,7 @@ export async function requireAppRole(
   }
   if (!requiredRoles.includes(authData.appRole)) {
     logger.warn(
-      `[AuthGuard] VIOLACIÓN DE ACCESO DE ROL: Usuario ${authData.user.id} con rol '${authData.appRole}' intentó acceder a un recurso que requiere [${requiredRoles.join(", ")}].`
+      `[AuthGuard] VIOLACIÓN DE ROL: Usuario ${authData.user.id} con rol '${authData.appRole}' intentó acceder a recurso que requiere [${requiredRoles.join(", ")}].`
     );
     return { success: false, error: "PERMISSION_DENIED", data: authData };
   }
@@ -126,15 +145,49 @@ export async function requireSitePermission(
   );
   if (!isAuthorized) {
     logger.warn(
-      `[AuthGuard] VIOLACIÓN DE ACCESO A SITIO: Usuario ${user.id} intentó acceder al sitio ${siteId} sin permisos en el workspace ${site.workspace_id}.`
+      `[AuthGuard] VIOLACIÓN DE SITIO: Usuario ${user.id} intentó acceder al sitio ${siteId} sin permisos en workspace ${site.workspace_id}.`
     );
-    const errorResult: AuthResultError = {
+    return {
       success: false,
       error: "PERMISSION_DENIED",
-      data: authData,
+      data: authData as any,
     };
-    return errorResult as AuthResult<{ user: User; site: SiteBasicInfo }>;
   }
   return { success: true, data: { user, site } };
+}
+
+export async function requireCampaignPermission(
+  campaignId: string,
+  requiredRoles: WorkspaceRole[]
+): Promise<AuthResult<UserAuthData>> {
+  const authData = await getAuthenticatedUserAuthData();
+  if (!authData) {
+    return { success: false, error: "SESSION_NOT_FOUND", data: null };
+  }
+  const { user } = authData;
+
+  const campaignInfo =
+    await campaignsData.management.getCampaignSiteInfoById(campaignId);
+  if (!campaignInfo || !campaignInfo.workspace_id) {
+    logger.warn(
+      `[AuthGuard] Fallo de permiso de campaña: Campaña ${campaignId} no encontrada o sin workspace.`
+    );
+    return { success: false, error: "NOT_FOUND", data: null };
+  }
+
+  const isAuthorized = await permissionsData.hasWorkspacePermission(
+    user.id,
+    campaignInfo.workspace_id,
+    requiredRoles
+  );
+
+  if (!isAuthorized) {
+    logger.warn(
+      `[AuthGuard] VIOLACIÓN DE CAMPAÑA: Usuario ${user.id} intentó acceder a la campaña ${campaignId} sin permisos en workspace ${campaignInfo.workspace_id}.`
+    );
+    return { success: false, error: "PERMISSION_DENIED", data: authData };
+  }
+
+  return { success: true, data: authData };
 }
 // src/lib/auth/user-permissions.ts

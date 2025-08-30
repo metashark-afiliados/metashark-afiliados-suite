@@ -6,7 +6,7 @@
  *              soberano `permissions-edge.ts`, desacoplándolo de la capa de datos
  *              del servidor y resolviendo el `TypeError` de runtime.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
+ * @version 6.0.0
  * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
@@ -23,16 +23,6 @@ import {
   type RouteSecurityRule,
 } from "@/middleware/lib/routing-manifest-edge";
 
-/**
- * @private
- * @function createRedirectResponse
- * @description Helper atómico que construye una respuesta de redirección.
- * @param {NextRequest} request - El objeto de la petición original.
- * @param {string} locale - El locale para la URL de destino.
- * @param {string} path - La ruta de destino.
- * @param {URLSearchParams} [searchParams] - Parámetros de búsqueda opcionales.
- * @returns {NextResponse} Un objeto de respuesta de redirección.
- */
 function createRedirectResponse(
   request: NextRequest,
   locale: string,
@@ -46,25 +36,12 @@ function createRedirectResponse(
   return NextResponse.redirect(redirectUrl);
 }
 
-/**
- * @private
- * @function findMatchingRouteRule
- * @description Encuentra la regla de seguridad que coincide con el pathname.
- * @param {string} pathname - La ruta a verificar.
- * @returns {RouteSecurityRule | undefined} La regla de seguridad encontrada.
- */
 function findMatchingRouteRule(
   pathname: string
 ): RouteSecurityRule | undefined {
   return ROUTE_MANIFEST.find((rule) => pathname.startsWith(rule.path));
 }
 
-/**
- * @private
- * @function handleUnauthenticated
- * @description Gestiona la lógica para usuarios no autenticados.
- * @returns {NextResponse | null} Una respuesta de redirección o null.
- */
 function handleUnauthenticated(
   request: NextRequest,
   rule: RouteSecurityRule,
@@ -82,12 +59,6 @@ function handleUnauthenticated(
   return null;
 }
 
-/**
- * @private
- * @function handleAuthenticated
- * @description Gestiona la lógica para usuarios autenticados.
- * @returns {NextResponse | null} Una respuesta de redirección o null.
- */
 function handleAuthenticated(
   request: NextRequest,
   authData: UserAuthData,
@@ -121,16 +92,6 @@ function handleAuthenticated(
   return null;
 }
 
-/**
- * @public
- * @async
- * @function handleAuth
- * @description Orquesta el flujo de autorización para una petición.
- * @param {NextRequest} request - La petición entrante.
- * @param {NextResponse} response - La respuesta del handler anterior en el pipeline.
- * @returns {Promise<NextResponse>} La respuesta final (potencialmente una redirección)
- *          o la respuesta actualizada con las cookies de sesión.
- */
 export async function handleAuth(
   request: NextRequest,
   response: NextResponse
@@ -154,7 +115,6 @@ export async function handleAuth(
 
   let rule = findMatchingRouteRule(pathnameWithoutLocale);
   if (!rule) {
-    // Si no se encuentra una regla explícita, se asume que la ruta es protegida por defecto.
     rule = { path: pathnameWithoutLocale, classification: "protected" };
   }
 
@@ -184,4 +144,4 @@ export async function handleAuth(
 
   return finalResponse;
 }
-// src/middleware/handlers/auth/index.ts
+// src/middleware/handlers/a

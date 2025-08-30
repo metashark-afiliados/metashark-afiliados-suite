@@ -3,7 +3,7 @@
  * @file index.md
  * @description Documento Espejo y SSoT para el manejador de autenticación del middleware.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 1.0.0
+ * @version 2.0.0
  */
 # Manifiesto Conceptual: Manejador de Autenticación del Middleware
 
@@ -16,6 +16,7 @@ Este aparato es el **guardián de seguridad principal** en el pipeline del middl
     *   `routing-manifest-edge.ts`: Para obtener las reglas de clasificación y permisos de cada ruta.
 2.  **Lógica Atómica y Pura:** La lógica compleja se descompone en helpers puros y atómicos (`createRedirectResponse`, `findMatchingRouteRule`, `handleUnauthenticated`, `handleAuthenticated`), mejorando la legibilidad, el SRP y la testeabilidad.
 3.  **Orquestación de Flujo:** La función principal `handleAuth` orquesta la invocación de estos helpers para tomar una decisión final: redirigir o permitir el paso.
+4.  **Seguridad por Defecto:** Si una ruta no tiene una regla explícita en el manifiesto, se asume que es protegida por defecto, aplicando el principio de mínimo privilegio.
 
 ## 3. Contrato de API
 - **Entrada:** `NextRequest`, `NextResponse`.
