@@ -1,12 +1,13 @@
+
 // src/app/[locale]/layout.tsx
 /**
  * @file src/app/[locale]/layout.tsx
- * @description Layout Canónico de Contexto y Estilo. Refactorizado para consumir
- *              el `nonce` de la cabecera de la petición y aplicarlo al `body`,
- *              completando el blindaje de seguridad contra ataques XSS.
+ * @description Layout Raíz Canónico de Contexto y Estilo. Refactorizado para
+ *              incluir documentación de élite sobre la implementación de seguridad CSP
+ *              y para consumir el `IconLibraryProvider` a nivel global.
  * @author Raz Podestá - MetaShark Tech
- * @version 13.0.0
- * @date 2025-08-26
+ * @version 15.0.0
+ * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -19,6 +20,7 @@ import { NextIntlClientProvider, useMessages } from "next-intl";
 import { unstable_setRequestLocale } from "next-intl/server";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { IconLibraryProvider } from "@/lib/context/IconLibraryContext";
 import { locales } from "@/lib/navigation";
 import "@/app/globals.css";
 
@@ -29,10 +31,26 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
 };
 
+/**
+ * @public
+ * @function generateStaticParams
+ * @description Genera las rutas estáticas para cada `locale` soportado,
+ *              optimizando el rendimiento de la construcción (build).
+ * @returns Un array de objetos con los parámetros de `locale`.
+ */
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+/**
+ * @public
+ * @component LocaleLayout
+ * @description El layout raíz que envuelve cada página de la aplicación.
+ * @param {object} props
+ * @param {React.ReactNode} props.children - El Server Component de la página actual.
+ * @param {object} props.params - Los parámetros de la ruta, incluyendo el `locale`.
+ * @returns {React.ReactElement} El elemento `<html>` completo con todos los proveedores de contexto.
+ */
 export default function LocaleLayout({
   children,
   params: { locale },
@@ -45,16 +63,16 @@ export default function LocaleLayout({
   }
   unstable_setRequestLocale(locale);
 
-  // --- INICIO DE REFACTORIZACIÓN DE SEGURIDAD (CSP) ---
-  // Se lee el nonce generado por `next.config.js` en cada petición.
+  // Implementación de seguridad CSP: Se lee el nonce generado en `next.config.mjs`
+  // para esta petición específica desde las cabeceras.
   const nonce = headers().get("x-nonce") || "";
-  // --- FIN DE REFACTORIZACIÓN DE SEGURIDAD (CSP) ---
 
   const messages = useMessages();
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      {/* Se aplica el nonce al body. Next.js lo propagará a sus scripts. */}
+      {/* El nonce se aplica al body. Next.js lo propagará automáticamente a
+          sus scripts inline, cumpliendo con la Política de Seguridad de Contenido. */}
       <body className="antialiased" nonce={nonce}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider
@@ -63,26 +81,14 @@ export default function LocaleLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Toaster position="bottom-right" />
-            {children}
+            <IconLibraryProvider activeLibraryId="lucide">
+              <Toaster position="bottom-right" />
+              {children}
+            </IconLibraryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Blindaje de Seguridad XSS Completado:** El layout ahora consume el `nonce` de la cabecera `x-nonce` y lo aplica al `<body>`. Next.js utilizará este `nonce` para autorizar la ejecución de sus propios scripts, completando así la implementación de la CSP estricta.
- * 2. ((Implementada)) **Arquitectura de Flujo de Datos Servidor:** La utilización de `headers()` de `next/headers` es la implementación canónica y de élite para acceder a las cabeceras de la petición dentro de un Server Component.
- *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Propagación de Nonce a Scripts de Terceros:** Si en el futuro se añaden scripts de terceros directamente en este layout (ej. Google Tag Manager), se deberá pasar explícitamente la prop `nonce={nonce}` a cada etiqueta `<Script>` de `next/script`.
- *
- * =====================================================================
- */
 // src/app/[locale]/layout.tsx

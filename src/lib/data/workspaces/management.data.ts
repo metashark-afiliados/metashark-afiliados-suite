@@ -3,18 +3,19 @@
  * @file management.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de
  *              lectura para la gestión de workspaces (Dashboard). Ha sido
- *              refactorizado holísticamente para incluir la función `getWorkspaceMembers`,
- *              una mejora crítica para la visualización de datos reales en el dashboard.
+ *              refactorizado holísticamente para utilizar `unstable_cache` de
+ *              `next/cache`, resolviendo el error de runtime y alineándose
+ *              con la SSoT de cacheo canónica.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-28
+ * @version 3.0.0
+ * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
 "use server";
 import "server-only";
 
-import { cache } from "react";
+import { unstable_cache as cache } from "next/cache";
 import { type SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "@/lib/logging";
@@ -32,10 +33,9 @@ type Supabase = SupabaseClient<
  * @async
  * @function getWorkspacesByUserId
  * @description Obtiene todos los workspaces a los que pertenece un usuario.
- *              La consulta a la base de datos está envuelta en `React.cache` para
- *              prevenir ejecuciones duplicadas dentro de una misma renderización de servidor.
+ *              La consulta está envuelta en `unstable_cache`.
  * @param {string} userId - El ID del usuario.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
  * @returns {Promise<Workspace[]>} Un array con los workspaces del usuario.
  */
 export const getWorkspacesByUserId = cache(
@@ -55,7 +55,9 @@ export const getWorkspacesByUserId = cache(
       logger.error(`Error al obtener workspaces para ${userId}:`, error);
       return [];
     }
-  }
+  },
+  ["workspaces"],
+  { tags: ["workspaces"] }
 );
 
 /**
@@ -63,10 +65,10 @@ export const getWorkspacesByUserId = cache(
  * @async
  * @function getWorkspaceById
  * @description Obtiene los datos básicos de un workspace por su ID.
- *              La consulta está envuelta en `React.cache`.
+ *              La consulta está envuelta en `unstable_cache`.
  * @param {string} workspaceId - El ID del workspace a obtener.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
- * @returns {Promise<Pick<Workspace, "id" | "name" | "icon"> | null>} El objeto del workspace o null si no se encuentra.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
+ * @returns {Promise<Pick<Workspace, "id" | "name" | "icon"> | null>}
  */
 export const getWorkspaceById = cache(
   async (
@@ -78,7 +80,7 @@ export const getWorkspaceById = cache(
     try {
       const { data, error } = await supabase
         .from("workspaces")
-        .select("id, name, icon") // <-- Seleccionar 'icon' también
+        .select("id, name, icon")
         .eq("id", workspaceId)
         .single();
 
@@ -93,19 +95,19 @@ export const getWorkspaceById = cache(
       logger.error(`Error en getWorkspaceById para ${workspaceId}:`, error);
       return null;
     }
-  }
+  },
+  ["workspace_by_id"],
+  { tags: ["workspaces"] }
 );
 
 /**
  * @public
  * @async
  * @function getWorkspaceMembers
- * @description Obtiene todos los miembros de un workspace específico, incluyendo
- *              información básica de sus perfiles.
+ * @description Obtiene todos los miembros de un workspace específico.
  * @param {string} workspaceId - El ID del workspace.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
- * @returns {Promise<Tables<'workspace_members'>[]>} Un array de objetos de miembros del workspace.
- * @throws {Error} Si la consulta a la base de datos falla.
+ * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
+ * @returns {Promise<Tables<'workspace_members'>[]>} Un array de miembros del workspace.
  */
 export async function getWorkspaceMembers(
   workspaceId: string,
@@ -118,7 +120,7 @@ export async function getWorkspaceMembers(
   try {
     const { data, error } = await supabase
       .from("workspace_members")
-      .select("*, profiles(id, email, full_name, avatar_url)") // Seleccionar perfil completo
+      .select("*, profiles(id, email, full_name, avatar_url)")
       .eq("workspace_id", workspaceId);
 
     if (error) {
@@ -134,25 +136,4 @@ export async function getWorkspaceMembers(
     return [];
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Función `getWorkspaceMembers`**: ((Implementada)) Se ha añadido esta función crítica a la capa de datos. Permite obtener los miembros de un workspace junto con su información de perfil (`profiles`), resolviendo la necesidad de datos reales para `dashboard-team-members-card.tsx`.
- * 2. **Tipado Estricto y Full Observabilidad**: ((Implementada)) La nueva función está fuertemente tipada y utiliza `logger.trace`/`logger.error` para una visibilidad completa.
- * 3. **Consistencia en `getWorkspaceById`**: ((Implementada)) La función `getWorkspaceById` ahora también selecciona la columna `icon`, asegurando que la información completa del workspace esté disponible.
- *
- * @subsection Melhorias Futuras
- * 1. **Cacheo de Miembros**: ((Vigente)) La función `getWorkspaceMembers` es candidata para `React.cache` (`unstable_cache`) para optimizar el rendimiento, ya que la lista de miembros no cambia con mucha frecuencia. La clave de caché debería incluir `workspaceId`.
- *
- * =====================================================================
- */
 // src/lib/data/workspaces/management.data.ts

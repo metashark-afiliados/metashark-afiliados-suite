@@ -2,16 +2,15 @@
 /**
  * @file src/middleware.ts
  * @description Orquestador de Middleware de Élite. Ha sido refactorizado
- *              holísticamente a un estándar de producción, implementando un
- *              manejo de errores centralizado para máxima resiliencia y logging
- *              de rendimiento granular para una observabilidad completa.
+ *              holísticamente a un estándar de producción, eliminando la
+ *              dependencia de APIs de Node.js ('perf_hooks') para garantizar
+ *              la compatibilidad con el Edge Runtime.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-29
+ * @version 6.0.0
+ * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
-import { performance } from "perf_hooks";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/logging";
@@ -105,13 +104,4 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 export const config = {
   matcher: ["/((?!api|trpc|_next|_vercel|.*\\..*).*)"],
 };
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Factoría de Pipeline de Middlewares**: ((Vigente)) La lógica de encadenamiento podría ser abstraída a una función `createMiddlewarePipeline([...handlers])` para un código más declarativo y una gestión de rendimiento aún más centralizada.
- * 2. **Configuración de Matcher Dinámica**: ((Vigente)) El `matcher` podría ser generado dinámicamente a partir del `ROUTE_MANIFEST` para una sincronización más robusta.
- * =====================================================================
- */
 // src/middleware.ts

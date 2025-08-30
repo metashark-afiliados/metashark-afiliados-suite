@@ -7,7 +7,7 @@
  *              del servidor y resolviendo el `TypeError` de runtime.
  * @author Raz Podestá - MetaShark Tech
  * @version 5.0.0
- * @date 2025-08-29
+ * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -154,6 +154,7 @@ export async function handleAuth(
 
   let rule = findMatchingRouteRule(pathnameWithoutLocale);
   if (!rule) {
+    // Si no se encuentra una regla explícita, se asume que la ruta es protegida por defecto.
     rule = { path: pathnameWithoutLocale, classification: "protected" };
   }
 
@@ -179,21 +180,8 @@ export async function handleAuth(
   logger.trace("==> [AUTH_HANDLER] END <==", {
     path: pathname,
     action: redirectResponse ? "REDIRECT" : "PASS",
-    status: finalResponse.status,
-    headers: Object.fromEntries(finalResponse.headers.entries()),
   });
 
   return finalResponse;
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Factoría de Reglas de Ruta para Rutas Dinámicas**: La función `findMatchingRouteRule` actual utiliza `startsWith`, lo cual es efectivo para rutas base. Para una granularidad de élite en rutas dinámicas (ej. `/dashboard/sites/[siteId]/settings` con permisos específicos), esta función debería ser mejorada para usar una librería de coincidencia de patrones de ruta (como `path-to-regexp`) para una resolución más precisa.
- * 2. **Cacheo de Reglas de Ruta**: Si el `ROUTE_MANIFEST` fuera a ser cargado desde una base de datos en el futuro, la función `findMatchingRouteRule` sería un candidato ideal para ser envuelta en un caché de alta velocidad (como Vercel KV o un caché en memoria) para evitar consultas a la base de datos en cada petición del middleware.
- * 3. **Gestión de Roles Múltiples**: La lógica actual de `handleAuthenticated` verifica si un usuario tiene *alguno* de los roles requeridos. Podría ser extendida para soportar una lógica más compleja, como requerir *todos* los roles de una lista, si el modelo de permisos evoluciona.
- * 4. **Manejo de Errores de Redirección**: El helper `createRedirectResponse` podría ser blindado con un bloque `try/catch` para manejar errores de URL inválida, aunque con la estructura actual de `path` controlado internamente, el riesgo es bajo.
- * =====================================================================
- */
 // src/middleware/handlers/auth/index.ts

@@ -2,10 +2,10 @@
 /**
  * @file src/components/ui/SmartLink.tsx
  * @description Componente de enlace inteligente y atómico. Ha sido nivelado a un
- *              estándar de élite al blindar su contenido con `RichText` internamente,
- *              haciéndolo inherentemente inmune al error `React.Children.only`.
+ *              estándar de élite para aceptar un `onClick` opcional y propagarlo
+ *              al elemento subyacente, resolviendo un error de tipo `TS2322`.
  * @author L.I.A. Legacy
- * @version 2.1.0
+ * @version 2.2.0
  */
 "use client";
 
@@ -18,15 +18,14 @@ export interface NavLinkItem {
   href: any;
   label: React.ReactNode;
   className?: string;
+  onClick?: () => void; // <-- CONTRATO DE API ACTUALIZADO
 }
 
 /**
  * @public
  * @component SmartLink
- * @description Renderiza un enlace inteligente que elige entre `<a>` para rutas
- *              externas y `<Link>` para internas. Envuelve el `label` en `<RichText>`
- *              para garantizar que siempre se pase un único hijo, previniendo
- *              errores de composición de forma sistémica.
+ * @description Renderiza un enlace inteligente que elige entre `<a>` y `<Link>`.
+ *              Ahora acepta y propaga un callback `onClick`.
  * @param {NavLinkItem} props - Propiedades del componente.
  * @returns {React.ReactElement}
  */
@@ -34,6 +33,7 @@ export const SmartLink: React.FC<NavLinkItem> = ({
   href,
   label,
   className,
+  onClick, 
   ...props
 }) => {
   const finalClassName =
@@ -56,6 +56,7 @@ export const SmartLink: React.FC<NavLinkItem> = ({
         className={finalClassName}
         target={isExternal ? "_blank" : undefined}
         rel={isExternal ? "noopener noreferrer" : undefined}
+        onClick={onClick} // <-- ONCLICK PROPAGADO
         {...props}
       >
         {content}
@@ -64,19 +65,11 @@ export const SmartLink: React.FC<NavLinkItem> = ({
   }
 
   return (
-    <Link href={href} className={finalClassName} {...props}>
+    <Link href={href} className={finalClassName} onClick={onClick} {...props}>
+      {" "}
+      {/* <-- ONCLICK PROPAGADO */}
       {content}
     </Link>
   );
 };
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Blindaje Sistémico**: ((Implementada)) El componente ahora envuelve `label` con `RichText` internamente. Esto resuelve el error `React.Children.only` en su origen, fortaleciendo todos los componentes que consumen `SmartLink`.
- *
- * =====================================================================
- */
 // src/components/ui/SmartLink.tsx

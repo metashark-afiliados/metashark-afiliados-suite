@@ -7,7 +7,7 @@
  *              resolviendo la cascada de errores de tipo TS2339 y TS7006.
  * @author Raz Podestá & L.I.A. Legacy
  * @version 8.0.0
- * @date 2025-08-29
+ * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -246,14 +246,4 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
     return null;
   }
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Abstracción de Métricas a la Capa de Datos**: La lógica para calcular las métricas (`activeSitesCount`, etc.) reside en el loader. Para una arquitectura de élite, esta lógica debería migrar a un nuevo aparato `src/lib/data/metrics/dashboard.data.ts`.
- * 2. **Tipado de `workspaceMembers`**: La aserción de tipo en `workspaceMembers` es pragmática. La solución de élite es refinar `getWorkspaceMembers` para que su tipo de retorno sea explícito y seguro.
- * 3. **Optimización de Consulta de Campañas Publicadas**: La subconsulta para obtener los `site_id` dentro de la consulta de campañas publicadas puede ser ineficiente. Una vista de base de datos o una función RPC sería más performante.
- * =====================================================================
- */
 // src/components/layout/dashboard.loader.ts

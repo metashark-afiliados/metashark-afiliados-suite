@@ -1,46 +1,55 @@
 // src/app/dashboard/layout.tsx
 /**
  * @file layout.tsx
- * @description Layout de servidor para la sección del dashboard. Actúa como un
- *              guardián de seguridad, validando la sesión del usuario, y luego
- *              renderiza el componente de layout de cliente que construye la UI.
- * @author Raz Podestá
- * @version 2.0.0
+ * @description Orquestador de servidor y guardián de seguridad para todo el
+ *              ecosistema del dashboard. Su única responsabilidad es obtener
+ *              los datos de la sesión a través del `loader`, proveer el
+ *              contexto global y ensamblar los componentes de UI del layout de cliente.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 13.0.0
+ * @date 2025-08-30
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
-import { type ReactNode } from "react";
+import React from "react";
 import { redirect } from "next/navigation";
 
-import { DashboardLayout } from "@/components/dashboard/layout/dashboard-layout";
-import { createClient } from "@/lib/supabase/server";
+import {
+  DashboardLayoutData,
+  getLayoutData,
+} from "@/components/layout/dashboard.loader";
+import { DashboardContextProviders } from "@/components/layout/DashboardContextProviders";
+import DashboardLayoutClient from "@/components/layout/DashboardLayout";
+import { GlobalOverlays } from "@/components/layout/GlobalOverlays";
+import { logger } from "@/lib/logging";
 
-interface Props {
-  children: ReactNode;
-}
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}): Promise<React.ReactElement> {
+  logger.trace(
+    "[DashboardLayout:Server] Iniciando orquestación de layout y obtención de datos de sesión."
+  );
 
-export default async function Layout({ children }: Props) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const layoutData: DashboardLayoutData | null = await getLayoutData();
 
-  if (!user) {
-    return redirect("/login");
+  if (!layoutData) {
+    logger.warn(
+      "[DashboardLayout:Server] Sesión no válida o datos no encontrados. Redirigiendo a /login."
+    );
+    return redirect("/login?next=/dashboard");
   }
 
-  return <DashboardLayout>{children}</DashboardLayout>;
-}
+  logger.info(
+    "[DashboardLayout:Server] Datos de sesión válidos. Renderizando layout autenticado."
+  );
 
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Alineación Arquitectónica**: ((Implementada)) El layout del servidor ahora se adhiere al patrón de responsabilidad única, delegando toda la construcción de la UI al componente de cliente `DashboardLayout`.
- * 2. **Seguridad Centralizada**: ((Implementada)) Actúa como un guardián de seguridad para todas las rutas anidadas dentro de `/dashboard`, asegurando que solo los usuarios autenticados puedan acceder.
- *
- * @subsection Melhorias Futuras
- * 1. **Carga de Datos Inicial**: ((Vigente)) Este Server Component es el lugar ideal para precargar datos globales del dashboard (como el `activeWorkspace`) y pasarlos a través de un proveedor de contexto en el `DashboardLayout` para evitar cascadas de peticiones en el cliente.
- *
- * =====================================================================
- */
+  return (
+    <DashboardContextProviders value={layoutData}>
+      <DashboardLayoutClient>{children}</DashboardLayoutClient>
+      <GlobalOverlays />
+    </DashboardContextProviders>
+  );
+}
+// src/app/dashboard/layout.tsx

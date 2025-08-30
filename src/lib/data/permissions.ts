@@ -8,7 +8,7 @@
  *              cacheo canónica de Next.js.
  * @author Raz Podestá - MetaShark Tech
  * @version 2.1.0
- * @date 2025-08-29
+ * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -73,13 +73,4 @@ export const hasWorkspacePermission = cache(
     tags: ["permissions"], // Etiqueta para revalidación
   }
 );
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Claves de Caché Dinámicas**: La clave de `unstable_cache` se podría hacer más específica (ej. `['workspace_permissions', userId, workspaceId]`) para evitar colisiones si la función se llamara con diferentes `requiredRoles` en la misma request, aunque el comportamiento por defecto de `cache` ya maneja esto basándose en los argumentos de la función.
- * 2. **Revalidación por Etiqueta**: Implementar llamadas a `revalidateTag('permissions')` en las Server Actions que modifican los roles de `workspace_members` para invalidar activamente este caché y garantizar la consistencia de los datos.
- * =====================================================================
- */
 // src/lib/data/permissions.ts

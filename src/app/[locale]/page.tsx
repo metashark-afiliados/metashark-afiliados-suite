@@ -2,12 +2,11 @@
 /**
  * @file src/app/[locale]/page.tsx
  * @description Página de Inicio Pública (Landing Page) de élite. Refactorizado
- *              para consumir la función de servidor `getTranslations` en lugar
- *              del hook `useTranslations`, resolviendo una regresión crítica
- *              de `ReferenceError` causada por una violación de las reglas de
- *              los React Server Components.
+ *              holísticamente para sincronizar su lógica de obtención de datos
+ *              con los contratos de i18n definidos en los schemas de Zod, resolviendo
+ *              errores de `TypeError` en runtime.
  * @author Raz Podestá
- * @version 9.1.0
+ * @version 10.0.0
  */
 import { redirect } from "next/navigation";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
@@ -55,7 +54,7 @@ export default async function HomePage({
     redirect("/dashboard");
   }
 
-  // --- INICIO DE CORRECCIÓN DE ÉLITE: RSC `getTranslations` ---
+  // Carga de namespaces de i18n
   const tHeader = await getTranslations("components.layout.LandingHeader");
   const tHero = await getTranslations("components.landing.Hero");
   const tSocial = await getTranslations("components.landing.SocialProof");
@@ -68,12 +67,12 @@ export default async function HomePage({
   const tFaq = await getTranslations("components.landing.FAQ");
   const tSupport = await getTranslations("components.landing.SupportCTA");
   const tBottom = await getTranslations("components.landing.BottomCTA");
-  // --- FIN DE CORRECCIÓN DE ÉLITE ---
 
+  // Construcción de props según los schemas
   const headerProps = {
     navLinks: [
       { href: "#features", label: tHeader("features") },
-      { href: "#process", label: tProcess("navLink") },
+      { href: "#process", label: tProcess("navLink") }, // Nota: 'navLink' viene de ProcessSteps
       { href: "/pricing", label: tHeader("pricing") },
     ],
     signInText: tHeader("signIn"),
@@ -171,18 +170,4 @@ export default async function HomePage({
     </div>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de `ReferenceError`**: ((Implementada)) Se ha reemplazado el hook `useTranslations` por la función de servidor `getTranslations`. Esta es la corrección canónica que resuelve la regresión crítica y alinea el componente con las reglas de los React Server Components.
- *
- * @subsection Melhorias Futuras
- * 1. **Abstracción de Datos de Página**: ((Vigente)) La lógica de construcción de `props` para cada sección podría ser abstraída a una función `getHomePageData(locale)` en la capa de datos (`src/lib/data`), manteniendo este Server Component como un ensamblador aún más limpio.
- *
- * =====================================================================
- */
 // src/app/[locale]/page.tsx

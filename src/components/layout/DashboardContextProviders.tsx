@@ -1,3 +1,4 @@
+// src/components/layout/DashboardContextProviders.tsx
 /**
  * @file DashboardContextProviders.tsx
  * @description Aparato de cliente atómico y puro. Ha sido refactorizado holísticamente
@@ -6,7 +7,7 @@
  *              y garantizando una integración robusta con `IconLibraryProvider`.
  * @author Raz Podestá - MetaShark Tech
  * @version 4.0.0
- * @date 2025-08-29
+ * @date 2025-08-30
  */
 "use client";
 
@@ -67,14 +68,4 @@ export function DashboardContextProviders({
     </DashboardProvider>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Proveedores Condicionales**: ((Vigente)) Si futuros contextos solo fueran necesarios para ciertos roles o planes (ej. un `BillingProvider` para planes `pro`), este componente podría renderizar proveedores de forma condicional basándose en `value.profile`, optimizando el árbol de componentes para roles específicos.
- *
- * =====================================================================
- */
+// src/components/layout/DashboardContextProviders.tsx

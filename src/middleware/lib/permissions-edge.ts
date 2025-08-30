@@ -3,12 +3,11 @@
  * @file src/middleware/lib/permissions-edge.ts
  * @description Aparato de lógica de sesión especializado para el Edge Runtime.
  *              Ha sido refactorizado holísticamente para incluir cacheo de roles
- *              en Vercel KV para un rendimiento de élite, lógica de reintentos
- *              para mayor resiliencia, y helpers atómicos para una máxima cohesión
- *              y adhesión al principio DRY.
+ *              en Vercel KV para un rendimiento de élite, y helpers atómicos para
+ *              una máxima cohesión y adhesión al principio DRY.
  * @author Raz Podestá - MetaShark Tech
  * @version 5.0.0
- * @date 2025-08-29
+ * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -161,15 +160,4 @@ export async function getAuthDataForMiddleware(
   );
   return { authData, response: supabaseResponse };
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Invalidación Activa de Caché**: La estrategia de caché actual depende de un TTL. Para una consistencia de datos de élite, la Server Action `updateUserRoleAction` debería ser modificada para invocar `kv.del(\`user-role:${userId}\`)` explícitamente, invalidando el caché inmediatamente después de un cambio de rol.
- * 2. **Refactorización de `getUserWithRetry`**: La lógica de reintentos para `getUser` fue omitida en esta iteración para mantener la cohesión del `Promise.all`. Una mejora futura sería implementar un helper genérico `withRetry(asyncFn)` que pueda envolver cualquier llamada asíncrona, y aplicarlo a `supabase.auth.getUser()` antes del `Promise.all`.
- * 3. **Tipado de `app_metadata` en `User`**: La mejora conceptual de extender el tipo `User` para incluir `app_metadata.app_role` sigue vigente. Esto requeriría modificar el trigger `handle_new_user_setup` en `schema.sql` para que popule `raw_app_meta_data` al crear el usuario en `auth.users`, lo cual eliminaría la necesidad de la consulta a `profiles` y la lógica de cacheo en este aparato.
- * 4. **Helper Genérico de Cacheo**: La lógica de cacheo en `getUserAppRole` podría ser abstraída a un helper genérico `cacheInEdge(key, ttl, fetchDataFn)` para ser reutilizada en otras funciones de la capa de datos que operen en el Edge.
- * =====================================================================
- */
 // src/middleware/lib/permissions-edge.ts

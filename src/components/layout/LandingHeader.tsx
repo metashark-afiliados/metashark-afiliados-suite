@@ -5,7 +5,7 @@
  *              páginas públicas. Alineado con la nueva arquitectura de autenticación
  *              de páginas dedicadas.
  * @author Raz Podestá
- * @version 4.0.0
+ * @version 5.0.0
  */
 "use client";
 
@@ -91,10 +91,19 @@ export function LandingHeader({
                   aria-label="Navegación Móvil"
                   className="grid gap-6 text-lg font-medium mt-8"
                 >
-                  {/* ... (Menú móvil sin cambios) ... */}
+                  {navLinks.map((link) => (
+                    <SmartLink
+                      key={
+                        typeof link.href === "string"
+                          ? link.href
+                          : link.href.pathname
+                      }
+                      onClick={() => setIsSheetOpen(false)}
+                      {...link}
+                    />
+                  ))}
                 </nav>
                 <div className="mt-8 pt-8 border-t border-border/40 flex flex-col gap-4">
-                  {/* ... (Acciones móviles ahora usan Link) ... */}
                   <Button
                     variant="ghost"
                     asChild
@@ -114,14 +123,4 @@ export function LandingHeader({
     </header>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Activación de Nuevo Flujo**: ((Implementada)) Se han reemplazado los handlers `onClick` por componentes `<Link>`, activando oficialmente la nueva arquitectura de autenticación y descomisionando el flujo modal.
- *
- * =====================================================================
- */
+// src/components/layout/LandingHeader.tsx
