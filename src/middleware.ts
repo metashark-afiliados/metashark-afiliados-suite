@@ -1,14 +1,12 @@
 // src/middleware.ts
 /**
  * @file src/middleware.ts
- * @description Orquestador de Middleware de Élite. Refactorizado para
- *              garantizar la compatibilidad con el Edge Runtime, mejorar la
- *              observabilidad y añadir documentación de nivel de producción.
+ * @description Orquestador de Middleware de Élite. Refactorizado para implementar
+ *              un patrón de "respuesta encadenada" inmutable, resolviendo una
+ *              regresión crítica en el Edge Runtime.
  * @author Raz Podestá - MetaShark Tech
- * @version 7.0.0
+ * @version 8.0.0
  * @date 2025-08-31
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -22,17 +20,6 @@ import {
   handleTelemetry,
 } from "@/middleware/handlers";
 
-/**
- * @private
- * @async
- * @function withPerformanceLogging
- * @description Wrapper de alto orden que mide y registra el tiempo de ejecución
- *              de un handler de middleware asíncrono.
- * @param {string} name - El nombre del handler para el logging.
- * @param {T} handler - La función del handler a ejecutar.
- * @param {Parameters<T>} args - Los argumentos a pasar al handler.
- * @returns {Promise<ReturnType<T>>} El resultado del handler.
- */
 async function withPerformanceLogging<
   T extends (...args: any[]) => Promise<any>,
 >(name: string, handler: T, ...args: Parameters<T>): Promise<ReturnType<T>> {
@@ -44,15 +31,6 @@ async function withPerformanceLogging<
   return result;
 }
 
-/**
- * @public
- * @middleware
- * @description Punto de entrada principal para el middleware de Next.js. Orquesta
- *              la ejecución secuencial de todos los manejadores.
- * @param {NextRequest} request - La petición entrante.
- * @returns {Promise<NextResponse>} La respuesta final, ya sea una redirección,
- *          una reescritura o la respuesta original modificada.
- */
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   logger.trace("==> [MIDDLEWARE_PIPELINE] START <==", { path: pathname });
@@ -65,11 +43,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     const maintenanceResponse = handleMaintenance(request);
     if (maintenanceResponse) return maintenanceResponse;
 
-    let response = await withPerformanceLogging("I18n", handleI18n, request);
-    
-    // Enriquecer el log con el locale detectado
+    // --- INICIO DE REFACTORIZACIÓN: PATRÓN DE RESPUESTA ENCADENADA ---
+    let response = NextResponse.next({
+      request: { headers: new Headers(request.headers) },
+    });
+
+    response = await withPerformanceLogging("I18n", handleI18n, request);
+
     const detectedLocale = response.headers.get("x-app-locale") || "N/A";
-    
+
     response = await withPerformanceLogging(
       "Multitenancy",
       handleMultitenancy,
@@ -82,12 +64,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       request,
       response
     );
+    // handleTelemetry puede mutar la response (añadir cookies) pero no necesita devolverla
+    // ya que es el último en la cadena principal.
     await withPerformanceLogging(
       "Telemetry",
       handleTelemetry,
       request,
       response
     );
+    // --- FIN DE REFACTORIZACIÓN ---
 
     const pipelineEndTime = performance.now();
     const totalDuration = (pipelineEndTime - pipelineStartTime).toFixed(2);
@@ -108,21 +93,13 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         stack: error instanceof Error ? error.stack : undefined,
       }
     );
-    // Devuelve una respuesta de error genérica para el usuario.
-    // El ID de error permite correlacionar el incidente en los logs.
-    return new NextResponse(
-      `Internal Server Error. Please report this issue with ID: ${errorId}`,
-      { status: 500 }
-    );
+    const url = request.nextUrl.clone();
+    url.pathname = "/500"; // Redirigir a una página de error estática o simple
+    url.search = `?errorId=${errorId}`;
+    return NextResponse.rewrite(url);
   }
 }
 
-/**
- * @public
- * @config
- * @description Configuración del matcher para el middleware. Excluye rutas de API,
- *              assets estáticos y archivos internos de Next.js.
- */
 export const config = {
   matcher: ["/((?!api|trpc|_next|_vercel|.*\\..*).*)"],
 };

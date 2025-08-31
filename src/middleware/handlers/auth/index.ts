@@ -2,14 +2,12 @@
 /**
  * @file src/middleware/handlers/auth/index.ts
  * @description Motor de reglas de autorización de élite para el middleware.
- *              Ha sido refactorizado holísticamente para consumir el nuevo aparato
- *              soberano `permissions-edge.ts`, desacoplándolo de la capa de datos
- *              del servidor y resolviendo el `TypeError` de runtime.
+ *              Ha sido refactorizado holísticamente para alinearse con el patrón
+ *              de "respuesta encadenada", resolviendo una regresión crítica
+ *              en el Edge Runtime.
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
- * @date 2025-08-30
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 7.0.0
+ * @date 2025-08-31
  */
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -106,6 +104,7 @@ export async function handleAuth(
     return response;
   }
 
+  // --- INICIO DE REFACTORIZACIÓN: PATRÓN DE RESPUESTA ENCADENADA ---
   const { authData, response: responseAfterAuthCheck } =
     await getAuthDataForMiddleware(request, response);
 
@@ -118,24 +117,18 @@ export async function handleAuth(
     rule = { path: pathnameWithoutLocale, classification: "protected" };
   }
 
-  let finalResponse = responseAfterAuthCheck;
-  let redirectResponse: NextResponse | null = null;
+  const redirectResponse = authData
+    ? handleAuthenticated(
+        request,
+        authData,
+        rule,
+        pathnameWithoutLocale,
+        locale
+      )
+    : handleUnauthenticated(request, rule, pathname, locale);
 
-  if (!authData) {
-    redirectResponse = handleUnauthenticated(request, rule, pathname, locale);
-  } else {
-    redirectResponse = handleAuthenticated(
-      request,
-      authData,
-      rule,
-      pathnameWithoutLocale,
-      locale
-    );
-  }
-
-  if (redirectResponse) {
-    finalResponse = redirectResponse;
-  }
+  const finalResponse = redirectResponse || responseAfterAuthCheck;
+  // --- FIN DE REFACTORIZACIÓN ---
 
   logger.trace("==> [AUTH_HANDLER] END <==", {
     path: pathname,
@@ -144,4 +137,4 @@ export async function handleAuth(
 
   return finalResponse;
 }
-// src/middleware/handlers/a
+// src/middleware/handlers/auth/index.ts

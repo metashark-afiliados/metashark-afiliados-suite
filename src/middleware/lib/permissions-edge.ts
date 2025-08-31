@@ -1,20 +1,23 @@
 // src/middleware/lib/permissions-edge.ts
 /**
  * @file src/middleware/lib/permissions-edge.ts
- * @description Aparato de lógica de sesión especializado para el Edge Runtime.
- *              Ha sido refactorizado holísticamente para incluir cacheo de roles
- *              en Vercel KV para un rendimiento de élite, y helpers atómicos para
- *              una máxima cohesión y adhesión al principio DRY.
+ * @description Aparato de lógica de sesión para el Edge Runtime. Ha sido
+ *              refactorizado a un estándar de élite para alinearse con el
+ *              patrón de "respuesta encadenada", resolviendo la regresión
+ *              crítica del middleware.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.1.0
- * @date 2025-08-30
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 7.0.0
+ * @date 2025-08-31
  */
 import "server-only";
 
 import { type NextRequest, type NextResponse } from "next/server";
-import { type SupabaseClient, type User } from "@supabase/supabase-js";
+import {
+  type SupabaseClient,
+  type User,
+  isAuthError,
+  AuthSessionMissingError,
+} from "@supabase/supabase-js";
 import { kv } from "@vercel/kv";
 
 import { createClient as createMiddlewareSupabaseClient } from "@/lib/supabase/middleware";
@@ -29,7 +32,7 @@ export type UserAuthData = {
   activeWorkspaceId: string | null;
 };
 
-const CACHE_TTL_SECONDS = 300; // 5 minutos
+const CACHE_TTL_SECONDS = 300;
 
 function getActiveWorkspaceIdFromCookie(request: NextRequest): string | null {
   return request.cookies.get("active_workspace_id")?.value || null;
@@ -45,9 +48,6 @@ async function getUserAppRole(
   try {
     const cachedRole = await kv.get<AppRole>(cacheKey);
     if (cachedRole) {
-      logger.trace(
-        `[PermissionsEdge:Cache] HIT para rol de usuario ${userId}.`
-      );
       return cachedRole;
     }
   } catch (error) {
@@ -57,9 +57,6 @@ async function getUserAppRole(
     );
   }
 
-  logger.trace(
-    `[PermissionsEdge:Cache] MISS para rol de usuario ${userId}. Consultando DB.`
-  );
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("app_role")
@@ -105,13 +102,18 @@ export async function getAuthDataForMiddleware(
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    if (userError) {
+    if (
+      isAuthError(userError) &&
+      userError instanceof AuthSessionMissingError
+    ) {
+      logger.trace(
+        "[PermissionsEdge] No se encontró sesión de usuario (esperado para anónimos)."
+      );
+    } else if (userError) {
       logger.error(
-        "[PermissionsEdge] Error al obtener usuario de Supabase.",
+        "[PermissionsEdge] Error inesperado al obtener usuario de Supabase.",
         userError
       );
-    } else {
-      logger.trace("[PermissionsEdge] No se encontró sesión de usuario.");
     }
     return { authData: null, response: supabaseResponse };
   }

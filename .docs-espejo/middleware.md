@@ -1,36 +1,34 @@
-// .docs-espejo/lib/supabase/middleware.md
+// .docs-espejo/middleware.md
 /**
  * @file middleware.md
- * @description Documento Espejo y SSoT para la factoría del cliente Supabase del Middleware.
+ * @description Documento Espejo y SSoT conceptual para el orquestador de middleware.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 2.0.0
+ * @version 8.0.0
  */
-# Manifiesto Conceptual: Factoría de Cliente Supabase para Middleware v2.0
+# Manifiesto Conceptual: Orquestador de Middleware v8.0
 
 ## 1. Rol Estratégico y Propósito
-Este aparato es una **factoría de infraestructura crítica y especializada**, diseñada para construir una instancia del cliente Supabase que sea **100% segura y compatible con el Edge Runtime de Next.js**.
-
-Abstrae la compleja lógica de gestión de cookies en un entorno inmutable, proveyendo una API simple y robusta para ser consumida exclusivamente por el pipeline del middleware.
+Este aparato es el **Director de Orquesta** de cada petición. Su única responsabilidad es ejecutar una secuencia de manejadores (`pipeline`) en un orden lógico y predefinido, implementando un **patrón de respuesta encadenada inmutable**.
 
 ## 2. Arquitectura del Contenido
-1.  **Patrón de Respuesta Encadenada:** Implementa la lógica de "respuesta encadenada" canónica. Cada vez que el cliente Supabase necesita modificar una cookie (`set` o `remove`), se crea una nueva `NextResponse` a partir de la petición actual, se aplica la modificación y se actualiza una referencia a esta respuesta. Esto asegura que todas las modificaciones de cookies se acumulen correctamente y se pasen al siguiente manejador en el pipeline.
-2.  **Helpers Atómicos (`getEdgeCookieHandlers`, `createChainedResponse`):** La lógica se descompone en funciones puras y atómicas para máxima claridad, cohesión y cumplimiento del SRP.
-3.  **Observabilidad de Cookies:** Cada operación de cookie (`get`, `set`, `remove`) es registrada con `logger.trace`, proporcionando una visibilidad completa del flujo de la sesión.
-4.  **Tipado Estricto de Cookies:** Introduce un tipo `CanonicalCookieName` para promover el manejo de cookies tipo-seguro dentro del middleware.
+1.  **Pipeline Secuencial Inmutable:** El orquestador inicia con una `NextResponse` base. Cada manejador del pipeline recibe la `request` y la `response` del paso anterior. El manejador ejecuta su lógica y devuelve una `NextResponse` (ya sea la misma o una nueva de redirección/reescritura). Esta respuesta se convierte en la entrada para el siguiente manejador. Este patrón garantiza un flujo de estado explícito y predecible, crítico para el Edge Runtime.
+2.  **Resiliencia Total:** El pipeline completo está envuelto en un `try/catch` global para capturar, registrar y devolver una respuesta de error controlada, previniendo el `MIDDLEWARE_INVOCATION_FAILED`.
+3.  **Observabilidad de Rendimiento:** Mantiene el `withPerformanceLogging` para medir la latencia de cada manejador y del pipeline completo.
 
 ## 3. Contrato de API
-- **Entrada:** `NextRequest` y `NextResponse` (opcional).
-- **Salida:** Un objeto `{ supabase, response }`, donde `supabase` es el cliente listo para usar y `response` es la `NextResponse` actualizada con cualquier cambio de cookie.
+- **Entrada:** `NextRequest`.
+- **Salida:** La `NextResponse` final, resultado de la composición de las modificaciones de todos los manejadores.
 
 /**
  * =====================================================================
  *                           ZONA DE MEJORAS
  * =====================================================================
  * @subsection Melhorias Futuras
- * 1.  **Centralización de Regex:** La expresión regular para validar la URL podría definirse en un manifiesto `src/config/regex.config.ts`.
- * 2.  **Tipado de Errores de Cookie:** Los bloques `catch` podrían usar un guardián de tipo para verificar si el error es una `TypeError` y registrar un log más específico.
- * 3.  **Gestión de Múltiples Sesiones:** Si la app soportara múltiples sesiones, el `CanonicalCookieName` podría ser extendido.
- * 4.  **Internacionalización de la Documentación:** Traducir este documento espejo.
+ * 1.  **Factoría de Pipeline Declarativa:** Abstraer la lógica de encadenamiento a una función `createMiddlewarePipeline([...handlers])` para un código más declarativo.
+ * 2.  **Configuración de Matcher Dinámica:** Generar `config.matcher` dinámicamente a partir del `ROUTE_MANIFEST`.
+ * 3.  **Manejador de A/B Testing:** Añadir un manejador para redirigir a variantes de una página para pruebas A/B.
+ * 4.  **Patrón de Circuit Breaker:** Implementar un "circuit breaker" para manejadores que dependen de servicios externos.
+ * 5.  **Internacionalización de la Documentación:** Traducir este manifiesto.
  * =====================================================================
  */
-// .docs-espejo/lib/supabase/middleware.md
+// .docs-espejo/middleware.md
