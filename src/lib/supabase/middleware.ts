@@ -3,14 +3,11 @@
  * @file src/lib/supabase/middleware.ts
  * @description Aparato de utilidad para la creación de un cliente Supabase de servidor,
  *              específicamente diseñado para el entorno de Middleware de Next.js (Edge Runtime).
- *              Ha sido refactorizado holísticamente para incluir validación de formato
- *              estricta para la URL de Supabase, un helper para la creación de respuestas
- *              encadenadas, observabilidad de cookies enriquecida y tipado estricto.
+ *              Ha sido refactorizado holísticamente para ser compatible con el Edge,
+ *              implementando el patrón de "respuesta encadenada" y mejorando la observabilidad.
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-30
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 5.0.0
+ * @date 2025-08-31
  */
 import { type NextRequest, NextResponse } from "next/server";
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
@@ -26,9 +23,9 @@ type CanonicalCookieName =
   | "sb-csrf";
 
 function createChainedResponse(request: NextRequest): NextResponse {
-  return NextResponse.next({
-    request: { headers: request.headers },
-  });
+  const headers = new Headers(request.headers);
+  headers.set("x-request-id", crypto.randomUUID());
+  return NextResponse.next({ request: { headers } });
 }
 
 function getEdgeCookieHandlers(

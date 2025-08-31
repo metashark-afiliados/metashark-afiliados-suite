@@ -1,14 +1,12 @@
 // src/app/[locale]/dev-console/telemetry/page.tsx
 /**
  * @file page.tsx
- * @description Página del Visor de Telemetría. Ha sido refactorizada a un estándar
- *              de élite para alinearse con la nueva API soberana del componente
- *              `PaginationControls`, resolviendo el error de compilación TS2322.
+ * @description Página del Visor de Telemetría. Ha sido refactorizada a un
+ *              estándar de élite para obtener e inyectar los textos de
+ *              paginación en su componente hijo, resolviendo el error de tipo TS2322.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-27
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 3.0.0
+ * @date 2025-08-31
  */
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
@@ -21,6 +19,7 @@ import {
   VisitorLogsTable,
   type VisitorLogRow,
 } from "../components/VisitorLogsTable";
+import { type PaginationTexts } from "@/components/shared/pagination-controls";
 
 const LOGS_PER_PAGE = 25;
 
@@ -56,6 +55,14 @@ export default async function TelemetryPage({
       ip_address: String(log.ip_address || "N/A"),
     }));
 
+    // --- INICIO DE REFACTORIZACIÓN (CONSTRUCCIÓN DE PROPS I18N) ---
+    const paginationTexts: PaginationTexts = {
+      previous: t("pagination.previousPageLabel"),
+      next: t("pagination.nextPageLabel"),
+      page: t("pagination.pageLabelTemplate"),
+    };
+    // --- FIN DE REFACTORIZACIÓN ---
+
     return (
       <div className="space-y-6">
         <div>
@@ -63,14 +70,13 @@ export default async function TelemetryPage({
           <p className="text-muted-foreground">{t("description")}</p>
         </div>
         <VisitorLogsTable logs={logs} />
-        {/* --- INICIO DE CORRECCIÓN DE API (TS2322) --- */}
         <PaginationControls
           page={page}
           totalCount={count ?? 0}
           limit={LOGS_PER_PAGE}
           basePath="/dev-console/telemetry"
+          texts={paginationTexts} // <-- PROP INYECTADA
         />
-        {/* --- FIN DE CORRECCIÓN DE API (TS2322) --- */}
       </div>
     );
   } catch (error) {
@@ -87,19 +93,4 @@ export default async function TelemetryPage({
     );
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Compilación (TS2322)**: ((Implementada)) Se ha eliminado la prop `texts` de la invocación de `PaginationControls`. Esta corrección alinea este componente con la nueva arquitectura de componentes soberanos, donde `PaginationControls` es ahora responsable de consumir sus propias traducciones.
- * 2. **Sincronización Arquitectónica**: ((Implementada)) Esta refactorización refuerza la arquitectura de componentes soberanos y desacoplados, mejorando la mantenibilidad y el cumplimiento del SRP.
- *
- * @subsection Melhorias Futuras
- * 1. **Filtros Avanzados**: ((Vigente)) Añadir `searchParams` para filtrar los logs por `ip_address`, `user_id` o `fingerprint`.
- *
- * =====================================================================
- */
 // src/app/[locale]/dev-console/telemetry/page.tsx

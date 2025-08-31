@@ -1,15 +1,12 @@
 // src/app/[locale]/dashboard/sites/sites-client.tsx
 /**
  * @file sites-client.tsx
- * @description Orquestador de UI de élite. Ha sido refactorizado holísticamente
- *              para consumir el nuevo aparato abstracto `PaginatedResourceView`,
- *              delegando toda la lógica de renderizado de vistas y paginación,
- *              y cumpliendo con el principio DRY al más alto nivel.
+ * @description Orquestador de UI de élite. Ha sido refactorizado para obtener
+ *              los textos de paginación y propagarlos a sus componentes hijos,
+ *              resolviendo la cadena de errores de tipo TS2741.
  * @author Raz Podestá - MetaShark Tech
- * @version 19.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 20.0.0
+ * @date 2025-08-31
  */
 "use client";
 
@@ -32,6 +29,7 @@ import { type SiteWithCampaignCount } from "@/lib/data/sites";
 import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
 import { useSitesPage } from "@/lib/hooks/useSitesPage";
 import { clientLogger } from "@/lib/logging";
+import { type PaginationTexts } from "@/components/shared/pagination-controls";
 
 interface SitesClientProps {
   initialSites: SiteWithCampaignCount[];
@@ -43,13 +41,6 @@ interface SitesClientProps {
   initialSortOption: "created_at_desc" | "name_asc" | "name_desc";
 }
 
-/**
- * @public
- * @component SitesClient
- * @description Componente de presentación puro que ensambla la UI para la página "Mis Sitios".
- * @param {SitesClientProps} props - Propiedades iniciales pasadas desde el cargador del servidor.
- * @returns {React.ReactElement}
- */
 export function SitesClient(props: SitesClientProps): React.ReactElement {
   clientLogger.trace(
     "[SitesClient] Renderizando orquestador de UI refactorizado."
@@ -81,6 +72,14 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
     );
   }
 
+  // --- INICIO DE REFACTORIZACIÓN (CONSTRUCCIÓN Y PROPAGACIÓN DE PROPS I18N) ---
+  const paginationTexts: PaginationTexts = {
+    previous: tSitesPage("pagination.previous"),
+    next: tSitesPage("pagination.next"),
+    page: tSitesPage("pagination.page"),
+  };
+  // --- FIN DE REFACTORIZACIÓN ---
+
   return (
     <div className="flex flex-col gap-6">
       <SitesHeader onCreateSiteClick={openCreateDialog} {...headerProps} />
@@ -109,6 +108,7 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
         limit={props.limit}
         basePath="/dashboard/sites"
         searchQuery={headerProps.searchQuery}
+        paginationTexts={paginationTexts} // <-- PROP INYECTADA
         renderView={(currentItems) =>
           headerProps.viewMode === "grid" ? (
             <SitesGrid
@@ -138,6 +138,7 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
               limit={props.limit}
               basePath="/dashboard/sites"
               searchQuery={headerProps.searchQuery}
+              paginationTexts={paginationTexts} // <-- PROP INYECTADA
             />
           )
         }
@@ -145,13 +146,4 @@ export function SitesClient(props: SitesClientProps): React.ReactElement {
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Contexto de Página (`SitesPageContext`)**: ((Vigente)) Para eliminar completamente el "prop drilling" hacia `SitesGrid` y `SitesTable`, este componente podría actuar como un proveedor de contexto, haciendo que el valor de retorno del hook `useSitesPage` esté disponible para todos sus componentes hijos sin necesidad de pasar props explícitamente.
- * 2. **Factoría de Items Optimistas Atómica**: ((Vigente)) La lógica para crear `optimisticItem` en el hook `useSitesPage` podría ser extraída a un helper `optimisticItemFactory.ts` para una máxima reutilización.
- * =====================================================================
- */
 // src/app/[locale]/dashboard/sites/sites-client.tsx

@@ -1,43 +1,36 @@
-// .docs-espejo/middleware.md
+// .docs-espejo/lib/supabase/middleware.md
 /**
  * @file middleware.md
- * @description Documento Espejo y SSoT conceptual para el orquestador de middleware.
+ * @description Documento Espejo y SSoT para la factoría del cliente Supabase del Middleware.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 7.0.0
+ * @version 2.0.0
  */
-# Manifiesto Conceptual: Orquestador de Middleware v7.0
+# Manifiesto Conceptual: Factoría de Cliente Supabase para Middleware v2.0
 
 ## 1. Rol Estratégico y Propósito
-Este aparato es el **Director de Orquesta** de cada petición entrante a la aplicación. Su única responsabilidad es ejecutar una secuencia de manejadores especializados (el "pipeline") en un orden predefinido y lógico. Actúa como la primera línea de defensa y de enriquecimiento de la aplicación, gestionando la internacionalización, seguridad, telemetría y redirecciones antes de que la petición llegue a la capa de renderizado de Next.js.
+Este aparato es una **factoría de infraestructura crítica y especializada**, diseñada para construir una instancia del cliente Supabase que sea **100% segura y compatible con el Edge Runtime de Next.js**.
+
+Abstrae la compleja lógica de gestión de cookies en un entorno inmutable, proveyendo una API simple y robusta para ser consumida exclusivamente por el pipeline del middleware.
 
 ## 2. Arquitectura del Contenido
-La arquitectura ha sido elevada a un estándar de élite a través de los siguientes pilares:
-
-1.  **Pipeline Secuencial Lógico:** El orquestador invoca a los manejadores en un orden de "salida temprana": los que pueden terminar el ciclo de la petición (redirecciones, mantenimiento) se ejecutan primero. Esto optimiza el rendimiento al evitar la ejecución de manejadores innecesarios.
-
-2.  **Resiliencia Total:** Todo el pipeline está envuelto en un bloque `try/catch` global. Esto garantiza que un fallo inesperado en cualquier manejador sea capturado, registrado con un ID de error único, y se devuelva una respuesta de error 500 controlada, previniendo caídas de la aplicación.
-
-3.  **Observabilidad de Rendimiento Edge-Safe:** Utiliza la API `performance` global, disponible en todos los runtimes, para medir la latencia. Cada manejador es invocado a través de un wrapper `withPerformanceLogging` que registra su tiempo de ejecución individual. El log final del pipeline ahora incluye el `locale` detectado para una trazabilidad de contexto completa.
+1.  **Patrón de Respuesta Encadenada:** Implementa la lógica de "respuesta encadenada" canónica. Cada vez que el cliente Supabase necesita modificar una cookie (`set` o `remove`), se crea una nueva `NextResponse` a partir de la petición actual, se aplica la modificación y se actualiza una referencia a esta respuesta. Esto asegura que todas las modificaciones de cookies se acumulen correctamente y se pasen al siguiente manejador en el pipeline.
+2.  **Helpers Atómicos (`getEdgeCookieHandlers`, `createChainedResponse`):** La lógica se descompone en funciones puras y atómicas para máxima claridad, cohesión y cumplimiento del SRP.
+3.  **Observabilidad de Cookies:** Cada operación de cookie (`get`, `set`, `remove`) es registrada con `logger.trace`, proporcionando una visibilidad completa del flujo de la sesión.
+4.  **Tipado Estricto de Cookies:** Introduce un tipo `CanonicalCookieName` para promover el manejo de cookies tipo-seguro dentro del middleware.
 
 ## 3. Contrato de API
-- **Entrada:** `NextRequest`.
-- **Salida:** Una `NextResponse` final, que es el resultado de la composición de las modificaciones de todos los manejadores del pipeline.
+- **Entrada:** `NextRequest` y `NextResponse` (opcional).
+- **Salida:** Un objeto `{ supabase, response }`, donde `supabase` es el cliente listo para usar y `response` es la `NextResponse` actualizada con cualquier cambio de cookie.
 
 /**
  * =====================================================================
- *                           MEJORA CONTINUA
+ *                           ZONA DE MEJORAS
  * =====================================================================
  * @subsection Melhorias Futuras
- * 1.  **Factoría de Pipeline Declarativa:** Abstraer la lógica de encadenamiento de manejadores a una función `createMiddlewarePipeline([...handlers])` o a un patrón de constructor (`builder pattern`) para hacer el código más declarativo y mantenible.
- * 2.  **Configuración de Matcher Dinámica:** Generar la constante `config.matcher` dinámicamente a partir del `ROUTE_MANIFEST`, garantizando que todas las rutas protegidas sean cubiertas automáticamente por el middleware.
- * 3.  **Manejador de A/B Testing:** Añadir un nuevo manejador al pipeline que lea cookies o cabeceras para redirigir a los usuarios a diferentes variantes de una página para pruebas A/B.
- * 4.  **Patrón de Circuit Breaker:** Para manejadores que dependen de servicios externos (como GeoIP), implementar un "circuit breaker" para deshabilitar temporalmente el manejador si el servicio externo falla repetidamente.
- * 5.  **Logging de Payload:** Añadir un manejador opcional, activado por una variable de entorno `DEBUG_MIDDLEWARE_PAYLOAD=true`, que registre el cuerpo de las peticiones POST (sanitizado) para una depuración profunda.
- * 6.  **Abstracción del Performance Wrapper:** Mover `withPerformanceLogging` a su propio aparato en `src/middleware/lib/` para una máxima atomicidad.
- * 7.  **Manejo de Errores por Handler:** Implementar un `try/catch` individual dentro de `withPerformanceLogging` para que el fallo de un handler no crítico (ej. `handleTelemetry`) no interrumpa el pipeline completo.
- * 8.  **Gestión de Secretos de Vercel:** Integrar con Vercel Edge Config para gestionar configuraciones como el modo de mantenimiento o las IPs en la lista blanca sin necesidad de un redespliegue.
- * 9.  **Cacheo de Resultados de Handlers:** Para manejadores costosos, implementar una capa de cacheo en Vercel KV para los resultados, basada en la URL y cabeceras de la petición.
- * 10. **Internacionalización de la Documentación:** Traducir este manifiesto para equipos de desarrollo multilingües.
+ * 1.  **Centralización de Regex:** La expresión regular para validar la URL podría definirse en un manifiesto `src/config/regex.config.ts`.
+ * 2.  **Tipado de Errores de Cookie:** Los bloques `catch` podrían usar un guardián de tipo para verificar si el error es una `TypeError` y registrar un log más específico.
+ * 3.  **Gestión de Múltiples Sesiones:** Si la app soportara múltiples sesiones, el `CanonicalCookieName` podría ser extendido.
+ * 4.  **Internacionalización de la Documentación:** Traducir este documento espejo.
  * =====================================================================
  */
-// .docs-espejo/middleware.md
+// .docs-espejo/lib/supabase/middleware.md

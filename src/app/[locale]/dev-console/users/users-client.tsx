@@ -3,14 +3,12 @@
  * @file users-client.tsx
  * @description Orquestador de UI de élite. Ha sido refactorizado holísticamente
  *              para consumir el nuevo componente abstracto `PaginatedDataTable`,
- *              delegar toda su lógica al hook soberano `useUsersPage`, y consumir
- *              el contrato de datos corregido `UserProfilesWithEmail`, resolviendo
- *              así la cascada de errores de tipo.
+ *              delegar toda su lógica al hook soberano `useUsersPage`, y para
+ *              inyectar los textos de paginación requeridos, resolviendo el
+ *              error de tipo TS2322.
  * @author Raz Podestá - MetaShark Tech
- * @version 8.0.0
- * @date 2025-08-27
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 9.0.0
+ * @date 2025-08-31
  */
 "use client";
 
@@ -23,6 +21,7 @@ import { type UserProfilesWithEmail } from "@/lib/data/admin";
 import { clientLogger } from "@/lib/logging";
 import { getUsersColumns } from "../components/users-table-columns";
 import { UsersPageHeader } from "./components/UsersPageHeader";
+import { type PaginationTexts } from "@/components/shared/pagination-controls";
 
 type ProfileRow = UserProfilesWithEmail;
 
@@ -34,13 +33,6 @@ interface UsersClientProps {
   searchQuery: string;
 }
 
-/**
- * @public
- * @component UsersClient
- * @description Orquesta la UI para la página de gestión de usuarios en el Dev Console.
- * @param {UsersClientProps} props - Propiedades iniciales pasadas desde el cargador del servidor.
- * @returns {React.ReactElement}
- */
 export function UsersClient({
   profiles,
   totalCount,
@@ -61,6 +53,14 @@ export function UsersClient({
     [t, isPending, handleRoleChange]
   );
 
+  // --- INICIO DE REFACTORIZACIÓN (PROPAGACIÓN DE PROPS I18N) ---
+  const paginationTexts: PaginationTexts = {
+    previous: t("pagination.previousPageLabel"),
+    next: t("pagination.nextPageLabel"),
+    page: t("pagination.pageLabelTemplate"),
+  };
+  // --- FIN DE REFACTORIZACIÓN ---
+
   return (
     <div className="space-y-6">
       <UsersPageHeader
@@ -80,20 +80,9 @@ export function UsersClient({
         limit={limit}
         basePath="/dev-console/users"
         searchQuery={searchTerm}
+        paginationTexts={paginationTexts} // <-- PROP INYECTADA
       />
     </div>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Acciones en Lote (Bulk Actions)**: ((Vigente)) El `PaginatedDataTable` podría ser mejorado para soportar la selección de filas (checkboxes). Este componente padre (`UsersClient`) podría entonces pasar un componente de "Barra de Acciones en Lote" que se mostraría cuando se seleccionan múltiples usuarios, permitiendo operaciones como "Cambiar Rol a Seleccionados" o "Eliminar Seleccionados".
- * 2. **Feedback de Sincronización de Búsqueda**: ((Vigente)) Al igual que en `campaigns-client`, el `SearchInput` en `UsersPageHeader` debería recibir el estado `isLoading={isSyncing}` desde el hook `useUsersPage` para proporcionar feedback visual al usuario mientras la URL se actualiza.
- *
- * =====================================================================
- */
 // src/app/[locale]/dev-console/users/users-client.tsx
