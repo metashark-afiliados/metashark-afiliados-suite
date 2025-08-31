@@ -2,10 +2,10 @@
 /**
  * @file WorkspaceSwitcher.tsx
  * @description Orquestador de UI soberano. Ha sido simplificado para delegar
- *              el consumo de i18n a sus hijos soberanos y para componer la
- *              lógica de hooks con los componentes de UI puros.
+ *              la lógica de edición en línea al componente `WorkspaceTrigger`,
+ *              actuando como un orquestador de UI más puro y desacoplado.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 12.0.0
+ * @version 13.0.0
  */
 "use client";
 
@@ -20,7 +20,6 @@ import {
   useWorkspaceContext,
   WorkspaceProvider,
 } from "@/lib/hooks/useWorkspaceContext.tsx";
-import { useWorkspaceInlineEditor } from "@/lib/hooks/useWorkspaceInlineEditor";
 import { useWorkspaceManager } from "@/lib/hooks/useWorkspaceManager";
 import { WorkspacePopoverContent } from "./WorkspacePopoverContent";
 import { WorkspaceTrigger } from "./WorkspaceTrigger";
@@ -45,12 +44,11 @@ const WorkspaceSwitcherContent = () => {
     handleWorkspaceSelect,
     ...actionHandlers
   } = useWorkspaceManager();
-  const inlineEditorHook = useWorkspaceInlineEditor();
 
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
       <PopoverTrigger asChild>
-        <WorkspaceTrigger hook={inlineEditorHook} />
+        <WorkspaceTrigger />
       </PopoverTrigger>
       <PopoverContent className="w-[220px] p-0">
         <WorkspacePopoverContent
@@ -75,7 +73,6 @@ const WorkspaceSwitcherContent = () => {
 export function WorkspaceSwitcher(): React.ReactElement | null {
   const { activeWorkspace } = useDashboard();
   if (!activeWorkspace) {
-    // En el flujo de onboarding, puede no haber un workspace activo todavía.
     return null;
   }
   return (

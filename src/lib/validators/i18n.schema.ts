@@ -3,9 +3,9 @@
  * @file i18n.schema.ts
  * @description Manifiesto de Tipos y SSoT para el contrato de i18n. Esta versión
  *              finaliza la refactorización de SSR al consolidar los schemas de la
- *              Landing Page bajo un único namespace.
+ *              Landing Page bajo un único namespace y eliminar las referencias obsoletas.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 52.0.0
+ * @version 53.0.0
  */
 import { z } from "zod";
 

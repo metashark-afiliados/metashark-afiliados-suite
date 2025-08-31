@@ -1,20 +1,21 @@
 // src/components/landing/NewsletterForm.tsx
 /**
  * @file src/components/landing/NewsletterForm.tsx
- * @description Aparato de cliente atómico y soberano para el formulario de suscripción.
- *              Su `SubmitButton` ha sido refactorizado para aceptar un icono opcional,
- *              aumentando su flexibilidad y reutilización para diferentes contextos de UI.
+ * @description Aparato de cliente atómico para el formulario de suscripción.
+ *              Ha sido refactorizado a un componente de presentación 100% puro,
+ *              recibiendo todos sus textos a través de props para alinearse
+ *              con la arquitectura de "Mega-Orquestador" de la HomePage.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 3.0.0
+ * @version 4.0.0
  */
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { useFormState, useFormStatus } from "react-dom";
 import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
+import { useFormState, useFormStatus } from "react-dom";
 import { motion, useAnimation } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl"; // Se mantiene para los toasts genéricos
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,7 +61,8 @@ export function NewsletterForm({
   placeholderText,
   ctaIcon,
 }: NewsletterFormProps) {
-  const t = useTranslations("components.landing.Newsletter");
+  // Se utiliza un namespace genérico para los mensajes de feedback
+  const tErrors = useTranslations("shared.ValidationErrors");
   const formRef = useRef<HTMLFormElement>(null);
   const animationControls = useAnimation();
   const [state, formAction] = useFormState(
@@ -71,17 +73,17 @@ export function NewsletterForm({
   useEffect(() => {
     if (state.success) {
       if (state.data?.messageKey) {
-        toast.success(t(state.data.messageKey as any));
+        toast.success(tErrors(state.data.messageKey as any));
         formRef.current?.reset();
       }
     } else if (state.error) {
-      toast.error(t(state.error as any));
+      toast.error(tErrors(state.error as any));
       animationControls.start({
         x: [0, -10, 10, -10, 10, 0],
         transition: { duration: 0.4, ease: "easeInOut" },
       });
     }
-  }, [state, t, animationControls]);
+  }, [state, tErrors, animationControls]);
 
   return (
     <motion.form
@@ -103,7 +105,7 @@ export function NewsletterForm({
       <SubmitButton text={ctaText} icon={ctaIcon} />
       {!state.success && state.error && (
         <p id="newsletter-error" className="sr-only">
-          {t(state.error as any)}
+          {tErrors(state.error as any)}
         </p>
       )}
     </motion.form>

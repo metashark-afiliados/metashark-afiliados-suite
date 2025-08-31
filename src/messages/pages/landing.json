@@ -7,15 +7,15 @@
         { "label": "How it Works", "href": "#process" },
         { "label": "Pricing", "href": "/pricing" }
       ],
-      "signInText": "Sign In",
-      "signUpText": "Sign Up Free",
-      "openMenuText": "Open menu"
+      "signIn": "Sign In",
+      "signUp": "Sign Up Free",
+      "openMenu": "Open menu"
     },
     "Hero": {
       "title": "Build High-Performance Affiliate Campaigns with AI",
       "subtitle": "Go from idea to published landing page in minutes. No code, just results.",
-      "ctaPrimaryText": "Start Now",
-      "ctaSecondaryText": "How it Works"
+      "ctaPrimary": "Start Now",
+      "ctaSecondary": "How it Works"
     },
     "SocialProof": {
       "title": "Trusted by the world's best affiliate marketers",
@@ -216,15 +216,15 @@
         { "label": "Cómo Funciona", "href": "#process" },
         { "label": "Precios", "href": "/pricing" }
       ],
-      "signInText": "Iniciar Sesión",
-      "signUpText": "Registrarse Gratis",
-      "openMenuText": "Abrir menú"
+      "signIn": "Iniciar Sesión",
+      "signUp": "Registrarse Gratis",
+      "openMenu": "Abrir menú"
     },
     "Hero": {
       "title": "Crea Campañas de Afiliados de Alto Rendimiento con IA",
       "subtitle": "Pasa de la idea a la landing page publicada en minutos. Sin código, solo resultados.",
-      "ctaPrimaryText": "Empezar Ahora",
-      "ctaSecondaryText": "Cómo Funciona"
+      "ctaPrimary": "Empezar Ahora",
+      "ctaSecondary": "Cómo Funciona"
     },
     "SocialProof": {
       "title": "Con la confianza de los mejores marketers de afiliados del mundo",
@@ -425,9 +425,9 @@
         { "label": "Como Funciona", "href": "#process" },
         { "label": "Preços", "href": "/pricing" }
       ],
-      "signInText": "Entrar",
-      "signUpText": "Cadastre-se Grátis",
-      "openMenuText": "Abrir menu"
+      "signIn": "Entrar",
+      "signUp": "Cadastre-se Grátis",
+      "openMenu": "Abrir menu"
     },
     "Hero": {
       "title": "Crie Campanhas de Afiliados de Alta Performance com IA",

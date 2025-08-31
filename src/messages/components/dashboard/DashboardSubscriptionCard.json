@@ -1,0 +1,40 @@
+
+{
+  "en-US": {
+    "title": "Current Subscription",
+    "view_all_button": "View All",
+    "no_active_subscriptions": "No active subscriptions.",
+    "plan_free_name": "Free Plan",
+    "plan_free_description": "Core features for individuals.",
+    "plan_free_price": "Free",
+    "plan_pro_name": "Pro Plan",
+    "plan_pro_description": "Advanced tools for professionals.",
+    "plan_pro_price": "$29.99",
+    "frequency_monthly": "mo"
+  },
+  "es-ES": {
+    "title": "Suscripción Actual",
+    "view_all_button": "Ver Todas",
+    "no_active_subscriptions": "No hay suscripciones activas.",
+    "plan_free_name": "Plan Gratuito",
+    "plan_free_description": "Funciones básicas para individuos.",
+    "plan_free_price": "Gratis",
+    "plan_pro_name": "Plan Pro",
+    "plan_pro_description": "Herramientas avanzadas para profesionales.",
+    "plan_pro_price": "€29.99",
+    "frequency_monthly": "mes"
+  },
+  "pt-BR": {
+    "title": "Assinatura Atual",
+    "view_all_button": "Ver Todas",
+    "no_active_subscriptions": "Nenhuma assinatura ativa.",
+    "plan_free_name": "Plano Gratuito",
+    "plan_free_description": "Recursos essenciais para indivíduos.",
+    "plan_free_price": "Grátis",
+    "plan_pro_name": "Plano Pro",
+    "plan_pro_description": "Ferramentas avançadas para profissionais.",
+    "plan_pro_price": "R$149,99",
+    "frequency_monthly": "mês"
+  }
+}
+

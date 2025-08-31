@@ -4,9 +4,9 @@
  * @description Documento Espejo y SSoT para el pie de página de las páginas públicas,
  *              refactorizado a un componente de presentación puro.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 3.0.0
+ * @version 4.0.0
  */
-# Manifiesto Conceptual: Pie de Página de Landing Page v3.0
+# Manifiesto Conceptual: Pie de Página de Landing Page v4.0
 
 ## 1. Rol Estratégico y Propósito
 Este aparato es el **cierre informativo y de conversión** para los visitantes no autenticados. Sus responsabilidades son:
@@ -16,11 +16,11 @@ Este aparato es el **cierre informativo y de conversión** para los visitantes n
 
 ## 2. Arquitectura del Contenido
 1.  **Componente de Presentación 100% Puro:** Es un componente de cliente (`"use client"`) completamente agnóstico al contenido. Ha sido despojado de toda lógica de obtención de datos. Recibe su contenido textual y la estructura de enlaces a través de su contrato de props (`LandingFooterProps`).
-2.  **Consumo de Datos Estructurados:** Acepta `productLinks`, `companyLinks`, y `legalLinks` como arrays de `NavLinkItem`, el contrato de datos canónico para la navegación. Esto lo desacopla de la estructura de la fuente de datos original (JSON).
-3.  **Composición Atómica:** Compone aparatos atómicos como `SmartLink` y `NewsletterForm`, delegando la lógica específica y adhiriéndose a la "Filosofía LEGO".
+2.  **Consumo de Datos Estructurados:** Acepta `productLinks`, `companyLinks`, y `legalLinks` como arrays de `NavLinkItem`.
+3.  **Composición y Propagación de Props:** Compone aparatos atómicos como `SmartLink` y `NewsletterForm`, delegando la lógica específica y propagando las `props` de texto necesarias al formulario.
 
 ## 3. Contrato de API
-- **Entrada:** `LandingFooterProps`, un objeto que contiene todos los textos y arrays de enlaces necesarios.
+- **Entrada:** `LandingFooterProps`, un objeto que contiene todos los textos y arrays de enlaces necesarios para sí mismo y para sus hijos.
 - **Salida:** Un elemento `<footer>` completamente funcional, responsive e internacionalizado, renderizado puramente a partir de sus props.
 
 /**

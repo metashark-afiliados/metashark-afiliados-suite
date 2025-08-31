@@ -4,7 +4,7 @@
  * @description Orquestador de datos de alto rendimiento y adaptador para la Landing Page.
  *              Esta versión completa la refactorización SSR, cargando todo el contenido
  *              con una única llamada a `getTranslations` y pasando los datos como props
- *              a sus componentes hijos puros.
+ *              a sus componentes hijos puros. Resuelve la cascada de errores `IntlError`.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
  * @version 13.0.0
  */
@@ -31,16 +31,6 @@ const DICEBEAR_API_URL =
   process.env.NEXT_PUBLIC_DICEBEAR_API_URL ||
   "https://api.dicebear.com/7.x/personas/svg";
 
-/**
- * @public
- * @page HomePage
- * @description Orquesta la carga de datos y el ensamblaje de la UI para la página
- *              de inicio pública. Actúa como un Server Component puro.
- * @param {object} props - Propiedades inyectadas por Next.js.
- * @param {object} props.params - Parámetros de la ruta.
- * @param {string} props.params.locale - El locale activo.
- * @returns {Promise<JSX.Element>} El componente de la página de inicio renderizado.
- */
 export default async function HomePage({
   params: { locale },
 }: {
@@ -58,7 +48,7 @@ export default async function HomePage({
 
   if (session) {
     logger.info(
-      `[HomePage] Sesión activa detectada para usuario ${session.user.id}. Redirigiendo al dashboard.`
+      `[HomePage] Sesión activa detectada. Redirigiendo al dashboard.`
     );
     redirect("/dashboard");
   }
@@ -151,7 +141,7 @@ export default async function HomePage({
   const transformLinks = (links: Record<string, string>): NavLinkItem[] =>
     Object.entries(links).map(([key, label]) => ({
       label: label,
-      href: key.startsWith("#") ? key : `/${key}`,
+      href: key.startsWith("#") ? key : `/${key.replace(/_/g, "-")}`,
     }));
 
   const footerProps = {

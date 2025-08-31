@@ -2,10 +2,10 @@
 /**
  * @file useWorkspaceInlineEditor.ts
  * @description Hook Soberano para la edición en línea. Ha sido refactorizado para
- *              utilizar `react-hook-form`, proporcionando una API compatible
- *              con el nuevo componente de campo de formulario atómico.
+ *              utilizar `react-hook-form` y corregir el tipado del evento
+ *              `handleKeyDown`, resolviendo el error de compilación TS2322.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 6.0.0
+ * @version 6.1.0
  */
 "use client";
 
@@ -19,6 +19,7 @@ import type { z } from "zod";
 import { updateWorkspaceNameAction } from "@/lib/actions/workspaces.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { UpdateWorkspaceNameSchema } from "@/lib/validators";
+import { isActionError } from "@/lib/validators";
 
 type FormData = z.infer<typeof UpdateWorkspaceNameSchema>;
 
@@ -72,7 +73,7 @@ export function useWorkspaceInlineEditor() {
 
         if (result.success) {
           toast.success(t("edit_form.success_toast"));
-        } else {
+        } else if (isActionError(result)) {
           toast.error(
             tErrors(result.error as any, { defaultValue: result.error })
           );
@@ -88,8 +89,11 @@ export function useWorkspaceInlineEditor() {
     handleSubmit(processSubmit)();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  // --- INICIO DE CORRECCIÓN DE TIPO ---
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    // --- FIN DE CORRECCIÓN DE TIPO ---
     if (e.key === "Enter") {
+      e.preventDefault(); // Prevenir el envío por defecto del formulario
       handleSubmit(processSubmit)();
     }
     if (e.key === "Escape") {

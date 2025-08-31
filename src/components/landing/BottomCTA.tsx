@@ -2,8 +2,9 @@
 /**
  * @file src/components/landing/BottomCTA.tsx
  * @description Componente de presentación para la sección de Llamada a la Acción
- *              principal. Compone el aparato `NewsletterForm` y recibe todo
- *              su contenido dinámicamente a través de props.
+ *              principal. Ha sido refactorizado para aceptar y propagar
+ *              props al `NewsletterForm`, alineándose con la arquitectura
+ *              de componentes puros.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
  * @version 3.2.0
  */

@@ -2,10 +2,10 @@
 /**
  * @file manifest.ts
  * @description Manifiesto de Importación Dinámica y SSoT. Esta versión ha sido
- *              corregida para eliminar la referencia a un archivo de mensajes
- *              inexistente, resolviendo un error de build TS2307.
+ *              sincronizada holísticamente para reflejar la estructura de archivos
+ *              real del proyecto, resolviendo errores de módulos no encontrados y omisiones.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 27.0.0
+ * @version 28.0.0
  */
 import { type ManifestModule } from "./types";
 
@@ -29,6 +29,9 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "app.[locale].signup.page": () => import("./app/[locale]/signup/page.json"),
 
   // --- Namespaces de Componentes (Sincronizado) ---
+  "components.auth.LoginForm": () => import("./components/auth/LoginForm.json"),
+  "components.auth.OAuthButton": () =>
+    import("./components/auth/OAuthButton.json"),
   "components.auth.SupabaseAuthUI": () =>
     import("./components/auth/SupabaseAuthUI.json"),
   "components.builder.BlocksPalette": () =>

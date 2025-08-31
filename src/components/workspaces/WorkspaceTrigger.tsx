@@ -2,8 +2,9 @@
 /**
  * @file WorkspaceTrigger.tsx
  * @description Componente de UI soberano. Ha sido refactorizado para consumir
- *              el componente atómico `WorkspaceNameInputField` para su modo de
- *              edición, consolidando la SSoT de la UI.
+ *              internamente su propio hook de lógica `useWorkspaceInlineEditor`
+ *              y el componente atómico `WorkspaceNameInputField` para su modo de
+ *              edición, consolidando la SSoT de la UI y la lógica de negocio.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
  * @version 7.0.0
  */
@@ -36,7 +37,6 @@ export const WorkspaceTrigger = React.forwardRef<
   WorkspaceTriggerProps
 >((props, ref) => {
   const { tWorkspaces } = useDashboardTranslations();
-  const hook = useWorkspaceInlineEditor();
   const {
     isEditing,
     setIsEditing,
@@ -46,7 +46,7 @@ export const WorkspaceTrigger = React.forwardRef<
     form,
     handleBlur,
     handleKeyDown,
-  } = hook;
+  } = useWorkspaceInlineEditor();
 
   clientLogger.trace("[WorkspaceTrigger] Renderizando disparador soberano.", {
     isEditing,
@@ -60,6 +60,7 @@ export const WorkspaceTrigger = React.forwardRef<
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           onSubmit={(e) => e.preventDefault()}
+          className="w-[220px]"
         >
           <WorkspaceNameInputField
             register={form.register}

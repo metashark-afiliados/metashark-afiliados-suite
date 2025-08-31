@@ -2,10 +2,11 @@
 /**
  * @file src/components/layout/LandingFooter.tsx
  * @description Componente de presentación 100% puro para el pie de página público.
- *              Agnóstico al contenido, recibe todas sus traducciones y datos
- *              estructurados a través de su contrato de props.
+ *              Ha sido refactorizado para ser agnóstico al contenido, recibiendo
+ *              todos sus textos y datos estructurados, incluyendo los del
+ *              `NewsletterForm`, a través de su contrato de props.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 3.0.0
+ * @version 4.0.0
  */
 "use client";
 
@@ -17,12 +18,6 @@ import { type NavLinkItem, SmartLink } from "@/components/ui/SmartLink";
 import { Link } from "@/lib/navigation";
 import { clientLogger } from "@/lib/logging";
 
-/**
- * @public
- * @interface LandingFooterProps
- * @description Define el contrato de props para el componente LandingFooter.
- *              Esta es la SSoT para el contenido que el pie de página puede renderizar.
- */
 export interface LandingFooterProps {
   brandName: string;
   logoAltText: string;
@@ -39,14 +34,6 @@ export interface LandingFooterProps {
   legalLinks: NavLinkItem[];
 }
 
-/**
- * @public
- * @component LandingFooter
- * @description Renderiza el pie de página de las páginas públicas. Es un componente
- *              de presentación puro que recibe todos sus datos como props.
- * @param {LandingFooterProps} props - Propiedades para configurar el pie de página.
- * @returns {React.ReactElement}
- */
 export function LandingFooter(props: LandingFooterProps): React.ReactElement {
   clientLogger.trace(
     "[LandingFooter] Renderizando componente de presentación puro."

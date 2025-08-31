@@ -2,23 +2,18 @@
 /**
  * @file Metrics.schema.ts
  * @description Define el contrato de datos atómico para el namespace 'Metrics'
- *              dentro de `landing.json`. Valida la estructura del array de
- *              objetos de métricas, garantizando la integridad de los datos para
- *              el componente `AnimatedCounter`.
+ *              dentro de `landing.json`. Ha sido refactorizado para eliminar la
+ *              dependencia de compilación con el archivo generado `lucide-icon-names.ts`.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 1.0.0
+ * @version 2.0.0
  */
 import { z } from "zod";
-
-import { LucideIconNameSchema } from "@/config/lucide-icon-names";
 
 export const MetricsSchema = z.object({
   /** Array de objetos, donde cada objeto representa una métrica individual. */
   metrics: z.array(
     z.object({
-      iconName: LucideIconNameSchema.describe(
-        "Nombre del icono de lucide-react."
-      ),
+      iconName: z.string().min(1).describe("Nombre del icono de lucide-react."),
       prefix: z
         .string()
         .optional()
