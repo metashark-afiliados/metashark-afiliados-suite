@@ -1,55 +1,51 @@
-// src/config/block-categories.config.ts
+// src/config/icon-libraries.config.ts
 /**
- * @file block-categories.config.ts
- * @description Manifiesto de Configuración Declarativo y SSoT para las categorías
- *              de bloques del constructor. Sincronizado con la nueva visión
- *              semántica para un constructor de landing pages profesional.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @file icon-libraries.config.ts
+ * @description Manifiesto de Configuración Declarativo y SSoT para las librerías de iconos.
+ *              Refactorizado a un estándar de élite con una SSoT de tipos literal (`as const`)
+ *              para garantizar la inferencia de tipos correcta en toda la aplicación.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 3.0.0
  */
 import { type LucideIconName } from "@/config/lucide-icon-names";
 
-export type BlockCategoryId =
-  | "templates"
-  | "headers"
-  | "heros"
-  | "features"
-  | "testimonials"
-  | "footers";
-
-export interface BlockCategoryDefinition {
-  id: BlockCategoryId;
-  iconName: LucideIconName;
-  i18nKey: string;
-}
-
-export const BLOCK_CATEGORIES_CONFIG: BlockCategoryDefinition[] = [
-  {
-    id: "templates",
-    iconName: "LayoutTemplate",
-    i18nKey: "category_templates",
-  },
-  { id: "headers", iconName: "PanelTop", i18nKey: "category_headers" },
-  { id: "heros", iconName: "Image", i18nKey: "category_heros" },
-  { id: "features", iconName: "Sparkles", i18nKey: "category_features" },
-  { id: "testimonials", iconName: "Quote", i18nKey: "category_testimonials" },
-  { id: "footers", iconName: "PanelBottom", i18nKey: "category_footers" },
-];
+/**
+ * @public
+ * @constant ICON_LIBRARY_IDS
+ * @description La Única Fuente de Verdad (SSoT) para los identificadores de
+ *              librerías de iconos. El uso de `as const` es crítico para que
+ *              TypeScript infiera un tuple de literales inmutables.
+ */
+export const ICON_LIBRARY_IDS = ["lucide", "tabler", "react-icons"] as const;
 
 /**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización Semántica**: ((Implementada)) El manifiesto ahora refleja la nueva estructura de categorías solicitada (`Templates`, `Headers`, `Heros`, etc.), sentando las bases para la nueva UX.
- *
- * @subsection Melhorias Futuras
- * 1. **Carga desde Base de Datos**: ((Vigente)) Para una flexibilidad máxima, esta configuración podría ser cargada desde una tabla `block_categories` en la base de datos.
- *
- * =====================================================================
+ * @public
+ * @typedef IconLibraryId
+ * @description El tipo de unión de literales para los IDs de librerías de iconos,
+ *              derivado directamente de la SSoT `ICON_LIBRARY_IDS`.
  */
-// src/config/block-categories.config.ts
+export type IconLibraryId = (typeof ICON_LIBRARY_IDS)[number];
+
+export interface IconLibraryDefinition {
+  id: IconLibraryId;
+  name: string;
+  packageName: string;
+  importFn: (name: string) => () => Promise<React.ComponentType<any>>;
+}
+
+export const ICON_LIBRARIES_MANIFEST: IconLibraryDefinition[] = [
+  {
+    id: "lucide",
+    name: "Lucide Icons",
+    packageName: "lucide-react",
+    importFn: (name: string) => () =>
+      import("lucide-react").then((mod) => {
+        if (name in mod.icons) {
+          return mod.icons[name as LucideIconName];
+        }
+        return mod.HelpCircle;
+      }),
+  },
+  // La lógica para otras librerías seguiría un patrón similar
+];
+// src/config/icon-libraries.config.ts

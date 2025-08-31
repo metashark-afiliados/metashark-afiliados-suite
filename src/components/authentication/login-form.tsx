@@ -1,8 +1,8 @@
 // src/components/authentication/login-form.tsx
 /**
  * @file login-form.tsx
- * @description Formulario de inicio de sesión de presentación puro.
- *              Ha sido refactorizado para ser 100% agnóstico a la i18n,
+ * @description Componente de UI puro para el formulario de inicio de sesión.
+ *              Ha sido refactorizado para ser 100% agnóstico al contenido,
  *              recibiendo todos sus textos a través de props.
  * @author Raz Podestá - MetaShark Tech
  * @version 5.0.0
@@ -83,7 +83,7 @@ export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
   };
 
   return (
-    <form action={formAction} className="grid gap-4 p-6">
+    <form action={formAction} className="grid gap-4">
       <div className="grid gap-2">
         <Label htmlFor="email">{texts.email_label}</Label>
         <Input

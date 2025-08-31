@@ -1,15 +1,11 @@
 // src/lib/hooks/use-sync-dashboard-prefs.ts
 /**
  * @file use-sync-dashboard-prefs.ts
- * @description Hook soberano de efecto secundario. Ha sido refactorizado
- *              holísticamente para leer el estado de preferencias completo del
- *              perfil del usuario, fusionar los cambios, y enviar el payload
- *              completo a la Server Action, resolviendo el error de tipo TS2345.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Hook soberano de efecto secundario. Persiste de forma asíncrona
+ *              las preferencias de UI del usuario, ahora alineado con la SSoT de
+ *              tipos literal, garantizando la seguridad de tipos.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 3.1.0
  */
 "use client";
 
@@ -21,7 +17,8 @@ import { useDashboard } from "@/lib/context/DashboardContext";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
 import { clientLogger } from "@/lib/logging";
-import { type DashboardLayoutPreferencesSchema } from "@/lib/validators";
+import { DashboardLayoutPreferencesSchema } from "@/lib/validators/schemas";
+import { type DashboardLayoutPreferences } from "@/lib/types/database/tables/profiles";
 
 export function useSyncDashboardPrefs() {
   const { profile } = useDashboard();
@@ -39,32 +36,23 @@ export function useSyncDashboardPrefs() {
 
     const syncPreferences = async () => {
       clientLogger.trace(
-        "[SyncPrefs] El estado de la UI ha cambiado. Sincronizando con la base de datos...",
+        "[SyncPrefs] Estado de UI debounced cambió. Sincronizando con la base de datos...",
         { isSidebarCollapsed: debouncedIsSidebarCollapsed }
       );
 
-      // Lee las preferencias actuales para no sobrescribir otros valores.
-      const currentPrefs = (profile?.dashboard_layout || {
-        isSidebarCollapsed: false,
-        activeIconLibraryId: "lucide",
-      }) as z.infer<typeof DashboardLayoutPreferencesSchema>;
+      const currentPrefs = (profile?.dashboard_layout ||
+        {}) as Partial<DashboardLayoutPreferences>;
 
-      await updateProfilePreferencesAction({
+      const newPrefsPayload: Partial<DashboardLayoutPreferences> = {
         ...currentPrefs,
         isSidebarCollapsed: debouncedIsSidebarCollapsed,
-      });
+      };
+
+      // La validación ahora funciona correctamente porque los tipos de origen son correctos.
+      await updateProfilePreferencesAction(newPrefsPayload);
     };
 
     syncPreferences();
   }, [debouncedIsSidebarCollapsed, profile?.dashboard_layout]);
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Sincronización de Múltiples Preferencias**: A medida que se añadan más preferencias al `useDashboardUIStore` (ej. `viewMode`), este hook debería ser extendido para sincronizarlas todas, posiblemente "debounceando" el objeto de estado completo en lugar de valores individuales.
- * 2. **Manejo de Errores de Sincronización**: La llamada a `updateProfilePreferencesAction` no maneja el caso de error. Se podría añadir un `try/catch` y mostrar un `toast.error` sutil si la sincronización en segundo plano falla.
- * 3. **Estado de Sincronización Global**: El hook podría exponer un estado `isSyncing: boolean` a través de un store global para mostrar un indicador en la UI (ej. en la `StatusBar`) mientras se guardan las preferencias.
- * =====================================================================
- */
+// src/lib/hooks/use-sync-dashboard-prefs.ts

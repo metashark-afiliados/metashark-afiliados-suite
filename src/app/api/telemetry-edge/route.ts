@@ -1,65 +1,75 @@
 // src/app/api/telemetry-edge/route.ts
 /**
  * @file route.ts
- * @description Endpoint de API de ingesta de telemetría. Ha sido blindado para
- *              requerir un token de autenticación secreto, previniendo el abuso
- *              y garantizando la integridad de los datos.
- * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Endpoint de API seguro y de alto rendimiento para el enriquecimiento
+ *              de telemetría del cliente. Diseñado para el Edge Runtime.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 4.0.0
  */
 import { NextResponse, type NextRequest } from "next/server";
 
-import { telemetry } from "@/lib/actions";
+import { enrichVisitorLogAction } from "@/lib/actions/telemetry.actions";
 import { logger } from "@/lib/logging";
+import { isActionError } from "@/lib/validators";
 
-export async function POST(request: NextRequest) {
-  // --- INICIO DE MEJORA DE SEGURIDAD ---
+// --- Configuración del Edge Runtime ---
+export const runtime = "edge";
+
+/**
+ * @public
+ * @function POST
+ * @description Manejador para las peticiones POST. Recibe un payload de enriquecimiento
+ *              del cliente, valida el token de autorización, e invoca la Server Action
+ *              correspondiente para actualizar el log de visitante.
+ * @param {NextRequest} request - La petición entrante.
+ * @returns {Promise<NextResponse>} Una respuesta JSON indicando el resultado.
+ */
+export async function POST(request: NextRequest): Promise<NextResponse> {
   const authToken = request.headers.get("Authorization")?.split("Bearer ")[1];
 
   if (authToken !== process.env.TELEMETRY_API_SECRET) {
-    logger.warn("[API:Telemetry] Intento de acceso no autorizado bloqueado.", {
+    logger.warn("[API:TelemetryEdge] Intento de acceso no autorizado bloqueado.", {
       ip: request.ip,
+      path: request.nextUrl.pathname,
     });
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { success: false, error: "generic.error_permission_denied" },
+      { status: 401 }
+    );
   }
-  // --- FIN DE MEJORA DE SEGURIDAD ---
 
   try {
     const payload = await request.json();
     logger.trace(
-      "[API:Telemetry] Petición autorizada. Invocando logVisitorAction..."
+      "[API:TelemetryEdge] Petición autorizada. Invocando enrichVisitorLogAction.",
+      { sessionId: payload?.sessionId }
     );
 
-    const result = await telemetry.logVisitorAction(payload);
+    const result = await enrichVisitorLogAction(payload);
 
-    if (!result.success) {
+    if (isActionError(result)) {
       const statusCode =
         result.error === "ValidationErrors.invalid_data" ? 400 : 500;
-      return NextResponse.json({ error: result.error }, { status: statusCode });
+      return NextResponse.json(
+        { success: false, error: result.error },
+        { status: statusCode }
+      );
     }
 
-    return NextResponse.json({ message: "Log registrado." }, { status: 201 });
+    return NextResponse.json(
+      { success: true, message: "Log enriquecido con éxito." },
+      { status: 200 }
+    );
   } catch (error) {
-    logger.error("[API:Telemetry] Error crítico al procesar la petición.", {
+    const errorId = `telemetry-edge-err-${Date.now()}`;
+    logger.error(`[API:TelemetryEdge] Error crítico al procesar la petición. ID: ${errorId}`, {
       error: error instanceof Error ? error.message : String(error),
     });
+    // No se usa createPersistentErrorLog porque puede depender de APIs de Node.js no disponibles en el Edge.
     return NextResponse.json(
-      { error: "ValidationErrors.error_server_generic" },
+      { success: false, error: "generic.error_server_generic", errorId },
       { status: 500 }
     );
   }
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Blindaje de Endpoint Completado:** El endpoint ahora valida el token `Bearer`, completando la solución de seguridad y previniendo el abuso.
- *
- * =====================================================================
- */
 // src/app/api/telemetry-edge/route.ts

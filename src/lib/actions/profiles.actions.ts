@@ -1,29 +1,28 @@
 // src/lib/actions/profiles.actions.ts
 /**
  * @file src/lib/actions/profiles.actions.ts
- * @description Contiene las Server Actions para la gestión del perfil del
- *              usuario. Ha sido refactorizado holísticamente para que
- *              `updateProfilePreferencesAction` acepte el contrato de datos completo
- *              `DashboardLayoutPreferencesSchema`, resolviendo un error de tipo
- *              sistémico y permitiendo una personalización de UI persistente y de élite.
- * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Contiene las Server Actions para la gestión del perfil del usuario.
+ *              Ha sido refactorizado para validar su payload de entrada y consumir
+ *              el contrato de tipo canónico, completando la inversión de control.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.0.0
  */
 "use server";
 import "server-only";
 
 import { revalidatePath } from "next/cache";
-import { type z } from "zod";
 
 import { createClient } from "@/lib/supabase/server";
+import { type DashboardLayoutPreferences } from "@/lib/types/database/tables/profiles";
 import {
   type ActionResult,
-  type DashboardLayoutPreferencesSchema,
+  DashboardLayoutPreferencesSchema,
 } from "@/lib/validators";
-import { getAuthenticatedUser } from "./_helpers";
+import {
+  createAuditLog,
+  createPersistentErrorLog,
+  getAuthenticatedUser,
+} from "./_helpers";
 import { logger } from "@/lib/logging";
 
 /**
@@ -32,63 +31,81 @@ import { logger } from "@/lib/logging";
  * @function updateProfilePreferencesAction
  * @description Actualiza las preferencias de UI del usuario en la columna
  *              `dashboard_layout` de la tabla `profiles`.
- * @param {z.infer<typeof DashboardLayoutPreferencesSchema>} preferences - Un objeto con las preferencias a actualizar.
+ * @param {Partial<DashboardLayoutPreferences>} preferences - Un objeto con las preferencias a actualizar.
  * @returns {Promise<ActionResult<void>>} El resultado de la operación.
  */
 export async function updateProfilePreferencesAction(
-  preferences: z.infer<typeof DashboardLayoutPreferencesSchema>
+  preferences: Partial<DashboardLayoutPreferences>
 ): Promise<ActionResult<void>> {
   const authResult = await getAuthenticatedUser();
   if ("error" in authResult) return authResult.error;
   const { user } = authResult;
 
   logger.trace(
-    `[ProfilesAction] Actualizando preferencias de UI para usuario ${user.id}`,
+    `[ProfilesAction] Iniciando actualización de preferencias de UI para usuario ${user.id}`,
     preferences
   );
 
-  const supabase = createClient();
-  const { data: currentProfile, error: fetchError } = await supabase
-    .from("profiles")
-    .select("dashboard_layout")
-    .eq("id", user.id)
-    .single();
+  const validation =
+    DashboardLayoutPreferencesSchema.partial().safeParse(preferences);
 
-  if (fetchError) {
-    logger.error(
-      `[ProfilesAction] Error al obtener perfil para actualizar preferencias:`,
-      fetchError
+  if (!validation.success) {
+    logger.warn(
+      `[ProfilesAction] Payload de preferencias inválido para usuario ${user.id}`,
+      { errors: validation.error.flatten() }
     );
-    return { success: false, error: "error_server_generic" };
+    return {
+      success: false,
+      error: "ValidationErrors.generic.error_invalid_data",
+    };
   }
 
-  const newLayout = {
-    ...((currentProfile?.dashboard_layout as object) || {}),
-    ...preferences,
-  };
+  try {
+    const supabase = createClient();
+    const { data: currentProfile, error: fetchError } = await supabase
+      .from("profiles")
+      .select("dashboard_layout")
+      .eq("id", user.id)
+      .single();
 
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({ dashboard_layout: newLayout })
-    .eq("id", user.id);
+    if (fetchError) throw fetchError;
 
-  if (updateError) {
-    logger.error(
-      `[ProfilesAction] Error al guardar preferencias:`,
-      updateError
+    const newLayout = {
+      ...((currentProfile?.dashboard_layout as object) || {}),
+      ...validation.data,
+    };
+
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ dashboard_layout: newLayout })
+      .eq("id", user.id);
+
+    if (updateError) throw updateError;
+
+    await createAuditLog("profile.preferences_updated", {
+      userId: user.id,
+      metadata: { updatedPreferences: validation.data },
+    });
+
+    revalidatePath("/dashboard", "layout");
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    const errorId = await createPersistentErrorLog(
+      "updateProfilePreferencesAction",
+      error as Error,
+      {
+        userId: user.id,
+        preferences,
+      }
     );
-    return { success: false, error: "error_update_failed" };
+    logger.error(
+      `[ProfilesAction] Fallo al actualizar preferencias para ${user.id}. Log ID: ${errorId}`
+    );
+    return {
+      success: false,
+      error: "ValidationErrors.generic.error_update_failed",
+    };
   }
-
-  return { success: true, data: undefined };
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Validación de `preferences` con Zod**: Antes de la fusión, el objeto `preferences` podría ser validado con `DashboardLayoutPreferencesSchema.safeParse()` para una capa adicional de seguridad en tiempo de ejecución.
- * 2. **Revalidación Condicional**: La revalidación de la ruta no es necesaria ya que la UI se actualiza de forma optimista. Sin embargo, si futuras preferencias afectaran el renderizado del servidor, se podría añadir una `revalidatePath("/dashboard", "layout")` condicional.
- * 3. **Logging de Cambios Específicos**: El log de `trace` podría ser mejorado para mostrar un "diff" entre las preferencias antiguas y las nuevas, proporcionando una auditoría más granular.
- * =====================================================================
- */
+// src/lib/actions/profiles.actions.ts
