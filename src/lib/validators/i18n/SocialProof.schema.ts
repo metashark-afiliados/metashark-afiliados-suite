@@ -1,10 +1,10 @@
 // src/lib/validators/i18n/SocialProof.schema.ts
 /**
- * @file src/lib/validators/i18n/SocialProof.schema.ts
- * @description Define el contrato de datos atómico para el namespace 'SocialProof'.
- *              Ha sido sincronizado para incluir el array de logos.
- * @author Raz Podestá
- * @version 2.0.0
+ * @file SocialProof.schema.ts
+ * @description Define el contrato de datos para el namespace 'SocialProof' dentro de `landing.json`.
+ *              Valida la estructura del array de logos, asegurando que `src` sea una URL válida.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 1.0.0
  */
 import { z } from "zod";
 
@@ -17,14 +17,4 @@ export const SocialProofSchema = z.object({
     })
   ),
 });
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato**: ((Implementada)) El schema ahora requiere un array de `logos`, alineándolo con los requisitos del componente `SocialProof`.
- *
- * =====================================================================
- */
 // src/lib/validators/i18n/SocialProof.schema.ts

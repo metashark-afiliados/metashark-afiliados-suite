@@ -3,20 +3,28 @@
  * @file SidebarLogo.tsx
  * @description Aparato de UI atómico y soberano. Renderiza el logo y el nombre
  *              de la marca. Consume sus propias traducciones.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.0.0
  */
 "use client";
 
 import Image from "next/image";
+
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { Link } from "@/lib/navigation";
+import { clientLogger } from "@/lib/logging";
 
-export function SidebarLogo() {
+/**
+ * @public
+ * @component SidebarLogo
+ * @description Renderiza el logo y el nombre de la marca en la barra lateral,
+ *              enlazando a la página principal del dashboard.
+ * @returns {React.ReactElement}
+ */
+export function SidebarLogo(): React.ReactElement {
   const { tSidebar } = useDashboardTranslations();
+  clientLogger.trace("[SidebarLogo] Renderizando componente soberano.");
+
   return (
     <div className="flex h-16 items-center border-b px-6">
       <Link
@@ -38,12 +46,4 @@ export function SidebarLogo() {
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Restauración de Archivo y Soberanía:** El componente ha sido reconstruido, exportado y hecho soberano, resolviendo `TS2459` y `TS2307`.
- * =====================================================================
- */
 // src/components/layout/sidebar/SidebarLogo.tsx

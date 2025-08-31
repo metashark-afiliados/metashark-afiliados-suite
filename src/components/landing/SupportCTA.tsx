@@ -1,12 +1,10 @@
 // src/components/landing/SupportCTA.tsx
 /**
  * @file src/components/landing/SupportCTA.tsx
- * @description Componente de presentación para la sección de "Llamada a la Acción de Soporte"
- *              de la landing page. Anima a los usuarios a contactar con soporte o
- *              consultar la documentación. Es un componente de cliente puro, animado
- *              y completamente agnóstico al contenido.
- * @author Raz Podestá
- * @version 1.0.0
+ * @description Componente de presentación para la sección de "Llamada a la Acción de Soporte".
+ *              Es un componente de cliente puro, animado y completamente agnóstico al contenido.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.0.0
  */
 "use client";
 
@@ -15,6 +13,7 @@ import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
+import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
@@ -41,6 +40,10 @@ export function SupportCTA({
   contactButtonText,
   docsButtonText,
 }: SupportCTAProps): React.ReactElement {
+  clientLogger.trace(
+    "[SupportCTA] Renderizando componente de presentación puro."
+  );
+
   const FADE_UP_VARIANTS = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
@@ -71,20 +74,4 @@ export function SupportCTA({
     </section>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Componente de Conversión Secundario**: ((Implementada)) Se ha creado un nuevo aparato que proporciona una ruta de conversión secundaria para usuarios que necesitan más información, una práctica de diseño de landing page de élite.
- * 2. **Componente Puro e Internacionalizable**: ((Implementada)) El componente es 100% agnóstico al contenido.
- * 3. **Estilo Sofisticado**: ((Implementada)) El uso de un fondo con gradiente sutil se alinea con la estética moderna del diseño de referencia.
- *
- * @subsection Melhorias Futuras
- * 1. **Integración con Widget de Chat**: ((Vigente)) El botón "Contactar Soporte" podría, en lugar de navegar, abrir directamente un widget de chat en vivo (como el futuro `LiaChatWidget`), proporcionando una asistencia más inmediata.
- *
- * =====================================================================
- */
 // src/components/landing/SupportCTA.tsx

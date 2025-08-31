@@ -1,48 +1,75 @@
 // src/components/workspaces/WorkspaceTrigger.tsx
 /**
  * @file WorkspaceTrigger.tsx
- * @description Componente de UI 100% soberano. Consume sus propias traducciones.
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Componente de UI soberano. Ha sido refactorizado para consumir
+ *              el componente atómico `WorkspaceNameInputField` para su modo de
+ *              edición, consolidando la SSoT de la UI.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 7.0.0
  */
+"use client";
+
 import * as React from "react";
+import { FormProvider } from "react-hook-form";
 import { ChevronsUpDown, LayoutGrid } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { useWorkspaceInlineEditor } from "@/lib/hooks/useWorkspaceInlineEditor";
 import { cn } from "@/lib/utils";
-import { WorkspaceNameInput } from "./WorkspaceNameInput";
+import { clientLogger } from "@/lib/logging";
+import { WorkspaceNameInputField } from "./form-fields/WorkspaceNameInputField";
 
 interface WorkspaceTriggerProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  hook: ReturnType<typeof useWorkspaceInlineEditor>;
-}
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
+/**
+ * @public
+ * @component WorkspaceTrigger
+ * @description Renderiza el disparador para el popover del selector de workspaces.
+ *              Maneja el renderizado condicional para la edición en línea del nombre.
+ * @param {WorkspaceTriggerProps} props - Propiedades para configurar el disparador.
+ * @returns {React.ReactElement}
+ */
 export const WorkspaceTrigger = React.forwardRef<
   HTMLButtonElement,
   WorkspaceTriggerProps
->(({ hook, ...props }, ref) => {
+>((props, ref) => {
   const { tWorkspaces } = useDashboardTranslations();
+  const hook = useWorkspaceInlineEditor();
   const {
     isEditing,
     setIsEditing,
     canEdit,
     isApiPending,
     activeWorkspaceName,
+    form,
+    handleBlur,
+    handleKeyDown,
   } = hook;
 
-  const texts = {
-    ariaLabel: tWorkspaces("selectWorkspace_label"),
-    statusText: tWorkspaces("changing_status"),
-    editAriaLabel: tWorkspaces("edit_form.name_aria_label"),
-  };
+  clientLogger.trace("[WorkspaceTrigger] Renderizando disparador soberano.", {
+    isEditing,
+    canEdit,
+  });
 
   if (isEditing) {
-    return <WorkspaceNameInput ariaLabel={texts.editAriaLabel} hook={hook} />;
+    return (
+      <FormProvider {...form}>
+        <form
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          onSubmit={(e) => e.preventDefault()}
+        >
+          <WorkspaceNameInputField
+            register={form.register}
+            errors={form.formState.errors}
+            isPending={isApiPending}
+            fieldName="name"
+          />
+        </form>
+      </FormProvider>
+    );
   }
 
   return (
@@ -51,12 +78,9 @@ export const WorkspaceTrigger = React.forwardRef<
       type="button"
       role="combobox"
       disabled={isApiPending || props.disabled}
-      onClick={(e) => {
-        props.onClick?.(e);
-        if (canEdit) setIsEditing(true);
-      }}
+      onDoubleClick={canEdit ? () => setIsEditing(true) : undefined}
       aria-disabled={!canEdit || isApiPending}
-      aria-label={texts.ariaLabel}
+      aria-label={tWorkspaces("selectWorkspace_label")}
       className={cn(
         buttonVariants({ variant: "ghost" }),
         "w-[220px] justify-between h-auto py-2"
@@ -66,7 +90,7 @@ export const WorkspaceTrigger = React.forwardRef<
       <div className="flex items-center gap-2 truncate">
         <LayoutGrid className="h-4 w-4 text-muted-foreground" />
         <span className="truncate font-semibold text-base">
-          {isApiPending ? texts.statusText : activeWorkspaceName}
+          {isApiPending ? tWorkspaces("changing_status") : activeWorkspaceName}
         </span>
       </div>
       <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
@@ -75,12 +99,4 @@ export const WorkspaceTrigger = React.forwardRef<
 });
 
 WorkspaceTrigger.displayName = "WorkspaceTrigger";
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Soberanía de i18n:** El componente ahora es autocontenido, resolviendo la causa raíz del error `TS2741`.
- * =====================================================================
- */
 // src/components/workspaces/WorkspaceTrigger.tsx

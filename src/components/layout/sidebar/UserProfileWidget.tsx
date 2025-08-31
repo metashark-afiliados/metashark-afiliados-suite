@@ -1,13 +1,11 @@
 // src/components/layout/sidebar/UserProfileWidget.tsx
 /**
  * @file UserProfileWidget.tsx
- * @description Aparato de UI atómico. Refactorizado a un componente soberano
- *              que consume sus propias traducciones.
- * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Aparato de UI atómico. Ha sido refactorizado a un componente
+ *              soberano que consume sus propias traducciones y contexto de datos,
+ *              desacoplándolo de su componente padre.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 4.0.0
  */
 "use client";
 
@@ -21,6 +19,13 @@ import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
 import { clientLogger } from "@/lib/logging";
 
+/**
+ * @public
+ * @component UserProfileWidget
+ * @description Renderiza un widget flotante con la información del perfil del usuario.
+ *              Es un componente soberano.
+ * @returns {React.ReactElement}
+ */
 export function UserProfileWidget() {
   const { user } = useDashboard();
   const { setProfileWidgetOpen } = useDashboardUIStore();
@@ -42,13 +47,14 @@ export function UserProfileWidget() {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="flex items-center gap-3 rounded-lg bg-card p-3 shadow-lg border w-64"
     >
       <Avatar className="h-10 w-10">
         <AvatarImage
           src={user?.user_metadata?.avatar_url}
           alt={tSidebar("userMenu_avatar_alt", {
-            username: user?.user_metadata?.full_name,
+            username: user?.user_metadata?.full_name || "usuario",
           })}
         />
         <AvatarFallback>{userInitials}</AvatarFallback>
@@ -71,14 +77,4 @@ export function UserProfileWidget() {
     </motion.div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Soberanía de i18n:** El componente ya no depende de props de traducción, resolviendo el `TS2741`.
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Acciones Rápidas:** Añadir un menú contextual con acciones como "Ver Perfil" o "Cerrar Sesión".
- * =====================================================================
- */
 // src/components/layout/sidebar/UserProfileWidget.tsx

@@ -1,12 +1,12 @@
 // src/app/[locale]/page.tsx
 /**
  * @file src/app/[locale]/page.tsx
- * @description Página de Inicio Pública (Landing Page) de élite. Refactorizado
- *              holísticamente para sincronizar su lógica de obtención de datos
- *              con los contratos de i18n definidos en los schemas de Zod, resolviendo
- *              errores de `TypeError` en runtime.
- * @author Raz Podestá
- * @version 10.0.0
+ * @description Orquestador de datos de alto rendimiento y adaptador para la Landing Page.
+ *              Esta versión completa la refactorización SSR, cargando todo el contenido
+ *              con una única llamada a `getTranslations` y pasando los datos como props
+ *              a sus componentes hijos puros.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 13.0.0
  */
 import { redirect } from "next/navigation";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
@@ -23,6 +23,7 @@ import { Testimonials } from "@/components/landing/Testimonials";
 import { LandingFooter } from "@/components/layout/LandingFooter";
 import { LandingHeader } from "@/components/layout/LandingHeader";
 import { CursorTrail } from "@/components/ui/CursorTrail";
+import { type NavLinkItem } from "@/components/ui/SmartLink";
 import { logger } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 
@@ -30,6 +31,16 @@ const DICEBEAR_API_URL =
   process.env.NEXT_PUBLIC_DICEBEAR_API_URL ||
   "https://api.dicebear.com/7.x/personas/svg";
 
+/**
+ * @public
+ * @page HomePage
+ * @description Orquesta la carga de datos y el ensamblaje de la UI para la página
+ *              de inicio pública. Actúa como un Server Component puro.
+ * @param {object} props - Propiedades inyectadas por Next.js.
+ * @param {object} props.params - Parámetros de la ruta.
+ * @param {string} props.params.locale - El locale activo.
+ * @returns {Promise<JSX.Element>} El componente de la página de inicio renderizado.
+ */
 export default async function HomePage({
   params: { locale },
 }: {
@@ -37,8 +48,7 @@ export default async function HomePage({
 }): Promise<JSX.Element> {
   unstable_setRequestLocale(locale);
   logger.trace(
-    "[HomePage] Renderizando página de inicio para el locale:",
-    locale
+    `[HomePage] Iniciando renderizado de servidor para el locale: ${locale}`
   );
 
   const supabase = createClient();
@@ -48,109 +58,121 @@ export default async function HomePage({
 
   if (session) {
     logger.info(
-      `[HomePage] Sesión activa detectada. Redirigiendo al dashboard.`,
-      { userId: session.user.id }
+      `[HomePage] Sesión activa detectada para usuario ${session.user.id}. Redirigiendo al dashboard.`
     );
     redirect("/dashboard");
   }
 
-  // Carga de namespaces de i18n
-  const tHeader = await getTranslations("components.layout.LandingHeader");
-  const tHero = await getTranslations("components.landing.Hero");
-  const tSocial = await getTranslations("components.landing.SocialProof");
-  const tFeatures = await getTranslations("components.landing.Features");
-  const tProcess = await getTranslations("components.landing.ProcessSteps");
-  const tTestimonials = await getTranslations(
-    "components.landing.Testimonials"
-  );
-  const tMetrics = await getTranslations("components.landing.Metrics");
-  const tFaq = await getTranslations("components.landing.FAQ");
-  const tSupport = await getTranslations("components.landing.SupportCTA");
-  const tBottom = await getTranslations("components.landing.BottomCTA");
+  const t = await getTranslations("pages.landing");
 
-  // Construcción de props según los schemas
+  // --- Capa de Adaptación: De i18n a Props ---
+
   const headerProps = {
-    navLinks: [
-      { href: "#features", label: tHeader("features") },
-      { href: "#process", label: tProcess("navLink") }, // Nota: 'navLink' viene de ProcessSteps
-      { href: "/pricing", label: tHeader("pricing") },
-    ],
-    signInText: tHeader("signIn"),
-    signUpText: tHeader("signUp"),
-    openMenuText: tHeader("openMenu"),
+    navLinks: t.raw("Header.navLinks"),
+    signInText: t("Header.signIn"),
+    signUpText: t("Header.signUp"),
+    openMenuText: t("Header.openMenu"),
   };
 
   const heroProps = {
-    title: tHero("title"),
-    subtitle: tHero("subtitle"),
-    ctaPrimaryText: tHero("ctaPrimary"),
-    ctaSecondaryText: tHero("ctaSecondary"),
+    title: t("Hero.title"),
+    subtitle: t("Hero.subtitle"),
+    ctaPrimaryText: t("Hero.ctaPrimary"),
+    ctaSecondaryText: t("Hero.ctaSecondary"),
   };
 
   const socialProofProps = {
-    title: tSocial("title"),
-    logos: tSocial.raw("logos"),
+    title: t("SocialProof.title"),
+    logos: t.raw("SocialProof.logos"),
   };
 
   const featuresProps = {
-    title: tFeatures("title"),
-    subtitle: tFeatures("subtitle"),
-    features: tFeatures.raw("features"),
+    title: t("Features.title"),
+    subtitle: t("Features.subtitle"),
+    features: t.raw("Features.features"),
   };
 
   const processStepsProps = {
-    tag: tProcess("tag"),
-    title: tProcess("title"),
-    description: tProcess("description"),
-    steps: tProcess.raw("steps"),
+    tag: t("ProcessSteps.tag"),
+    title: t("ProcessSteps.title"),
+    description: t("ProcessSteps.description"),
+    steps: t.raw("ProcessSteps.steps"),
   };
 
   const metricsProps = {
-    metrics: tMetrics.raw("metrics"),
+    metrics: t.raw("Metrics.metrics"),
   };
 
   const testimonialsProps = {
-    tag: tTestimonials("tag"),
-    title: tTestimonials("title"),
-    subtitle: tTestimonials("subtitle"),
-    testimonials: tTestimonials.raw("testimonials").map((testimonial: any) => ({
-      ...testimonial,
-      authorImage: `${DICEBEAR_API_URL}?seed=${testimonial.authorName.replace(
-        /\s/g,
-        ""
-      )}&size=64&backgroundColor=transparent`,
-    })),
+    tag: t("Testimonials.tag"),
+    title: t("Testimonials.title"),
+    subtitle: t("Testimonials.subtitle"),
+    testimonials: t
+      .raw("Testimonials.testimonials")
+      .map((testimonial: any) => ({
+        ...testimonial,
+        authorImage: `${DICEBEAR_API_URL}?seed=${testimonial.authorName.replace(
+          /\s/g,
+          ""
+        )}&size=64&backgroundColor=transparent`,
+      })),
   };
 
   const faqProps = {
-    tag: tFaq("tag"),
-    title: tFaq("title"),
-    subtitle: tFaq("subtitle"),
-    items: tFaq.raw("items"),
-    searchPlaceholder: tFaq("searchPlaceholder"),
-    noResultsText: tFaq("noResultsText"),
-    clearSearchAriaLabel: tFaq("clearSearchAriaLabel"),
+    tag: t("FAQ.tag"),
+    title: t("FAQ.title"),
+    subtitle: t("FAQ.subtitle"),
+    items: t.raw("FAQ.items"),
+    searchPlaceholder: t("FAQ.searchPlaceholder"),
+    noResultsText: t("FAQ.noResultsText"),
+    clearSearchAriaLabel: t("FAQ.clearSearchAriaLabel"),
   };
 
   const supportCTAProps = {
-    title: tSupport("title"),
-    description: tSupport("description"),
-    contactButtonText: tSupport("contactButtonText"),
-    docsButtonText: tSupport("docsButtonText"),
+    title: t("SupportCTA.title"),
+    description: t("SupportCTA.description"),
+    contactButtonText: t("SupportCTA.contactButtonText"),
+    docsButtonText: t("SupportCTA.docsButtonText"),
   };
 
   const bottomCTAProps = {
-    title: tBottom("title"),
-    subtitle: tBottom("subtitle"),
-    featuresTitle: tBottom("featuresTitle"),
-    features: tBottom.raw("features"),
-    ctaPrimaryText: tBottom("ctaPrimaryText"),
-    ctaPlaceholderText: tBottom("ctaPlaceholderText"),
-    pricingNote: tBottom("pricingNote"),
-    guaranteeNote: tBottom("guaranteeNote"),
-    creditCardNote: tBottom("creditCardNote"),
+    title: t("BottomCTA.title"),
+    subtitle: t("BottomCTA.subtitle"),
+    featuresTitle: t("BottomCTA.featuresTitle"),
+    features: t.raw("BottomCTA.features"),
+    ctaPrimaryText: t("BottomCTA.ctaPrimaryText"),
+    ctaPlaceholderText: t("BottomCTA.ctaPlaceholderText"),
+    pricingNote: t("BottomCTA.pricingNote"),
+    guaranteeNote: t("BottomCTA.guaranteeNote"),
+    creditCardNote: t("BottomCTA.creditCardNote"),
   };
 
+  const rawFooterLinks = t.raw("Footer");
+  const transformLinks = (links: Record<string, string>): NavLinkItem[] =>
+    Object.entries(links).map(([key, label]) => ({
+      label: label,
+      href: key.startsWith("#") ? key : `/${key}`,
+    }));
+
+  const footerProps = {
+    brandName: t("Footer.brand_name"),
+    logoAltText: t("Footer.logo_alt_text"),
+    slogan: t("Footer.slogan"),
+    productColumnTitle: t("Footer.product"),
+    companyColumnTitle: t("Footer.company"),
+    newsletterTitle: t("Footer.stayUpdated"),
+    newsletterPrompt: t("Footer.newsletterPrompt"),
+    subscribeButtonText: t("Footer.subscribe"),
+    placeholderEmail: t("Footer.placeholder_email"),
+    allRightsReservedText: t("Footer.allRightsReserved", {
+      year: new Date().getFullYear(),
+    }),
+    productLinks: transformLinks(rawFooterLinks.productLinks),
+    companyLinks: transformLinks(rawFooterLinks.companyLinks),
+    legalLinks: transformLinks(rawFooterLinks.legalLinks),
+  };
+
+  // --- Capa de Ensamblaje de UI ---
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <CursorTrail />
@@ -166,7 +188,7 @@ export default async function HomePage({
         <SupportCTA {...supportCTAProps} />
         <BottomCTA {...bottomCTAProps} />
       </main>
-      <LandingFooter />
+      <LandingFooter {...footerProps} />
     </div>
   );
 }

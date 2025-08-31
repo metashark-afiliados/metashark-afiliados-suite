@@ -1,11 +1,11 @@
 // src/components/layout/LandingHeader.tsx
 /**
  * @file src/components/layout/LandingHeader.tsx
- * @description Componente de presentación puro que renderiza el encabezado para las
- *              páginas públicas. Alineado con la nueva arquitectura de autenticación
- *              de páginas dedicadas.
- * @author Raz Podestá
- * @version 5.0.0
+ * @description Componente de presentación 100% puro para el encabezado público.
+ *              Recibe todo su contenido a través de props para alinearse con
+ *              la arquitectura de orquestador de servidor de la `HomePage`.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.0.0
  */
 "use client";
 
@@ -19,6 +19,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { type NavLinkItem, SmartLink } from "@/components/ui/SmartLink";
 import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
 import { Link } from "@/lib/navigation";
+import { clientLogger } from "@/lib/logging";
 
 export interface LandingHeaderProps {
   navLinks: NavLinkItem[];
@@ -27,12 +28,24 @@ export interface LandingHeaderProps {
   openMenuText: string;
 }
 
+/**
+ * @public
+ * @component LandingHeader
+ * @description Renderiza la cabecera de la landing page. Es un componente de
+ *              presentación puro que recibe todos los textos y datos de
+ *              navegación como props.
+ * @param {LandingHeaderProps} props - Propiedades para configurar el encabezado.
+ * @returns {React.ReactElement}
+ */
 export function LandingHeader({
   navLinks,
   signInText,
   signUpText,
   openMenuText,
 }: LandingHeaderProps): React.ReactElement {
+  clientLogger.trace(
+    "[LandingHeader] Renderizando componente de presentación puro."
+  );
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
   return (
@@ -53,7 +66,7 @@ export function LandingHeader({
           aria-label="Navegación Principal"
           className="hidden items-center gap-6 text-sm font-medium md:flex"
         >
-          {navLinks.map((link) => (
+          {(navLinks || []).map((link) => (
             <SmartLink
               key={
                 typeof link.href === "string" ? link.href : link.href.pathname
@@ -91,7 +104,7 @@ export function LandingHeader({
                   aria-label="Navegación Móvil"
                   className="grid gap-6 text-lg font-medium mt-8"
                 >
-                  {navLinks.map((link) => (
+                  {(navLinks || []).map((link) => (
                     <SmartLink
                       key={
                         typeof link.href === "string"

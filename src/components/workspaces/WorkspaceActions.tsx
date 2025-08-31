@@ -3,13 +3,9 @@
  * @file src/components/workspaces/WorkspaceActions.tsx
  * @description Componente de presentación 100% puro y soberano. Ha sido
  *              refactorizado a un estándar de élite para ser autocontenido en
- *              su consumo de internacionalización, eliminando la prop `texts`
- *              y adhiriéndose al patrón de componente soberano.
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              su consumo de internacionalización.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 6.0.0
  */
 "use client";
 
@@ -93,17 +89,4 @@ export function WorkspaceActions({
     </CommandGroup>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Renderizado Declarativo**: En lugar de bloques de JSX condicionales, las acciones podrían definirse en un array de configuración. Esto permitiría a la función `.map()` renderizarlos, haciendo el código más declarativo y fácil de extender.
- * 2. **Atajos de Teclado**: Integrar el componente `CommandShortcut` para mostrar atajos de teclado (ej. `⌘+N` para "Crear Workspace"), mejorando la accesibilidad y la productividad para usuarios avanzados.
- * 3. **Estado `disabled` Granular**: Añadir una prop `isPending: boolean` que deshabilite todas las acciones mientras una operación está en curso, proporcionando un feedback de UI más robusto.
- * 4. **Tooltips Explicativos**: Envolver cada `CommandItem` en un `Tooltip` para proporcionar una descripción más detallada de lo que hace cada acción, mejorando la usabilidad.
- * 5. **Abstracción `ActionItem`**: El patrón `CommandItem` con un icono y texto es altamente reutilizable. Podría ser abstraído a un componente `ActionItem` para reducir la duplicación de código.
- * 6. **Permisos a Nivel de Característica**: La lógica `canEdit` y `canDelete` podría ser expandida para manejar permisos más granulares (ej. `canInvite`, `canRename`) si el modelo de roles se vuelve más complejo.
- * =====================================================================
- */
 // src/components/workspaces/WorkspaceActions.tsx

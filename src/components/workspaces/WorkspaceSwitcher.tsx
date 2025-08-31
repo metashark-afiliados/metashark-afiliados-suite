@@ -1,13 +1,11 @@
 // src/components/workspaces/WorkspaceSwitcher.tsx
 /**
  * @file WorkspaceSwitcher.tsx
- * @description Orquestador de UI soberano. Simplificado para delegar
- *              el consumo de i18n a sus hijos soberanos.
- * @author Raz Podestá - MetaShark Tech
- * @version 11.0.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Orquestador de UI soberano. Ha sido simplificado para delegar
+ *              el consumo de i18n a sus hijos soberanos y para componer la
+ *              lógica de hooks con los componentes de UI puros.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 12.0.0
  */
 "use client";
 
@@ -26,8 +24,19 @@ import { useWorkspaceInlineEditor } from "@/lib/hooks/useWorkspaceInlineEditor";
 import { useWorkspaceManager } from "@/lib/hooks/useWorkspaceManager";
 import { WorkspacePopoverContent } from "./WorkspacePopoverContent";
 import { WorkspaceTrigger } from "./WorkspaceTrigger";
+import { clientLogger } from "@/lib/logging";
 
+/**
+ * @private
+ * @component WorkspaceSwitcherContent
+ * @description Componente interno que consume los contextos y hooks para
+ *              ensamblar la UI del selector de workspaces.
+ * @returns {React.ReactElement}
+ */
 const WorkspaceSwitcherContent = () => {
+  clientLogger.trace(
+    "[WorkspaceSwitcherContent] Ensamblando lógica y UI del switcher."
+  );
   const { workspaces, activeWorkspace } = useDashboard();
   const { canEdit, canDelete } = useWorkspaceContext();
   const {
@@ -57,9 +66,16 @@ const WorkspaceSwitcherContent = () => {
   );
 };
 
+/**
+ * @public
+ * @component WorkspaceSwitcher
+ * @description Orquesta el contexto y la UI para el selector de workspaces.
+ * @returns {React.ReactElement | null}
+ */
 export function WorkspaceSwitcher(): React.ReactElement | null {
   const { activeWorkspace } = useDashboard();
   if (!activeWorkspace) {
+    // En el flujo de onboarding, puede no haber un workspace activo todavía.
     return null;
   }
   return (
@@ -68,12 +84,4 @@ export function WorkspaceSwitcher(): React.ReactElement | null {
     </WorkspaceProvider>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Simplificación Radical (SRP):** El componente es ahora un ensamblador puro, libre de lógica de i18n.
- * =====================================================================
- */
 // src/components/workspaces/WorkspaceSwitcher.tsx

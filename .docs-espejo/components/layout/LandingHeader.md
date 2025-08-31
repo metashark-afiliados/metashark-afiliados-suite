@@ -1,7 +1,7 @@
 // .docs-espejo/components/layout/LandingHeader.md
 /**
  * @file LandingHeader.md
- * @description Documento Espejo y SSoT para el encabezado de las páginas públicas.
+ * @description Documento Espejo y SSoT conceptual para el encabezado de las páginas públicas.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
@@ -21,7 +21,7 @@ Este aparato es el **punto de navegación principal para los visitantes no auten
 
 /**
  * =====================================================================
- *                           MEJORA CONTINUA
+ *                           ZONA DE MEJORAS
  * =====================================================================
  * @subsection Melhorias Futuras
  * 1.  **Header Pegajoso con Transparencia (`Sticky Header`):** Implementar un `useEffect` con un listener de scroll que añada una clase de fondo (ej. `bg-background/80 backdrop-blur-sm`) solo cuando el usuario se desplaza hacia abajo, haciendo que el header sea transparente inicialmente sobre la sección Hero.
@@ -29,6 +29,11 @@ Este aparato es el **punto de navegación principal para los visitantes no auten
  * 3.  **Menú Desplegable para Navegación Compleja:** Si la navegación crece, se podrían introducir sub-menús utilizando el componente `DropdownMenu` para agrupar enlaces relacionados.
  * 4.  **Cierre de `Sheet` en Navegación:** Mejorar la UX móvil haciendo que el menú `Sheet` se cierre automáticamente después de hacer clic en un enlace de navegación.
  * 5.  **Pruebas de Accesibilidad (Axe):** Añadir pruebas unitarias con `jest-axe` para validar que tanto la navegación de escritorio como la móvil cumplen con los estándares de accesibilidad WCAG.
+ * 6.  **Logo Configurable:** Aceptar `logoSrc` y `logoAltText` como props para una mayor personalización de la marca.
+ * 7.  **Animaciones de Entrada:** Utilizar `framer-motion` para animar la aparición de los elementos del header al cargar la página.
+ * 8.  **Reutilización de Menú Móvil:** Abstraer el contenido del `SheetContent` a un componente `MobileNavMenu` si se reutiliza en otros headers.
+ * 9.  **Propagación de `aria-current`:** Asegurar que `SmartLink` propague correctamente el atributo `aria-current="page"` para los enlaces activos, mejorando la accesibilidad.
+ * 10. **Internacionalización de la Documentación:** Traducir este documento espejo.
  * =====================================================================
  */
 // .docs-espejo/components/layout/LandingHeader.md

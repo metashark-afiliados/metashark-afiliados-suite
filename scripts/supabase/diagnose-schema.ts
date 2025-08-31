@@ -1,26 +1,38 @@
 // scripts/supabase/diagnose-schema.ts
 import { createClient } from "@supabase/supabase-js";
 import chalk from "chalk";
-
+import fs from "fs";
+import path from "path";
 import { loadEnvironment } from "./_utils";
 
 /**
  * @file diagnose-schema.ts
  * @description Herramienta de auditoría de sistema de élite. Invoca la RPC
- *              `get_system_diagnostics` para realizar una radiografía completa del
- *              esquema, RLS, funciones y triggers de la base de datos remota.
- * @author Raz Podestá
- * @version 1.0.0
- * @usage pnpm diag:all
+ *              `get_system_diagnostics`, persiste el resultado como un snapshot JSON
+ *              y muestra un resumen formateado en la consola.
+ * @author L.I.A. Legacy & Raz Podestá
+ * @version 4.0.0
+ * @usage pnpm diag:schema
  */
-const printSection = (title: string) =>
-  console.log(
-    `\n\n${chalk.blue("=".repeat(80))}\n${chalk.blueBright.bold(
-      `🚀 DIAGNÓSTICO: ${title.toUpperCase()}`
-    )}\n${chalk.blue("=".repeat(80))}`
-  );
+
+/**
+ * @private
+ * @function printSection
+ * @description Renderiza una sección del reporte en la consola en formato tabular.
+ * @param {string} title - El título de la sección.
+ * @param {any[] | null} data - El array de datos a mostrar.
+ */
+function printSection(title: string, data: any[] | null) {
+  console.log(chalk.blueBright.bold(`\n--- ${title.toUpperCase()} ---`));
+  if (data && data.length > 0) {
+    console.table(data);
+  } else {
+    console.log(chalk.yellow("No se encontraron datos para esta sección."));
+  }
+}
 
 async function main() {
+  console.clear();
   loadEnvironment();
 
   const { NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
@@ -35,13 +47,9 @@ async function main() {
   );
 
   console.log(
-    chalk.cyan(
-      `\n🔬 Iniciando auditoría en el entorno remoto definido en .env.local...`
-    )
+    chalk.cyan(`\n🔬 Iniciando auditoría de esquema en el entorno remoto...`)
   );
 
-  printSection("Radiografía del Sistema (Esquema, RLS, Funciones y Triggers)");
-  // Asumimos que la RPC 'get_system_diagnostics' existe en su base de datos.
   const { data, error } = await supabaseAdmin.rpc("get_system_diagnostics");
 
   if (error) {
@@ -54,22 +62,35 @@ async function main() {
     chalk.green("✅ RPC 'get_system_diagnostics' ejecutada con éxito.")
   );
 
-  console.log(chalk.white('\n--- Columnas del Esquema "public" ---'));
-  console.table(data.schema_columns || []);
+  // Renderizar en consola
+  printSection("Columnas del Esquema", data.schema_columns);
+  printSection("Políticas RLS", data.rls_policies);
+  printSection("Funciones y Procedimientos", data.functions_and_procedures);
+  printSection("Triggers", data.triggers);
+  printSection("Restricciones de Tabla", data.table_constraints);
+  printSection("Índices", data.indexes);
+  printSection("Extensiones", data.extensions);
 
-  console.log(chalk.white("\n--- Políticas de Seguridad (RLS) ---"));
-  console.table(data.rls_policies || []);
+  // Persistir en archivo JSON
+  const reportDir = path.resolve(process.cwd(), "supabase/reports");
+  if (!fs.existsSync(reportDir)) {
+    fs.mkdirSync(reportDir, { recursive: true });
+  }
 
-  console.log(chalk.white("\n--- Funciones (Routines) ---"));
-  console.table(data.routines || []);
+  const reportPath = path.resolve(reportDir, `latest-schema-diagnostics.json`);
 
-  console.log(chalk.white("\n--- Triggers (public & auth) ---"));
-  console.table(data.triggers || []);
+  fs.writeFileSync(reportPath, JSON.stringify(data, null, 2));
+
+  console.log(
+    chalk.blueBright.bold(
+      `\n📄 Reporte JSON completo guardado en: ${chalk.yellow(reportPath)}`
+    )
+  );
 }
 
 main()
   .then(() =>
-    console.log(chalk.green.bold("\n\n✅ Auditoría del sistema completada."))
+    console.log(chalk.green.bold("\n\n✅ Auditoría del esquema completada."))
   )
   .catch((error) => {
     console.error(
@@ -78,19 +99,4 @@ main()
     );
     process.exit(1);
   });
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Funcionalidad Restaurada**: ((Implementada)) Se ha restaurado la lógica funcional del snapshot original, que utiliza la RPC `get_system_diagnostics` para una auditoría completa.
- * 2. **Visibilidad Mejorada**: ((Implementada)) La auditoría de triggers ahora incluye el esquema `auth`, proporcionando una visión más completa de la automatización de la base de datos.
- *
- * @subsection Melhorias Futuras
- * 1. **Generación de Informes**: ((Vigente)) La salida de `console.table` podría ser escrita a un archivo `.md` para un registro persistente y fácil de compartir.
- *
- * =====================================================================
- */
 // scripts/supabase/diagnose-schema.ts

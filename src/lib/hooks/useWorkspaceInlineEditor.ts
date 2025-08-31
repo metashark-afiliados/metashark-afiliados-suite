@@ -1,114 +1,112 @@
 // src/lib/hooks/useWorkspaceInlineEditor.ts
 /**
  * @file useWorkspaceInlineEditor.ts
- * @description Hook Soberano que orquesta la lógica para la edición en línea del
- *              nombre del workspace. Sincronizado para alinear su API y el
- *              manejo de tipos de i18n.
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Hook Soberano para la edición en línea. Ha sido refactorizado para
+ *              utilizar `react-hook-form`, proporcionando una API compatible
+ *              con el nuevo componente de campo de formulario atómico.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 6.0.0
  */
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { z } from "zod";
 
-import { workspaces as workspaceActions } from "@/lib/actions";
+import { updateWorkspaceNameAction } from "@/lib/actions/workspaces.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
-import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
-import { useHandleErrors } from "@/lib/hooks/useHandleErrors";
+import { UpdateWorkspaceNameSchema } from "@/lib/validators";
+
+type FormData = z.infer<typeof UpdateWorkspaceNameSchema>;
 
 /**
  * @public
  * @function useWorkspaceInlineEditor
- * @description Orquesta el estado y las acciones para la edición en línea del nombre del workspace.
- * @returns Un objeto con todo el estado y los manejadores necesarios para la UI.
+ * @description Orquesta el estado y las acciones para la edición en línea.
+ * @returns Un objeto con la instancia del formulario y la lógica para la UI.
  */
 export function useWorkspaceInlineEditor() {
-  const { tWorkspaces, tErrors } = useDashboardTranslations();
-  const { handleError } = useHandleErrors({
-    tValidationErrors: tErrors as any,
-  });
+  const t = useTranslations("components.workspaces.WorkspaceSwitcher");
+  const tErrors = useTranslations("shared.ValidationErrors");
   const { activeWorkspace, activeWorkspaceRole } = useDashboard();
-
   const [isEditing, setIsEditing] = useState(false);
-  const [inputValue, setInputValue] = useState(activeWorkspace?.name || "");
   const [isApiPending, startApiTransition] = useTransition();
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const canEdit =
-    activeWorkspaceRole === "owner" || activeWorkspaceRole === "admin";
+  const form = useForm<FormData>({
+    resolver: zodResolver(UpdateWorkspaceNameSchema),
+    defaultValues: {
+      name: activeWorkspace?.name || "",
+    },
+  });
+
+  const {
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = form;
+
   const activeWorkspaceName = activeWorkspace?.name || "";
 
   useEffect(() => {
     if (activeWorkspace) {
-      setInputValue(activeWorkspace.name);
+      reset({ name: activeWorkspace.name });
     }
-  }, [activeWorkspace]);
+  }, [activeWorkspace, reset]);
 
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
-
-  const handleSaveName = useCallback(async () => {
-    if (
-      !activeWorkspace ||
-      inputValue.trim() === "" ||
-      inputValue.trim() === activeWorkspaceName
-    ) {
-      setIsEditing(false);
-      setInputValue(activeWorkspaceName);
-      return;
-    }
-
-    startApiTransition(async () => {
-      const result = await workspaceActions.updateWorkspaceNameAction(
-        activeWorkspace.id,
-        inputValue
-      );
-
-      if (result.success) {
-        toast.success(tWorkspaces("edit_form.success_toast"));
-      } else {
-        await handleError(result);
-        setInputValue(activeWorkspaceName); // Rollback optimistic UI
+  const processSubmit: SubmitHandler<FormData> = useCallback(
+    (data) => {
+      if (!activeWorkspace || data.name.trim() === activeWorkspaceName) {
+        setIsEditing(false);
+        reset({ name: activeWorkspaceName });
+        return;
       }
+
+      startApiTransition(async () => {
+        const result = await updateWorkspaceNameAction(
+          activeWorkspace.id,
+          data.name
+        );
+
+        if (result.success) {
+          toast.success(t("edit_form.success_toast"));
+        } else {
+          toast.error(
+            tErrors(result.error as any, { defaultValue: result.error })
+          );
+          reset({ name: activeWorkspaceName });
+        }
+        setIsEditing(false);
+      });
+    },
+    [activeWorkspace, activeWorkspaceName, t, tErrors, reset]
+  );
+
+  const handleBlur = () => {
+    handleSubmit(processSubmit)();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSubmit(processSubmit)();
+    }
+    if (e.key === "Escape") {
       setIsEditing(false);
-    });
-  }, [
-    activeWorkspace,
-    inputValue,
-    activeWorkspaceName,
-    tWorkspaces,
-    handleError,
-  ]);
+      reset({ name: activeWorkspaceName });
+    }
+  };
 
   return {
     isEditing,
     setIsEditing,
-    inputValue,
-    setInputValue,
-    isApiPending,
-    inputRef,
-    canEdit,
-    handleSaveName,
+    isApiPending: isApiPending || isSubmitting,
+    canEdit: activeWorkspaceRole === "owner" || activeWorkspaceRole === "admin",
     activeWorkspaceName,
+    form,
+    handleBlur,
+    handleKeyDown,
   };
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Resolución de Error de API (TS2554): Se ha eliminado el parámetro `props` de la firma del hook, alineándolo con su refactorización previa.
- * 2. ((Implementada)) Resolución Pragmática de Tipos (TS2739): Se ha utilizado una aserción de tipo `as any` al pasar `tErrors` a `useHandleErrors`. Esta es una solución pragmática que resuelve la incompatibilidad de tipos sin degradar la funcionalidad.
- *
- * =====================================================================
- */
+// src/lib/hooks/useWorkspaceInlineEditor.ts

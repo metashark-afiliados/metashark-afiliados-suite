@@ -1,13 +1,12 @@
 // src/components/landing/Features.tsx
 /**
  * @file src/components/landing/Features.tsx
- * @description Componente de presentación puro para la sección de características
- *              de la landing page. Se alinea con la arquitectura de React Server
- *              Components (RSC) al recibir nombres de iconos como strings y
- *              renderizarlos dinámicamente en el cliente a través del aparato
- *              atómico `DynamicIcon`.
- * @author L.I.A. Legacy
- * @version 2.0.0
+ * @description Componente de presentación puro para la sección de características.
+ *              Ha sido refactorizado a un Componente de Cliente (`"use client"`) para
+ *              soportar animaciones con `framer-motion` y recibe todo su contenido
+ *              dinámicamente a través de props.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 3.0.0
  */
 "use client";
 
@@ -21,6 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
@@ -30,18 +30,11 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
  *              Server Components a Client Components.
  */
 export interface Feature {
-  /**
-   * @property {string} icon - El nombre del icono de `lucide-react` a renderizar,
-   *                  en formato PascalCase (ej. "LayoutTemplate").
-   */
+  /** El nombre del icono de `lucide-react` a renderizar. */
   icon: string;
-  /**
-   * @property {string} title - El título de la característica, internacionalizado.
-   */
+  /** El título de la característica. */
   title: string;
-  /**
-   * @property {string} description - La descripción de la característica, internacionalizada.
-   */
+  /** La descripción de la característica. */
   description: string;
 }
 
@@ -51,11 +44,8 @@ export interface Feature {
  * @description Define el contrato de props para el componente `Features`.
  */
 export interface FeaturesProps {
-  /** El título principal de la sección. */
   title: string;
-  /** El subtítulo o descripción de la sección. */
   subtitle: string;
-  /** Un array de objetos de características a mostrar. */
   features: Feature[];
 }
 
@@ -71,6 +61,10 @@ export function Features({
   subtitle,
   features,
 }: FeaturesProps): React.ReactElement {
+  clientLogger.trace(
+    "[Features] Renderizando componente de presentación puro."
+  );
+
   const FADE_IN_ANIMATION_VARIANTS = {
     hidden: { opacity: 0, y: 10 },
     show: { opacity: 1, y: 0, transition: { type: "spring" } },
@@ -94,11 +88,6 @@ export function Features({
           }}
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {/* 
-            Parche defensivo: Se añade `(features || []).map` para evitar el crash
-            mientras se nivela el componente padre. Esto es una medida temporal
-            que será innecesaria una vez que `page.tsx` se corrija.
-          */}
           {(features || []).map((feature) => (
             <motion.div
               key={feature.title}
@@ -125,19 +114,4 @@ export function Features({
     </section>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Conformidad con Arquitectura RSC**: ((Implementada)) El contrato de props (`Feature.icon`) como `string` y el uso de `DynamicIcon` es el patrón canónico para este componente, restaurando la lógica correcta del snapshot original y preparando la solución al `TypeError`.
- * 2. **Componente Puro e Internacionalizable**: ((Implementada)) El componente se mantiene 100% agnóstico al contenido, permitiendo que la `HomePage` (Server Component) construya el array `features` con textos totalmente internacionalizados.
- *
- * @subsection Melhorias Futuras
- * 1. **Modal con Detalles Adicionales**: ((Vigente)) Añadir una prop `onClick` a cada `Feature` para permitir abrir un modal con más información, videos o ejemplos de la característica.
- *
- * =====================================================================
- */
 // src/components/landing/Features.tsx

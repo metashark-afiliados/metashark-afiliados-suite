@@ -1,8 +1,10 @@
 // src/lib/validators/i18n/LandingHeader.schema.ts
 /**
  * @file LandingHeader.schema.ts
- * @description Define el contrato de datos para el namespace 'LandingHeader'.
- * @author Raz Podestá
+ * @description Define el contrato de datos para el namespace 'Header' dentro de `landing.json`.
+ *              Este aparato atómico de validación es consumido por la infraestructura
+ *              de i18n para garantizar la seguridad de tipos.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 import { z } from "zod";
@@ -14,13 +16,4 @@ export const LandingHeaderSchema = z.object({
   signUp: z.string(),
   openMenu: z.string(),
 });
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad**: ((Implementada)) Schema aislado para su namespace.
- * =====================================================================
- */
 // src/lib/validators/i18n/LandingHeader.schema.ts

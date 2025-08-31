@@ -1,15 +1,11 @@
 // src/components/workspaces/InviteMemberForm.tsx
 /**
  * @file InviteMemberForm.tsx
- * @description Aparato de ensamblaje de UI puro. Ha sido refactorizado a un
- *              estándar de élite para consumir el hook soberano `useInviteMemberForm`,
- *              delegando toda la lógica y resolviendo el error de tipo TS2339
- *              de forma definitiva.
- * @author Raz Podestá - MetaShark Tech
+ * @description Aparato de ensamblaje de UI puro. Consume el hook soberano
+ *              `useInviteMemberForm`, delegando toda la lógica y resolviendo
+ *              el error de tipo TS2339 de forma definitiva.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
  * @version 2.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -19,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useInviteMemberForm } from "@/lib/hooks/useInviteMemberForm";
 import { EmailInputField } from "./form-fields/EmailInputField";
 import { RoleSelectField } from "./form-fields/RoleSelectField";
+import { clientLogger } from "@/lib/logging";
 
 interface InviteMemberFormProps {
   workspaceId: string;
@@ -38,7 +35,9 @@ export function InviteMemberForm({
   workspaceId,
   onSuccess,
 }: InviteMemberFormProps): React.ReactElement {
-  const { form, isLoading, processSubmit, t, tErrors } = useInviteMemberForm({
+  clientLogger.trace("[InviteMemberForm] Renderizando ensamblador de UI puro.");
+
+  const { form, isLoading, processSubmit, t } = useInviteMemberForm({
     workspaceId,
     onSuccess,
   });
@@ -74,19 +73,4 @@ export function InviteMemberForm({
     </form>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Futuras
- * 1. **Abstracción de Botón de Envío**: El `Button` de envío con su lógica de estado `isLoading` es un patrón repetido. Podría ser abstraído a un componente `SubmitButton` genérico para una máxima adhesión al principio DRY.
- * 2. **Componente de Feedback de Error a Nivel de Formulario**: En lugar de mostrar solo toasts, se podría añadir un componente `FormError` en la parte superior del formulario que muestre un resumen de los errores devueltos por la Server Action.
- * 3. **Estado de "Éxito" Visual**: Tras un envío exitoso, se podría mostrar un mensaje de éxito dentro del modal antes de cerrarlo, proporcionando un feedback de UI más integrado que el `toast`.
- * =====================================================================
- */
+// src/components/workspaces/InviteMemberForm.tsx

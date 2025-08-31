@@ -1,19 +1,19 @@
 // src/components/landing/Metrics.tsx
 /**
  * @file src/components/landing/Metrics.tsx
- * @description Componente de presentación de élite para la sección de métricas.
- *              Ha sido refactorizado para incluir contadores animados con
- *              `framer-motion` e iconos contextuales, proporcionando una
+ * @description Componente de presentación para la sección de métricas.
+ *              Implementa contadores animados e iconos contextuales para una
  *              experiencia de usuario dinámica y visualmente atractiva.
- * @author Raz Podestá
- * @version 2.0.0
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.1.0
  */
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { animate, motion, useInView } from "framer-motion";
 
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
@@ -40,7 +40,10 @@ export interface MetricsProps {
 /**
  * @private
  * @component AnimatedCounter
- * @description Componente hijo que se encarga de la lógica de animación del contador.
+ * @description Sub-componente atómico que anima un número desde 0 hasta el valor objetivo
+ *              cuando entra en el viewport.
+ * @param {{ to: number, prefix?: string, suffix: string }} props - El valor final y los afijos.
+ * @returns {React.ReactElement}
  */
 const AnimatedCounter = ({
   to,
@@ -61,7 +64,9 @@ const AnimatedCounter = ({
         duration: 2,
         ease: "easeOut",
         onUpdate(value) {
-          node.textContent = `${prefix || ""}${Math.round(value).toLocaleString()}${suffix}`;
+          node.textContent = `${prefix || ""}${Math.round(
+            value
+          ).toLocaleString()}${suffix}`;
         },
       });
       return () => controls.stop();
@@ -79,6 +84,8 @@ const AnimatedCounter = ({
  * @returns {React.ReactElement}
  */
 export function Metrics({ metrics }: MetricsProps): React.ReactElement {
+  clientLogger.trace("[Metrics] Renderizando componente de presentación puro.");
+
   const FADE_UP_VARIANTS = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -96,7 +103,7 @@ export function Metrics({ metrics }: MetricsProps): React.ReactElement {
         }}
         className="container mx-auto grid grid-cols-1 gap-8 px-4 text-center md:grid-cols-3 md:px-6"
       >
-        {metrics.map((metric) => (
+        {(metrics || []).map((metric) => (
           <motion.div
             key={metric.label}
             variants={FADE_UP_VARIANTS}
@@ -120,21 +127,4 @@ export function Metrics({ metrics }: MetricsProps): React.ReactElement {
     </section>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Contador Animado**: ((Implementada)) Se ha creado el sub-componente `AnimatedCounter` que utiliza el hook `animate` de Framer Motion junto con `useInView`. Esto crea un efecto visual de alto impacto donde los números "cuentan hacia arriba" cuando la sección se hace visible.
- * 2. **Iconos Contextuales**: ((Implementada)) El contrato de datos `MetricItem` ahora incluye `iconName`, y el componente renderiza un `DynamicIcon` para cada métrica, mejorando la comunicación visual.
- * 3. **Contrato de Datos Flexible**: ((Implementada)) La interfaz `MetricItem` ahora soporta `prefix` y `suffix` para manejar métricas que no son solo números (ej. `+`, `%`, `$`).
- * 4. **Atomicidad Mejorada**: ((Implementada)) La lógica de animación se ha aislado en su propio componente, manteniendo el componente principal `Metrics` como un orquestador limpio.
- *
- * @subsection Melhorias Futuras
- * 1. **Formateo de Números Localizado**: ((Vigente)) La función `toLocaleString()` utilizada en `AnimatedCounter` usará por defecto el locale del servidor o del navegador. Para una consistencia total, se podría pasar el `locale` actual desde la `HomePage` y usarlo explícitamente: `value.toLocaleString(locale)`.
- *
- * =====================================================================
- */
 // src/components/landing/Metrics.tsx

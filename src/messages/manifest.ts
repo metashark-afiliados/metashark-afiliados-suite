@@ -1,13 +1,11 @@
 // src/messages/manifest.ts
 /**
  * @file manifest.ts
- * @description Manifiesto de Importación Dinámica y SSoT. Ha sido actualizado
- *              para registrar los nuevos namespaces soberanos del ecosistema de
- *              "Mis Sitios" y "Hub Creativo", resolviendo la desincronización
- *              sistémica de i18n y la cascada de errores TS2345.
- * @author L.I.A. Legacy (Generado por script, verificado manualmente)
- * @version 23.0.0
- * @date 2025-08-27
+ * @description Manifiesto de Importación Dinámica y SSoT. Esta versión ha sido
+ *              corregida para eliminar la referencia a un archivo de mensajes
+ *              inexistente, resolviendo un error de build TS2307.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 27.0.0
  */
 import { type ManifestModule } from "./types";
 
@@ -30,10 +28,7 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "app.[locale].login.page": () => import("./app/[locale]/login/page.json"),
   "app.[locale].signup.page": () => import("./app/[locale]/signup/page.json"),
 
-  // --- Namespaces de Componentes ---
-  "components.auth.LoginForm": () => import("./components/auth/LoginForm.json"),
-  "components.auth.OAuthButton": () =>
-    import("./components/auth/OAuthButton.json"),
+  // --- Namespaces de Componentes (Sincronizado) ---
   "components.auth.SupabaseAuthUI": () =>
     import("./components/auth/SupabaseAuthUI.json"),
   "components.builder.BlocksPalette": () =>
@@ -45,6 +40,12 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./components/builder/SettingsPanel.json"),
   "components.builder.SiteAssignmentControl": () =>
     import("./components/builder/SiteAssignmentControl.json"),
+  "components.dashboard.DashboardTeamMembersCard": () =>
+    import("./components/dashboard/DashboardTeamMembersCard.json"),
+  "components.dashboard.DashboardTutorialCard": () =>
+    import("./components/dashboard/DashboardTutorialCard.json"),
+  "components.dashboard.DashboardUsageCardGroup": () =>
+    import("./components/dashboard/DashboardUsageCardGroup.json"),
   "components.dashboard.InvitationBell": () =>
     import("./components/dashboard/InvitationBell.json"),
   "components.dashboard.RecentActivity": () =>
@@ -53,38 +54,18 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./components/dashboard/WelcomeHero.json"),
   "components.dev-console.DevSidebar": () =>
     import("./components/dev-console/DevSidebar.json"),
+  "components.dev-console.JsonViewerDialog": () =>
+    import("./components/dev-console/JsonViewerDialog.json"),
   "components.feedback.CommandPalette": () =>
     import("./components/feedback/CommandPalette.json"),
   "components.feedback.LiaChatWidget": () =>
     import("./components/feedback/LiaChatWidget.json"),
-  "components.landing.BottomCTA": () =>
-    import("./components/landing/BottomCTA.json"),
-  "components.landing.FAQ": () => import("./components/landing/FAQ.json"),
-  "components.landing.Features": () =>
-    import("./components/landing/Features.json"),
-  "components.landing.Hero": () => import("./components/landing/Hero.json"),
-  "components.landing.Metrics": () =>
-    import("./components/landing/Metrics.json"),
-  "components.landing.Newsletter": () =>
-    import("./components/landing/Newsletter.json"),
-  "components.landing.ProcessSteps": () =>
-    import("./components/landing/ProcessSteps.json"),
-  "components.landing.SocialProof": () =>
-    import("./components/landing/SocialProof.json"),
-  "components.landing.SupportCTA": () =>
-    import("./components/landing/SupportCTA.json"),
-  "components.landing.Testimonials": () =>
-    import("./components/landing/Testimonials.json"),
   "components.layout.AuthLayout": () =>
     import("./components/layout/AuthLayout.json"),
   "components.layout.DashboardHeader": () =>
     import("./components/layout/DashboardHeader.json"),
   "components.layout.DashboardSidebar": () =>
     import("./components/layout/DashboardSidebar.json"),
-  "components.layout.LandingFooter": () =>
-    import("./components/layout/LandingFooter.json"),
-  "components.layout.LandingHeader": () =>
-    import("./components/layout/LandingHeader.json"),
   "components.sites.SitesHeader": () =>
     import("./components/sites/SitesHeader.json"),
   "components.ui.Dialogs": () => import("./components/ui/Dialogs.json"),
@@ -100,7 +81,6 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "pages.AboutPage": () => import("./pages/AboutPage.json"),
   "pages.AuthNoticePage": () => import("./pages/AuthNoticePage.json"),
   "pages.BlogPage": () => import("./pages/BlogPage.json"),
-  "pages.BuilderPage": () => import("./pages/BuilderPage.json"),
   "pages.ContactPage": () => import("./pages/ContactPage.json"),
   "pages.CookiePolicyPage": () => import("./pages/CookiePolicyPage.json"),
   "pages.DisclaimerPage": () => import("./pages/DisclaimerPage.json"),
@@ -112,6 +92,7 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "pages.ResetPasswordPage": () => import("./pages/ResetPasswordPage.json"),
   "pages.TemplateGallery": () => import("./pages/TemplateGallery.json"),
   "pages.TermsOfServicePage": () => import("./pages/TermsOfServicePage.json"),
+  "pages.landing": () => import("./pages/landing.json"),
 
   // --- Namespaces Compartidos ---
   "shared.ActionDock": () => import("./shared/ActionDock.json"),

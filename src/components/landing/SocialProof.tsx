@@ -2,16 +2,17 @@
 /**
  * @file src/components/landing/SocialProof.tsx
  * @description Componente de presentación para la sección de "Prueba Social".
- *              Ha sido nivelado a un estándar de élite, eliminando la dependencia
- *              de activos locales, desacoplando su contenido y añadiendo
- *              microinteracciones y animaciones sutiles para una UX superior.
- * @author Raz Podestá
- * @version 2.0.0
+ *              Ha sido nivelado a un estándar de élite para ser 100% puro,
+ *              desacoplado de activos locales, y enriquecido con microinteracciones
+ *              y animaciones para una UX superior.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.1.0
  */
 "use client";
 
 import React from "react";
 import { motion } from "framer-motion";
+import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
@@ -44,13 +45,17 @@ export function SocialProof({
   title,
   logos,
 }: SocialProofProps): React.ReactElement {
+  clientLogger.trace(
+    "[SocialProof] Renderizando componente de presentación puro."
+  );
+
   const FADE_IN_VARIANTS = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
   return (
-    <section className="py-12 section-delimiter-top">
+    <section className="py-12">
       <motion.div
         initial="hidden"
         whileInView="show"
@@ -62,7 +67,7 @@ export function SocialProof({
           {title}
         </h2>
         <div className="mx-auto mt-10 grid max-w-lg grid-cols-2 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-3 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5">
-          {logos.map((logo) => (
+          {(logos || []).map((logo) => (
             <motion.div
               key={logo.name}
               className="col-span-1"
@@ -75,6 +80,7 @@ export function SocialProof({
                 alt={logo.name}
                 width={158}
                 height={48}
+                loading="lazy"
               />
             </motion.div>
           ))}
@@ -83,22 +89,4 @@ export function SocialProof({
     </section>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Cero Activos Locales**: ((Implementada)) El componente ya no depende de imágenes en `public/`. Ahora recibe un array de `logos` a través de props, haciendo que la `HomePage` sea responsable de proveer las URLs (de placeholders o de un futuro CMS).
- * 2. **Componente Puro y Desacoplado**: ((Implementada)) Al recibir todo su contenido vía props, el componente se convierte en una pieza de "Lego" 100% reutilizable.
- * 3. **Microinteracciones de Élite**: ((Implementada)) Se ha añadido una animación `whileHover` de `framer-motion` y transiciones de CSS para `opacity` y `grayscale`. Esto añade "vida" y feedback visual, alineándose con la nueva directiva de diseño.
- * 4. **Animación de Entrada**: ((Implementada)) La sección completa ahora tiene una animación de `fade-in` al hacer scroll, mejorando el dinamismo de la página.
- * 5. **Delimitación de Sección**: ((Implementada)) Se ha añadido la clase `section-delimiter-top` para crear una separación visual sutil y profesional con la sección `Hero`, como se solicitó.
- *
- * @subsection Melhorias Futuras
- * 1. **Logos desde CMS**: ((Vigente)) La mejora de élite para este componente es que la `HomePage` obtenga el array de `logos` desde un CMS Headless, permitiendo al equipo de marketing actualizar la prueba social sin necesidad de un despliegue.
- *
- * =====================================================================
- */
 // src/components/landing/SocialProof.tsx

@@ -1,52 +1,72 @@
 // src/components/layout/LandingFooter.tsx
 /**
  * @file src/components/layout/LandingFooter.tsx
- * @description Componente de presentación puro para el pie de página público.
- *              Refactorizado para consumir el namespace de i18n canónico,
- *              resolviendo un error crítico de renderizado.
- * @author Raz Podestá
- * @version 6.0.0
+ * @description Componente de presentación 100% puro para el pie de página público.
+ *              Agnóstico al contenido, recibe todas sus traducciones y datos
+ *              estructurados a través de su contrato de props.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 3.0.0
  */
 "use client";
 
 import Image from "next/image";
 import React from "react";
-import { useTranslations } from "next-intl";
 
 import { NewsletterForm } from "@/components/landing/NewsletterForm";
 import { type NavLinkItem, SmartLink } from "@/components/ui/SmartLink";
 import { Link } from "@/lib/navigation";
+import { clientLogger } from "@/lib/logging";
 
-export function LandingFooter(): React.ReactElement {
-  const t = useTranslations("components.layout.LandingFooter");
+/**
+ * @public
+ * @interface LandingFooterProps
+ * @description Define el contrato de props para el componente LandingFooter.
+ *              Esta es la SSoT para el contenido que el pie de página puede renderizar.
+ */
+export interface LandingFooterProps {
+  brandName: string;
+  logoAltText: string;
+  slogan: string;
+  productColumnTitle: string;
+  companyColumnTitle: string;
+  newsletterTitle: string;
+  newsletterPrompt: string;
+  subscribeButtonText: string;
+  placeholderEmail: string;
+  allRightsReservedText: string;
+  productLinks: NavLinkItem[];
+  companyLinks: NavLinkItem[];
+  legalLinks: NavLinkItem[];
+}
 
-  const productLinks: NavLinkItem[] = [
-    { href: "#features", label: t("productLinks.features") },
-    { href: "#process", label: t("productLinks.process") },
-    { href: "/pricing", label: t("productLinks.pricing") },
-  ];
+/**
+ * @public
+ * @component LandingFooter
+ * @description Renderiza el pie de página de las páginas públicas. Es un componente
+ *              de presentación puro que recibe todos sus datos como props.
+ * @param {LandingFooterProps} props - Propiedades para configurar el pie de página.
+ * @returns {React.ReactElement}
+ */
+export function LandingFooter(props: LandingFooterProps): React.ReactElement {
+  clientLogger.trace(
+    "[LandingFooter] Renderizando componente de presentación puro."
+  );
 
-  const companyLinks: NavLinkItem[] = [
-    { href: "/about", label: t("companyLinks.about") },
-    { href: "/blog", label: t("companyLinks.blog") },
-  ];
-
-  const legalLinks: NavLinkItem[] = [
-    { href: "/privacy", label: t("legalLinks.privacy") },
-    { href: "/terms", label: t("legalLinks.terms") },
-  ];
-
-  const footerProps = {
-    slogan: t("slogan"),
-    productColumnTitle: t("product"),
-    companyColumnTitle: t("company"),
-    newsletterTitle: t("stayUpdated"),
-    newsletterPrompt: t("newsletterPrompt"),
-    subscribeButtonText: t("subscribe"),
-    allRightsReservedText: t("allRightsReserved", {
-      year: new Date().getFullYear(),
-    }),
-  };
+  const {
+    brandName,
+    logoAltText,
+    slogan,
+    productColumnTitle,
+    companyColumnTitle,
+    newsletterTitle,
+    newsletterPrompt,
+    subscribeButtonText,
+    placeholderEmail,
+    allRightsReservedText,
+    productLinks,
+    companyLinks,
+    legalLinks,
+  } = props;
 
   return (
     <footer className="border-t border-border/40 bg-background">
@@ -56,23 +76,21 @@ export function LandingFooter(): React.ReactElement {
             <Link href="/" className="flex items-center gap-3">
               <Image
                 src="/images/logo.png"
-                alt={t("logo_alt_text")}
+                alt={logoAltText}
                 width={32}
                 height={32}
                 className="h-8 w-auto"
               />
               <span className="text-lg font-bold text-foreground">
-                {t("brand_name")}
+                {brandName}
               </span>
             </Link>
-            <p className="text-sm text-muted-foreground">
-              {footerProps.slogan}
-            </p>
+            <p className="text-sm text-muted-foreground">{slogan}</p>
           </div>
           <div>
-            <h3 className="font-semibold">{footerProps.productColumnTitle}</h3>
+            <h3 className="font-semibold">{productColumnTitle}</h3>
             <ul className="mt-4 space-y-2 text-sm">
-              {productLinks.map((link) => (
+              {(productLinks || []).map((link) => (
                 <li
                   key={
                     typeof link.href === "string"
@@ -80,15 +98,19 @@ export function LandingFooter(): React.ReactElement {
                       : link.href.pathname
                   }
                 >
-                  <SmartLink href={link.href} label={link.label} />
+                  <SmartLink
+                    href={link.href}
+                    label={link.label}
+                    className="text-muted-foreground transition-colors hover:text-primary"
+                  />
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold">{footerProps.companyColumnTitle}</h3>
+            <h3 className="font-semibold">{companyColumnTitle}</h3>
             <ul className="mt-4 space-y-2 text-sm">
-              {companyLinks.map((link) => (
+              {(companyLinks || []).map((link) => (
                 <li
                   key={
                     typeof link.href === "string"
@@ -96,36 +118,41 @@ export function LandingFooter(): React.ReactElement {
                       : link.href.pathname
                   }
                 >
-                  <SmartLink href={link.href} label={link.label} />
+                  <SmartLink
+                    href={link.href}
+                    label={link.label}
+                    className="text-muted-foreground transition-colors hover:text-primary"
+                  />
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold">{footerProps.newsletterTitle}</h3>
+            <h3 className="font-semibold">{newsletterTitle}</h3>
             <p className="mt-4 text-sm text-muted-foreground">
-              {footerProps.newsletterPrompt}
+              {newsletterPrompt}
             </p>
             <div className="mt-4">
               <NewsletterForm
-                ctaText={footerProps.subscribeButtonText}
-                placeholderText={t("placeholder_email")}
+                ctaText={subscribeButtonText}
+                placeholderText={placeholderEmail}
               />
             </div>
           </div>
         </div>
         <div className="mt-12 border-t border-border/40 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            {footerProps.allRightsReservedText}
+            {allRightsReservedText}
           </p>
           <div className="flex flex-wrap gap-4 text-sm">
-            {legalLinks.map((link) => (
+            {(legalLinks || []).map((link) => (
               <SmartLink
                 key={
                   typeof link.href === "string" ? link.href : link.href.pathname
                 }
                 href={link.href}
                 label={link.label}
+                className="text-muted-foreground transition-colors hover:text-primary"
               />
             ))}
           </div>

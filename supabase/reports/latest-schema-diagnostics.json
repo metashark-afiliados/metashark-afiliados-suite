@@ -1,0 +1,2378 @@
+{
+  "views": [
+    {
+      "view_name": "pg_stat_statements_info",
+      "view_schema": "extensions",
+      "view_definition": null
+    },
+    {
+      "view_name": "pg_stat_statements",
+      "view_schema": "extensions",
+      "view_definition": null
+    },
+    {
+      "view_name": "decrypted_secrets",
+      "view_schema": "vault",
+      "view_definition": null
+    }
+  ],
+  "grants": [
+    {
+      "grantee": "service_role",
+      "table_name": "buckets",
+      "table_schema": "storage",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "buckets",
+      "table_schema": "storage",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "buckets",
+      "table_schema": "storage",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "buckets",
+      "table_schema": "storage",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "buckets",
+      "table_schema": "storage",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "buckets",
+      "table_schema": "storage",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "buckets",
+      "table_schema": "storage",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "objects",
+      "table_schema": "storage",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "objects",
+      "table_schema": "storage",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "objects",
+      "table_schema": "storage",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "objects",
+      "table_schema": "storage",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "objects",
+      "table_schema": "storage",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "objects",
+      "table_schema": "storage",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "objects",
+      "table_schema": "storage",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "secrets",
+      "table_schema": "vault",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "secrets",
+      "table_schema": "vault",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "decrypted_secrets",
+      "table_schema": "vault",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "decrypted_secrets",
+      "table_schema": "vault",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads",
+      "table_schema": "storage",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads",
+      "table_schema": "storage",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads",
+      "table_schema": "storage",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads",
+      "table_schema": "storage",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads",
+      "table_schema": "storage",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads",
+      "table_schema": "storage",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads",
+      "table_schema": "storage",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "schema_migrations",
+      "table_schema": "realtime",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "subscription",
+      "table_schema": "realtime",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads_parts",
+      "table_schema": "storage",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads_parts",
+      "table_schema": "storage",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads_parts",
+      "table_schema": "storage",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads_parts",
+      "table_schema": "storage",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads_parts",
+      "table_schema": "storage",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads_parts",
+      "table_schema": "storage",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "s3_multipart_uploads_parts",
+      "table_schema": "storage",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_members",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_members",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_members",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_members",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_members",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_members",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_members",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_roles",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_roles",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_roles",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_roles",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_roles",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_roles",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspace_roles",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "messages",
+      "table_schema": "realtime",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "messages",
+      "table_schema": "realtime",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "messages",
+      "table_schema": "realtime",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "sites",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "sites",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "sites",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "sites",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "sites",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "sites",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "sites",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "site_statuses",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "site_statuses",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "site_statuses",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "site_statuses",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "site_statuses",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "site_statuses",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "site_statuses",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "creations",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "creations",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "creations",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "creations",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "creations",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "creations",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "creations",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaigns",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaigns",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaigns",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaigns",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaigns",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaigns",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaigns",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaign_statuses",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaign_statuses",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaign_statuses",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaign_statuses",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaign_statuses",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaign_statuses",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "campaign_statuses",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "invitations",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "invitations",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "invitations",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "invitations",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "invitations",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "invitations",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "invitations",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "visitor_logs",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "visitor_logs",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "visitor_logs",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "visitor_logs",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "visitor_logs",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "visitor_logs",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "visitor_logs",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "audit_logs",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "audit_logs",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "audit_logs",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "audit_logs",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "audit_logs",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "audit_logs",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "audit_logs",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "system_errors",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "system_errors",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "system_errors",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "system_errors",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "system_errors",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "system_errors",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "system_errors",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "profiles",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "profiles",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "profiles",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "profiles",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "profiles",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "profiles",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "profiles",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspaces",
+      "table_schema": "public",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspaces",
+      "table_schema": "public",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspaces",
+      "table_schema": "public",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspaces",
+      "table_schema": "public",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspaces",
+      "table_schema": "public",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspaces",
+      "table_schema": "public",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "service_role",
+      "table_name": "workspaces",
+      "table_schema": "public",
+      "privilege_type": "TRIGGER"
+    }
+  ],
+  "indexes": [
+    {
+      "index_name": "sso_domains_pkey",
+      "table_name": "sso_domains",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX sso_domains_pkey ON auth.sso_domains USING btree (id)"
+    },
+    {
+      "index_name": "sso_domains_sso_provider_id_idx",
+      "table_name": "sso_domains",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX sso_domains_sso_provider_id_idx ON auth.sso_domains USING btree (sso_provider_id)"
+    },
+    {
+      "index_name": "sso_domains_domain_idx",
+      "table_name": "sso_domains",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX sso_domains_domain_idx ON auth.sso_domains USING btree (lower(domain))"
+    },
+    {
+      "index_name": "saml_providers_pkey",
+      "table_name": "saml_providers",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX saml_providers_pkey ON auth.saml_providers USING btree (id)"
+    },
+    {
+      "index_name": "saml_providers_entity_id_key",
+      "table_name": "saml_providers",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX saml_providers_entity_id_key ON auth.saml_providers USING btree (entity_id)"
+    },
+    {
+      "index_name": "saml_providers_sso_provider_id_idx",
+      "table_name": "saml_providers",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX saml_providers_sso_provider_id_idx ON auth.saml_providers USING btree (sso_provider_id)"
+    },
+    {
+      "index_name": "sso_providers_pkey",
+      "table_name": "sso_providers",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX sso_providers_pkey ON auth.sso_providers USING btree (id)"
+    },
+    {
+      "index_name": "sso_providers_resource_id_idx",
+      "table_name": "sso_providers",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX sso_providers_resource_id_idx ON auth.sso_providers USING btree (lower(resource_id))"
+    },
+    {
+      "index_name": "sso_providers_resource_id_pattern_idx",
+      "table_name": "sso_providers",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX sso_providers_resource_id_pattern_idx ON auth.sso_providers USING btree (resource_id text_pattern_ops)"
+    },
+    {
+      "index_name": "instances_pkey",
+      "table_name": "instances",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX instances_pkey ON auth.instances USING btree (id)"
+    },
+    {
+      "index_name": "schema_migrations_pkey",
+      "table_name": "schema_migrations",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX schema_migrations_pkey ON auth.schema_migrations USING btree (version)"
+    },
+    {
+      "index_name": "mfa_factors_pkey",
+      "table_name": "mfa_factors",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX mfa_factors_pkey ON auth.mfa_factors USING btree (id)"
+    },
+    {
+      "index_name": "mfa_factors_user_friendly_name_unique",
+      "table_name": "mfa_factors",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX mfa_factors_user_friendly_name_unique ON auth.mfa_factors USING btree (friendly_name, user_id) WHERE (TRIM(BOTH FROM friendly_name) <> ''::text)"
+    },
+    {
+      "index_name": "factor_id_created_at_idx",
+      "table_name": "mfa_factors",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX factor_id_created_at_idx ON auth.mfa_factors USING btree (user_id, created_at)"
+    },
+    {
+      "index_name": "mfa_factors_user_id_idx",
+      "table_name": "mfa_factors",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX mfa_factors_user_id_idx ON auth.mfa_factors USING btree (user_id)"
+    },
+    {
+      "index_name": "unique_phone_factor_per_user",
+      "table_name": "mfa_factors",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX unique_phone_factor_per_user ON auth.mfa_factors USING btree (user_id, phone)"
+    },
+    {
+      "index_name": "mfa_factors_last_challenged_at_key",
+      "table_name": "mfa_factors",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX mfa_factors_last_challenged_at_key ON auth.mfa_factors USING btree (last_challenged_at)"
+    },
+    {
+      "index_name": "buckets_pkey",
+      "table_name": "buckets",
+      "schema_name": "storage",
+      "index_definition": "CREATE UNIQUE INDEX buckets_pkey ON storage.buckets USING btree (id)"
+    },
+    {
+      "index_name": "bname",
+      "table_name": "buckets",
+      "schema_name": "storage",
+      "index_definition": "CREATE UNIQUE INDEX bname ON storage.buckets USING btree (name)"
+    },
+    {
+      "index_name": "objects_pkey",
+      "table_name": "objects",
+      "schema_name": "storage",
+      "index_definition": "CREATE UNIQUE INDEX objects_pkey ON storage.objects USING btree (id)"
+    },
+    {
+      "index_name": "bucketid_objname",
+      "table_name": "objects",
+      "schema_name": "storage",
+      "index_definition": "CREATE UNIQUE INDEX bucketid_objname ON storage.objects USING btree (bucket_id, name)"
+    },
+    {
+      "index_name": "name_prefix_search",
+      "table_name": "objects",
+      "schema_name": "storage",
+      "index_definition": "CREATE INDEX name_prefix_search ON storage.objects USING btree (name text_pattern_ops)"
+    },
+    {
+      "index_name": "idx_objects_bucket_id_name",
+      "table_name": "objects",
+      "schema_name": "storage",
+      "index_definition": "CREATE INDEX idx_objects_bucket_id_name ON storage.objects USING btree (bucket_id, name COLLATE \"C\")"
+    },
+    {
+      "index_name": "refresh_tokens_pkey",
+      "table_name": "refresh_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX refresh_tokens_pkey ON auth.refresh_tokens USING btree (id)"
+    },
+    {
+      "index_name": "refresh_tokens_instance_id_idx",
+      "table_name": "refresh_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX refresh_tokens_instance_id_idx ON auth.refresh_tokens USING btree (instance_id)"
+    },
+    {
+      "index_name": "refresh_tokens_instance_id_user_id_idx",
+      "table_name": "refresh_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX refresh_tokens_instance_id_user_id_idx ON auth.refresh_tokens USING btree (instance_id, user_id)"
+    },
+    {
+      "index_name": "refresh_tokens_token_unique",
+      "table_name": "refresh_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX refresh_tokens_token_unique ON auth.refresh_tokens USING btree (token)"
+    },
+    {
+      "index_name": "refresh_tokens_parent_idx",
+      "table_name": "refresh_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX refresh_tokens_parent_idx ON auth.refresh_tokens USING btree (parent)"
+    },
+    {
+      "index_name": "refresh_tokens_session_id_revoked_idx",
+      "table_name": "refresh_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX refresh_tokens_session_id_revoked_idx ON auth.refresh_tokens USING btree (session_id, revoked)"
+    },
+    {
+      "index_name": "refresh_tokens_updated_at_idx",
+      "table_name": "refresh_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX refresh_tokens_updated_at_idx ON auth.refresh_tokens USING btree (updated_at DESC)"
+    },
+    {
+      "index_name": "secrets_pkey",
+      "table_name": "secrets",
+      "schema_name": "vault",
+      "index_definition": "CREATE UNIQUE INDEX secrets_pkey ON vault.secrets USING btree (id)"
+    },
+    {
+      "index_name": "secrets_name_idx",
+      "table_name": "secrets",
+      "schema_name": "vault",
+      "index_definition": "CREATE UNIQUE INDEX secrets_name_idx ON vault.secrets USING btree (name) WHERE (name IS NOT NULL)"
+    },
+    {
+      "index_name": "users_pkey",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX users_pkey ON auth.users USING btree (id)"
+    },
+    {
+      "index_name": "users_instance_id_idx",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX users_instance_id_idx ON auth.users USING btree (instance_id)"
+    },
+    {
+      "index_name": "users_instance_id_email_idx",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX users_instance_id_email_idx ON auth.users USING btree (instance_id, lower((email)::text))"
+    },
+    {
+      "index_name": "confirmation_token_idx",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX confirmation_token_idx ON auth.users USING btree (confirmation_token) WHERE ((confirmation_token)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "index_name": "recovery_token_idx",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX recovery_token_idx ON auth.users USING btree (recovery_token) WHERE ((recovery_token)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "index_name": "email_change_token_current_idx",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX email_change_token_current_idx ON auth.users USING btree (email_change_token_current) WHERE ((email_change_token_current)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "index_name": "email_change_token_new_idx",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX email_change_token_new_idx ON auth.users USING btree (email_change_token_new) WHERE ((email_change_token_new)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "index_name": "reauthentication_token_idx",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX reauthentication_token_idx ON auth.users USING btree (reauthentication_token) WHERE ((reauthentication_token)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "index_name": "users_email_partial_key",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX users_email_partial_key ON auth.users USING btree (email) WHERE (is_sso_user = false)"
+    },
+    {
+      "index_name": "users_phone_key",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX users_phone_key ON auth.users USING btree (phone)"
+    },
+    {
+      "index_name": "users_is_anonymous_idx",
+      "table_name": "users",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX users_is_anonymous_idx ON auth.users USING btree (is_anonymous)"
+    },
+    {
+      "index_name": "audit_log_entries_pkey",
+      "table_name": "audit_log_entries",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX audit_log_entries_pkey ON auth.audit_log_entries USING btree (id)"
+    },
+    {
+      "index_name": "audit_logs_instance_id_idx",
+      "table_name": "audit_log_entries",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX audit_logs_instance_id_idx ON auth.audit_log_entries USING btree (instance_id)"
+    },
+    {
+      "index_name": "saml_relay_states_pkey",
+      "table_name": "saml_relay_states",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX saml_relay_states_pkey ON auth.saml_relay_states USING btree (id)"
+    },
+    {
+      "index_name": "saml_relay_states_sso_provider_id_idx",
+      "table_name": "saml_relay_states",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX saml_relay_states_sso_provider_id_idx ON auth.saml_relay_states USING btree (sso_provider_id)"
+    },
+    {
+      "index_name": "saml_relay_states_for_email_idx",
+      "table_name": "saml_relay_states",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX saml_relay_states_for_email_idx ON auth.saml_relay_states USING btree (for_email)"
+    },
+    {
+      "index_name": "saml_relay_states_created_at_idx",
+      "table_name": "saml_relay_states",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX saml_relay_states_created_at_idx ON auth.saml_relay_states USING btree (created_at DESC)"
+    },
+    {
+      "index_name": "sessions_pkey",
+      "table_name": "sessions",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX sessions_pkey ON auth.sessions USING btree (id)"
+    },
+    {
+      "index_name": "user_id_created_at_idx",
+      "table_name": "sessions",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX user_id_created_at_idx ON auth.sessions USING btree (user_id, created_at)"
+    },
+    {
+      "index_name": "sessions_user_id_idx",
+      "table_name": "sessions",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX sessions_user_id_idx ON auth.sessions USING btree (user_id)"
+    },
+    {
+      "index_name": "sessions_not_after_idx",
+      "table_name": "sessions",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX sessions_not_after_idx ON auth.sessions USING btree (not_after DESC)"
+    },
+    {
+      "index_name": "mfa_amr_claims_session_id_authentication_method_pkey",
+      "table_name": "mfa_amr_claims",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX mfa_amr_claims_session_id_authentication_method_pkey ON auth.mfa_amr_claims USING btree (session_id, authentication_method)"
+    },
+    {
+      "index_name": "amr_id_pk",
+      "table_name": "mfa_amr_claims",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX amr_id_pk ON auth.mfa_amr_claims USING btree (id)"
+    },
+    {
+      "index_name": "flow_state_pkey",
+      "table_name": "flow_state",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX flow_state_pkey ON auth.flow_state USING btree (id)"
+    },
+    {
+      "index_name": "idx_auth_code",
+      "table_name": "flow_state",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX idx_auth_code ON auth.flow_state USING btree (auth_code)"
+    },
+    {
+      "index_name": "idx_user_id_auth_method",
+      "table_name": "flow_state",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX idx_user_id_auth_method ON auth.flow_state USING btree (user_id, authentication_method)"
+    },
+    {
+      "index_name": "flow_state_created_at_idx",
+      "table_name": "flow_state",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX flow_state_created_at_idx ON auth.flow_state USING btree (created_at DESC)"
+    },
+    {
+      "index_name": "identities_user_id_idx",
+      "table_name": "identities",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX identities_user_id_idx ON auth.identities USING btree (user_id)"
+    },
+    {
+      "index_name": "identities_email_idx",
+      "table_name": "identities",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX identities_email_idx ON auth.identities USING btree (email text_pattern_ops)"
+    },
+    {
+      "index_name": "identities_pkey",
+      "table_name": "identities",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX identities_pkey ON auth.identities USING btree (id)"
+    },
+    {
+      "index_name": "identities_provider_id_provider_unique",
+      "table_name": "identities",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX identities_provider_id_provider_unique ON auth.identities USING btree (provider_id, provider)"
+    },
+    {
+      "index_name": "one_time_tokens_pkey",
+      "table_name": "one_time_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX one_time_tokens_pkey ON auth.one_time_tokens USING btree (id)"
+    },
+    {
+      "index_name": "one_time_tokens_token_hash_hash_idx",
+      "table_name": "one_time_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX one_time_tokens_token_hash_hash_idx ON auth.one_time_tokens USING hash (token_hash)"
+    },
+    {
+      "index_name": "one_time_tokens_relates_to_hash_idx",
+      "table_name": "one_time_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX one_time_tokens_relates_to_hash_idx ON auth.one_time_tokens USING hash (relates_to)"
+    },
+    {
+      "index_name": "one_time_tokens_user_id_token_type_key",
+      "table_name": "one_time_tokens",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX one_time_tokens_user_id_token_type_key ON auth.one_time_tokens USING btree (user_id, token_type)"
+    },
+    {
+      "index_name": "mfa_challenges_pkey",
+      "table_name": "mfa_challenges",
+      "schema_name": "auth",
+      "index_definition": "CREATE UNIQUE INDEX mfa_challenges_pkey ON auth.mfa_challenges USING btree (id)"
+    },
+    {
+      "index_name": "mfa_challenge_created_at_idx",
+      "table_name": "mfa_challenges",
+      "schema_name": "auth",
+      "index_definition": "CREATE INDEX mfa_challenge_created_at_idx ON auth.mfa_challenges USING btree (created_at DESC)"
+    },
+    {
+      "index_name": "migrations_pkey",
+      "table_name": "migrations",
+      "schema_name": "storage",
+      "index_definition": "CREATE UNIQUE INDEX migrations_pkey ON storage.migrations USING btree (id)"
+    },
+    {
+      "index_name": "migrations_name_key",
+      "table_name": "migrations",
+      "schema_name": "storage",
+      "index_definition": "CREATE UNIQUE INDEX migrations_name_key ON storage.migrations USING btree (name)"
+    },
+    {
+      "index_name": "s3_multipart_uploads_pkey",
+      "table_name": "s3_multipart_uploads",
+      "schema_name": "storage",
+      "index_definition": "CREATE UNIQUE INDEX s3_multipart_uploads_pkey ON storage.s3_multipart_uploads USING btree (id)"
+    },
+    {
+      "index_name": "idx_multipart_uploads_list",
+      "table_name": "s3_multipart_uploads",
+      "schema_name": "storage",
+      "index_definition": "CREATE INDEX idx_multipart_uploads_list ON storage.s3_multipart_uploads USING btree (bucket_id, key, created_at)"
+    },
+    {
+      "index_name": "schema_migrations_pkey",
+      "table_name": "schema_migrations",
+      "schema_name": "realtime",
+      "index_definition": "CREATE UNIQUE INDEX schema_migrations_pkey ON realtime.schema_migrations USING btree (version)"
+    },
+    {
+      "index_name": "pk_subscription",
+      "table_name": "subscription",
+      "schema_name": "realtime",
+      "index_definition": "CREATE UNIQUE INDEX pk_subscription ON realtime.subscription USING btree (id)"
+    },
+    {
+      "index_name": "subscription_subscription_id_entity_filters_key",
+      "table_name": "subscription",
+      "schema_name": "realtime",
+      "index_definition": "CREATE UNIQUE INDEX subscription_subscription_id_entity_filters_key ON realtime.subscription USING btree (subscription_id, entity, filters)"
+    },
+    {
+      "index_name": "ix_realtime_subscription_entity",
+      "table_name": "subscription",
+      "schema_name": "realtime",
+      "index_definition": "CREATE INDEX ix_realtime_subscription_entity ON realtime.subscription USING btree (entity)"
+    },
+    {
+      "index_name": "s3_multipart_uploads_parts_pkey",
+      "table_name": "s3_multipart_uploads_parts",
+      "schema_name": "storage",
+      "index_definition": "CREATE UNIQUE INDEX s3_multipart_uploads_parts_pkey ON storage.s3_multipart_uploads_parts USING btree (id)"
+    },
+    {
+      "index_name": "workspace_members_pkey",
+      "table_name": "workspace_members",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX workspace_members_pkey ON public.workspace_members USING btree (id)"
+    },
+    {
+      "index_name": "workspace_members_workspace_id_user_id_key",
+      "table_name": "workspace_members",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX workspace_members_workspace_id_user_id_key ON public.workspace_members USING btree (workspace_id, user_id)"
+    },
+    {
+      "index_name": "workspace_roles_pkey",
+      "table_name": "workspace_roles",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX workspace_roles_pkey ON public.workspace_roles USING btree (id)"
+    },
+    {
+      "index_name": "workspace_roles_name_key",
+      "table_name": "workspace_roles",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX workspace_roles_name_key ON public.workspace_roles USING btree (name)"
+    },
+    {
+      "index_name": "messages_pkey",
+      "table_name": "messages",
+      "schema_name": "realtime",
+      "index_definition": "CREATE UNIQUE INDEX messages_pkey ON ONLY realtime.messages USING btree (id, inserted_at)"
+    },
+    {
+      "index_name": "sites_pkey",
+      "table_name": "sites",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX sites_pkey ON public.sites USING btree (id)"
+    },
+    {
+      "index_name": "sites_subdomain_key",
+      "table_name": "sites",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX sites_subdomain_key ON public.sites USING btree (subdomain)"
+    },
+    {
+      "index_name": "sites_custom_domain_key",
+      "table_name": "sites",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX sites_custom_domain_key ON public.sites USING btree (custom_domain)"
+    },
+    {
+      "index_name": "site_statuses_pkey",
+      "table_name": "site_statuses",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX site_statuses_pkey ON public.site_statuses USING btree (id)"
+    },
+    {
+      "index_name": "site_statuses_name_key",
+      "table_name": "site_statuses",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX site_statuses_name_key ON public.site_statuses USING btree (name)"
+    },
+    {
+      "index_name": "creations_pkey",
+      "table_name": "creations",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX creations_pkey ON public.creations USING btree (id)"
+    },
+    {
+      "index_name": "campaigns_pkey",
+      "table_name": "campaigns",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX campaigns_pkey ON public.campaigns USING btree (id)"
+    },
+    {
+      "index_name": "campaigns_site_id_slug_key",
+      "table_name": "campaigns",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX campaigns_site_id_slug_key ON public.campaigns USING btree (site_id, slug)"
+    },
+    {
+      "index_name": "campaign_statuses_pkey",
+      "table_name": "campaign_statuses",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX campaign_statuses_pkey ON public.campaign_statuses USING btree (id)"
+    },
+    {
+      "index_name": "campaign_statuses_name_key",
+      "table_name": "campaign_statuses",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX campaign_statuses_name_key ON public.campaign_statuses USING btree (name)"
+    },
+    {
+      "index_name": "invitations_pkey",
+      "table_name": "invitations",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX invitations_pkey ON public.invitations USING btree (id)"
+    },
+    {
+      "index_name": "invitations_workspace_id_invitee_email_key",
+      "table_name": "invitations",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX invitations_workspace_id_invitee_email_key ON public.invitations USING btree (workspace_id, invitee_email)"
+    },
+    {
+      "index_name": "visitor_logs_pkey",
+      "table_name": "visitor_logs",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX visitor_logs_pkey ON public.visitor_logs USING btree (id)"
+    },
+    {
+      "index_name": "visitor_logs_session_id_key",
+      "table_name": "visitor_logs",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX visitor_logs_session_id_key ON public.visitor_logs USING btree (session_id)"
+    },
+    {
+      "index_name": "audit_logs_pkey",
+      "table_name": "audit_logs",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX audit_logs_pkey ON public.audit_logs USING btree (id)"
+    },
+    {
+      "index_name": "system_errors_pkey",
+      "table_name": "system_errors",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX system_errors_pkey ON public.system_errors USING btree (id)"
+    },
+    {
+      "index_name": "profiles_pkey",
+      "table_name": "profiles",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)"
+    },
+    {
+      "index_name": "profiles_email_key",
+      "table_name": "profiles",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX profiles_email_key ON public.profiles USING btree (email)"
+    },
+    {
+      "index_name": "workspaces_pkey",
+      "table_name": "workspaces",
+      "schema_name": "public",
+      "index_definition": "CREATE UNIQUE INDEX workspaces_pkey ON public.workspaces USING btree (id)"
+    }
+  ],
+  "triggers": [
+    {
+      "trigger_name": "handle_updated_at",
+      "trigger_schema": "public",
+      "event_manipulation": "UPDATE",
+      "event_object_table": "profiles"
+    },
+    {
+      "trigger_name": "handle_updated_at",
+      "trigger_schema": "public",
+      "event_manipulation": "UPDATE",
+      "event_object_table": "workspaces"
+    },
+    {
+      "trigger_name": "handle_updated_at",
+      "trigger_schema": "public",
+      "event_manipulation": "UPDATE",
+      "event_object_table": "sites"
+    },
+    {
+      "trigger_name": "handle_updated_at",
+      "trigger_schema": "public",
+      "event_manipulation": "UPDATE",
+      "event_object_table": "creations"
+    },
+    {
+      "trigger_name": "handle_updated_at",
+      "trigger_schema": "public",
+      "event_manipulation": "UPDATE",
+      "event_object_table": "campaigns"
+    },
+    {
+      "trigger_name": "handle_updated_at",
+      "trigger_schema": "public",
+      "event_manipulation": "UPDATE",
+      "event_object_table": "invitations"
+    }
+  ],
+  "relations": [],
+  "extensions": [
+    {
+      "extension_name": "plpgsql",
+      "extension_version": "1.0"
+    },
+    {
+      "extension_name": "pg_stat_statements",
+      "extension_version": "1.11"
+    },
+    {
+      "extension_name": "uuid-ossp",
+      "extension_version": "1.1"
+    },
+    {
+      "extension_name": "pgcrypto",
+      "extension_version": "1.3"
+    },
+    {
+      "extension_name": "supabase_vault",
+      "extension_version": "0.3.1"
+    },
+    {
+      "extension_name": "pg_graphql",
+      "extension_version": "1.5.11"
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "messages",
+      "check_clause": null,
+      "table_schema": "realtime",
+      "constraint_name": "messages_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "secrets",
+      "check_clause": null,
+      "table_schema": "vault",
+      "constraint_name": "secrets_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "buckets",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "buckets_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "objects",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "objects_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "s3_multipart_uploads",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "s3_multipart_uploads_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "s3_multipart_uploads_parts_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "workspace_roles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "workspace_roles_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "workspace_roles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "workspace_roles_name_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "site_statuses",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "site_statuses_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "site_statuses",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "site_statuses_name_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "campaign_statuses",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "campaign_statuses_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "campaign_statuses",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "campaign_statuses_name_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "profiles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "profiles_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "profiles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "profiles_email_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "workspaces",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "workspaces_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "workspace_members",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "workspace_members_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "workspace_members",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "workspace_members_workspace_id_user_id_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "sites",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "sites_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "sites",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "sites_subdomain_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "sites",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "sites_custom_domain_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "creations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "creations_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "campaigns",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "campaigns_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "campaigns",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "campaigns_site_id_slug_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "invitations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "invitations_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "invitations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "invitations_workspace_id_invitee_email_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "visitor_logs",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "visitor_logs_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "visitor_logs",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "visitor_logs_session_id_key",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "table_name": "audit_logs",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "audit_logs_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "system_errors",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "system_errors_pkey",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "table_name": "messages",
+      "check_clause": null,
+      "table_schema": "realtime",
+      "constraint_name": "16605_17255_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "messages",
+      "check_clause": null,
+      "table_schema": "realtime",
+      "constraint_name": "16605_17255_4_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "messages",
+      "check_clause": null,
+      "table_schema": "realtime",
+      "constraint_name": "16605_17255_8_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "messages",
+      "check_clause": null,
+      "table_schema": "realtime",
+      "constraint_name": "16605_17255_9_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "messages",
+      "check_clause": null,
+      "table_schema": "realtime",
+      "constraint_name": "16605_17255_10_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "secrets",
+      "check_clause": null,
+      "table_schema": "vault",
+      "constraint_name": "16653_16658_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "secrets",
+      "check_clause": null,
+      "table_schema": "vault",
+      "constraint_name": "16653_16658_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "secrets",
+      "check_clause": null,
+      "table_schema": "vault",
+      "constraint_name": "16653_16658_4_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "secrets",
+      "check_clause": null,
+      "table_schema": "vault",
+      "constraint_name": "16653_16658_7_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "secrets",
+      "check_clause": null,
+      "table_schema": "vault",
+      "constraint_name": "16653_16658_8_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "buckets",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_16546_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "buckets",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_16546_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "objects",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_16561_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17040_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17040_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17040_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17040_4_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17040_5_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17040_6_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17040_8_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17054_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17054_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17054_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17054_4_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17054_5_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17054_6_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17054_7_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17054_9_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "s3_multipart_uploads_parts",
+      "check_clause": null,
+      "table_schema": "storage",
+      "constraint_name": "16542_17054_10_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "system_errors",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21515_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "system_errors",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21515_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "system_errors",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21515_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "system_errors",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21515_6_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "system_errors",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21515_7_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "profiles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21323_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "profiles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21323_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "profiles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21323_5_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "profiles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21323_6_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "profiles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21323_8_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "profiles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21323_9_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspace_members",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21355_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspace_members",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21355_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspace_members",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21355_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspace_members",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21355_4_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspace_members",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21355_5_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspace_roles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21290_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspace_roles",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21290_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "sites",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21379_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "sites",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21379_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "sites",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21379_4_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "sites",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21379_9_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "sites",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21379_10_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "site_statuses",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21301_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "site_statuses",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21301_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "creations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21408_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "creations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21408_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "creations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21408_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "creations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21408_4_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "creations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21408_6_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "campaigns",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21427_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "campaigns",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21427_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "campaigns",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21427_4_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "campaigns",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21427_5_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "campaigns",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21427_6_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "campaigns",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21427_8_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "campaign_statuses",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21312_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "campaign_statuses",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21312_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "invitations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21454_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "invitations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21454_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "invitations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21454_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "invitations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21454_4_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "invitations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21454_5_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "invitations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21454_6_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "invitations",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21454_7_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "visitor_logs",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21481_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "visitor_logs",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21481_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "visitor_logs",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21481_14_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "audit_logs",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21500_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "audit_logs",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21500_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "audit_logs",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21500_8_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspaces",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21341_1_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspaces",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21341_2_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspaces",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21341_3_not_null",
+      "constraint_type": "CHECK"
+    },
+    {
+      "table_name": "workspaces",
+      "check_clause": null,
+      "table_schema": "public",
+      "constraint_name": "2200_21341_5_not_null",
+      "constraint_type": "CHECK"
+    }
+  ],
+  "custom_types": [
+    {
+      "type_name": "aal_level",
+      "enum_values": [
+        "aal1",
+        "aal2",
+        "aal3"
+      ],
+      "schema_name": "auth"
+    },
+    {
+      "type_name": "code_challenge_method",
+      "enum_values": [
+        "s256",
+        "plain"
+      ],
+      "schema_name": "auth"
+    },
+    {
+      "type_name": "factor_status",
+      "enum_values": [
+        "unverified",
+        "verified"
+      ],
+      "schema_name": "auth"
+    },
+    {
+      "type_name": "factor_type",
+      "enum_values": [
+        "totp",
+        "webauthn",
+        "phone"
+      ],
+      "schema_name": "auth"
+    },
+    {
+      "type_name": "one_time_token_type",
+      "enum_values": [
+        "confirmation_token",
+        "reauthentication_token",
+        "recovery_token",
+        "email_change_token_new",
+        "email_change_token_current",
+        "phone_change_token"
+      ],
+      "schema_name": "auth"
+    },
+    {
+      "type_name": "app_role",
+      "enum_values": [
+        "user",
+        "admin",
+        "developer"
+      ],
+      "schema_name": "public"
+    },
+    {
+      "type_name": "plan_type",
+      "enum_values": [
+        "free",
+        "basic",
+        "pro",
+        "enterprise"
+      ],
+      "schema_name": "public"
+    },
+    {
+      "type_name": "action",
+      "enum_values": [
+        "INSERT",
+        "UPDATE",
+        "DELETE",
+        "TRUNCATE",
+        "ERROR"
+      ],
+      "schema_name": "realtime"
+    },
+    {
+      "type_name": "equality_op",
+      "enum_values": [
+        "eq",
+        "neq",
+        "lt",
+        "lte",
+        "gt",
+        "gte",
+        "in"
+      ],
+      "schema_name": "realtime"
+    }
+  ],
+  "rls_policies": [
+    {
+      "event": "ALL",
+      "tablename": "profiles",
+      "policyname": "Users can manage their own profile.",
+      "schemaname": "public",
+      "check_expression": "(auth.uid() = id)",
+      "using_expression": "(auth.uid() = id)"
+    },
+    {
+      "event": "SELECT",
+      "tablename": "workspaces",
+      "policyname": "Members can view their workspaces.",
+      "schemaname": "public",
+      "check_expression": null,
+      "using_expression": "is_workspace_member(auth.uid(), id, ARRAY['owner'::text, 'admin'::text, 'member'::text, 'viewer'::text, 'billing'::text])"
+    },
+    {
+      "event": "ALL",
+      "tablename": "workspaces",
+      "policyname": "Owners/admins can manage their workspaces.",
+      "schemaname": "public",
+      "check_expression": null,
+      "using_expression": "is_workspace_member(auth.uid(), id, ARRAY['owner'::text, 'admin'::text])"
+    }
+  ]
+}

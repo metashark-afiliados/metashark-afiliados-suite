@@ -1,0 +1,22 @@
+{
+  "generated_at": "2025-08-31T00:10:58.201779+00:00",
+  "entity_counts": {
+    "sites": 0,
+    "profiles": 0,
+    "campaigns": 0,
+    "creations": 0,
+    "workspaces": 0
+  },
+  "system_health": {
+    "total_invitations": 0,
+    "pending_invitations": 0
+  },
+  "status_distribution": {
+    "sites": null,
+    "campaigns": null
+  },
+  "relationship_metrics": {
+    "avg_sites_per_workspace": null,
+    "avg_members_per_workspace": null
+  }
+}

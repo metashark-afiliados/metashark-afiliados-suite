@@ -1,10 +1,11 @@
 // src/lib/validators/i18n/Features.schema.ts
 /**
  * @file Features.schema.ts
- * @description Define el contrato de datos para el namespace 'components.landing.Features'.
+ * @description Define el contrato de datos para el namespace 'Features' dentro de `landing.json`.
  *              Este aparato atómico de validación garantiza la seguridad de tipos para la
- *              sección de características de la landing page.
- * @author L.I.A. Legacy
+ *              sección de características de la landing page, incluyendo la validación
+ *              de los nombres de iconos contra la SSoT de `lucide-react`.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 import { z } from "zod";
@@ -24,19 +25,4 @@ export const FeaturesSchema = z.object({
     })
   ),
 });
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Restauración de Integridad**: ((Implementada)) La creación de este schema resuelve la última dependencia faltante reportada para el ensamblador `i18n.schema.ts`.
- * 2. **Blindaje de Contrato de Datos**: ((Implementada)) El campo `icon` es validado por `LucideIconNameSchema`, previniendo arquitectónicamente el uso de un nombre de icono inválido en los archivos de mensajes.
- *
- * @subsection Melhorias Futuras
- * 1. **Validación de Array No Vacío**: ((Vigente)) Se podría añadir `.nonempty()` al schema `features` para asegurar que siempre haya al menos una característica definida.
- *
- * =====================================================================
- */
 // src/lib/validators/i18n/Features.schema.ts

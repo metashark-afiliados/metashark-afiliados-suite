@@ -4,7 +4,7 @@
  * @description Aparato de cliente atómico y soberano para el formulario de suscripción.
  *              Su `SubmitButton` ha sido refactorizado para aceptar un icono opcional,
  *              aumentando su flexibilidad y reutilización para diferentes contextos de UI.
- * @author Raz Podestá
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
  * @version 3.0.0
  */
 "use client";
@@ -60,7 +60,7 @@ export function NewsletterForm({
   placeholderText,
   ctaIcon,
 }: NewsletterFormProps) {
-  const t = useTranslations();
+  const t = useTranslations("components.landing.Newsletter");
   const formRef = useRef<HTMLFormElement>(null);
   const animationControls = useAnimation();
   const [state, formAction] = useFormState(
@@ -109,18 +109,4 @@ export function NewsletterForm({
     </motion.form>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Flexibilidad de UI**: ((Implementada)) El `SubmitButton` ahora acepta una prop `icon` opcional. Esto lo convierte en un componente más reutilizable y permite al `BottomCTA` renderizar el formulario sin el icono de flecha, corrigiendo la regresión de diseño.
- *
- * @subsection Melhorias Futuras
- * 1. **Animación de Éxito**: ((Vigente)) Tras una suscripción exitosa, se podría mostrar una animación de confeti o un icono de "check" animado para una experiencia de usuario aún más gratificante.
- *
- * =====================================================================
- */
 // src/components/landing/NewsletterForm.tsx

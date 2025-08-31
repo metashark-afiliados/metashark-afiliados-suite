@@ -1,13 +1,12 @@
 // src/middleware.ts
 /**
  * @file src/middleware.ts
- * @description Orquestador de Middleware de Élite. Ha sido refactorizado
- *              holísticamente a un estándar de producción, eliminando la
- *              dependencia de APIs de Node.js ('perf_hooks') para garantizar
- *              la compatibilidad con el Edge Runtime.
+ * @description Orquestador de Middleware de Élite. Refactorizado para
+ *              garantizar la compatibilidad con el Edge Runtime, mejorar la
+ *              observabilidad y añadir documentación de nivel de producción.
  * @author Raz Podestá - MetaShark Tech
- * @version 6.0.0
- * @date 2025-08-30
+ * @version 7.0.0
+ * @date 2025-08-31
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -30,9 +29,9 @@ import {
  * @description Wrapper de alto orden que mide y registra el tiempo de ejecución
  *              de un handler de middleware asíncrono.
  * @param {string} name - El nombre del handler para el logging.
- * @param {Function} handler - La función del handler a ejecutar.
- * @param {any[]} args - Los argumentos a pasar al handler.
- * @returns {Promise<any>} El resultado del handler.
+ * @param {T} handler - La función del handler a ejecutar.
+ * @param {Parameters<T>} args - Los argumentos a pasar al handler.
+ * @returns {Promise<ReturnType<T>>} El resultado del handler.
  */
 async function withPerformanceLogging<
   T extends (...args: any[]) => Promise<any>,
@@ -45,6 +44,15 @@ async function withPerformanceLogging<
   return result;
 }
 
+/**
+ * @public
+ * @middleware
+ * @description Punto de entrada principal para el middleware de Next.js. Orquesta
+ *              la ejecución secuencial de todos los manejadores.
+ * @param {NextRequest} request - La petición entrante.
+ * @returns {Promise<NextResponse>} La respuesta final, ya sea una redirección,
+ *          una reescritura o la respuesta original modificada.
+ */
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   logger.trace("==> [MIDDLEWARE_PIPELINE] START <==", { path: pathname });
@@ -58,6 +66,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     if (maintenanceResponse) return maintenanceResponse;
 
     let response = await withPerformanceLogging("I18n", handleI18n, request);
+    
+    // Enriquecer el log con el locale detectado
+    const detectedLocale = response.headers.get("x-app-locale") || "N/A";
+    
     response = await withPerformanceLogging(
       "Multitenancy",
       handleMultitenancy,
@@ -81,8 +93,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     const totalDuration = (pipelineEndTime - pipelineStartTime).toFixed(2);
     logger.info(`[PERF] Pipeline completo ejecutado en ${totalDuration}ms.`, {
       path: pathname,
+      locale: detectedLocale,
     });
 
+    logger.trace("==> [MIDDLEWARE_PIPELINE] END <==", { path: pathname });
     return response;
   } catch (error) {
     const errorId = `mw-err-${Date.now()}`;
@@ -94,6 +108,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         stack: error instanceof Error ? error.stack : undefined,
       }
     );
+    // Devuelve una respuesta de error genérica para el usuario.
+    // El ID de error permite correlacionar el incidente en los logs.
     return new NextResponse(
       `Internal Server Error. Please report this issue with ID: ${errorId}`,
       { status: 500 }
@@ -101,6 +117,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 }
 
+/**
+ * @public
+ * @config
+ * @description Configuración del matcher para el middleware. Excluye rutas de API,
+ *              assets estáticos y archivos internos de Next.js.
+ */
 export const config = {
   matcher: ["/((?!api|trpc|_next|_vercel|.*\\..*).*)"],
 };

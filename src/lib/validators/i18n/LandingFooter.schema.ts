@@ -1,12 +1,18 @@
 // src/lib/validators/i18n/LandingFooter.schema.ts
 /**
  * @file LandingFooter.schema.ts
- * @description Define el contrato de datos para el namespace 'LandingFooter'.
- *              Sincronizado para incluir la estructura anidada de los enlaces.
- * @author Raz Podestá
- * @version 2.0.0
+ * @description Define el contrato de datos para el namespace 'Footer' dentro de `landing.json`.
+ *              Este schema valida la estructura completa del pie de página, incluyendo
+ *              los arrays de objetos de enlace.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 1.0.0
  */
 import { z } from "zod";
+
+const LinkSchema = z.object({
+  label: z.string(),
+  href: z.any(), // Para ser compatible con el tipo Route de next-intl que puede ser un string o un objeto.
+});
 
 export const LandingFooterSchema = z.object({
   brand_name: z.string(),
@@ -19,27 +25,8 @@ export const LandingFooterSchema = z.object({
   subscribe: z.string(),
   placeholder_email: z.string(),
   allRightsReserved: z.string(),
-  productLinks: z.object({
-    features: z.string(),
-    process: z.string(),
-    pricing: z.string(),
-  }),
-  companyLinks: z.object({
-    about: z.string(),
-    blog: z.string(),
-  }),
-  legalLinks: z.object({
-    privacy: z.string(),
-    terms: z.string(),
-  }),
+  productLinks: z.array(LinkSchema),
+  companyLinks: z.array(LinkSchema),
+  legalLinks: z.array(LinkSchema),
 });
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de SSoT de Tipos**: ((Implementada)) El schema Zod ahora valida la nueva estructura anidada del archivo de mensajes, garantizando la integridad del contrato de datos en toda la aplicación.
- *
- * =====================================================================
- */
+// src/lib/validators/i18n/LandingFooter.schema.ts

@@ -1,0 +1,631 @@
+
+{
+  "en-US": {
+    "Header": {
+      "navLinks": [
+        { "label": "Features", "href": "#features" },
+        { "label": "How it Works", "href": "#process" },
+        { "label": "Pricing", "href": "/pricing" }
+      ],
+      "signInText": "Sign In",
+      "signUpText": "Sign Up Free",
+      "openMenuText": "Open menu"
+    },
+    "Hero": {
+      "title": "Build High-Performance Affiliate Campaigns with AI",
+      "subtitle": "Go from idea to published landing page in minutes. No code, just results.",
+      "ctaPrimaryText": "Start Now",
+      "ctaSecondaryText": "How it Works"
+    },
+    "SocialProof": {
+      "title": "Trusted by the world's best affiliate marketers",
+      "logos": [
+        {
+          "name": "Vercel",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/vercel.svg"
+        },
+        {
+          "name": "Supabase",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/supabase.svg"
+        },
+        {
+          "name": "Next.js",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/nextjs.svg"
+        },
+        {
+          "name": "Sentry",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/sentry.svg"
+        },
+        {
+          "name": "Stripe",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/stripe.svg"
+        }
+      ]
+    },
+    "Features": {
+      "title": "A Suite of Tools, Unlimited Potential",
+      "subtitle": "Everything you need to scale your affiliate operations, powered by the most advanced technology.",
+      "features": [
+        {
+          "icon": "LayoutTemplate",
+          "title": "AI Landing Builder",
+          "description": "Create high-converting sales and capture pages in minutes with our AI-guided builder."
+        },
+        {
+          "icon": "FilePenLine",
+          "title": "AI Copywriter Pro",
+          "description": "Generate persuasive copy for your ads, emails, and landing pages that connects with your audience and sells."
+        },
+        {
+          "icon": "ChartPie",
+          "title": "Predictive Analysis",
+          "description": "Our AI analyzes your metrics and gives you clear insights to optimize your campaigns and maximize your ROI."
+        }
+      ]
+    },
+    "ProcessSteps": {
+      "tag": "The Process",
+      "title": "From Idea to Profit in 3 Simple Steps",
+      "description": "We've streamlined the entire workflow, so you can focus on strategy, not on technical details.",
+      "steps": [
+        {
+          "stepNumber": "01",
+          "iconName": "MousePointerClick",
+          "title": "Build & Customize",
+          "description": "Select a high-converting template and customize it in minutes with our intuitive AI-powered drag-and-drop editor. No coding required.",
+          "checklist": [
+            "Choose from a library of proven templates",
+            "AI-assisted copy generation",
+            "Integrate your brand identity"
+          ]
+        },
+        {
+          "stepNumber": "02",
+          "iconName": "Rocket",
+          "title": "Launch & Distribute",
+          "description": "Publish your campaign to a fast, global edge network with a single click. Use our free subdomain or connect your own.",
+          "checklist": [
+            "One-click publishing",
+            "Global CDN for maximum speed",
+            "Custom domain support"
+          ]
+        },
+        {
+          "stepNumber": "03",
+          "iconName": "ChartBarBig",
+          "title": "Analyze & Optimize",
+          "description": "Our predictive analytics dashboard gives you clear, actionable insights. Understand your traffic and optimize for maximum ROI.",
+          "checklist": [
+            "Real-time performance tracking",
+            "A/B testing suggestions",
+            "L.I.A. strategic recommendations"
+          ]
+        }
+      ]
+    },
+    "Testimonials": {
+      "tag": "Testimonials",
+      "title": "What Our Users Say",
+      "subtitle": "Real results from real marketers who have supercharged their business with ConvertiKit.",
+      "testimonials": [
+        {
+          "quote": "ConvertiKit has been a game-changer for our agency. We've cut our campaign launch time by 90% and seen a significant uplift in conversions across the board. The AI copywriter alone is worth the price.",
+          "authorName": "Sarah J.",
+          "authorTitle": "Founder, Digital Growth Agency"
+        },
+        {
+          "quote": "As a solo affiliate marketer, I don't have time for complex tools. ConvertiKit is incredibly intuitive and the predictive analytics help me make smarter decisions. My profits have doubled since I started using it.",
+          "authorName": "Mike R.",
+          "authorTitle": "Super Affiliate, Health & Wellness Niche"
+        }
+      ]
+    },
+    "Metrics": {
+      "metrics": [
+        {
+          "iconName": "Zap",
+          "value": 98,
+          "suffix": "%",
+          "label": "Faster Campaign Launches"
+        },
+        {
+          "iconName": "TrendingUp",
+          "prefix": "+",
+          "value": 35,
+          "suffix": "%",
+          "label": "Average Conversion Uplift"
+        },
+        {
+          "iconName": "Users",
+          "value": 10000,
+          "suffix": "+",
+          "label": "Happy Marketers"
+        }
+      ]
+    },
+    "FAQ": {
+      "tag": "FAQs",
+      "title": "Frequently Asked Questions",
+      "subtitle": "Have questions? We have answers. If you can't find what you're looking for, feel free to contact our support team.",
+      "items": [
+        {
+          "question": "Is there a free trial available?",
+          "answer": "Yes, we offer a free plan that includes all the basic features to get you started. No credit card is required to sign up."
+        },
+        {
+          "question": "Can I use my own domain?",
+          "answer": "Absolutely. Our Pro plan allows you to connect your own custom domain for a fully branded experience."
+        }
+      ],
+      "searchPlaceholder": "Search questions...",
+      "noResultsText": "No matching questions found.",
+      "clearSearchAriaLabel": "Clear search"
+    },
+    "SupportCTA": {
+      "title": "Still Have Questions?",
+      "description": "Our dedicated support team is here to help you succeed. Whether you're a beginner or an expert, we've got your back.",
+      "contactButtonText": "Contact Support",
+      "docsButtonText": "Read Docs"
+    },
+    "BottomCTA": {
+      "title": "Ready to Skyrocket Your Conversions?",
+      "subtitle": "Join thousands of elite affiliates who are building faster, converting higher, and scaling their business with ConvertiKit.",
+      "featuresTitle": "Get started with everything you need:",
+      "features": [
+        "AI-Powered Landing Page Builder",
+        "High-Performance Hosting Included",
+        "Advanced Analytics & Tracking",
+        "Unlimited Campaigns"
+      ],
+      "ctaPrimaryText": "Get Started for Free",
+      "ctaPlaceholderText": "Enter your email",
+      "pricingNote": "Free Forever. No credit card required.",
+      "guaranteeNote": "100% Satisfaction Guarantee.",
+      "creditCardNote": "No credit card required."
+    },
+    "Footer": {
+      "brand_name": "ConvertiKit",
+      "logo_alt_text": "ConvertiKit Logo",
+      "slogan": "Your strategic co-pilot for affiliate marketing.",
+      "product": "Product",
+      "company": "Company",
+      "stayUpdated": "Stay Updated",
+      "newsletterPrompt": "Join our newsletter for the latest news and tips.",
+      "subscribe": "Subscribe",
+      "placeholder_email": "Enter your email...",
+      "allRightsReserved": "© {year} ConvertiKit. All rights reserved.",
+      "productLinks": {
+        "features": "Features",
+        "process": "How it Works",
+        "pricing": "Pricing"
+      },
+      "companyLinks": {
+        "about": "About Us",
+        "blog": "Blog"
+      },
+      "legalLinks": {
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service"
+      }
+    }
+  },
+  "es-ES": {
+    "Header": {
+      "navLinks": [
+        { "label": "Características", "href": "#features" },
+        { "label": "Cómo Funciona", "href": "#process" },
+        { "label": "Precios", "href": "/pricing" }
+      ],
+      "signInText": "Iniciar Sesión",
+      "signUpText": "Registrarse Gratis",
+      "openMenuText": "Abrir menú"
+    },
+    "Hero": {
+      "title": "Crea Campañas de Afiliados de Alto Rendimiento con IA",
+      "subtitle": "Pasa de la idea a la landing page publicada en minutos. Sin código, solo resultados.",
+      "ctaPrimaryText": "Empezar Ahora",
+      "ctaSecondaryText": "Cómo Funciona"
+    },
+    "SocialProof": {
+      "title": "Con la confianza de los mejores marketers de afiliados del mundo",
+      "logos": [
+        {
+          "name": "Vercel",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/vercel.svg"
+        },
+        {
+          "name": "Supabase",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/supabase.svg"
+        },
+        {
+          "name": "Next.js",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/nextjs.svg"
+        },
+        {
+          "name": "Sentry",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/sentry.svg"
+        },
+        {
+          "name": "Stripe",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/stripe.svg"
+        }
+      ]
+    },
+    "Features": {
+      "title": "Una Suite de Herramientas, Potencial Ilimitado",
+      "subtitle": "Todo lo que necesitas para escalar tus operaciones de afiliado, impulsado por la tecnología más avanzada.",
+      "features": [
+        {
+          "icon": "LayoutTemplate",
+          "title": "Constructor de Landings IA",
+          "description": "Crea páginas de venta y captura de alta conversión en minutos con nuestro constructor guiado por IA."
+        },
+        {
+          "icon": "FilePenLine",
+          "title": "AI Copywriter Pro",
+          "description": "Genera textos persuasivos para tus anuncios, emails y landings que conectan con tu audiencia y venden."
+        },
+        {
+          "icon": "ChartPie",
+          "title": "Análisis Predictivo",
+          "description": "Nuestra IA analiza tus métricas y te da insights claros para optimizar tus campañas y maximizar tu ROI."
+        }
+      ]
+    },
+    "ProcessSteps": {
+      "tag": "El Proceso",
+      "title": "De la Idea al Beneficio en 3 Simples Pasos",
+      "description": "Hemos optimizado todo el flujo de trabajo, para que puedas concentrarte en la estrategia, no en los detalles técnicos.",
+      "steps": [
+        {
+          "stepNumber": "01",
+          "iconName": "MousePointerClick",
+          "title": "Construye y Personaliza",
+          "description": "Selecciona una plantilla de alta conversión y personalízala en minutos con nuestro intuitivo editor de arrastrar y soltar, impulsado por IA. No se requiere código.",
+          "checklist": [
+            "Elige de una biblioteca de plantillas probadas",
+            "Generación de copy asistida por IA",
+            "Integra tu identidad de marca"
+          ]
+        },
+        {
+          "stepNumber": "02",
+          "iconName": "Rocket",
+          "title": "Lanza y Distribuye",
+          "description": "Publica tu campaña en una red global y rápida (edge network) con un solo clic. Usa nuestro subdominio gratuito o conecta el tuyo.",
+          "checklist": [
+            "Publicación con un solo clic",
+            "CDN global para máxima velocidad",
+            "Soporte para dominios personalizados"
+          ]
+        },
+        {
+          "stepNumber": "03",
+          "iconName": "ChartBarBig",
+          "title": "Analiza y Optimiza",
+          "description": "Nuestro panel de análisis predictivo te brinda insights claros y accionables. Entiende tu tráfico y optimiza para el máximo ROI.",
+          "checklist": [
+            "Seguimiento del rendimiento en tiempo real",
+            "Sugerencias de pruebas A/B",
+            "Recomendaciones estratégicas de L.I.A."
+          ]
+        }
+      ]
+    },
+    "Testimonials": {
+      "tag": "Testimonios",
+      "title": "Lo que Dicen Nuestros Usuarios",
+      "subtitle": "Resultados reales de marketers reales que han potenciado su negocio con ConvertiKit.",
+      "testimonials": [
+        {
+          "quote": "ConvertiKit ha cambiado las reglas del juego para nuestra agencia. Hemos reducido el tiempo de lanzamiento de campañas en un 90% y hemos visto un aumento significativo en las conversiones en general. Solo el redactor de IA vale el precio.",
+          "authorName": "Sara J.",
+          "authorTitle": "Fundadora, Agencia de Crecimiento Digital"
+        },
+        {
+          "quote": "Como marketer de afiliados en solitario, no tengo tiempo para herramientas complejas. ConvertiKit es increíblemente intuitivo y los análisis predictivos me ayudan a tomar decisiones más inteligentes. Mis ganancias se han duplicado desde que empecé a usarlo.",
+          "authorName": "Miguel R.",
+          "authorTitle": "Súper Afiliado, Nicho de Salud y Bienestar"
+        }
+      ]
+    },
+    "Metrics": {
+      "metrics": [
+        {
+          "iconName": "Zap",
+          "value": 98,
+          "suffix": "%",
+          "label": "Lanzamientos de Campaña Más Rápidos"
+        },
+        {
+          "iconName": "TrendingUp",
+          "prefix": "+",
+          "value": 35,
+          "suffix": "%",
+          "label": "Aumento Promedio de Conversión"
+        },
+        {
+          "iconName": "Users",
+          "value": 10000,
+          "suffix": "+",
+          "label": "Marketers Satisfechos"
+        }
+      ]
+    },
+    "FAQ": {
+      "tag": "FAQs",
+      "title": "Preguntas Frecuentes",
+      "subtitle": "¿Tienes preguntas? Tenemos respuestas. Si no encuentras lo que buscas, no dudes en contactar a nuestro equipo de soporte.",
+      "items": [
+        {
+          "question": "¿Hay una prueba gratuita disponible?",
+          "answer": "Sí, ofrecemos un plan gratuito que incluye todas las funciones básicas para que puedas empezar. No se requiere tarjeta de crédito para registrarse."
+        },
+        {
+          "question": "¿Puedo usar mi propio dominio?",
+          "answer": "Absolutamente. Aunque proporcionamos un subdominio gratuito para cada sitio, nuestro plan Pro te permite conectar tu propio dominio personalizado para una experiencia de marca completa."
+        }
+      ],
+      "searchPlaceholder": "Buscar preguntas...",
+      "noResultsText": "No se encontraron preguntas coincidentes.",
+      "clearSearchAriaLabel": "Limpiar búsqueda"
+    },
+    "SupportCTA": {
+      "title": "¿Aún Tienes Preguntas?",
+      "description": "Nuestro equipo de soporte dedicado está aquí para ayudarte a tener éxito. Ya seas un principiante o un experto, te cubrimos las espaldas.",
+      "contactButtonText": "Contactar Soporte",
+      "docsButtonText": "Leer Documentación"
+    },
+    "BottomCTA": {
+      "title": "¿Listo para Disparar tus Conversiones?",
+      "subtitle": "Únete a miles de afiliados de élite que construyen más rápido, convierten más y escalan su negocio con ConvertiKit.",
+      "featuresTitle": "Empieza con todo lo que necesitas:",
+      "features": [
+        "Constructor de Landing Pages con IA",
+        "Hosting de Alto Rendimiento Incluido",
+        "Analíticas y Seguimiento Avanzados",
+        "Campañas Ilimitadas"
+      ],
+      "ctaPrimaryText": "Empezar Gratis",
+      "ctaPlaceholderText": "Introduce tu correo electrónico",
+      "pricingNote": "Gratis para Siempre. No se requiere tarjeta de crédito.",
+      "guaranteeNote": "Garantía de Satisfacción del 100%.",
+      "creditCardNote": "No se requiere tarjeta."
+    },
+    "Footer": {
+      "brand_name": "ConvertiKit",
+      "logo_alt_text": "Logo de ConvertiKit",
+      "slogan": "Tu copiloto estratégico para el marketing de afiliados.",
+      "product": "Producto",
+      "company": "Compañía",
+      "stayUpdated": "Mantente Actualizado",
+      "newsletterPrompt": "Únete a nuestro boletín para recibir las últimas noticias y consejos.",
+      "subscribe": "Suscribirse",
+      "placeholder_email": "Introduce tu email...",
+      "allRightsReserved": "© {year} ConvertiKit. Todos los derechos reservados.",
+      "productLinks": {
+        "features": "Características",
+        "process": "Cómo Funciona",
+        "pricing": "Precios"
+      },
+      "companyLinks": {
+        "about": "Sobre Nosotros",
+        "blog": "Blog"
+      },
+      "legalLinks": {
+        "privacy": "Política de Privacidad",
+        "terms": "Términos de Servicio"
+      }
+    }
+  },
+  "pt-BR": {
+    "Header": {
+      "navLinks": [
+        { "label": "Recursos", "href": "#features" },
+        { "label": "Como Funciona", "href": "#process" },
+        { "label": "Preços", "href": "/pricing" }
+      ],
+      "signInText": "Entrar",
+      "signUpText": "Cadastre-se Grátis",
+      "openMenuText": "Abrir menu"
+    },
+    "Hero": {
+      "title": "Crie Campanhas de Afiliados de Alta Performance com IA",
+      "subtitle": "Vá da ideia à landing page publicada em minutos. Sem código, apenas resultados.",
+      "ctaPrimary": "Comece Agora",
+      "ctaSecondary": "Como Funciona"
+    },
+    "SocialProof": {
+      "title": "Com a confiança dos melhores profissionais de marketing de afiliados do mundo",
+      "logos": [
+        {
+          "name": "Vercel",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/vercel.svg"
+        },
+        {
+          "name": "Supabase",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/supabase.svg"
+        },
+        {
+          "name": "Next.js",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/nextjs.svg"
+        },
+        {
+          "name": "Sentry",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/sentry.svg"
+        },
+        {
+          "name": "Stripe",
+          "src": "https://raw.githubusercontent.com/razpodesta/marketing-afiliados/main/public/images/logos/stripe.svg"
+        }
+      ]
+    },
+    "Features": {
+      "title": "Uma Suíte de Ferramentas, Potencial Ilimitado",
+      "subtitle": "Tudo o que você precisa para escalar suas operações de afiliado, impulsionado pela tecnologia mais avançada.",
+      "features": [
+        {
+          "icon": "LayoutTemplate",
+          "title": "Construtor de Landings IA",
+          "description": "Crie páginas de venda e captura de alta conversão em minutos com nosso construtor guiado por IA."
+        },
+        {
+          "icon": "FilePenLine",
+          "title": "AI Copywriter Pro",
+          "description": "Gere textos persuasivos para seus anúncios, e-mails e landing pages que conectam com sua audiência e vendem."
+        },
+        {
+          "icon": "ChartPie",
+          "title": "Análise Preditiva",
+          "description": "Nossa IA analisa suas métricas e te dá insights claros para otimizar suas campanhas e maximizar seu ROI."
+        }
+      ]
+    },
+    "ProcessSteps": {
+      "tag": "O Processo",
+      "title": "Da Ideia ao Lucro em 3 Passos Simples",
+      "description": "Otimizamos todo o fluxo de trabalho, para que você possa se concentrar na estratégia, não nos detalhes técnicos.",
+      "steps": [
+        {
+          "stepNumber": "01",
+          "iconName": "MousePointerClick",
+          "title": "Construa e Personalize",
+          "description": "Selecione um modelo de alta conversão e personalize-o em minutos com nosso editor intuitivo de arrastar e soltar, impulsionado por IA. Não é necessário codificar.",
+          "checklist": [
+            "Escolha de uma biblioteca de modelos comprovados",
+            "Geração de copy assistida por IA",
+            "Integre sua identidade de marca"
+          ]
+        },
+        {
+          "stepNumber": "02",
+          "iconName": "Rocket",
+          "title": "Lance e Distribua",
+          "description": "Publique sua campanha em uma rede global e rápida (edge network) com um único clique. Use nosso subdomínio gratuito ou conecte o seu próprio.",
+          "checklist": [
+            "Publicação com um único clique",
+            "CDN global para velocidade máxima",
+            "Suporte a domínios personalizados"
+          ]
+        },
+        {
+          "stepNumber": "03",
+          "iconName": "ChartBarBig",
+          "title": "Analise e Otimize",
+          "description": "Nosso painel de análise preditiva oferece insights claros e acionáveis. Entenda seu tráfego e otimize para o máximo ROI.",
+          "checklist": [
+            "Acompanhamento de desempenho em tempo real",
+            "Sugestões de testes A/B",
+            "Recomendações estratégicas da L.I.A."
+          ]
+        }
+      ]
+    },
+    "Testimonials": {
+      "tag": "Depoimentos",
+      "title": "O que Nossos Usuários Dizem",
+      "subtitle": "Resultados reais de profissionais de marketing reais que potencializaram seus negócios com o ConvertiKit.",
+      "testimonials": [
+        {
+          "quote": "O ConvertiKit mudou o jogo para nossa agência. Reduzimos nosso tempo de lançamento de campanhas em 90% e vimos um aumento significativo nas conversões em geral. Só o redator de IA já vale o preço.",
+          "authorName": "Sara J.",
+          "authorTitle": "Fundadora, Agência de Crescimento Digital"
+        },
+        {
+          "quote": "Como profissional de marketing de afiliados solo, não tenho tempo para ferramentas complexas. O ConvertiKit é incrivelmente intuitivo e as análises preditivas me ajudam a tomar decisões mais inteligentes. Meus lucros dobraram desde que comecei a usá-lo.",
+          "authorName": "Miguel R.",
+          "authorTitle": "Super Afiliado, Nicho de Saúde e Bem-Estar"
+        }
+      ]
+    },
+    "Metrics": {
+      "metrics": [
+        {
+          "iconName": "Zap",
+          "value": 98,
+          "suffix": "%",
+          "label": "Lançamentos de Campanha Mais Rápidos"
+        },
+        {
+          "iconName": "TrendingUp",
+          "prefix": "+",
+          "value": 35,
+          "suffix": "%",
+          "label": "Aumento Médio de Conversão"
+        },
+        {
+          "iconName": "Users",
+          "value": 10000,
+          "suffix": "+",
+          "label": "Marketers Satisfeitos"
+        }
+      ]
+    },
+    "FAQ": {
+      "tag": "FAQs",
+      "title": "Perguntas Frequentes",
+      "subtitle": "Tem perguntas? Nós temos respostas. Se não encontrar o que procura, sinta-se à vontade para contatar nossa equipe de suporte.",
+      "items": [
+        {
+          "question": "Existe um período de teste gratuito?",
+          "answer": "Sim, oferecemos um plano gratuito que inclui todos os recursos básicos para você começar. Não é necessário cartão de crédito para se inscrever."
+        },
+        {
+          "question": "Posso usar meu próprio domínio?",
+          "answer": "Com certeza. Embora forneçamos um subdomínio gratuito para cada site, nosso plano Pro permite que você conecte seu próprio domínio personalizado para uma experiência de marca completa."
+        }
+      ],
+      "searchPlaceholder": "Buscar perguntas...",
+      "noResultsText": "Nenhuma pergunta correspondente encontrada.",
+      "clearSearchAriaLabel": "Limpar busca"
+    },
+    "SupportCTA": {
+      "title": "Ainda tem Dúvidas?",
+      "description": "Nossa equipe de suporte dedicada está aqui para ajudá-lo a ter sucesso. Seja você um iniciante ou um especialista, nós te damos cobertura.",
+      "contactButtonText": "Contatar Suporte",
+      "docsButtonText": "Ler Documentação"
+    },
+    "BottomCTA": {
+      "title": "Pronto para Disparar suas Conversões?",
+      "subtitle": "Junte-se a milhares de afiliados de elite que constroem mais rápido, convertem mais e escalam seus negócios com o ConvertiKit.",
+      "featuresTitle": "Comece com tudo que você precisa:",
+      "features": [
+        "Construtor de Landing Pages com IA",
+        "Hospedagem de Alta Performance Inclusa",
+        "Análises e Rastreamento Avançados",
+        "Campanhas Ilimitadas"
+      ],
+      "ctaPrimaryText": "Comece de Graça",
+      "ctaPlaceholderText": "Digite seu e-mail",
+      "pricingNote": "Grátis para Sempre. Não é necessário cartão de crédito.",
+      "guaranteeNote": "Garantia de Satisfação de 100%.",
+      "creditCardNote": "Sem cartão de crédito."
+    },
+    "Footer": {
+      "brand_name": "ConvertiKit",
+      "logo_alt_text": "Logo da ConvertiKit",
+      "slogan": "Seu copiloto estratégico para marketing de afiliados.",
+      "product": "Produto",
+      "company": "Empresa",
+      "stayUpdated": "Mantenha-se Atualizado",
+      "newsletterPrompt": "Junte-se à nossa newsletter para receber as últimas notícias e dicas.",
+      "subscribe": "Inscrever-se",
+      "placeholder_email": "Digite seu e-mail...",
+      "allRightsReserved": "© {year} ConvertiKit. Todos os direitos reservados.",
+      "productLinks": {
+        "features": "Recursos",
+        "process": "Como Funciona",
+        "pricing": "Preços"
+      },
+      "companyLinks": {
+        "about": "Sobre Nós",
+        "blog": "Blog"
+      },
+      "legalLinks": {
+        "privacy": "Política de Privacidade",
+        "terms": "Termos de Serviço"
+      }
+    }
+  }
+}
+

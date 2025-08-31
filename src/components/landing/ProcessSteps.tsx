@@ -1,12 +1,11 @@
 // src/components/landing/ProcessSteps.tsx
 /**
  * @file src/components/landing/ProcessSteps.tsx
- * @description Componente de presentación para la sección "Pasos del Proceso" de la
- *              landing page. Detalla visualmente el flujo de trabajo en 3 pasos,
- *              alternando la disposición para un mayor dinamismo. Es un componente
- *              de cliente puro, animado y totalmente agnóstico al contenido.
- * @author Raz Podestá
- * @version 1.0.0
+ * @description Componente de presentación para la sección "Pasos del Proceso".
+ *              Es un componente de cliente puro, animado y completamente
+ *              agnóstico al contenido, que recibe sus datos vía props.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.0.0
  */
 "use client";
 
@@ -15,24 +14,18 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
  * @interface Step
  * @description Define el contrato de datos para un único paso en el proceso.
- *              Esta estructura es serializable y segura para ser pasada desde
- *              Server Components.
  */
 export interface Step {
-  /** El número del paso, ej. "01". */
   stepNumber: string;
-  /** El nombre del icono de `lucide-react` a renderizar. */
   iconName: string;
-  /** El título del paso. */
   title: string;
-  /** La descripción detallada del paso. */
   description: string;
-  /** Un array de strings que representan los puntos clave del paso. */
   checklist: string[];
 }
 
@@ -42,24 +35,17 @@ export interface Step {
  * @description Define el contrato de props para el componente `ProcessSteps`.
  */
 export interface ProcessStepsProps {
-  /** Una etiqueta para la sección, ej. "El Proceso". */
   tag: string;
-  /** El título principal de la sección. */
   title: string;
-  /** La descripción de la sección. */
   description: string;
-  /** Un array de objetos de tipo `Step` a renderizar. */
   steps: Step[];
 }
 
 /**
  * @private
  * @component StepCard
- * @description Renderiza una tarjeta para un único paso, manejando la alineación
- *              alterna de la imagen y el contenido para un diseño dinámico.
+ * @description Renderiza una tarjeta para un único paso del proceso.
  * @param {object} props - Propiedades del sub-componente.
- * @param {Step} props.step - El objeto de datos para el paso actual.
- * @param {number} props.index - El índice del paso, usado para la alineación.
  * @returns {React.ReactElement}
  */
 const StepCard = ({
@@ -85,7 +71,7 @@ const StepCard = ({
       </div>
       <p className="mt-4 text-muted-foreground">{step.description}</p>
       <ul className="mt-6 space-y-3">
-        {step.checklist.map((item, itemIndex) => (
+        {(step.checklist || []).map((item, itemIndex) => (
           <li key={itemIndex} className="flex items-start gap-3">
             <Check className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
             <span>{item}</span>
@@ -135,6 +121,10 @@ export function ProcessSteps({
   description,
   steps,
 }: ProcessStepsProps): React.ReactElement {
+  clientLogger.trace(
+    "[ProcessSteps] Renderizando componente de presentación puro."
+  );
+
   return (
     <section id="process" className="py-20">
       <div className="container mx-auto flex flex-col items-center gap-4 px-4 text-center md:px-6">
@@ -146,28 +136,11 @@ export function ProcessSteps({
       </div>
 
       <div className="container mx-auto mt-16 flex flex-col gap-16 px-4 md:px-6">
-        {steps.map((step, index) => (
+        {(steps || []).map((step, index) => (
           <StepCard key={step.stepNumber} step={step} index={index} />
         ))}
       </div>
     </section>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Componente de Proceso Visual**: ((Implementada)) Se ha reconstruido este aparato clave que comunica eficazmente el flujo de trabajo del producto en la `HomePage`.
- * 2. **Composición Atómica (SRP)**: ((Implementada)) La lógica de renderizado de cada paso se ha abstraído al sub-componente `StepCard`, mejorando la legibilidad y el Principio de Responsabilidad Única.
- * 3. **Full Internacionalización**: ((Implementada)) El componente es 100% agnóstico al contenido, preparado para ser ensamblado en `page.tsx` con textos traducidos.
- * 4. **Animaciones de Alto Rendimiento**: ((Implementada)) Utiliza `framer-motion` con `whileInView` para animar los elementos a medida que el usuario se desplaza, mejorando la UX.
- *
- * @subsection Melhorias Futuras
- * 1. **Conectores Visuales**: ((Vigente)) Añadir conectores visuales (ej. flechas punteadas) entre los `StepCard` para guiar la vista del usuario a través del flujo, replicando con total fidelidad los diseños de referencia de alta gama.
- *
- * =====================================================================
- */
 // src/components/landing/ProcessSteps.tsx

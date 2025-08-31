@@ -1,12 +1,11 @@
 // src/components/landing/Testimonials.tsx
 /**
  * @file src/components/landing/Testimonials.tsx
- * @description Componente de presentación para la sección de testimonios de la
- *              landing page. Implementa un carrusel interactivo y animado para
- *              mostrar las opiniones de los clientes. Es un componente de cliente
- *              puro y completamente internacionalizable.
- * @author Raz Podestá
- * @version 1.0.0
+ * @description Componente de presentación para la sección de testimonios.
+ *              Implementa un carrusel interactivo y animado. Es un componente
+ *              de cliente puro, agnóstico al contenido, y completamente internacionalizable.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.0.0
  */
 "use client";
 
@@ -17,6 +16,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
@@ -55,14 +55,26 @@ export function Testimonials({
   subtitle,
   testimonials,
 }: TestimonialsProps): React.ReactElement {
+  clientLogger.trace(
+    "[Testimonials] Renderizando componente de presentación puro."
+  );
   const [[page, direction], setPage] = useState([0, 0]);
+
+  // Guardia de robustez para prevenir errores si la prop es nula o vacía.
+  const safeTestimonials = testimonials || [];
+  if (safeTestimonials.length === 0) {
+    return <></>; // No renderizar nada si no hay testimonios
+  }
 
   const paginate = (newDirection: number) => {
     setPage([page + newDirection, newDirection]);
   };
 
   const testimonialIndex =
-    ((page % testimonials.length) + testimonials.length) % testimonials.length;
+    ((page % safeTestimonials.length) + safeTestimonials.length) %
+    safeTestimonials.length;
+
+  const currentTestimonial = safeTestimonials[testimonialIndex];
 
   const variants = {
     enter: (direction: number) => ({
@@ -108,25 +120,23 @@ export function Testimonials({
           >
             <Card className="w-full max-w-2xl">
               <CardContent className="flex flex-col items-center justify-center p-8 text-center">
-                <p className="text-xl italic">
-                  "{testimonials[testimonialIndex].quote}"
-                </p>
+                <p className="text-xl italic">"{currentTestimonial.quote}"</p>
                 <div className="mt-6 flex items-center gap-4">
                   <Avatar>
                     <AvatarImage
-                      src={testimonials[testimonialIndex].authorImage}
-                      alt={testimonials[testimonialIndex].authorName}
+                      src={currentTestimonial.authorImage}
+                      alt={currentTestimonial.authorName}
                     />
                     <AvatarFallback>
-                      {testimonials[testimonialIndex].authorName.charAt(0)}
+                      {currentTestimonial.authorName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-semibold">
-                      {testimonials[testimonialIndex].authorName}
+                      {currentTestimonial.authorName}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {testimonials[testimonialIndex].authorTitle}
+                      {currentTestimonial.authorTitle}
                     </p>
                   </div>
                 </div>
@@ -157,21 +167,4 @@ export function Testimonials({
     </section>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Componente de Prueba Social**: ((Implementada)) Se ha creado un nuevo aparato que añade una sección de testimonios, un elemento crucial para generar confianza y prueba social en la `HomePage`.
- * 2. **Carrusel Interactivo y Animado**: ((Implementada)) La implementación utiliza `framer-motion` para crear un carrusel de "swipe" animado y de alto rendimiento, replicando la experiencia de usuario del diseño de referencia.
- * 3. **Componente Puro e Internacionalizable**: ((Implementada)) El componente es 100% agnóstico al contenido, preparado para ser ensamblado en `page.tsx` con textos y datos de testimonios traducidos.
- *
- * @subsection Melhorias Futuras
- * 1. **Paginación con Puntos**: ((Vigente)) Añadir indicadores de paginación (puntos) debajo del carrusel para mostrar en qué testimonio se encuentra el usuario y permitir la navegación directa a un testimonio específico.
- * 2. **Auto-Play con Pausa en Hover**: ((Vigente)) Añadir una prop opcional `autoPlay: boolean` que, si es `true`, haga que el carrusel avance automáticamente cada cierto número de segundos, pausándose cuando el usuario posa el cursor sobre la tarjeta.
- *
- * =====================================================================
- */
 // src/components/landing/Testimonials.tsx

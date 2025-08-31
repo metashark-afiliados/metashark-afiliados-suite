@@ -2,10 +2,11 @@
 /**
  * @file src/components/landing/Hero.tsx
  * @description Componente de presentación puro para la sección "Hero".
- *              Sincronizado con la SSoT de enrutamiento v7.0.0, apuntando
- *              a la ruta de login canónica `/login`.
- * @author Raz Podestá
- * @version 2.1.0
+ *              Ha sido refactorizado para ser 100% agnóstico al contenido,
+ *              recibiendo todos sus textos a través de props desde el
+ *              orquestador de servidor.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 3.0.0
  */
 "use client";
 
@@ -16,6 +17,11 @@ import { Button } from "@/components/ui/button";
 import { clientLogger } from "@/lib/logging";
 import { Link } from "@/lib/navigation";
 
+/**
+ * @public
+ * @interface HeroProps
+ * @description Define el contrato de props para el componente de presentación Hero.
+ */
 export interface HeroProps {
   title: string;
   subtitle: string;
@@ -23,6 +29,14 @@ export interface HeroProps {
   ctaSecondaryText: string;
 }
 
+/**
+ * @public
+ * @component Hero
+ * @description Renderiza la sección "Hero" de la landing page. Es un componente de
+ *              presentación puro que recibe todo su contenido como props.
+ * @param {HeroProps} props - Propiedades para configurar el componente.
+ * @returns {React.ReactElement}
+ */
 export function Hero({
   title,
   subtitle,
@@ -66,13 +80,11 @@ export function Hero({
           variants={FADE_IN_ANIMATION_VARIANTS}
           className="mt-8 flex flex-col justify-center gap-4 sm:flex-row"
         >
-          {/* --- INICIO DE CORRECCIÓN DE RUTA --- */}
           <Button asChild size="lg" onClick={() => handleCTAClick("Primary")}>
             <Link href="/login">
               {ctaPrimaryText} <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-          {/* --- FIN DE CORRECCIÓN DE RUTA --- */}
           <Button
             asChild
             variant="outline"
@@ -86,17 +98,4 @@ export function Hero({
     </section>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Tipo (TS2322)**: ((Implementada)) Se ha actualizado el `href` a `/login`, alineando el componente con el manifiesto de rutas `navigation.ts` y resolviendo el error de compilación.
- *
- * @subsection Melhorias Futuras
- * 1. **Botones de CTA Dinámicos**: ((Vigente)) La prop `ctaButtons` (un array de objetos) sigue siendo la mejora de élite para una máxima flexibilidad.
- *
- * =====================================================================
- */
 // src/components/landing/Hero.tsx

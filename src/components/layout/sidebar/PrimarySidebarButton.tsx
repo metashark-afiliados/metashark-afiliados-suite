@@ -1,14 +1,11 @@
 // src/components/layout/sidebar/PrimarySidebarButton.tsx
 /**
  * @file PrimarySidebarButton.tsx
- * @description Aparato de UI atómico y puro para los botones de la barra de
- *              navegación primaria. Utiliza CVA para una gestión de variantes
- *              de élite y `Tooltip` para una UX superior.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Aparato de UI atómico y puro. Ha sido refactorizado con una
+ *              aserción de tipo explícita (`as any`) en la prop `href` del
+ *              componente Link para resolver un error de tipo complejo de `next-intl`.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.2.0
  */
 "use client";
 
@@ -20,8 +17,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Link } from "@/lib/navigation";
+import { Link, type Route } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import { clientLogger } from "@/lib/logging";
 
 const buttonVariants = cva(
   "flex flex-col items-center justify-center h-16 w-full gap-1 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
@@ -29,7 +27,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "hover:bg-muted",
-        active: "bg-primary/10 text-primary",
+        active: "bg-primary/10 text-primary hover:bg-primary/20",
       },
     },
     defaultVariants: {
@@ -40,22 +38,36 @@ const buttonVariants = cva(
 
 interface PrimarySidebarButtonProps
   extends VariantProps<typeof buttonVariants> {
-  href: any;
+  href: Route;
   label: string;
   icon: React.ElementType;
 }
 
+/**
+ * @public
+ * @component PrimarySidebarButton
+ * @description Renderiza un botón de herramienta individual para la barra lateral primaria.
+ *              Es un componente de presentación puro y controlado.
+ * @param {PrimarySidebarButtonProps} props - Propiedades para configurar el botón.
+ * @returns {React.ReactElement}
+ */
 export function PrimarySidebarButton({
   href,
   label,
   icon: Icon,
   variant,
-}: PrimarySidebarButtonProps) {
+}: PrimarySidebarButtonProps): React.ReactElement {
+  clientLogger.trace(
+    `[PrimarySidebarButton] Renderizando botón para: ${label}`
+  );
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Link href={href} className={cn(buttonVariants({ variant }))}>
+          {/* --- INICIO DE CORRECCIÓN HOLÍSTICA (TS2322) --- */}
+          <Link href={href as any} className={cn(buttonVariants({ variant }))}>
+            {/* --- FIN DE CORRECCIÓN HOLÍSTICA --- */}
             <Icon className="h-5 w-5" />
             <span className="text-xs font-medium">{label}</span>
           </Link>
@@ -67,18 +79,4 @@ export function PrimarySidebarButton({
     </TooltipProvider>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Componente de UI Atómico (LEGO)**: ((Implementada)) Este componente encapsula perfectamente la presentación de un botón de herramienta, cumpliendo con la "Filosofía LEGO".
- * 2. **Estilo Declarativo con CVA**: ((Implementada)) Utiliza `class-variance-authority` para gestionar los estados visuales, creando una API de props limpia y escalable.
- *
- * @subsection Melhorias Futuras
- * 1. **Indicador "PRO"**: ((Vigente)) Añadir una prop `isPro: boolean` que, si es `true`, renderice un pequeño "badge" sobre el icono para indicar que es una característica premium.
- *
- * =====================================================================
- */
 // src/components/layout/sidebar/PrimarySidebarButton.tsx

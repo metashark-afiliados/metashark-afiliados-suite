@@ -2,12 +2,10 @@
 /**
  * @file NavList.tsx
  * @description Aparato de UI atómico y soberano. Renderiza la lista de
- *              navegación principal y la de desarrollador.
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              navegación principal y de desarrollador. Consume sus propias
+ *              traducciones y contexto para la lógica de renderizado condicional.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 6.0.0
  */
 "use client";
 
@@ -19,9 +17,17 @@ import { useDashboard } from "@/lib/context/DashboardContext";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import { primaryNavLinks } from "./primary-sidebar.config"; // Assuming this is the correct config for secondary as well
+import { clientLogger } from "@/lib/logging";
+import { primaryNavLinks } from "./primary-sidebar.config";
 
-function NavLink({
+/**
+ * @private
+ * @component NavLink
+ * @description Sub-componente de presentación puro para un único enlace de navegación.
+ * @param {object} props - Propiedades del componente.
+ * @returns {React.ReactElement}
+ */
+const NavLink = ({
   href,
   label,
   icon: Icon,
@@ -29,7 +35,7 @@ function NavLink({
   href: any;
   label: string;
   icon: React.ElementType;
-}) {
+}) => {
   const pathname = usePathname();
   const hrefAsString = typeof href === "string" ? href : (href.pathname ?? "/");
   const isActive =
@@ -49,7 +55,7 @@ function NavLink({
       {label}
     </Link>
   );
-}
+};
 
 const NavListSkeleton = () => (
   <nav className="grid items-start gap-1 px-2 py-4 lg:px-4">
@@ -59,9 +65,17 @@ const NavListSkeleton = () => (
   </nav>
 );
 
+/**
+ * @public
+ * @component NavList
+ * @description Renderiza la lista de enlaces de navegación para la barra lateral secundaria.
+ *              Es un componente soberano.
+ * @returns {React.ReactElement}
+ */
 export function NavList(): React.ReactElement {
   const { user } = useDashboard();
   const { tSidebar } = useDashboardTranslations();
+  clientLogger.trace("[NavList] Renderizando componente soberano.");
 
   if (!user) {
     return <NavListSkeleton />;
@@ -73,7 +87,7 @@ export function NavList(): React.ReactElement {
 
   const mainNavLinks = primaryNavLinks.map((link) => ({
     href: link.href,
-    label: tSidebar(link.i18nKey),
+    label: tSidebar(link.i18nKey as any),
     icon: link.icon,
   }));
 
@@ -98,12 +112,4 @@ export function NavList(): React.ReactElement {
     </nav>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Soberanía de i18n:** El componente ya no depende de props de traducción.
- * =====================================================================
- */
 // src/components/layout/sidebar/NavList.tsx

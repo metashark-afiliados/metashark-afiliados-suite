@@ -1,11 +1,12 @@
 // src/components/layout/DashboardHeader.tsx
 /**
  * @file DashboardHeader.tsx
- * @description Cabecera de dashboard de élite. Ahora es soberana en su consumo
- *              de i18n e integra el nuevo componente dinámico `Breadcrumbs`.
+ * @description Cabecera de dashboard de élite. Ahora es un componente soberano que
+ *              consume sus propias traducciones y estado de UI, e integra el nuevo
+ *              componente dinámico `Breadcrumbs`.
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-26
+ * @version 4.0.0
+ * @date 2025-08-31
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -16,7 +17,6 @@ import { ChevronLeft, Menu, Search } from "lucide-react";
 
 import { Breadcrumbs } from "@/components/dashboard/Breadcrumbs";
 import { InvitationBell } from "@/components/dashboard/InvitationBell";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -26,8 +26,16 @@ import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
 import { cn } from "@/lib/utils";
 import { clientLogger } from "@/lib/logging";
+import { DashboardSidebar } from "./DashboardSidebar";
 
-export function DashboardHeader() {
+/**
+ * @public
+ * @component DashboardHeader
+ * @description Renderiza la cabecera principal del dashboard, incluyendo navegación,
+ *              búsqueda y acciones de usuario. Es un componente soberano.
+ * @returns {React.ReactElement}
+ */
+export function DashboardHeader(): React.ReactElement {
   clientLogger.trace(
     "[DashboardHeader] Renderizando cabecera de dashboard soberana."
   );
@@ -74,6 +82,7 @@ export function DashboardHeader() {
             variant="outline"
             className="w-full justify-start text-muted-foreground pl-8 font-normal"
             onClick={openCommandPalette}
+            aria-label={tHeader("search_placeholder")}
           >
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             {tHeader("search_placeholder")}
@@ -89,3 +98,4 @@ export function DashboardHeader() {
     </header>
   );
 }
+// src/components/layout/DashboardHeader.tsx

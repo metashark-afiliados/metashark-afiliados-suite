@@ -1,4 +1,14 @@
 // src/components/workspaces/form-fields/RoleSelectField.tsx
+/**
+ * @file RoleSelectField.tsx
+ * @description Componente de campo de formulario atómico y soberano. Encapsula
+ *              la lógica de presentación para un selector de rol y consume
+ *              sus propias traducciones.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.0.0
+ */
+"use client";
+
 import React from "react";
 import { Controller, type Control, type FieldErrors } from "react-hook-form";
 import { useTranslations } from "next-intl";
@@ -11,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
@@ -26,8 +37,7 @@ interface RoleSelectFieldProps {
 /**
  * @public
  * @component RoleSelectField
- * @description Componente de presentación atómico para un campo de selección de rol
- *              en un formulario gestionado por `react-hook-form`.
+ * @description Componente de presentación atómico para un campo de selección de rol.
  * @param {RoleSelectFieldProps} props - Propiedades del componente.
  * @returns {React.ReactElement}
  */
@@ -36,8 +46,11 @@ export function RoleSelectField({
   errors,
   isPending,
 }: RoleSelectFieldProps): React.ReactElement {
-  const tForm = useTranslations("WorkspaceSwitcher.invite_form");
-  const tErrors = useTranslations("ValidationErrors");
+  clientLogger.trace("[RoleSelectField] Renderizando componente soberano.");
+  const tForm = useTranslations(
+    "components.workspaces.WorkspaceSwitcher.invite_form"
+  );
+  const tErrors = useTranslations("shared.ValidationErrors");
 
   return (
     <div className="space-y-2">
@@ -69,18 +82,4 @@ export function RoleSelectField({
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Encapsulamiento del `Controller`**: ((Implementada)) Este componente abstrae el uso del `Controller` de `react-hook-form`, que es necesario para componentes de UI controlados como `Select`. Esto simplifica el formulario padre.
- * 2. **Reutilización y SRP**: ((Implementada)) Crea un componente reutilizable para la selección de roles, que podría ser usado en otros formularios (ej. un futuro panel de gestión de miembros).
- *
- * @subsection Melhorias Futuras
- * 1. **Opciones Dinámicas**: ((Vigente)) El componente podría ser generalizado para aceptar un array de `options` como prop, convirtiéndolo en un `GenericSelectField` para cualquier tipo de selección.
- *
- * =====================================================================
- */
 // src/components/workspaces/form-fields/RoleSelectField.tsx

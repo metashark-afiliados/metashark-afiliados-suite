@@ -1,10 +1,21 @@
 // src/components/workspaces/form-fields/EmailInputField.tsx
+/**
+ * @file EmailInputField.tsx
+ * @description Componente de campo de formulario atómico y soberano. Encapsula
+ *              la lógica de presentación para un campo de email y consume sus
+ *              propias traducciones.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 2.0.0
+ */
+"use client";
+
 import React from "react";
 import { type FieldErrors, type UseFormRegister } from "react-hook-form";
 import { useTranslations } from "next-intl";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { clientLogger } from "@/lib/logging";
 
 /**
  * @public
@@ -20,8 +31,7 @@ interface EmailInputFieldProps {
 /**
  * @public
  * @component EmailInputField
- * @description Componente de presentación atómico para un campo de email en un
- *              formulario gestionado por `react-hook-form`.
+ * @description Componente de presentación atómico para un campo de email.
  * @param {EmailInputFieldProps} props - Propiedades del componente.
  * @returns {React.ReactElement}
  */
@@ -30,8 +40,11 @@ export function EmailInputField({
   errors,
   isPending,
 }: EmailInputFieldProps): React.ReactElement {
-  const tForm = useTranslations("WorkspaceSwitcher.invite_form");
-  const tErrors = useTranslations("ValidationErrors");
+  clientLogger.trace("[EmailInputField] Renderizando componente soberano.");
+  const tForm = useTranslations(
+    "components.workspaces.WorkspaceSwitcher.invite_form"
+  );
+  const tErrors = useTranslations("shared.ValidationErrors");
 
   return (
     <div className="space-y-2">
@@ -43,6 +56,7 @@ export function EmailInputField({
         aria-invalid={!!errors.email}
         disabled={isPending}
         {...register("email")}
+        hasError={!!errors.email}
       />
       {errors.email?.message && (
         <p className="text-sm text-destructive" role="alert">
@@ -52,17 +66,4 @@ export function EmailInputField({
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical**: ((Implementada)) Este nuevo aparato encapsula perfectamente un único campo de formulario, mejorando la reutilización y el SRP.
- *
- * @subsection Melhorias Futuras
- * 1. **Componente Genérico `FormField`**: ((Vigente)) Este componente podría ser generalizado aún más para aceptar `name`, `label`, y `type` como props, convirtiéndose en un `FormField` universal.
- *
- * =====================================================================
- */
 // src/components/workspaces/form-fields/EmailInputField.tsx

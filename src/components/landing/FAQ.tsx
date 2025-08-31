@@ -1,11 +1,11 @@
 // src/components/landing/FAQ.tsx
 /**
  * @file src/components/landing/FAQ.tsx
- * @description Componente de presentación de élite definitivo para la sección de
- *              "Preguntas Frecuentes". Ha sido refactorizado para consumir el nuevo
- *              componente atómico `SearchInput`.
- * @author Raz Podestá
- * @version 7.0.0
+ * @description Componente de presentación para la sección "Preguntas Frecuentes".
+ *              Es un componente de cliente puro que gestiona una UI compleja con
+ *              búsqueda, filtrado, sincronización con URL y un acordeón interactivo.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 7.1.0
  */
 "use client";
 
@@ -19,9 +19,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { SearchInput } from "@/components/ui/SearchInput"; // <-- Uso del componente de conveniencia
+import { SearchInput } from "@/components/ui/SearchInput";
 import { useDebounce } from "@/lib/hooks/use-debounce";
+import { clientLogger } from "@/lib/logging";
 
+/**
+ * @private
+ * @component HighlightedText
+ * @description Sub-componente que resalta una subcadena dentro de un texto.
+ * @param {{ text: string, highlight: string }} props - Texto y subcadena a resaltar.
+ * @returns {React.ReactElement}
+ */
 const HighlightedText = ({
   text,
   highlight,
@@ -67,6 +75,13 @@ export interface FaqProps {
   clearSearchAriaLabel: string;
 }
 
+/**
+ * @public
+ * @component FAQ
+ * @description Orquesta el renderizado de la sección de preguntas frecuentes.
+ * @param {FaqProps} props - Propiedades para configurar la sección.
+ * @returns {React.ReactElement}
+ */
 export function FAQ({
   tag,
   title,
@@ -76,6 +91,7 @@ export function FAQ({
   noResultsText,
   clearSearchAriaLabel,
 }: FaqProps): React.ReactElement {
+  clientLogger.trace("[FAQ] Renderizando componente de presentación puro.");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -98,9 +114,10 @@ export function FAQ({
   }, [debouncedSearchTerm, pathname, router]);
 
   const filteredItems = useMemo(() => {
-    if (!debouncedSearchTerm.trim()) return items;
+    const safeItems = items || [];
+    if (!debouncedSearchTerm.trim()) return safeItems;
     const lowercasedTerm = debouncedSearchTerm.toLowerCase();
-    return items.filter(
+    return safeItems.filter(
       (item) =>
         item.question.toLowerCase().includes(lowercasedTerm) ||
         (typeof item.answer === "string" &&
@@ -155,7 +172,6 @@ export function FAQ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             clearAriaLabel={clearSearchAriaLabel}
-            // isLoading={...} // Preparado para futuras búsquedas asíncronas
           />
         </div>
 
@@ -211,18 +227,4 @@ export function FAQ({
     </section>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Consumo de Componente Atómico**: ((Implementada)) El componente `FAQ` ahora utiliza el nuevo `SearchInput`, simplificando su JSX y adhiriéndose al principio DRY.
- *
- * @subsection Melhorias Futuras
- * 1. **Búsqueda Asíncrona**: ((Vigente)) La estructura ahora está preparada para soportar búsquedas asíncronas. Se podría añadir un estado `isLoading` al `FAQ` y pasarlo al `SearchInput` si las FAQs se obtuvieran de una API.
- *
- * =====================================================================
- */
 // src/components/landing/FAQ.tsx

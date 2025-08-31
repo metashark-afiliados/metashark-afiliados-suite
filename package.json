@@ -1,4 +1,3 @@
-
 {
   "name": "convertikit",
   "version": "1.3.0",
@@ -19,7 +18,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "diag:all": "tsx --tsconfig tsconfig.json scripts/supabase/diagnose-schema.ts",
+    "db:push": "supabase db push",
+    "diag:schema": "tsx --tsconfig tsconfig.json scripts/supabase/diagnose-schema.ts",
+    "diag:content": "tsx --tsconfig tsconfig.json scripts/supabase/diagnose-content.ts",
+    "diag:all": "pnpm diag:schema && pnpm diag:content",
     "gen:i18n:manifest": "tsx --tsconfig tsconfig.json scripts/i18n/generate-manifest.ts",
     "gen:i18n:schema": "tsx --tsconfig tsconfig.json scripts/i18n/generate-schema.ts",
     "gen:i18n": "pnpm gen:i18n:manifest && pnpm gen:i18n:schema",

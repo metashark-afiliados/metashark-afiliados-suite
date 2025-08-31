@@ -1,7 +1,8 @@
+// src/app/[locale]/login/page.tsx
 /**
  * @author Raz Podestá - MetaShark Tech
- * @version 7.0.0
- * @date 2025-08-29
+ * @version 8.0.0
+ * @date 2025-08-30
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
@@ -9,7 +10,6 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { unstable_setRequestLocale } from "next-intl/server";
 
 import {
   LoginForm,
@@ -25,15 +25,12 @@ import { clientLogger } from "@/lib/logging";
  * @description Orquesta la UI para la página de inicio de sesión.
  *              Es un Client Component que obtiene las traducciones necesarias y
  *              las inyecta en los componentes de presentación puros.
- * @param {object} props - Propiedades de la página, incluyendo el `locale`.
  * @returns {React.ReactElement}
  */
-export default function LoginPage({
-  params: { locale },
-}: {
-  params: { locale: string };
-}): React.ReactElement {
-  unstable_setRequestLocale(locale);
+export default function LoginPage(): React.ReactElement {
+  // La llamada a `unstable_setRequestLocale` fue eliminada porque es una
+  // función de servidor y no puede ser usada en un Client Component.
+  // El layout en `src/app/[locale]/layout.tsx` ya maneja esta lógica.
   clientLogger.trace("[LoginPage] Renderizando página de inicio de sesión.");
   const t = useTranslations("app.[locale].login.page");
 
@@ -63,14 +60,4 @@ export default function LoginPage({
     </AuthCardLayout>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Abstracción a `AuthPageLayout`**: ((Vigente)) El patrón de `AuthCardLayout` y `bottomLink` es similar entre `LoginPage` y `SignupPage`. Podría ser abstraído a un componente `AuthPageLayout` para una máxima adhesión al principio DRY.
- *
- * =====================================================================
- */
+// src/app/[locale]/login/page.tsx

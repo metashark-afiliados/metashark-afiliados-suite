@@ -2,12 +2,10 @@
 /**
  * @file DashboardSidebar.tsx
  * @description Barra lateral contextual. Refactorizada a un ensamblador puro
- *              que compone componentes soberanos.
- * @author Raz Podestá - MetaShark Tech
- * @version 11.0.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              que compone componentes soberanos y está instrumentada con
+ *              observabilidad y documentación de élite.
+ * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @version 12.0.0
  */
 "use client";
 
@@ -16,8 +14,18 @@ import React from "react";
 import { WorkspaceSwitcher } from "@/components/workspaces/WorkspaceSwitcher";
 import { NavList } from "./sidebar/NavList";
 import { SidebarLogo } from "./sidebar/SidebarLogo";
+import { clientLogger } from "@/lib/logging";
 
+/**
+ * @public
+ * @component DashboardSidebar
+ * @description Ensambla la barra lateral secundaria (contextual) del dashboard.
+ *              Es un componente de cliente puro que compone aparatos soberanos.
+ * @returns {React.ReactElement}
+ */
 export function DashboardSidebar(): React.ReactElement {
+  clientLogger.trace("[DashboardSidebar] Renderizando ensamblador de UI.");
+
   return (
     <>
       <SidebarLogo />
@@ -28,12 +36,4 @@ export function DashboardSidebar(): React.ReactElement {
     </>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Resolución de Errores de Tipo:** La refactorización a componentes soberanos resuelve toda la cascada de errores.
- * =====================================================================
- */
 // src/components/layout/DashboardSidebar.tsx
