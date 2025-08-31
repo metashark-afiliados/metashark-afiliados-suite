@@ -1,15 +1,11 @@
 // src/components/layout/GlobalOverlays.tsx
 /**
  * @file GlobalOverlays.tsx
- * @description Componente de cliente atómico y puro. Su única responsabilidad es
- *              renderizar todos los componentes de UI globales. Sincronizado
- *              para implementar la lógica de renderizado condicional del
- *              `WelcomeModal` para el flujo de "Onboarding Implícito".
+ * @description Componente de cliente atómico y puro. Revertido para eliminar
+ *              la dependencia del `AuthDialog` obsoleto.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 7.0.0
+ * @date 2025-08-31
  */
 "use client";
 
@@ -34,39 +30,22 @@ export function GlobalOverlays() {
 
   return (
     <>
-      {/* Diálogos de Gestión de Workspaces (Contexto de Dashboard) */}
+      {/* Widgets y Modales Globales */}
+      <LiaChatWidget />
+      <CommandPalette />
+
+      {/* Overlays Específicos del Dashboard (requieren `profile`) */}
       {profile && (
         <>
           <CreateWorkspaceDialog />
           <InviteMemberDialog />
           <DeleteWorkspaceDialog />
           <RenameWorkspaceDialog />
+          <TemplateGalleryModal />
+          {!profile.has_completed_onboarding && <WelcomeModal />}
         </>
       )}
-
-      {/* Widgets y Modales Globales */}
-      <LiaChatWidget />
-      <CommandPalette />
-      <TemplateGalleryModal />
-
-      {/* Flujo de Onboarding (Renderizado Condicional) */}
-      {profile && !profile.has_completed_onboarding && <WelcomeModal />}
     </>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Implementación de Onboarding Implícito: El componente ahora renderiza el `WelcomeModal` condicionalmente, completando la implementación del flujo de onboarding y la arquitectura v8.1.
- * 2. ((Implementada)) Desacoplamiento de Lógica: La lógica de renderizado condicional reside en este orquestador, manteniendo los componentes `DashboardLayout` (servidor) y `WelcomeModal` (cliente) puros y desacoplados.
- * 3. ((Implementada)) Componente Puro y Sin Estado: El componente no utiliza `useState`, su renderizado es una función pura de los datos del contexto, lo que lo hace predecible y performante.
- *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) Renderizado Condicional por Ruta: Para una optimización de élite, se podría usar el hook `usePathname` para renderizar ciertos overlays (como el `TemplateGalleryModal`) solo en las rutas donde son necesarios, reduciendo la huella de componentes en páginas irrelevantes.
- *
- * =====================================================================
- */
+// src/components/layout/GlobalOverlays.tsx

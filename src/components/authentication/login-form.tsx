@@ -1,9 +1,12 @@
+// src/components/authentication/login-form.tsx
 /**
+ * @file login-form.tsx
+ * @description Formulario de inicio de sesión de presentación puro.
+ *              Ha sido refactorizado para ser 100% agnóstico a la i18n,
+ *              recibiendo todos sus textos a través de props.
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 5.0.0
+ * @date 2025-08-31
  */
 "use client";
 
@@ -114,22 +117,8 @@ export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
           </span>
         </div>
       </div>
-      <OAuthButtonGroup
-        providers={["google", "apple"]}
-        texts={oauthButtonGroupTexts}
-      />
+      <OAuthButtonGroup providers={["google"]} texts={oauthButtonGroupTexts} />
     </form>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Tipado Estricto de Claves de Error**: ((Vigente)) El `as any` al pasar `state.error` a `tErrors` persiste. Se podría refinar el tipo `ActionResult` para que `error` sea un genérico `TErrorKey extends keyof ValidationErrors`, permitiendo una validación más estricta.
- * 2. **Formulario Controlado con `react-hook-form`**: ((Vigente)) Migrar este formulario para que utilice `react-hook-form` (como el de registro) proporcionaría validación del lado del cliente en tiempo real y una gestión de estado más robusta.
- *
- * =====================================================================
- */
+// src/components/authentication/login-form.tsx

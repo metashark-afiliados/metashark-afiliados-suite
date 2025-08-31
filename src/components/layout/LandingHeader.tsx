@@ -1,11 +1,11 @@
 // src/components/layout/LandingHeader.tsx
 /**
  * @file src/components/layout/LandingHeader.tsx
- * @description Componente de presentación 100% puro para el encabezado público.
- *              Recibe todo su contenido a través de props para alinearse con
- *              la arquitectura de orquestador de servidor de la `HomePage`.
+ * @description Componente de presentación puro. Ha sido revertido para utilizar
+ *              enlaces de navegación (`<Link>`) para la autenticación, restaurando
+ *              el flujo de navegación original del proyecto.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 2.0.0
+ * @version 4.0.0
  */
 "use client";
 
@@ -28,15 +28,6 @@ export interface LandingHeaderProps {
   openMenuText: string;
 }
 
-/**
- * @public
- * @component LandingHeader
- * @description Renderiza la cabecera de la landing page. Es un componente de
- *              presentación puro que recibe todos los textos y datos de
- *              navegación como props.
- * @param {LandingHeaderProps} props - Propiedades para configurar el encabezado.
- * @returns {React.ReactElement}
- */
 export function LandingHeader({
   navLinks,
   signInText,

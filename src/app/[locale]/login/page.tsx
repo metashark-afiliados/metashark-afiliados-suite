@@ -1,15 +1,17 @@
 // src/app/[locale]/login/page.tsx
 /**
+ * @file page.tsx
+ * @description Página de inicio de sesión. Refactorizada a un orquestador de UI
+ *              soberano que ensambla el layout y el formulario de login.
  * @author Raz Podestá - MetaShark Tech
- * @version 8.0.0
- * @date 2025-08-30
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 9.0.0
+ * @date 2025-08-31
  */
 "use client";
 
 import React from "react";
 import { useTranslations } from "next-intl";
+import { unstable_setRequestLocale } from "next-intl/server";
 
 import {
   LoginForm,
@@ -19,18 +21,19 @@ import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { clientLogger } from "@/lib/logging";
 
-/**
- * @public
- * @page LoginPage
- * @description Orquesta la UI para la página de inicio de sesión.
- *              Es un Client Component que obtiene las traducciones necesarias y
- *              las inyecta en los componentes de presentación puros.
- * @returns {React.ReactElement}
- */
-export default function LoginPage(): React.ReactElement {
-  // La llamada a `unstable_setRequestLocale` fue eliminada porque es una
-  // función de servidor y no puede ser usada en un Client Component.
-  // El layout en `src/app/[locale]/layout.tsx` ya maneja esta lógica.
+export default function LoginPage({
+  params: { locale },
+}: {
+  params: { locale: string };
+}): React.ReactElement {
+  // Nota: unstable_setRequestLocale es una no-op en Client Components,
+  // pero se mantiene por coherencia con las convenciones de `next-intl`.
+  try {
+    unstable_setRequestLocale(locale);
+  } catch (error) {
+    // Ignorar el error esperado en el cliente.
+  }
+
   clientLogger.trace("[LoginPage] Renderizando página de inicio de sesión.");
   const t = useTranslations("app.[locale].login.page");
 
@@ -39,7 +42,7 @@ export default function LoginPage(): React.ReactElement {
       <SmartLink
         href="/signup"
         label={chunks}
-        className="text-primary hover:underline"
+        className="font-bold text-primary hover:underline"
       />
     ),
   });
