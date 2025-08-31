@@ -3,17 +3,16 @@
  * @file src/middleware/handlers/multitenancy/index.ts
  * @description Manejador multi-tenant de élite. Valida la existencia de un
  *              subdominio contra un caché en el Edge (Vercel KV) antes de
- *              reescribir la URL, optimizando drásticamente el rendimiento.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              reescribir la URL, y está alineado con la infraestructura de
+ *              logging canónica de la aplicación.
+ * @author L.I.A. Legacy
+ * @copilot RaZ WriTe
+ * @version 3.0.0
  */
 import { type NextRequest, NextResponse } from "next/server";
 
 import { getSiteSubdomainStatus } from "@/lib/data/sites-edge";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { rootDomain } from "@/lib/utils";
 
 export async function handleMultitenancy(
@@ -30,13 +29,14 @@ export async function handleMultitenancy(
 
   if (isSubdomainRequest) {
     const subdomain = hostWithoutPort.replace(`.${rootDomainWithoutPort}`, "");
-    logger.trace(`[MULTITENANCY_HANDLER] Subdominio detectado: ${subdomain}`);
+    logger.trace({ subdomain }, "[MULTITENANCY_HANDLER] Subdominio detectado.");
 
     const isValidSubdomain = await getSiteSubdomainStatus(subdomain);
 
     if (!isValidSubdomain) {
       logger.warn(
-        `[MULTITENANCY_HANDLER] Subdominio inválido o no encontrado en el caché del Edge: '${subdomain}'. Dejando que Next.js maneje el 404.`
+        { subdomain },
+        "[MULTITENANCY_HANDLER] Subdominio inválido o no encontrado en caché. Dejando que Next.js maneje el 404."
       );
       return response;
     }
@@ -48,8 +48,8 @@ export async function handleMultitenancy(
     );
 
     logger.info(
-      "[MULTITENANCY_HANDLER] DECISION: Reescribiendo a ruta de sitio público.",
-      { to: rewriteUrl.pathname }
+      { to: rewriteUrl.pathname },
+      "[MULTITENANCY_HANDLER] DECISION: Reescribiendo a ruta de sitio público."
     );
 
     const headers = new Headers(response.headers);
@@ -61,18 +61,4 @@ export async function handleMultitenancy(
   );
   return response;
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Validación Preventiva en el Edge:** El manejador ahora valida la existencia del subdominio antes de la reescritura, optimizando el rendimiento.
- * 2. ((Implementada)) **Reducción de Carga del Backend:** Se reduce la carga sobre el runtime de Node.js y la base de datos PostgreSQL.
- *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Soporte para Dominios Personalizados:** La lógica debe ser expandida para consultar también un set de `custom_domains` en Vercel KV.
- *
- * =====================================================================
- */
 // src/middleware/handlers/multitenancy/index.ts

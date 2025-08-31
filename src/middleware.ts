@@ -1,16 +1,18 @@
 // src/middleware.ts
 /**
  * @file src/middleware.ts
- * @description Orquestador de Middleware de Élite. Refactorizado para implementar
- *              un patrón de "respuesta encadenada" inmutable, resolviendo una
- *              regresión crítica en el Edge Runtime.
- * @author Raz Podestá - MetaShark Tech
- * @version 8.0.0
- * @date 2025-08-31
+ * @description Orquestador de Middleware de Élite. Implementa un patrón de
+ *              "respuesta encadenada" inmutable para garantizar la integridad
+ *              de la petición y la respuesta a través de un pipeline de
+ *              manejadores secuenciales y observables.
+ * @author L.I.A. Legacy
+ * @copilot RaZ WriTe
+ * @version 8.1.0
+ * @see .docs-espejo/middleware.ts.md
  */
 import { type NextRequest, NextResponse } from "next/server";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import {
   handleAuth,
   handleI18n,
@@ -27,13 +29,16 @@ async function withPerformanceLogging<
   const result = await handler(...args);
   const endTime = performance.now();
   const duration = (endTime - startTime).toFixed(2);
-  logger.trace(`[PERF] Handler '${name}' ejecutado en ${duration}ms.`);
+  logger.trace(
+    { duration_ms: parseFloat(duration) },
+    `[PERF] Handler '${name}' ejecutado.`
+  );
   return result;
 }
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
-  logger.trace("==> [MIDDLEWARE_PIPELINE] START <==", { path: pathname });
+  logger.trace({ path: pathname }, "==> [MIDDLEWARE_PIPELINE] INICIO <==");
   const pipelineStartTime = performance.now();
 
   try {
@@ -44,11 +49,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     if (maintenanceResponse) return maintenanceResponse;
 
     // --- INICIO DE REFACTORIZACIÓN: PATRÓN DE RESPUESTA ENCADENADA ---
-    let response = NextResponse.next({
-      request: { headers: new Headers(request.headers) },
-    });
-
-    response = await withPerformanceLogging("I18n", handleI18n, request);
+    let response = await withPerformanceLogging("I18n", handleI18n, request);
 
     const detectedLocale = response.headers.get("x-app-locale") || "N/A";
 
@@ -64,8 +65,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       request,
       response
     );
-    // handleTelemetry puede mutar la response (añadir cookies) pero no necesita devolverla
-    // ya que es el último en la cadena principal.
+
+    // handleTelemetry puede mutar la response (añadir cookies) pero es el último.
     await withPerformanceLogging(
       "Telemetry",
       handleTelemetry,
@@ -76,25 +77,30 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
     const pipelineEndTime = performance.now();
     const totalDuration = (pipelineEndTime - pipelineStartTime).toFixed(2);
-    logger.info(`[PERF] Pipeline completo ejecutado en ${totalDuration}ms.`, {
-      path: pathname,
-      locale: detectedLocale,
-    });
+    logger.info(
+      {
+        path: pathname,
+        locale: detectedLocale,
+        duration_ms: parseFloat(totalDuration),
+      },
+      "[PERF] Pipeline completo ejecutado."
+    );
 
-    logger.trace("==> [MIDDLEWARE_PIPELINE] END <==", { path: pathname });
+    logger.trace({ path: pathname }, "==> [MIDDLEWARE_PIPELINE] FIN <==");
     return response;
   } catch (error) {
     const errorId = `mw-err-${Date.now()}`;
     logger.error(
-      `[MIDDLEWARE_PIPELINE] FALLO CRÍTICO IRRECUPERABLE. Error ID: ${errorId}`,
       {
+        errorId,
         path: pathname,
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
+      `[MIDDLEWARE_PIPELINE] FALLO CRÍTICO IRRECUPERABLE.`
     );
     const url = request.nextUrl.clone();
-    url.pathname = "/500"; // Redirigir a una página de error estática o simple
+    url.pathname = "/500";
     url.search = `?errorId=${errorId}`;
     return NextResponse.rewrite(url);
   }

@@ -6,7 +6,8 @@
  *              en toda la aplicación, desde componentes de UI hasta manejadores
  *              de middleware.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @copilot RaZ WriTe
+ * @version 2.0.0
  */
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -37,7 +38,7 @@ export const rootDomain =
  * @param {...ClassValue[]} inputs - Una secuencia de clases a combinar.
  * @returns {string} La cadena de clases finales, optimizada y sin conflictos.
  */
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
@@ -83,17 +84,42 @@ export function isPrivateIpAddress(ip: string): boolean {
 }
 
 /**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Fundación de Utilidades**: ((Implementada)) La reconstrucción de este archivo proporciona utilidades críticas (`cn`, `debounce`, `rootDomain`) que son dependencias para la gran mayoría de los aparatos de UI y hooks del proyecto, desbloqueando su reconstrucción.
- * 2. **Cero Regresiones**: ((Implementada)) La lógica es una transcripción de alta fidelidad del snapshot original.
- *
- * @subsection Melhorias Futuras
- * 1. **Validación de URL Canónica**: ((Vigente)) Añadir una función `canonicalizeUrl(url)` para validar y limpiar URLs, asegurando que siempre sean canónicas y seguras (ej. eliminando parámetros de seguimiento innecesarios).
- *
- * =====================================================================
+ * @public
+ * @function slugify
+ * @description Convierte un string en un slug URL-friendly. Normaliza,
+ *              translitera caracteres especiales a sus equivalentes ASCII,
+ *              reemplaza espacios por guiones y limpia caracteres no válidos.
+ * @param {string} text - El texto de entrada.
+ * @returns {string} El texto convertido en slug.
  */
+export const slugify = (text: string): string => {
+  const a =
+    "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
+  const b =
+    "aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------";
+  const p = new RegExp(a.split("").join("|"), "g");
+
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, "-") // Reemplazar espacios con -
+    .replace(p, (c) => b.charAt(a.indexOf(c))) // Reemplazar caracteres especiales
+    .replace(/&/g, "-and-") // Reemplazar & con 'and'
+    .replace(/[^\w-]+/g, "") // Eliminar caracteres inválidos
+    .replace(/--+/g, "-") // Colapsar guiones múltiples
+    .replace(/^-+/, "") // Recortar guiones del inicio
+    .replace(/-+$/, ""); // Recortar guiones del final
+};
+
+/**
+ * @public
+ * @function pascalToKebabCase
+ * @description Convierte una string de PascalCase (ej. "ArrowRightLeft") a kebab-case (ej. "arrow-right-left").
+ *              Es útil para generar nombres de clases CSS o identificadores de HTML a partir de nombres de componentes/iconos.
+ * @param {string} str - La string en PascalCase a ser convertida.
+ * @returns {string} La string convertida en kebab-case.
+ */
+export const pascalToKebabCase = (str: string): string => {
+  return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1-$2").toLowerCase();
+};
 // src/lib/utils.ts

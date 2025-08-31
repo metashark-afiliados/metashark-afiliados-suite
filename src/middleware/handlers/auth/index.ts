@@ -2,16 +2,16 @@
 /**
  * @file src/middleware/handlers/auth/index.ts
  * @description Motor de reglas de autorización de élite para el middleware.
- *              Ha sido refactorizado holísticamente para alinearse con el patrón
- *              de "respuesta encadenada", resolviendo una regresión crítica
- *              en el Edge Runtime.
- * @author Raz Podestá - MetaShark Tech
- * @version 7.0.0
- * @date 2025-08-31
+ *              Implementa un patrón de "respuesta encadenada" para garantizar
+ *              la integridad de la sesión y las cookies a través del pipeline.
+ * @author L.I.A. Legacy
+ * @copilot RaZ WriTe
+ * @version 8.0.0
+ * @see .docs-espejo/middleware/handlers/auth/index.md
  */
 import { type NextRequest, NextResponse } from "next/server";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import {
   getAuthDataForMiddleware,
   type UserAuthData,
@@ -49,8 +49,8 @@ function handleUnauthenticated(
   if (rule.classification === "protected") {
     const searchParams = new URLSearchParams({ next: pathname });
     logger.info(
-      "[AUTH_HANDLER] Usuario no autenticado en ruta protegida. Redirigiendo a login.",
-      { from: pathname, to: `/${locale}/login` }
+      { from: pathname, to: `/${locale}/login` },
+      "[AUTH_HANDLER] Usuario no autenticado en ruta protegida. Redirigiendo a login."
     );
     return createRedirectResponse(request, locale, "/login", searchParams);
   }
@@ -66,8 +66,8 @@ function handleAuthenticated(
 ): NextResponse | null {
   if (rule.classification === "auth") {
     logger.info(
-      "[AUTH_HANDLER] Usuario autenticado en ruta de autenticación. Redirigiendo a dashboard.",
-      { from: pathname, userId: authData.user.id }
+      { from: pathname, userId: authData.user.id },
+      "[AUTH_HANDLER] Usuario autenticado en ruta de autenticación. Redirigiendo a dashboard."
     );
     return createRedirectResponse(request, locale, "/dashboard");
   }
@@ -75,13 +75,13 @@ function handleAuthenticated(
   if (rule.classification === "protected" && rule.requiredRoles) {
     if (!rule.requiredRoles.includes(authData.appRole)) {
       logger.warn(
-        "[AUTH_HANDLER] VIOLACIÓN DE PERMISOS: Acceso denegado a la ruta.",
         {
           userId: authData.user.id,
           role: authData.appRole,
           required: rule.requiredRoles,
           path: pathname,
-        }
+        },
+        "[AUTH_HANDLER] VIOLACIÓN DE PERMISOS: Acceso denegado a la ruta."
       );
       return createRedirectResponse(request, locale, "/unauthorized");
     }
@@ -95,7 +95,7 @@ export async function handleAuth(
   response: NextResponse
 ): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
-  logger.trace("==> [AUTH_HANDLER] START <==", { path: pathname });
+  logger.trace({ path: pathname }, "==> [AUTH_HANDLER] INICIO <==");
 
   if (process.env.DEV_MODE_AUTH_BYPASS === "true") {
     logger.warn(
@@ -104,7 +104,6 @@ export async function handleAuth(
     return response;
   }
 
-  // --- INICIO DE REFACTORIZACIÓN: PATRÓN DE RESPUESTA ENCADENADA ---
   const { authData, response: responseAfterAuthCheck } =
     await getAuthDataForMiddleware(request, response);
 
@@ -128,12 +127,11 @@ export async function handleAuth(
     : handleUnauthenticated(request, rule, pathname, locale);
 
   const finalResponse = redirectResponse || responseAfterAuthCheck;
-  // --- FIN DE REFACTORIZACIÓN ---
 
-  logger.trace("==> [AUTH_HANDLER] END <==", {
-    path: pathname,
-    action: redirectResponse ? "REDIRECT" : "PASS",
-  });
+  logger.trace(
+    { path: pathname, action: redirectResponse ? "REDIRECT" : "PASS" },
+    "==> [AUTH_HANDLER] FIN <=="
+  );
 
   return finalResponse;
 }

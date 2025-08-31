@@ -2,22 +2,21 @@
 /**
  * @file src/i18n.ts
  * @description Orquestador de Internacionalización de élite. Este aparato es
- *              el motor de la estrategia IMAS (Internationalization Modular
- *              Atomic Strategy). Consume el manifiesto de mensajes, carga
- *              dinámicamente los módulos para el locale actual y reconstruye
- *              la estructura de objetos anidados que `next-intl` requiere.
- * @author Raz Podestá - MetaShark Tech
- * @version 12.0.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              el motor y guardián de la estrategia IMAS. Carga, ensambla y
+ *              valida los mensajes contra el `i18nSchema` maestro, actuando
+ *              como una barrera de calidad para el contenido de la aplicación.
+ * @author L.I.A. Legacy
+ * @copilot RaZ WriTe
+ * @version 13.1.0
+ * @see .docs-espejo/lib/i18n.ts.md
  */
 import { getRequestConfig } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { setNestedProperty } from "@/lib/helpers/set-nested-property.helper";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { type AppLocale, locales } from "@/lib/navigation";
+import { i18nSchema } from "@/lib/validators";
 import { messagesManifest } from "@/messages/manifest";
 
 export const defaultLocale: AppLocale = "es-ES";
@@ -54,26 +53,28 @@ export default getRequestConfig(async ({ locale }) => {
       {} as Record<string, any>
     );
 
-    return { messages };
+    const validation = i18nSchema.safeParse(messages);
+    if (!validation.success) {
+      const errorMessage = `[I18N] INCONSISTENCIA CRÍTICA: Los mensajes ensamblados para el locale '${typedLocale}' no cumplen con el contrato i18nSchema.`;
+      logger.error({ errors: validation.error.flatten() }, errorMessage);
+      throw new Error(errorMessage);
+    }
+    logger.trace(
+      `[I18N] Mensajes para locale '${typedLocale}' validados con éxito.`
+    );
+
+    return { messages: validation.data as any };
   } catch (error) {
-    logger.error("[I18N] Fallo crítico al ensamblar mensajes.", {
-      locale: typedLocale,
-      error: error instanceof Error ? error.message : String(error),
-    });
+    // --- INICIO DE REFACTORIZACIÓN (Firma de Pino API) ---
+    logger.error(
+      {
+        locale: typedLocale,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      "[I18N] Fallo crítico al ensamblar mensajes."
+    );
+    // --- FIN DE REFACTORIZACIÓN ---
     return { messages: {} };
   }
 });
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Arquitectura Canónica Validada:** La auditoría confirma que esta implementación es la solución de élite para una i18n modular y tipo-segura en Next.js.
- *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Validación con Zod en Build:** Integrar la validación del `i18nSchema` aquí. Si el objeto `messages` ensamblado no cumple con el contrato de Zod, el proceso de build debería fallar explícitamente, previniendo la subida de traducciones con tipos incorrectos.
- *
- * =====================================================================
- */
 // src/i18n.ts

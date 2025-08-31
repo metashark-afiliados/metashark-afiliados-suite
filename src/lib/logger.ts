@@ -1,13 +1,15 @@
 // src/lib/logger.ts
-
 /**
  * @file src/lib/logger.ts
  * @description Aparato de Logging de Élite y Desacoplado.
  *              Proporciona dos loggers distintos: `logger` para el entorno de
  *              servidor (con `pino`) y `clientLogger` para el entorno de cliente
  *              (wrapper de `console`), garantizando la separación de dependencias.
+ *              Esta es la implementación canónica que cumple con el manifiesto
+ *              de observabilidad.
  * @author L.I.A. Legacy
- * @version 1.1.0
+ * @copilot RaZ WriTe
+ * @version 2.1.0
  * @see .docs/espejo/lib/logger.md
  */
 
@@ -16,9 +18,9 @@ import pino from "pino";
 // --- LOGGER DE SERVIDOR ---
 
 /**
- * @description El nivel de log para el logger de servidor.
+ * Define el nivel de log para el logger de servidor.
  * Se lee desde la variable de entorno `LOG_LEVEL`. Si no se define,
- * se utiliza 'info' en producción y 'trace' en desarrollo.
+ * se utiliza 'info' en producción y 'trace' en desarrollo para máxima observabilidad.
  * @type {pino.Level}
  */
 const logLevel: pino.Level =
@@ -26,29 +28,9 @@ const logLevel: pino.Level =
   (process.env.NODE_ENV === "development" ? "trace" : "info");
 
 /**
- * @description Opciones de configuración base para el logger de Pino.
- * @type {pino.LoggerOptions}
- */
-const pinoOptions: pino.LoggerOptions = {
-  level: logLevel,
-  base: {
-    service: "convertikit-server",
-    pid: process.pid,
-    hostname:
-      typeof process.env.HOSTNAME === "string"
-        ? process.env.HOSTNAME
-        : "unknown",
-  },
-  timestamp: pino.stdTimeFunctions.isoTime,
-  formatters: {
-    level: (label: string) => ({ level: label }),
-  },
-};
-
-/**
- * @description Transporte de Pino para formatear logs en desarrollo.
- * Utiliza `pino-pretty` para una salida legible y coloreada.
- * En producción, este transporte es `undefined`, resultando en logs JSON.
+ * Transporte de Pino para formatear logs en desarrollo.
+ * Utiliza `pino-pretty` para una salida legible y coloreada, mejorando la DX.
+ * En producción, este transporte es `undefined`, resultando en logs JSON estructurados.
  * @type {pino.TransportSingleOptions | undefined}
  */
 const pinoTransport: pino.TransportSingleOptions | undefined =
@@ -74,7 +56,25 @@ const pinoTransport: pino.TransportSingleOptions | undefined =
  * import { logger } from '@/lib/logger';
  * logger.info({ userId: '123' }, 'User logged in successfully');
  */
-export const logger = pino(pinoOptions, pinoTransport);
+export const logger = pino({
+  level: logLevel,
+  base: {
+    service: "convertikit-server",
+    pid: process.pid,
+    hostname:
+      typeof process.env.HOSTNAME === "string"
+        ? process.env.HOSTNAME
+        : "unknown",
+  },
+  timestamp: pino.stdTimeFunctions.isoTime,
+  formatters: {
+    level: (label: string) => ({ level: label }),
+  },
+  // --- INICIO DE REFACTORIZACIÓN (API Pino v8+) ---
+  // El transporte ahora se pasa dentro del objeto de opciones.
+  transport: pinoTransport,
+  // --- FIN DE REFACTORIZACIÓN ---
+});
 
 // --- LOGGER DE CLIENTE ---
 
@@ -95,5 +95,4 @@ export const clientLogger = {
   warn: console.warn.bind(console, "[WARN]"),
   error: console.error.bind(console, "[ERROR]"),
 };
-
 // src/lib/logger.ts

@@ -1,20 +1,16 @@
 // src/middleware/handlers/telemetry/index.ts
 /**
  * @file src/middleware/handlers/telemetry/index.ts
- * @description Manejador de telemetría de élite. Ha sido refactorizado para
- *              eliminar el anti-patrón de "petición a sí mismo" y para enviar
- *              únicamente datos veraces del servidor, delegando el enriquecimiento
- *              al cliente.
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-30
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Manejador de telemetría de élite. Alineado con la
+ *              infraestructura de logging canónica de la aplicación.
+ * @author L.I.A. Legacy
+ * @copilot RaZ WriTe
+ * @version 6.0.0
  */
 import { type NextRequest, type NextResponse } from "next/server";
 
 import { telemetry } from "@/lib/actions";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { lookupIpAddress } from "@/lib/services/geoip.service";
 
 /**
@@ -57,8 +53,8 @@ export async function handleTelemetry(
 
   telemetry.logVisitorAction(logPayload).catch((error) => {
     logger.error(
-      "[TelemetryHandler] Fallo en la ejecución en segundo plano de logVisitorAction.",
-      error
+      { error: error instanceof Error ? error.message : String(error) },
+      "[TelemetryHandler] Fallo en la ejecución en segundo plano de logVisitorAction."
     );
   });
 
