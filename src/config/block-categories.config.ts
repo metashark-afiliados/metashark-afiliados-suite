@@ -1,51 +1,54 @@
-// src/config/icon-libraries.config.ts
+// src/config/block-categories.config.ts
 /**
- * @file icon-libraries.config.ts
- * @description Manifiesto de Configuración Declarativo y SSoT para las librerías de iconos.
- *              Refactorizado a un estándar de élite con una SSoT de tipos literal (`as const`)
- *              para garantizar la inferencia de tipos correcta en toda la aplicación.
+ * @file block-categories.config.ts
+ * @description Manifiesto de Configuración Declarativo y SSoT para las categorías
+ *              de bloques del constructor. Corregido para asegurar la exportación
+ *              correcta de la configuración, resolviendo un error crítico de build.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 3.0.0
+ * @version 2.1.0
  */
 import { type LucideIconName } from "@/config/lucide-icon-names";
 
 /**
  * @public
- * @constant ICON_LIBRARY_IDS
- * @description La Única Fuente de Verdad (SSoT) para los identificadores de
- *              librerías de iconos. El uso de `as const` es crítico para que
- *              TypeScript infiera un tuple de literales inmutables.
+ * @typedef BlockCategoryId
+ * @description Define la unión de todos los identificadores de categoría de bloque válidos.
  */
-export const ICON_LIBRARY_IDS = ["lucide", "tabler", "react-icons"] as const;
+export type BlockCategoryId =
+  | "templates"
+  | "headers"
+  | "heros"
+  | "features"
+  | "testimonials"
+  | "footers";
 
 /**
  * @public
- * @typedef IconLibraryId
- * @description El tipo de unión de literales para los IDs de librerías de iconos,
- *              derivado directamente de la SSoT `ICON_LIBRARY_IDS`.
+ * @interface BlockCategoryDefinition
+ * @description Define el contrato de datos para una única categoría de bloque.
  */
-export type IconLibraryId = (typeof ICON_LIBRARY_IDS)[number];
-
-export interface IconLibraryDefinition {
-  id: IconLibraryId;
-  name: string;
-  packageName: string;
-  importFn: (name: string) => () => Promise<React.ComponentType<any>>;
+export interface BlockCategoryDefinition {
+  id: BlockCategoryId;
+  iconName: LucideIconName;
+  i18nKey: string;
 }
 
-export const ICON_LIBRARIES_MANIFEST: IconLibraryDefinition[] = [
+/**
+ * @public
+ * @constant BLOCK_CATEGORIES_CONFIG
+ * @description El manifiesto canónico que define la estructura y metadatos
+ *              de las categorías de bloques disponibles en el constructor.
+ */
+export const BLOCK_CATEGORIES_CONFIG: BlockCategoryDefinition[] = [
   {
-    id: "lucide",
-    name: "Lucide Icons",
-    packageName: "lucide-react",
-    importFn: (name: string) => () =>
-      import("lucide-react").then((mod) => {
-        if (name in mod.icons) {
-          return mod.icons[name as LucideIconName];
-        }
-        return mod.HelpCircle;
-      }),
+    id: "templates",
+    iconName: "LayoutTemplate",
+    i18nKey: "category_templates",
   },
-  // La lógica para otras librerías seguiría un patrón similar
+  { id: "headers", iconName: "PanelTop", i18nKey: "category_headers" },
+  { id: "heros", iconName: "Image", i18nKey: "category_heros" },
+  { id: "features", iconName: "Sparkles", i18nKey: "category_features" },
+  { id: "testimonials", iconName: "Quote", i18nKey: "category_testimonials" },
+  { id: "footers", iconName: "PanelBottom", i18nKey: "category_footers" },
 ];
-// src/config/icon-libraries.config.ts
+// src/config/block-categories.config.ts
