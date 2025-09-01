@@ -1,89 +1,84 @@
 // src/lib/actions/_helpers/rate-limiter.helper.ts
 /**
  * @file src/lib/actions/_helpers/rate-limiter.helper.ts
- * @description Helper para gestionar la limitación de tasa (rate limiting) de acciones sensibles.
- *              Este aparato es una capa de seguridad fundamental para prevenir ataques
- *              de fuerza bruta y abuso de recursos en endpoints públicos como el login
- *              o el restablecimiento de contraseña. Ha sido blindado para manejar
- *              de forma segura entradas de IP nulas o indefinidas.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Helper de seguridad para la limitación de tasa (rate limiting).
+ *              Alineado con la arquitectura de logging de élite (pino).
+ * @author @author RaZ Podestá - MetaShark Tech
+ * @version 2.1.0
+ * @see .docs-espejo/lib/actions/_helpers/rate-limiter.helper.ts.md
  */
 "use server";
 import "server-only";
 
-import { logger } from "@/lib/logging";
+import { kv } from "@vercel/kv";
+
+import { logger } from "@/lib/logger";
+import { type ActionResult } from "@/lib/validators";
+
+const RATE_LIMIT_LIMIT = parseInt(process.env.RATE_LIMIT_LIMIT || "10", 10);
+const RATE_LIMIT_DURATION_S = parseInt(
+  process.env.RATE_LIMIT_DURATION_S || "60",
+  60
+);
+
+export type RateLimitedAction = "password_reset" | "login" | "email_resend";
 
 /**
  * @public
  * @async
  * @function checkRateLimit
- * @description Verifica si una acción específica, originada desde una IP, puede ser
- *              ejecutada con base en límites de tasa predefinidos.
- *              Actualmente, es una simulación que permite el paso, pero está diseñada
- *              para ser integrada con un servicio como Vercel KV o Upstash Redis.
- * @param {string | null | undefined} ip - La dirección IP de la petición a verificar.
- * @param {'password_reset' | 'login' | 'email_resend'} action - El tipo de acción a ser limitada.
- * @returns {Promise<{ success: boolean; error?: string }>} El resultado de la verificación.
- *          `success: true` si la acción está permitida.
- *          `success: false` con un mensaje de `error` si la acción está bloqueada.
+ * @description Verifica si una acción puede ser ejecutada basándose en límites de tasa.
+ * @param {string | null | undefined} ip - La dirección IP de la petición.
+ * @param {RateLimitedAction} action - El tipo de acción a limitar.
+ * @returns {Promise<ActionResult<void>>} El resultado de la verificación.
  */
 export async function checkRateLimit(
   ip: string | null | undefined,
-  action: "password_reset" | "login" | "email_resend"
-): Promise<{ success: boolean; error?: string }> {
+  action: RateLimitedAction
+): Promise<ActionResult<void>> {
   if (!ip) {
     logger.warn(
-      `[RateLimiter] No se pudo determinar la dirección IP. Se omitirá la verificación de límite de tasa para la acción: ${action}. Esta acción será permitida.`
+      `[RateLimiter] No se pudo determinar la dirección IP. Se omitirá la verificación.`,
+      { action }
     );
-    // Por seguridad, en un entorno de producción estricto, esto podría devolver `success: false`.
-    // Sin embargo, para no bloquear a usuarios detrás de proxies, se permite el paso.
-    return { success: true };
+    return { success: true, data: undefined };
   }
 
-  /*
-   * Lógica de implementación real con un servicio como Vercel KV:
-   *
-   * import { kv } from "@vercel/kv";
-   *
-   * const LIMIT = 5; // 5 peticiones
-   * const DURATION = 60; // por 60 segundos
-   *
-   * const key = `rate_limit_${action}_${ip}`;
-   * const current = await kv.get<number>(key);
-   *
-   * if (current && current >= LIMIT) {
-   *   logger.warn(`[RateLimiter] Límite de tasa excedido para ${ip} en la acción ${action}.`);
-   *   return { success: false, error: "Demasiadas solicitudes. Por favor, intente de nuevo más tarde." };
-   * }
-   *
-   * // Usar una transacción para incrementar el contador y establecer el TTL
-   * const pipe = kv.pipeline();
-   * pipe.incr(key);
-   * pipe.expire(key, DURATION);
-   * await pipe.exec();
-   *
-   */
-  logger.info(
-    `[RateLimiter:Simulated] Verificación de límite de tasa para IP ${ip} en la acción ${action}. Acción permitida.`
-  );
-  return { success: true };
-}
+  const key = `rate_limit:${action}:${ip}`;
 
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Integração Real com Vercel KV/Upstash**: ((Vigente)) Substituir a simulação pela implementação real utilizando um serviço de armazenamento chave-valor de baixa latência para rastrear as requisições por IP.
- * 2. **Limites Configuráveis**: ((Vigente)) Mover os limites (ex: 5 requisições por minuto) para variáveis de ambiente, permitindo ajustar a política de rate limiting sem necessidade de redes implantar a aplicação.
- *
- * @subsection Melhorias Adicionadas
- * 1. **Abstração de Segurança**: ((Implementada)) Este helper abstrai a complexidade da lógica de `rate limiting`, fornecendo uma interface simples (`checkRateLimit`) para ser consumida pelas Server Actions.
- * 2. **Manejo Robusto de IP**: ((Implementada)) A função lida de forma segura com o caso de uma IP nula ou indefinida, registrando uma advertência, mas permitindo que a ação continue para não bloquear usuários legítimos atrás de proxies mal configurados.
- * 3. **Documentação Explícita**: ((Implementada)) O código inclui um exemplo comentado de uma implementação real com Vercel KV, servindo como documentação para a futura integração.
- *
- * =====================================================================
- */
+  try {
+    const currentCount = await kv.get<number>(key);
+
+    if (currentCount && currentCount >= RATE_LIMIT_LIMIT) {
+      logger.warn(`[RateLimiter] Límite de tasa excedido.`, {
+        ip,
+        action,
+        limit: RATE_LIMIT_LIMIT,
+      });
+      return {
+        success: false,
+        error: "ValidationErrors.generic.error_too_many_requests",
+      };
+    }
+
+    const pipe = kv.pipeline();
+    pipe.incr(key);
+    pipe.expire(key, RATE_LIMIT_DURATION_S);
+    await pipe.exec();
+
+    logger.trace(`[RateLimiter] Petición permitida y contada.`, {
+      ip,
+      action,
+      count: (currentCount || 0) + 1,
+    });
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    logger.error(
+      `[RateLimiter] Fallo crítico al interactuar con Vercel KV. Se permitirá la acción por defecto.`,
+      { err: error, key }
+    );
+    return { success: true, data: undefined };
+  }
+}
 // src/lib/actions/_helpers/rate-limiter.helper.ts

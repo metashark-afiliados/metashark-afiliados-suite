@@ -3,16 +3,17 @@
  * @file src/lib/supabase/middleware.ts
  * @description Aparato de utilidad para la creación de un cliente Supabase de servidor,
  *              específicamente diseñado para el entorno de Middleware de Next.js (Edge Runtime).
- *              Ha sido refactorizado holísticamente para ser compatible con el Edge,
- *              implementando el patrón de "respuesta encadenada" y mejorando la observabilidad.
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-31
+ *              Implementa el patrón de "respuesta encadenada" para una gestión de
+ *              cookies robusta e inmutable.
+ * @author L.I.A. Legacy
+ * @copilot RaZ WriTe
+ * @version 6.0.0
+ * @see .docs-espejo/lib/supabase/middleware.md
  */
 import { type NextRequest, NextResponse } from "next/server";
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { type Database } from "@/lib/types/database";
 
 type CanonicalCookieName =
@@ -46,22 +47,26 @@ function getEdgeCookieHandlers(
       options: CookieOptions
     ) {
       logger.trace(
-        `[SupabaseMiddlewareClient:CookieHandler] Setting cookie: ${name}`
+        { cookieName: name },
+        `[SupabaseMiddlewareClient:CookieHandler] Setting cookie.`
       );
       try {
+        // Se clona la request para crear una nueva response y aplicar la cookie.
         const newResponse = createChainedResponse(request);
         newResponse.cookies.set({ name, value, ...options });
+        // Se notifica al orquestador sobre la nueva response.
         updateResponseCallback(newResponse);
       } catch (error) {
         logger.error(
-          `[SupabaseMiddlewareClient:CookieHandler] Failed to set cookie: ${name}`,
-          error
+          { cookieName: name, error },
+          `[SupabaseMiddlewareClient:CookieHandler] Failed to set cookie.`
         );
       }
     },
     remove(name: CanonicalCookieName | string, options: CookieOptions) {
       logger.trace(
-        `[SupabaseMiddlewareClient:CookieHandler] Removing cookie: ${name}`
+        { cookieName: name },
+        `[SupabaseMiddlewareClient:CookieHandler] Removing cookie.`
       );
       try {
         const newResponse = createChainedResponse(request);
@@ -69,8 +74,8 @@ function getEdgeCookieHandlers(
         updateResponseCallback(newResponse);
       } catch (error) {
         logger.error(
-          `[SupabaseMiddlewareClient:CookieHandler] Failed to remove cookie: ${name}`,
-          error
+          { cookieName: name, error },
+          `[SupabaseMiddlewareClient:CookieHandler] Failed to remove cookie.`
         );
       }
     },
@@ -90,6 +95,7 @@ export function createClient(
     throw new Error("Supabase environment variables are not defined.");
   }
 
+  // Utiliza la respuesta inicial o crea una nueva.
   let response = initialResponse || createChainedResponse(request);
 
   const updateResponse = (newResponse: NextResponse) => {

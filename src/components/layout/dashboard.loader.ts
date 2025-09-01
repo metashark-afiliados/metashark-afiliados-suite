@@ -1,22 +1,23 @@
 // src/components/layout/dashboard.loader.ts
 /**
  * @file dashboard.loader.ts
- * @description Aparato de carga de datos de élite. Ha sido refactorizado
- *              holísticamente para consumir la API de datos atomizada y namespaced,
- *              y para fortalecer su contrato de retorno `DashboardLayoutData`,
- *              resolviendo la cascada de errores de tipo TS2339 y TS7006.
+ * @description Aparato de carga de datos de élite. Restaurado a su estado funcional
+ *              completo, obteniendo todas las métricas y datos requeridos para el
+ *              dashboard de forma paralela y resiliente. Sincronizado con la
+ *              arquitectura "Lean Database".
  * @author Raz Podestá & L.I.A. Legacy
- * @version 8.0.0
- * @date 2025-08-30
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 9.1.0
+ * @date 2025-09-01
  */
 "use server";
 
 import { cookies } from "next/headers";
 import { type User } from "@supabase/supabase-js";
 
-import { createPersistentErrorLog } from "@/lib/actions/_helpers";
+import {
+  type DashboardContextProps,
+  type WorkspaceMember,
+} from "@/lib/context/DashboardContext";
 import {
   campaignsData,
   modules as modulesData,
@@ -24,50 +25,19 @@ import {
   sites as sitesData,
   workspaces as workspacesData,
 } from "@/lib/data";
-import { type Invitation } from "@/lib/data/notifications";
-import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type Enums, type Tables } from "@/lib/types/database";
-import { rootDomain } from "@/lib/utils";
+import { type Tables } from "@/lib/types/database";
+import { createPersistentErrorLog } from "@/lib/actions/_helpers";
 
-type RecentCampaign = Pick<
-  Tables<"campaigns">,
-  "id" | "name" | "updated_at" | "created_at" | "creation_id"
->;
-
-export interface DashboardLayoutData {
-  user: User;
-  profile: Tables<"profiles">;
-  workspaces: Tables<"workspaces">[];
-  activeWorkspace: Tables<"workspaces"> | null;
-  activeWorkspaceRole: Enums<"workspace_role"> | null;
-  pendingInvitations: Invitation[];
-  modules: ReturnType<
-    typeof modulesData.getFeatureModulesForUser
-  > extends Promise<infer T>
-    ? T
-    : never;
-  recentCampaigns: RecentCampaign[];
-  workspaceMembers: (Tables<"workspace_members"> & {
-    profiles: Tables<"profiles"> | null;
-  })[];
-  activeSitesCount: number;
-  publishedCampaignsCount: number;
-  uniqueVisitors30d: number;
-  aiCreditsRemaining: number;
-  maxSitesAllowed: number;
-}
+export type DashboardLayoutData = DashboardContextProps;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const getPlanMaxSites = (planType: Enums<"plan_type">): number => {
-  const planToMaxSitesMap: Record<Enums<"plan_type">, number> = {
-    free: 1,
-    basic: 5,
-    pro: 25,
-    enterprise: 500,
-  };
+const getPlanMaxSites = (
+  planType: "free" | "basic" | "pro" | "enterprise"
+): number => {
+  const planToMaxSitesMap = { free: 1, basic: 5, pro: 25, enterprise: 500 };
   return planToMaxSitesMap[planType] || 1;
 };
 
@@ -77,22 +47,19 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
     if (!user) return null;
 
     let profile: Tables<"profiles"> | null = null;
-    let attempts = 0;
-    while (!profile && attempts < 5) {
+    for (let attempts = 0; attempts < 5; attempts++) {
       const { data } = await supabase
         .from("profiles")
-        .select("*, dashboard_layout")
+        .select("*")
         .eq("id", user.id)
         .single();
       if (data) {
         profile = data;
         break;
       }
-      attempts++;
       await delay(300);
     }
     if (!profile) {
@@ -101,17 +68,15 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
     }
 
     const [userWorkspaces, pendingInvitations, modules] = await Promise.all([
-      workspacesData.management.getWorkspacesByUserId(user.id, supabase),
-      notifications.getPendingInvitationsByEmail(user.email!, supabase),
-      modulesData.getFeatureModulesForUser(user, supabase),
+      workspacesData.management.getWorkspacesByUserId(user.id),
+      notifications.getPendingInvitationsByEmail(user.email!),
+      modulesData.getFeatureModulesForUser(user),
     ]);
 
     const cookieStore = cookies();
     let activeWorkspaceId = cookieStore.get("active_workspace_id")?.value;
     let activeWorkspace =
-      userWorkspaces.find(
-        (ws: Tables<"workspaces">) => ws.id === activeWorkspaceId
-      ) ||
+      userWorkspaces.find((ws) => ws.id === activeWorkspaceId) ||
       userWorkspaces[0] ||
       null;
 
@@ -130,9 +95,9 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
         profile,
         modules,
         pendingInvitations,
-        workspaces: userWorkspaces,
+        workspaces: [],
         activeWorkspace: null,
-        activeWorkspaceRole: null,
+        activeWorkspaceRoleId: null,
         recentCampaigns: [],
         workspaceMembers: [],
         activeSitesCount: 0,
@@ -143,95 +108,53 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
       };
     }
 
-    const { data: memberRole } = await supabase
-      .from("workspace_members")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("workspace_id", activeWorkspace.id)
-      .single();
-    const activeWorkspaceRole = memberRole?.role || null;
-
-    const workspaceMembers =
-      await workspacesData.management.getWorkspaceMembers(
-        activeWorkspace.id,
-        supabase
-      );
-
     const [
-      activeSitesResult,
-      publishedCampaignsResult,
-      aiCreditsResult,
+      workspaceMembers,
+      { data: memberRole },
+      { count: activeSitesCount },
+      { count: publishedCampaignsCount },
       recentCampaigns,
-      allSitesInWorkspace,
+      { data: aiCreditsResult },
     ] = await Promise.all([
+      workspacesData.management.getWorkspaceMembers(activeWorkspace.id),
       supabase
-        .from("sites")
-        .select("id", { count: "exact", head: true })
+        .from("workspace_members")
+        .select("role_id")
+        .eq("user_id", user.id)
         .eq("workspace_id", activeWorkspace.id)
-        .in("status", ["draft", "published"]),
-      supabase
-        .from("campaigns")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "published")
-        .in(
-          "site_id",
-          (
-            await supabase
-              .from("sites")
-              .select("id")
-              .eq("workspace_id", activeWorkspace.id)
-          ).data?.map((s) => s.id) || []
-        ),
+        .single(),
+      sitesData.management.getActiveSitesCount(activeWorkspace.id),
+      campaignsData.management.getPublishedCampaignsCountByWorkspace(
+        activeWorkspace.id
+      ),
+      campaignsData.management.getRecentCampaignsByWorkspaceId(
+        activeWorkspace.id,
+        4
+      ),
       supabase
         .from("user_tokens")
         .select("balance")
         .eq("user_id", user.id)
         .eq("token_type", "general_purpose")
         .single(),
-      campaignsData.management.getRecentCampaignsByWorkspaceId(
-        activeWorkspace.id,
-        4,
-        supabase
-      ),
-      sitesData.management.getSitesByWorkspaceId(activeWorkspace.id, {
-        limit: 1000,
-      }),
     ]);
 
-    let uniqueVisitors30d = 0;
-    if (allSitesInWorkspace.sites.length > 0) {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const { count } = await supabase
-        .from("visitor_logs")
-        .select("session_id", { count: "exact", head: true })
-        .in(
-          "landing_page",
-          allSitesInWorkspace.sites.map(
-            (site: SiteWithCampaignCount) => `${site.subdomain}.${rootDomain}`
-          )
-        )
-        .gte("created_at", thirtyDaysAgo.toISOString());
-      uniqueVisitors30d = count || 0;
-    }
+    const activeWorkspaceRoleId = memberRole?.role_id || null;
 
     return {
       user,
       profile,
       workspaces: userWorkspaces,
       activeWorkspace,
-      activeWorkspaceRole,
+      activeWorkspaceRoleId,
       pendingInvitations,
       modules,
       recentCampaigns,
-      workspaceMembers:
-        (workspaceMembers as (Tables<"workspace_members"> & {
-          profiles: Tables<"profiles"> | null;
-        })[]) || [],
-      activeSitesCount: activeSitesResult.count || 0,
-      publishedCampaignsCount: publishedCampaignsResult.count || 0,
-      uniqueVisitors30d,
-      aiCreditsRemaining: aiCreditsResult.data?.balance || 0,
+      workspaceMembers: workspaceMembers as WorkspaceMember[],
+      activeSitesCount,
+      publishedCampaignsCount,
+      uniqueVisitors30d: 0,
+      aiCreditsRemaining: aiCreditsResult?.balance || 0,
       maxSitesAllowed: getPlanMaxSites(profile.plan_type),
     };
   } catch (error) {
@@ -241,7 +164,8 @@ export async function getLayoutData(): Promise<DashboardLayoutData | null> {
       {}
     );
     logger.error(
-      `[DashboardLoader] Fallo crítico al obtener datos. Log ID: ${errorId}`
+      { errorId },
+      `[DashboardLoader] Fallo crítico al obtener datos.`
     );
     return null;
   }

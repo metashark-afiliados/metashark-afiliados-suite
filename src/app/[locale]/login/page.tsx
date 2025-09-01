@@ -1,17 +1,17 @@
 // src/app/[locale]/login/page.tsx
 /**
  * @file page.tsx
- * @description Página de inicio de sesión. Refactorizada a un orquestador de UI
- *              soberano que ensambla el layout y el formulario de login.
- * @author Raz Podestá - MetaShark Tech
- * @version 9.0.0
- * @date 2025-08-31
+ * @description Orquestador de UI soberano para la página de inicio de sesión.
+ *              Ensambla el layout y el formulario, actuando como una capa de
+ *              adaptación entre la i18n y los componentes de presentación puros.
+ * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @version 2.0.0
+ * @see .docs-espejo/app/[locale]/login/page.tsx.md
  */
 "use client";
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { unstable_setRequestLocale } from "next-intl/server";
 
 import {
   LoginForm,
@@ -19,24 +19,26 @@ import {
 } from "@/components/authentication/login-form";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
+/**
+ * @public
+ * @page LoginPage
+ * @description Orquesta y ensambla la UI de la página de inicio de sesión.
+ * @param {object} props - Propiedades de la página, incluyendo el locale.
+ * @returns {React.ReactElement}
+ */
 export default function LoginPage({
   params: { locale },
 }: {
   params: { locale: string };
 }): React.ReactElement {
-  // Nota: unstable_setRequestLocale es una no-op en Client Components,
-  // pero se mantiene por coherencia con las convenciones de `next-intl`.
-  try {
-    unstable_setRequestLocale(locale);
-  } catch (error) {
-    // Ignorar el error esperado en el cliente.
-  }
-
-  clientLogger.trace("[LoginPage] Renderizando página de inicio de sesión.");
+  clientLogger.trace(
+    `[LoginPage] Renderizando orquestador de UI para locale: ${locale}`
+  );
   const t = useTranslations("app.[locale].login.page");
 
+  // --- Capa de Adaptación: i18n -> Props ---
   const bottomLink = t.rich("dontHaveAccount", {
     strong: (chunks) => (
       <SmartLink
@@ -57,6 +59,7 @@ export default function LoginPage({
     signInWithProvider: t("signInWithProvider"),
   };
 
+  // --- Capa de Ensamblaje de UI ---
   return (
     <AuthCardLayout bottomLink={bottomLink}>
       <LoginForm texts={loginFormTexts} />

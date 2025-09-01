@@ -2,16 +2,24 @@
 /**
  * @file src/lib/validators/schemas/auth.schemas.ts
  * @description Aparato de validación atómico y SSoT para el ciclo de vida de
- *              autenticación. Este módulo encapsula todos los schemas de Zod
- *              relacionados con el registro (signup) y la gestión de contraseñas.
+ *              autenticación. Enriquecido con `SignInSchema` para completar
+ *              el contrato de validación del módulo.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 2.0.0
+ * @date 2025-09-01
  */
 import { z } from "zod";
 import { EmailSchema, PasswordSchema } from "./_base.schemas";
+
+/**
+ * @public
+ * @constant SignInSchema
+ * @description Valida el payload para el inicio de sesión con email y contraseña.
+ */
+export const SignInSchema = z.object({
+  email: EmailSchema,
+  password: PasswordSchema,
+});
 
 /**
  * @public
@@ -49,17 +57,4 @@ export const ResetPasswordSchema = z
     message: "ValidationErrors.generic.passwords_do_not_match",
     path: ["confirmPassword"],
   });
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **`SignInSchema`**: Crear un `SignInSchema` que valide explícitamente `email` y `password` para el flujo de inicio de sesión, en lugar de validar los campos por separado en la Server Action.
- * 2. **Complejidad de Contraseña con Mensajes Múltiples**: Mejorar el `PasswordSchema` en `_base.schemas.ts` para que valide múltiples criterios (mayúsculas, números, símbolos) y utilizar un `.refine()` aquí para devolver un array de mensajes de error si múltiples criterios fallan, proporcionando un feedback más granular al usuario.
- * 3. **Validación de Token de Restablecimiento**: Para una seguridad de élite, la Server Action `updatePasswordAction` podría aceptar un token del `searchParams` y el `ResetPasswordSchema` podría ser extendido para validarlo (ej. `resetToken: z.string().uuid()`).
- * 4. **Internacionalización de Mensajes Zod**: Centralizar la lógica de traducción de los mensajes de error de Zod utilizando `z.setErrorMap`, en lugar de manejarlo en cada `toast.error`.
- * 5. **Schema para `signInWithOAuth`**: Crear un `OAuthSchema` que valide que el `provider` es uno de los valores permitidos (ej. `z.enum(["google", "apple"])`), para ser usado en la `signInWithOAuthAction`.
- * =====================================================================
- */
 // src/lib/validators/schemas/auth.schemas.ts

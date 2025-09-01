@@ -1,15 +1,12 @@
 // src/components/layout/AuthCardLayout.tsx
 /**
  * @file AuthCardLayout.tsx
- * @description Aparato de layout de élite, atómico y reutilizable. Su única
- *              responsabilidad es proporcionar una estructura visual consistente
- *              y centrada para los formularios de autenticación, cumpliendo con
- *              la "Filosofía LEGO" y el principio DRY.
- * @author Raz Podestá - MetaShark Tech
+ * @description Aparato de layout de élite, atómico y reutilizable. Es la SSoT
+ *              visual para el Portal de Acceso, proporcionando una estructura
+ *              consistente e inmersiva para los formularios de autenticación.
+ * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
  * @version 1.0.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @see .docs-espejo/components/layout/AuthCardLayout.tsx.md
  */
 "use client";
 
@@ -17,8 +14,13 @@ import React from "react";
 
 import { LoginCardGradient } from "@/components/gradients/login-card-gradient";
 import { LoginGradient } from "@/components/gradients/login-gradient";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
+/**
+ * @public
+ * @interface AuthCardLayoutProps
+ * @description Define el contrato de props para el layout de autenticación.
+ */
 export interface AuthCardLayoutProps {
   /**
    * El contenido principal de la tarjeta, típicamente un formulario
@@ -46,7 +48,7 @@ export function AuthCardLayout({
 }: AuthCardLayoutProps): React.ReactElement {
   clientLogger.trace("[AuthCardLayout] Renderizando layout de autenticación.");
   return (
-    <div className="relative flex min-h-screen w-full items-center justify-center p-4">
+    <main className="relative flex min-h-screen w-full items-center justify-center p-4">
       <LoginGradient />
       <div className="z-10 flex flex-col">
         <div
@@ -69,23 +71,7 @@ export function AuthCardLayout({
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) Abstracción de Layout (DRY): Este aparato encapsula la lógica de layout que es repetida en las páginas de `login` y `signup`, eliminando la duplicación de código y estableciendo una SSoT visual.
- * 2. ((Implementada)) Layout de Élite Centrado: Utiliza Flexbox para garantizar un centrado vertical y horizontal perfecto, proporcionando una base visual robusta y profesional.
- * 3. ((Implementada)) Documentación TSDoc Perfeccionada: Se ha enriquecido la documentación para reflejar su rol canónico en la arquitectura.
- *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) El componente podría ser extendido para aceptar una prop `variant` que modifique sutilmente la apariencia de la tarjeta para diferentes contextos (ej. `variant="compact"` para un modal).
- * 2. ((Vigente)) Envolver la tarjeta en `motion.div` de `framer-motion` para añadir una animación de entrada sutil, mejorando la experiencia de usuario.
- *
- * =====================================================================
- */
+// src/components/layout/AuthCardLayout.tsx

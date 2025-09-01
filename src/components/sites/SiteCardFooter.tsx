@@ -18,7 +18,7 @@ import { CardFooter as CardFooterPrimitive } from "@/components/ui/card";
 import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
 import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
 import { Link } from "@/lib/navigation";
-import { protocol, rootDomain } from "@/lib/utils";
+import { protocol, rootDomain } from "@/config/site.config";
 import { clientLogger } from "@/lib/logging";
 import { DeleteSiteDialog } from "./DeleteSiteDialog";
 

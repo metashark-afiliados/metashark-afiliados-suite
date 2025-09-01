@@ -1,0 +1,63 @@
+{
+  "en-US": {
+    "metadata_title": "System Diagnostics",
+    "title": "System Diagnostics",
+    "description": "Tools to verify the health and connectivity of integrated services.",
+    "connectivity": {
+      "title": "Service Connectivity",
+      "description": "This section checks if the application can communicate correctly with external services like Sentry.",
+      "sentry_ok": "Sentry SDK is connected and ready to capture errors.",
+      "sentry_fail": "Sentry SDK connectivity failed. Errors might not be captured. Check your ad-blocker or network configuration."
+    },
+    "actions": {
+      "title": "Diagnostic Actions",
+      "description": "Use these buttons to trigger controlled errors and verify that they are correctly reported.",
+      "frontend_error_button": "Trigger Frontend Error",
+      "frontend_error_toast": "Frontend error sent to Sentry!",
+      "backend_error_button": "Trigger Backend Error",
+      "backend_error_toast_success": "Backend error triggered and captured successfully!",
+      "backend_error_toast_fail": "The backend action did not throw an error as expected."
+    }
+  },
+  "es-ES": {
+    "metadata_title": "Diagnóstico del Sistema",
+    "title": "Diagnóstico del Sistema",
+    "description": "Herramientas para verificar la salud y conectividad de los servicios integrados.",
+    "connectivity": {
+      "title": "Conectividad de Servicios",
+      "description": "Esta sección comprueba si la aplicación puede comunicarse correctamente con servicios externos como Sentry.",
+      "sentry_ok": "El SDK de Sentry está conectado y listo para capturar errores.",
+      "sentry_fail": "Falló la conectividad del SDK de Sentry. Es posible que los errores no se capturen. Revisa tu bloqueador de anuncios o la configuración de red."
+    },
+    "actions": {
+      "title": "Acciones de Diagnóstico",
+      "description": "Usa estos botones para provocar errores controlados y verificar que se reportan correctamente.",
+      "frontend_error_button": "Provocar Error de Frontend",
+      "frontend_error_toast": "¡Error de frontend enviado a Sentry!",
+      "backend_error_button": "Provocar Error de Backend",
+      "backend_error_toast_success": "¡Error de backend provocado y capturado con éxito!",
+      "backend_error_toast_fail": "La acción del backend no lanzó un error como se esperaba."
+    }
+  },
+  "pt-BR": {
+    "metadata_title": "Diagnóstico do Sistema",
+    "title": "Diagnóstico do Sistema",
+    "description": "Ferramentas para verificar a saúde e a conectividade dos serviços integrados.",
+    "connectivity": {
+      "title": "Conectividade de Serviços",
+      "description": "Esta seção verifica se o aplicativo consegue se comunicar corretamente com serviços externos como o Sentry.",
+      "sentry_ok": "O SDK do Sentry está conectado e pronto para capturar erros.",
+      "sentry_fail": "A conectividade do SDK do Sentry falhou. Erros podem não ser capturados. Verifique seu bloqueador de anúncios ou configuração de rede."
+    },
+    "actions": {
+      "title": "Ações de Diagnóstico",
+      "description": "Use estes botões para disparar erros controlados e verificar se são reportados corretamente.",
+      "frontend_error_button": "Disparar Erro de Frontend",
+      "frontend_error_toast": "Erro de frontend enviado para o Sentry!",
+      "backend_error_button": "Disparar Erro de Backend",
+      "backend_error_toast_success": "Erro de backend disparado e capturado com sucesso!",
+      "backend_error_toast_fail": "A ação do backend não lançou um erro como esperado."
+    }
+  }
+}
+

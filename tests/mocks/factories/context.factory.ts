@@ -1,26 +1,24 @@
 // tests/mocks/factories/context.factory.ts
 /**
  * @file context.factory.ts
- * @description Factoría de élite para la creación de mocks. Ha sido sincronizada
- *              con el contrato de datos `DashboardContextProps` para incluir la
- *              propiedad `workspaceMembers`, resolviendo el error de tipo TS2322
- *              y garantizando una simulación de alta fidelidad para el entorno de pruebas.
+ * @description Factoría de élite para la creación de mocks. Sincronizada con la
+ *              arquitectura "Lean Database".
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 4.0.0
+ * @date 2025-09-01
  */
 import { faker } from "@faker-js/faker";
 import { type User } from "@supabase/supabase-js";
 
 import { type DashboardContextProps } from "@/lib/context/DashboardContext";
 import { type FeatureModule } from "@/lib/data/modules";
-import { type Enums, type Tables } from "@/lib/types/database";
+import { type Tables } from "@/lib/types/database";
+import { WORKSPACE_ROLES } from "@/config/roles.config";
 
 import { DEV_USER, DEV_WORKSPACE } from "../data/database-state";
 
 export function createMockUser(overrides?: Partial<User>): User {
+  // ... (función sin cambios)
   return {
     id: faker.string.uuid(),
     email: faker.internet.email(),
@@ -28,11 +26,7 @@ export function createMockUser(overrides?: Partial<User>): User {
       full_name: faker.person.fullName(),
       avatar_url: faker.image.avatar(),
     },
-    app_metadata: {
-      provider: "email",
-      providers: ["email"],
-      app_role: "user" as Enums<"app_role">,
-    },
+    app_metadata: { provider: "email", providers: ["email"], app_role: "user" },
     aud: "authenticated",
     created_at: faker.date.recent().toISOString(),
     ...overrides,
@@ -42,6 +36,7 @@ export function createMockUser(overrides?: Partial<User>): User {
 export function createMockProfile(
   overrides?: Partial<Tables<"profiles">>
 ): Tables<"profiles"> {
+  // ... (función sin cambios)
   const user = createMockUser({ id: overrides?.id });
   return {
     id: user.id,
@@ -61,12 +56,12 @@ export function createMockProfile(
 export function createMockWorkspace(
   overrides?: Partial<Tables<"workspaces">>
 ): Tables<"workspaces"> {
+  // ... (función sin cambios)
   return {
     id: faker.string.uuid(),
     name: faker.company.name(),
     owner_id: faker.string.uuid(),
     icon: "🏢",
-    current_site_count: faker.number.int({ min: 0, max: 10 }),
     created_at: faker.date.recent().toISOString(),
     updated_at: faker.date.recent().toISOString(),
     ...overrides,
@@ -76,6 +71,7 @@ export function createMockWorkspace(
 export function createMockFeatureModule(
   overrides?: Partial<FeatureModule>
 ): FeatureModule {
+  // ... (función sin cambios)
   return {
     id: faker.string.uuid(),
     title: faker.lorem.words({ min: 2, max: 4 }),
@@ -103,7 +99,7 @@ export function createMockDashboardContext(
     id: user.id,
     email: user.email!,
     full_name: user.user_metadata?.full_name as string,
-    app_role: user.app_metadata?.app_role as Enums<"app_role">,
+    app_role: user.app_metadata?.app_role as "user" | "admin" | "developer",
   });
   const activeWorkspace = createMockWorkspace({
     id: DEV_WORKSPACE.id,
@@ -116,7 +112,7 @@ export function createMockDashboardContext(
     profile,
     workspaces: [activeWorkspace, createMockWorkspace()],
     activeWorkspace,
-    activeWorkspaceRole: "owner",
+    activeWorkspaceRoleId: WORKSPACE_ROLES.OWNER.id,
     pendingInvitations: [],
     modules: [
       createMockFeatureModule({
@@ -127,15 +123,15 @@ export function createMockDashboardContext(
       }),
     ],
     recentCampaigns: [],
-    // --- INICIO DE REFACTORIZACIÓN HOLÍSTICA (TS2322) ---
     workspaceMembers: [
       {
         id: faker.string.uuid(),
         workspace_id: activeWorkspace.id,
         user_id: user.id,
-        role: "owner",
+        role_id: WORKSPACE_ROLES.OWNER.id,
         created_at: new Date().toISOString(),
         profiles: profile,
+        workspace_roles: { name: WORKSPACE_ROLES.OWNER.name },
       },
     ],
     activeSitesCount: 1,
@@ -143,23 +139,7 @@ export function createMockDashboardContext(
     uniqueVisitors30d: 1234,
     aiCreditsRemaining: 500,
     maxSitesAllowed: 1,
-    // --- FIN DE REFACTORIZACIÓN HOLÍSTICA ---
     ...overrides,
   };
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Futuras
- * 1. **Factorías Anidadas**: Para una simulación aún más realista, `createMockDashboardContext` podría invocar a `createMockWorkspaceMembers(count)` para poblar dinámicamente la lista de miembros.
- * 2. **Tipado de Overrides**: El tipo `Partial<DashboardContextProps>` es permisivo. Se podría utilizar un tipo más estricto (`DeepPartial`) para los `overrides` para mejorar la seguridad de tipos en las pruebas.
- * 3. **Consistencia de Datos**: El mock de `workspaceMembers` se crea estáticamente. Podría ser generado dinámicamente basándose en los `workspaces` y el `user` del contexto para una mayor consistencia interna del mock.
- * =====================================================================
- */
+// tests/mocks/factories/context.factory.ts

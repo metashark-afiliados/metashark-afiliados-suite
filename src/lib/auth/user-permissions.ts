@@ -1,12 +1,11 @@
 // src/lib/auth/user-permissions.ts
 /**
  * @file user-permissions.ts
- * @description Guardián de seguridad de élite. Ha sido refactorizado para
- *              extraer la llamada a `cookies()` fuera del ámbito de `unstable_cache`,
- *              resolviendo un error crítico de build en Vercel.
- * @author Raz Podestá
+ * @description Guardián de seguridad de élite y SSoT para la obtención de datos de
+ *              sesión en el servidor. Sincronizado con la arquitectura "Lean Database".
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 6.0.0
- * @date 2025-08-30
+ * @see .docs-espejo/lib/auth/user-permissions.md
  */
 "use server";
 import "server-only";
@@ -21,12 +20,12 @@ import {
   campaignsData,
 } from "@/lib/data";
 import { type SiteBasicInfo } from "@/lib/data/sites/types";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { type Database } from "@/lib/types/database";
+import { type WorkspaceRoleName } from "@/config/roles.config";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
-type WorkspaceRole = Database["public"]["Enums"]["workspace_role"];
 
 export type UserAuthData = {
   user: User;
@@ -90,6 +89,23 @@ export async function getAuthenticatedUserAuthData(): Promise<UserAuthData | nul
   };
 }
 
+/**
+ * @public
+ * @async
+ * @function getRequiredAuthData
+ * @description Obtiene los datos de sesión de un usuario autenticado. Lanza un error
+ *              si no se encuentra una sesión válida. Es el reemplazo canónico
+ *              para el obsoleto `getAuthenticatedUser`.
+ * @returns {Promise<AuthResult<UserAuthData>>}
+ */
+export async function getRequiredAuthData(): Promise<AuthResult<UserAuthData>> {
+  const authData = await getAuthenticatedUserAuthData();
+  if (!authData) {
+    return { success: false, error: "SESSION_NOT_FOUND", data: null };
+  }
+  return { success: true, data: authData };
+}
+
 export async function requireAppRole(
   requiredRoles: AppRole[]
 ): Promise<AuthResult<UserAuthData>> {
@@ -98,9 +114,11 @@ export async function requireAppRole(
     return { success: false, error: "SESSION_NOT_FOUND", data: null };
   }
   if (!requiredRoles.includes(authData.appRole)) {
-    logger.warn(
-      `[AuthGuard] VIOLACIÓN DE ROL: Usuario ${authData.user.id} con rol '${authData.appRole}' intentó acceder a recurso que requiere [${requiredRoles.join(", ")}].`
-    );
+    logger.warn(`[AuthGuard] VIOLACIÓN DE ROL: Acceso a recurso denegado.`, {
+      userId: authData.user.id,
+      role: authData.appRole,
+      required: requiredRoles,
+    });
     return { success: false, error: "PERMISSION_DENIED", data: authData };
   }
   return { success: true, data: authData };
@@ -108,7 +126,7 @@ export async function requireAppRole(
 
 export async function requireWorkspacePermission(
   workspaceId: string,
-  requiredRoles: WorkspaceRole[]
+  requiredRoles: WorkspaceRoleName[]
 ): Promise<AuthResult<UserAuthData>> {
   const authData = await getAuthenticatedUserAuthData();
   if (!authData) {
@@ -127,7 +145,7 @@ export async function requireWorkspacePermission(
 
 export async function requireSitePermission(
   siteId: string,
-  requiredRoles: WorkspaceRole[]
+  requiredRoles: WorkspaceRoleName[]
 ): Promise<AuthResult<{ user: User; site: SiteBasicInfo }>> {
   const authData = await getAuthenticatedUserAuthData();
   if (!authData) {
@@ -144,9 +162,11 @@ export async function requireSitePermission(
     requiredRoles
   );
   if (!isAuthorized) {
-    logger.warn(
-      `[AuthGuard] VIOLACIÓN DE SITIO: Usuario ${user.id} intentó acceder al sitio ${siteId} sin permisos en workspace ${site.workspace_id}.`
-    );
+    logger.warn(`[AuthGuard] VIOLACIÓN DE SITIO: Acceso denegado.`, {
+      userId: user.id,
+      siteId,
+      workspaceId: site.workspace_id,
+    });
     return {
       success: false,
       error: "PERMISSION_DENIED",
@@ -158,7 +178,7 @@ export async function requireSitePermission(
 
 export async function requireCampaignPermission(
   campaignId: string,
-  requiredRoles: WorkspaceRole[]
+  requiredRoles: WorkspaceRoleName[]
 ): Promise<AuthResult<UserAuthData>> {
   const authData = await getAuthenticatedUserAuthData();
   if (!authData) {
@@ -170,7 +190,8 @@ export async function requireCampaignPermission(
     await campaignsData.management.getCampaignSiteInfoById(campaignId);
   if (!campaignInfo || !campaignInfo.workspace_id) {
     logger.warn(
-      `[AuthGuard] Fallo de permiso de campaña: Campaña ${campaignId} no encontrada o sin workspace.`
+      `[AuthGuard] Fallo de permiso de campaña: Campaña no encontrada o sin workspace.`,
+      { campaignId }
     );
     return { success: false, error: "NOT_FOUND", data: null };
   }
@@ -182,9 +203,11 @@ export async function requireCampaignPermission(
   );
 
   if (!isAuthorized) {
-    logger.warn(
-      `[AuthGuard] VIOLACIÓN DE CAMPAÑA: Usuario ${user.id} intentó acceder a la campaña ${campaignId} sin permisos en workspace ${campaignInfo.workspace_id}.`
-    );
+    logger.warn(`[AuthGuard] VIOLACIÓN DE CAMPAÑA: Acceso denegado.`, {
+      userId: user.id,
+      campaignId,
+      workspaceId: campaignInfo.workspace_id,
+    });
     return { success: false, error: "PERMISSION_DENIED", data: authData };
   }
 

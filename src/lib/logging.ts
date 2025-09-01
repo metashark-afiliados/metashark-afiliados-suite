@@ -1,66 +1,68 @@
 // src/lib/logging.ts
 /**
  * @file src/lib/logging.ts
- * @description Aparato de Logging de Élite y Desacoplado.
- *              Proporciona dos loggers distintos: `logger` para el entorno de
- *              servidor (con integración completa de Sentry) y `clientLogger`
- *              para el entorno de cliente (un wrapper ligero de `console`).
- *              Esta separación es crucial para la arquitectura y previene
- *              que dependencias de servidor se empaqueten en el bundle del cliente.
+ * @description Aparato de Logging de Élite Unificado y SSoT.
+ *              Implementa `pino` para un logging estructurado y de alto rendimiento.
+ *              La API del `logger` de servidor está encapsulada para mantener
+ *              retrocompatibilidad con la firma `(message, ...context)` usada
+ *              a través de la aplicación, garantizando cero regresiones.
  * @author L.I.A. Legacy
- * @version 7.0.0
+ * @co-piloto RaZ WriTe
+ * @version 9.0.0
+ * @see .docs-espejo/lib/logging.md
  */
-import * as Sentry from "@sentry/nextjs";
+import pino from "pino";
 
-type LogLevel = "trace" | "info" | "warn" | "error";
+// --- NÚCLEO PINO ---
 
-// --- LOGGER DE SERVIDOR ---
+const logLevel: pino.Level =
+  (process.env.LOG_LEVEL as pino.Level) ||
+  (process.env.NODE_ENV === "development" ? "trace" : "info");
 
-function logToServerConsole(
-  level: LogLevel,
-  message: string,
-  ...context: any[]
-) {
-  if (process.env.NODE_ENV !== "development") return;
-  const timestamp = new Date().toISOString();
-  const logMessage = `[${level.toUpperCase()}] [${timestamp}] ${message}`;
+/**
+ * @private
+ * @constant pinoLogger
+ * @description Instancia base de Pino. Emite logs JSON a `stdout`.
+ *              Para una salida legible en desarrollo, ejecute con `pnpm dev:pretty`.
+ */
+const pinoLogger = pino({
+  level: logLevel,
+  base: {
+    service: "convertikit-server",
+    pid: typeof process !== "undefined" ? process.pid : undefined,
+    hostname:
+      typeof process !== "undefined" && typeof process.env.HOSTNAME === "string"
+        ? process.env.HOSTNAME
+        : "unknown",
+  },
+  timestamp: pino.stdTimeFunctions.isoTime,
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
-  const consoleMethod = {
-    trace: console.debug,
-    info: console.info,
-    warn: console.warn,
-    error: console.error,
-  };
-  consoleMethod[level](logMessage, ...context);
-}
+// --- LOGGER DE SERVIDOR (CON WRAPPER DE RETROCOMPATIBILIDAD) ---
 
 /**
  * @public
  * @constant logger
- * @description Logger canónico para uso en **entornos de servidor** (Server Components,
- *              Server Actions, Middleware, etc.). Envía logs a Sentry en producción.
+ * @description Logger canónico para uso en TODOS los entornos de servidor.
+ *              Mantiene una API idéntica a la implementación anterior para
+ *              garantizar la retrocompatibilidad y evitar refactorizaciones masivas.
+ *              Transforma las llamadas `(message, ...context)` al formato
+ *              de pino `{ context }, message`.
  */
 export const logger = {
-  trace: (message: string, ...context: any[]) => {
-    logToServerConsole("trace", message, ...context);
-  },
-  info: (message: string, ...context: any[]) => {
-    logToServerConsole("info", message, ...context);
-    if (process.env.NODE_ENV === "production") {
-      Sentry.captureMessage(message, { level: "info", extra: { context } });
-    }
-  },
-  warn: (message: string, ...context: any[]) => {
-    logToServerConsole("warn", message, ...context);
-    if (process.env.NODE_ENV === "production") {
-      Sentry.captureMessage(message, { level: "warning", extra: { context } });
-    }
-  },
+  trace: (message: string, ...context: any[]) =>
+    pinoLogger.trace({ context }, message),
+  info: (message: string, ...context: any[]) =>
+    pinoLogger.info({ context }, message),
+  warn: (message: string, ...context: any[]) =>
+    pinoLogger.warn({ context }, message),
   error: (message: string, ...context: any[]) => {
-    logToServerConsole("error", message, ...context);
-    if (process.env.NODE_ENV === "production") {
-      Sentry.captureMessage(message, { level: "error", extra: { context } });
-    }
+    const errorObject = context.find((c) => c instanceof Error);
+    const extraContext = context.filter((c) => !(c instanceof Error));
+    pinoLogger.error({ err: errorObject, context: extraContext }, message);
   },
 };
 
@@ -69,9 +71,7 @@ export const logger = {
 /**
  * @public
  * @constant clientLogger
- * @description Logger ligero para uso exclusivo en **Client Components**. Es un simple
- *              wrapper alrededor de `console` y NO tiene dependencias de Sentry o
- *              cualquier otro paquete de Node.js, garantizando un bundle de cliente óptimo.
+ * @description Logger ligero y sin dependencias para uso exclusivo en Client Components.
  */
 export const clientLogger = {
   trace: console.debug.bind(console, "[TRACE]"),
@@ -79,15 +79,4 @@ export const clientLogger = {
   warn: console.warn.bind(console, "[WARN]"),
   error: console.error.bind(console, "[ERROR]"),
 };
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Separación Cliente/Servidor**: ((Implementada)) La creación de dos loggers separados resuelve la advertencia de "Critical dependency" y previene que el SDK de Sentry para Node.js se incluya en el bundle del cliente.
- *
- * =====================================================================
- */
 // src/lib/logging.ts

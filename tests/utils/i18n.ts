@@ -6,11 +6,11 @@
  *              de i18n para el entorno de pruebas. Refactorizado para usar una
  *              ruta relativa explícita y garantizar la resolución del módulo.
  * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 2.1.0
+ * @version 3.0.0
  */
 import { setNestedProperty } from "@/lib/helpers/set-nested-property.helper";
 import { type AppLocale } from "@/lib/navigation";
-import { mockedMessagesManifest } from "../mocks/messages.manifest.mock.ts";
+import { mockedMessagesManifest } from "../mocks/messages.manifest.mock";
 
 /**
  * @public
@@ -31,7 +31,10 @@ export async function loadTestMessages(
 
   for (const namespace of namespaces) {
     try {
-      const moduleLoader = mockedMessagesManifest[namespace];
+      const moduleLoader =
+        mockedMessagesManifest[
+          namespace as keyof typeof mockedMessagesManifest
+        ];
       const module = await moduleLoader();
       const localeMessages = module.default[locale as AppLocale];
       if (localeMessages) {

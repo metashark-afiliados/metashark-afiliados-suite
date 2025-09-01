@@ -1,98 +1,107 @@
 // src/lib/logger.ts
 /**
  * @file src/lib/logger.ts
- * @description Aparato de Logging de Élite y Desacoplado.
- *              Proporciona dos loggers distintos: `logger` para el entorno de
- *              servidor (con `pino`) y `clientLogger` para el entorno de cliente
- *              (wrapper de `console`), garantizando la separación de dependencias.
- *              Esta es la implementación canónica que cumple con el manifiesto
- *              de observabilidad.
- * @author L.I.A. Legacy
- * @copilot RaZ WriTe
- * @version 2.1.0
+ * @description Aparato de Logging de Élite Unificado y SSoT. Implementa `pino`
+ *              para un logging estructurado, de alto rendimiento y seguro por
+ *              defecto con redacción de datos sensibles. La API del `logger`
+ *              de servidor está encapsulada para mantener retrocompatibilidad.
+ * @author @author RaZ Podestá - MetaShark Tech
+ * @version 4.0.0
  * @see .docs/espejo/lib/logger.md
  */
-
 import pino from "pino";
 
-// --- LOGGER DE SERVIDOR ---
+// --- NÚCLEO PINO ---
 
-/**
- * Define el nivel de log para el logger de servidor.
- * Se lee desde la variable de entorno `LOG_LEVEL`. Si no se define,
- * se utiliza 'info' en producción y 'trace' en desarrollo para máxima observabilidad.
- * @type {pino.Level}
- */
 const logLevel: pino.Level =
   (process.env.LOG_LEVEL as pino.Level) ||
   (process.env.NODE_ENV === "development" ? "trace" : "info");
 
 /**
- * Transporte de Pino para formatear logs en desarrollo.
- * Utiliza `pino-pretty` para una salida legible y coloreada, mejorando la DX.
- * En producción, este transporte es `undefined`, resultando en logs JSON estructurados.
- * @type {pino.TransportSingleOptions | undefined}
+ * @private
+ * @constant pinoLogger
+ * @description Instancia base de Pino. Emite logs JSON a `stdout`.
+ *              Incluye redacción automática para datos sensibles.
+ *              Para una salida legible en desarrollo, ejecute con `pnpm dev:pretty`.
  */
-const pinoTransport: pino.TransportSingleOptions | undefined =
-  process.env.NODE_ENV === "development"
-    ? {
-        target: "pino-pretty",
-        options: {
-          colorize: true,
-          levelFirst: true,
-          translateTime: "SYS:yyyy-mm-dd HH:MM:ss.l",
-        },
-      }
-    : undefined;
-
-/**
- * @public
- * @constant logger
- * @description Logger canónico para uso en **entornos de servidor** (Server Components,
- * Server Actions, Middleware, etc.). Utiliza `pino` para un logging estructurado y de alto rendimiento.
- * - **En Desarrollo:** Salida formateada y legible.
- * - **En Producción:** Salida en formato JSON, optimizada para la ingesta por Sentry u otros servicios.
- * @example
- * import { logger } from '@/lib/logger';
- * logger.info({ userId: '123' }, 'User logged in successfully');
- */
-export const logger = pino({
+const pinoLogger = pino({
   level: logLevel,
   base: {
     service: "convertikit-server",
-    pid: process.pid,
+    pid: typeof process !== "undefined" ? process.pid : undefined,
     hostname:
-      typeof process.env.HOSTNAME === "string"
+      typeof process !== "undefined" && typeof process.env.HOSTNAME === "string"
         ? process.env.HOSTNAME
         : "unknown",
   },
   timestamp: pino.stdTimeFunctions.isoTime,
   formatters: {
-    level: (label: string) => ({ level: label }),
+    level: (label) => ({ level: label.toUpperCase() }),
   },
-  // --- INICIO DE REFACTORIZACIÓN (API Pino v8+) ---
-  // El transporte ahora se pasa dentro del objeto de opciones.
-  transport: pinoTransport,
-  // --- FIN DE REFACTORIZACIÓN ---
+  /**
+   * @property redact
+   * @description Capa de seguridad que censura automáticamente datos sensibles
+   *              en los logs para prevenir fugas de información.
+   */
+  redact: {
+    paths: [
+      "email",
+      "password",
+      "token",
+      "accessToken",
+      "refreshToken",
+      "*.password",
+      "*.email",
+      "req.headers.authorization",
+      'req.headers["x-api-key"]',
+      "obj.user.email",
+    ],
+    censor: "[REDACTED]",
+  },
 });
+
+// --- LOGGER DE SERVIDOR (CON WRAPPER DE RETROCOMPATIBILIDAD) ---
+
+/**
+ * @public
+ * @constant logger
+ * @description Logger canónico para uso en TODOS los entornos de servidor. Mantiene una
+ *              API idéntica a la implementación anterior para garantizar la
+ *              retrocompatibilidad y evitar refactorizaciones masivas. Transforma
+ *              las llamadas `(message, ...context)` al formato de pino `{ err, context }, message`.
+ */
+export const logger = {
+  trace: (message: string, ...context: any[]) =>
+    pinoLogger.trace({ context }, message),
+  info: (message: string, ...context: any[]) =>
+    pinoLogger.info({ context }, message),
+  warn: (message: string, ...context: any[]) =>
+    pinoLogger.warn({ context }, message),
+  error: (message: string, ...context: any[]) => {
+    const errorObject = context.find((c) => c instanceof Error);
+    const extraContext = context.filter((c) => !(c instanceof Error));
+    pinoLogger.error({ err: errorObject, context: extraContext }, message);
+  },
+  fatal: (message: string, ...context: any[]) => {
+    const errorObject = context.find((c) => c instanceof Error);
+    const extraContext = context.filter((c) => !(c instanceof Error));
+    pinoLogger.fatal({ err: errorObject, context: extraContext }, message);
+  },
+};
 
 // --- LOGGER DE CLIENTE ---
 
 /**
  * @public
  * @constant clientLogger
- * @description Logger ligero y sin dependencias para uso exclusivo en **Client Components**.
- * Es un simple wrapper alrededor de `console` para mantener una API consistente
- * y garantizar que ninguna dependencia de servidor se filtre en el bundle del cliente.
- * @example
- * "use client";
- * import { clientLogger } from '@/lib/logger';
- * clientLogger.info('Component mounted');
+ * @description Logger ligero y sin dependencias para uso exclusivo en Client Components.
+ *              Su API es simétrica con la del logger de servidor.
  */
 export const clientLogger = {
   trace: console.debug.bind(console, "[TRACE]"),
   info: console.info.bind(console, "[INFO]"),
   warn: console.warn.bind(console, "[WARN]"),
   error: console.error.bind(console, "[ERROR]"),
+  fatal: console.error.bind(console, "[FATAL]"),
 };
 // src/lib/logger.ts

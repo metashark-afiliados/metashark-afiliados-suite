@@ -2,13 +2,13 @@
 /**
  * @file sites.ts
  * @description Define el contrato de datos atómico para la tabla `sites`.
- *              Sincronizado para incluir la propiedad `status`, resolviendo una
- *              desincronización crítica con el esquema de la base de datos.
+ *              Sincronizado con la arquitectura "Lean Database" para utilizar
+ *              una clave foránea `status_id` en lugar de un ENUM.
  * @author L.I.A Legacy
- * @version 2.1.0 (Schema Synchronized)
+ * @copilot RaZ WriTe
+ * @version 3.0.0
+ * @see .docs-espejo/lib/types/database/tables/sites.ts.md
  */
-import { type Enums } from "../enums";
-
 export type Sites = {
   Row: {
     created_at: string;
@@ -18,10 +18,10 @@ export type Sites = {
     id: string;
     name: string;
     owner_id: string | null;
+    status_id: number; // <-- REFACTORIZADO
     subdomain: string | null;
     updated_at: string | null;
     workspace_id: string;
-    status: Enums["site_status"]; // <-- PROPIEDAD RESTAURADA
   };
   Insert: {
     created_at?: string;
@@ -31,10 +31,10 @@ export type Sites = {
     id?: string;
     name: string;
     owner_id?: string | null;
+    status_id?: number; // <-- REFACTORIZADO
     subdomain?: string | null;
     updated_at?: string | null;
     workspace_id: string;
-    status?: Enums["site_status"]; // <-- PROPIEDAD RESTAURADA
   };
   Update: {
     created_at?: string;
@@ -44,10 +44,10 @@ export type Sites = {
     id?: string;
     name?: string;
     owner_id?: string | null;
+    status_id?: number; // <-- REFACTORIZADO
     subdomain?: string | null;
     updated_at?: string | null;
     workspace_id?: string;
-    status?: Enums["site_status"]; // <-- PROPIEDAD RESTAURADA
   };
   Relationships: [
     {
@@ -64,20 +64,13 @@ export type Sites = {
       referencedRelation: "workspaces";
       referencedColumns: ["id"];
     },
+    {
+      foreignKeyName: "sites_status_id_fkey";
+      columns: ["status_id"];
+      isOneToOne: false;
+      referencedRelation: "site_statuses";
+      referencedColumns: ["id"];
+    },
   ];
 };
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Esquema**: ((Implementada)) Se ha añadido la propiedad `status` al contrato de tipo, resolviendo la desincronización con el `schema.sql` y corrigiendo la causa raíz del error TS2352.
- *
- * @subsection Melhorias Futuras
- * 1. **Estado de Dominio Personalizado**: ((Vigente)) Adicionar un campo `custom_domain_status` de tipo ENUM para gerenciar el proceso de verificação de domínios.
- *
- * =====================================================================
- */
 // src/lib/types/database/tables/sites.ts

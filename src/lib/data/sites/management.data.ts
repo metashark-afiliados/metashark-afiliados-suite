@@ -3,18 +3,17 @@
  * @file src/lib/data/sites/management.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de
  *              lectura para la gestión de sitios (Dashboard). Ha sido optimizado
- *              con `unstable_cache` para un rendimiento de élite.
+ *              con `unstable_cache` y enriquecido con una función de conteo.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-30
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 3.0.0
+ * @date 2025-09-01
  */
 "use server";
 import "server-only";
 
 import { unstable_cache as cache } from "next/cache";
-import { logger } from "@/lib/logging";
+
+import { logger } from "@/lib/logger";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import {
   type SiteBasicInfo,
@@ -23,37 +22,26 @@ import {
   type SiteWithCampaignCount,
 } from "./types";
 
-/**
- * @private
- * @function buildSiteSearchQuery
- * @description Función pura que construye la consulta de Supabase para la búsqueda
- *              y filtrado de sitios, encapsulando la lógica compleja.
- * @param {string} workspaceId - El ID del workspace a consultar.
- * @param {object} filters - Los filtros a aplicar.
- * @returns Un query builder de Supabase.
- */
 function buildSiteSearchQuery(
   workspaceId: string,
-  filters: {
-    query?: string;
-    status?: SiteStatusFilter;
-    sort?: SiteSortOption;
-  }
+  filters: { query?: string; status?: SiteStatusFilter; sort?: SiteSortOption }
 ) {
   const supabase = createServerClient();
   let queryBuilder = supabase
     .from("sites_with_campaign_counts")
     .select("*", { count: "exact" })
     .eq("workspace_id", workspaceId);
-
   if (filters.query) {
     queryBuilder = queryBuilder.ilike("name", `%${filters.query}%`);
   }
-
   if (filters.status && filters.status !== "all") {
-    queryBuilder = queryBuilder.eq("status", filters.status);
+    // La consulta debe usar el ID numérico del estado
+    const statusMap = { draft: 1, published: 2, archived: 3 };
+    const statusId = statusMap[filters.status as keyof typeof statusMap];
+    if (statusId) {
+      queryBuilder = queryBuilder.eq("status_id", statusId);
+    }
   }
-
   const sortMap: Record<
     SiteSortOption,
     { column: string; ascending: boolean }
@@ -63,22 +51,10 @@ function buildSiteSearchQuery(
     name_desc: { column: "name", ascending: false },
   };
   const sort = sortMap[filters.sort || "created_at_desc"];
-  queryBuilder = queryBuilder.order(sort.column, {
-    ascending: sort.ascending,
-  });
-
+  queryBuilder = queryBuilder.order(sort.column, { ascending: sort.ascending });
   return queryBuilder;
 }
 
-/**
- * @public
- * @async
- * @function getSitesByWorkspaceId
- * @description Obtiene los sitios paginados y filtrados para un workspace.
- * @param {string} workspaceId - El ID del workspace.
- * @param {object} options - Opciones de paginación, búsqueda y ordenamiento.
- * @returns {Promise<{ sites: SiteWithCampaignCount[]; totalCount: number }>}
- */
 export async function getSitesByWorkspaceId(
   workspaceId: string,
   {
@@ -97,15 +73,12 @@ export async function getSitesByWorkspaceId(
 ): Promise<{ sites: SiteWithCampaignCount[]; totalCount: number }> {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
-
   const queryBuilder = buildSiteSearchQuery(workspaceId, {
     query: searchQuery,
     status: statusFilter,
     sort: sortOption,
   });
-
   const { data, error, count } = await queryBuilder.range(from, to);
-
   if (error) {
     logger.error(
       `[DataLayer:Sites] Error al obtener sitios para workspace ${workspaceId}:`,
@@ -113,22 +86,12 @@ export async function getSitesByWorkspaceId(
     );
     throw new Error("No se pudieron obtener los sitios del workspace.");
   }
-
   return {
     sites: (data as SiteWithCampaignCount[]) || [],
     totalCount: count || 0,
   };
 }
 
-/**
- * @public
- * @async
- * @function getSiteById
- * @description Obtiene la información básica de un sitio por su ID. La consulta
- *              está envuelta en `unstable_cache`.
- * @param {string} siteId - El ID del sitio a obtener.
- * @returns {Promise<SiteBasicInfo | null>} El objeto del sitio o null si no se encuentra.
- */
 export const getSiteById = cache(
   async (siteId: string): Promise<SiteBasicInfo | null> => {
     logger.trace(`[Cache MISS] Cargando datos del sitio: ${siteId}`);
@@ -138,19 +101,35 @@ export const getSiteById = cache(
       .select("id, subdomain, workspace_id, name")
       .eq("id", siteId)
       .single();
-
-    if (error) {
-      if (error.code !== "PGRST116") {
-        logger.error(
-          `[DataLayer:Sites] Error al obtener el sitio ${siteId}:`,
-          error
-        );
-      }
-      return null;
+    if (error && error.code !== "PGRST116") {
+      logger.error(
+        `[DataLayer:Sites] Error al obtener el sitio ${siteId}:`,
+        error
+      );
     }
     return data;
   },
-  ["getSiteById"], // Base key for the cache segment
-  { revalidate: 3600, tags: ["sites"] } // Revalidate after 1 hour, add tags
+  ["getSiteById"],
+  { revalidate: 3600, tags: ["sites"] }
 );
+
+export async function getActiveSitesCount(
+  workspaceId: string
+): Promise<{ count: number }> {
+  const supabase = createServerClient();
+  const { count, error } = await supabase
+    .from("sites")
+    .select("id", { count: "exact", head: true })
+    .eq("workspace_id", workspaceId)
+    .neq("status_id", 3); // 3 es el ID para 'archived' en `site_statuses`
+
+  if (error) {
+    logger.error(
+      { error },
+      `[DataLayer:Sites] Error al contar sitios activos para workspace ${workspaceId}.`
+    );
+    return { count: 0 };
+  }
+  return { count: count || 0 };
+}
 // src/lib/data/sites/management.data.ts

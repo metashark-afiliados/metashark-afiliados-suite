@@ -1,17 +1,16 @@
 // src/lib/actions/_helpers/error-log.helper.ts
 /**
  * @file error-log.helper.ts
- * @description Helper atómico para registrar errores críticos persistentes.
- *              Ha sido refactorizado holísticamente para sanitizar de forma
- *              robusta los metadatos, aceptando cualquier objeto y garantizando
- *              la serialización JSON, resolviendo una cascada de errores TS2345.
- * @author Raz Podestá
- * @version 3.0.0
+ * @description Helper atómico para registrar errores críticos persistentes. Sanitiza
+ *              robustamente los metadatos para garantizar la serialización JSON.
+ * @author @author RaZ Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @see .docs-espejo/lib/actions/_helpers/error-log.helper.ts.md
  */
 "use server";
 import "server-only";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 import { type Json, type TablesInsert } from "@/lib/types/database";
 
@@ -19,7 +18,6 @@ import { type Json, type TablesInsert } from "@/lib/types/database";
  * @private
  * @function sanitizeForJson
  * @description Sanea recursivamente un objeto para asegurar que sea serializable a JSON.
- *              Convierte objetos `File` en un formato serializable y maneja otros tipos no estándar.
  * @param {any} data - Los datos a sanear.
  * @returns {Json} Los datos saneados y listos para ser serializados.
  */
@@ -47,7 +45,6 @@ function sanitizeForJson(data: any): Json {
     }
     return sanitizedObj;
   }
-  // Primitivos, null, etc., son seguros.
   return data;
 }
 
@@ -55,11 +52,11 @@ function sanitizeForJson(data: any): Json {
  * @public
  * @async
  * @function createPersistentErrorLog
- * @description Inserta un registro de error y devuelve su ID.
- * @param {string} source - El módulo donde se originó el error.
+ * @description Inserta un registro de error en la tabla `system_errors` y devuelve su ID.
+ * @param {string} source - El módulo donde se originó el error (ej. "createSiteAction").
  * @param {Error} error - El objeto de error capturado.
  * @param {Record<string, any>} [metadata] - Datos contextuales adicionales que serán saneados.
- * @returns {Promise<string>} El ID del log de error creado, o una cadena genérica si falla.
+ * @returns {Promise<string>} El ID del log de error creado, o una cadena genérica si la operación falla.
  */
 export async function createPersistentErrorLog(
   source: string,
@@ -87,7 +84,7 @@ export async function createPersistentErrorLog(
     if (insertError) {
       logger.error(
         `[ErrorLogHelper] FALLO AL REGISTRAR FALLO PERSISTENTE. Origen: ${source}`,
-        insertError
+        { err: insertError }
       );
       return "log-failed";
     }
@@ -100,18 +97,9 @@ export async function createPersistentErrorLog(
   } catch (e) {
     logger.error(
       `[ErrorLogHelper] FALLO CRÍTICO irrecuperable en el helper. Origen: ${source}`,
-      e
+      { err: e }
     );
     return "log-critical-failure";
   }
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Manejo de Profundidad Máxima**: ((Vigente)) La función de saneamiento recursivo podría ser mejorada para incluir un límite de profundidad y prevenir desbordamientos de pila con objetos circulares o extremadamente anidados.
- * 2. **Tipado de Retorno de Saneamiento**: ((Vigente)) El tipo `Json` es amplio. Se podrían utilizar genéricos avanzados para inferir un tipo de retorno más preciso de la función `sanitizeForJson`.
- * =====================================================================
- */
 // src/lib/actions/_helpers/error-log.helper.ts

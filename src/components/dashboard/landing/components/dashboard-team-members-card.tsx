@@ -1,15 +1,12 @@
 // src/components/dashboard/landing/components/dashboard-team-members-card.tsx
 /**
  * @file dashboard-team-members-card.tsx
- * @description Componente de UI de presentación puro. Ha sido refactorizado
- *              a un estándar de élite para ser un ensamblador 100% agnóstico a la
- *              lógica de negocio, consumiendo el hook soberano `useTeamMembersCard`
- *              para obtener todo su estado y contenido.
+ * @description Componente de UI de presentación puro. Sincronizado con la
+ *              arquitectura "Lean Database" para consumir el nombre del rol
+ *              desde la relación `workspace_roles`.
  * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 5.0.0
+ * @date 2025-09-01
  */
 "use client";
 
@@ -21,14 +18,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTeamMembersCard } from "@/lib/hooks/useTeamMembersCard";
 import { clientLogger } from "@/lib/logging";
 
-/**
- * @public
- * @component DashboardTeamMembersCard
- * @description Ensambla la tarjeta de miembros del equipo en el Hub Creativo.
- *              Es un componente de presentación puro que delega toda su lógica
- *              al hook `useTeamMembersCard`.
- * @returns {React.ReactElement}
- */
 export function DashboardTeamMembersCard(): React.ReactElement {
   clientLogger.trace(
     "[DashboardTeamMembersCard] Renderizando componente de presentación puro."
@@ -91,11 +80,16 @@ export function DashboardTeamMembersCard(): React.ReactElement {
                   <span className={"text-sm leading-5 text-muted-foreground"}>
                     {member.profiles?.email}
                   </span>
+                  {/* --- INICIO DE REFACTORIZACIÓN (Lean Database) --- */}
                   <span
                     className={"text-xs leading-4 text-primary font-semibold"}
                   >
-                    {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+                    {(member.workspace_roles?.name ?? "member")
+                      .charAt(0)
+                      .toUpperCase() +
+                      (member.workspace_roles?.name ?? "member").slice(1)}
                   </span>
+                  {/* --- FIN DE REFACTORIZACIÓN --- */}
                 </div>
               </div>
             </div>
@@ -109,16 +103,4 @@ export function DashboardTeamMembersCard(): React.ReactElement {
     </Card>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Componente `TeamMemberRow` Atómico**: La `div` que renderiza cada miembro dentro del `.map()` podría ser extraída a su propio componente `TeamMemberRow.tsx` para una máxima atomicidad y limpieza del JSX en este orquestador.
- * 2. **Esqueleto de Carga (Skeleton)**: Si `useTeamMembersCard` implementa un estado `isLoading`, este componente debería renderizar una lista de `Skeleton` `div`s para mejorar la UX de carga.
- * 3. **Internacionalización de Roles**: El rol del miembro (`member.role`) se capitaliza directamente. Para una internacionalización completa, se debería usar `t('role_' + member.role)`, lo cual requeriría añadir estas claves al `DashboardTeamMembersCard.json`.
- * 4. **Accesibilidad de la Lista**: La lista de miembros podría ser envuelta en una `<ul>` y cada miembro en un `<li>` para una mejor semántica HTML y accesibilidad.
- * 5. **Acciones por Miembro**: Integrar un `DropdownMenu` con acciones contextuales (Cambiar Rol, Eliminar) para cada miembro, consumiendo nuevas funciones que serían expuestas por el hook `useTeamMembersCard`.
- * =====================================================================
- */
 // src/components/dashboard/landing/components/dashboard-team-members-card.tsx

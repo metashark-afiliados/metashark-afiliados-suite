@@ -1,113 +1,63 @@
 // src/components/authentication/login-form.tsx
 /**
  * @file login-form.tsx
- * @description Componente de UI puro para el formulario de inicio de sesión.
- *              Ha sido refactorizado para ser 100% agnóstico al contenido,
- *              recibiendo todos sus textos a través de props.
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-31
+ * @description Componente de UI puro que ensambla el formulario de inicio de sesión.
+ *              Delega toda la lógica a su hook soberano `useLoginForm` y recibe
+ *              los textos como props. Implementa funcionalidad de UX de élite.
+ * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @version 3.0.0
+ * @see .docs-espejo/components/authentication/login-form.tsx.md
  */
 "use client";
 
-import React from "react";
-import { useFormState, useFormStatus } from "react-dom";
-import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-
-import { signInWithEmailAction } from "@/lib/actions/auth.actions";
-import { Link } from "@/lib/navigation";
-import { type ActionResult, isActionError } from "@/lib/validators";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useState } from "react";
+import { FormProvider } from "react-hook-form";
+import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 
 import {
   OAuthButtonGroup,
   type OAuthButtonGroupProps,
-} from "./OAuthButtonGroup";
+} from "@/components/authentication";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useLoginForm } from "@/lib/hooks/useLoginForm";
+import { clientLogger } from "@/lib/logger";
+import { Link } from "@/lib/navigation";
 
-interface SubmitButtonProps {
-  texts: {
-    signInButton: string;
-    signInButton_pending: string;
-  };
-}
+export type { LoginFormTexts } from "@/lib/hooks/useLoginForm";
 
-function SubmitButton({ texts }: SubmitButtonProps) {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {pending ? texts.signInButton_pending : texts.signInButton}
-    </Button>
-  );
-}
-
-export interface LoginFormTexts {
-  email_label: string;
-  password_label: string;
-  forgot_password_link: string;
-  signInButton: string;
-  signInButton_pending: string;
-  signInWith: string;
-  signInWithProvider: string;
-}
-
-export interface LoginFormProps {
-  texts: LoginFormTexts;
-}
-
-export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
-  const tErrors = useTranslations("shared.ValidationErrors");
-  const [state, formAction] = useFormState<ActionResult<never>, FormData>(
-    signInWithEmailAction,
-    {
-      success: false,
-      error: "",
-    }
+/**
+ * @public
+ * @component LoginForm
+ * @description Ensambla la UI del formulario de inicio de sesión. Es un componente de
+ *              presentación 100% puro.
+ * @returns {React.ReactElement}
+ */
+export function LoginForm(): React.ReactElement {
+  clientLogger.trace(
+    "[LoginForm] Renderizando componente de presentación puro."
   );
 
-  React.useEffect(() => {
-    if (isActionError(state)) {
-      const errorMessage = tErrors(state.error as any, {
-        defaultValue: state.error,
-      });
-      toast.error(errorMessage);
-    }
-  }, [state, tErrors]);
+  const { form, isLoading, processSubmit, texts } = useLoginForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const oauthButtonGroupTexts: OAuthButtonGroupProps["texts"] = {
     signInWithProvider: texts.signInWithProvider,
   };
 
   return (
-    <form action={formAction} className="grid gap-4">
-      <div className="grid gap-2">
-        <Label htmlFor="email">{texts.email_label}</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="m@example.com"
-          required
-        />
-      </div>
-      <div className="grid gap-2">
-        <div className="flex items-center">
-          <Label htmlFor="password">{texts.password_label}</Label>
-          <Link
-            href="/forgot-password"
-            className="ml-auto inline-block text-sm underline"
-          >
-            {texts.forgot_password_link}
-          </Link>
-        </div>
-        <Input id="password" name="password" type="password" required />
-      </div>
-      <SubmitButton texts={texts} />
-      <div className="relative my-2">
+    <div className="space-y-4 p-6">
+      <OAuthButtonGroup providers={["google"]} texts={oauthButtonGroupTexts} />
+
+      <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
@@ -117,8 +67,81 @@ export function LoginForm({ texts }: LoginFormProps): React.ReactElement {
           </span>
         </div>
       </div>
-      <OAuthButtonGroup providers={["google"]} texts={oauthButtonGroupTexts} />
-    </form>
+
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit(processSubmit)} className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="email">{texts.email_label}</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                autoComplete="email"
+                disabled={isLoading}
+                hasError={!!errors.email}
+                className="pl-9"
+                {...register("email")}
+              />
+            </div>
+            {errors.email && (
+              <p className="text-sm text-destructive" role="alert">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <div className="flex items-center">
+              <Label htmlFor="password">{texts.password_label}</Label>
+              <Link
+                href="/forgot-password"
+                className="ml-auto inline-block text-sm underline"
+              >
+                {texts.forgot_password_link}
+              </Link>
+            </div>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                disabled={isLoading}
+                hasError={!!errors.password}
+                className="pl-9 pr-10"
+                {...register("password")}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:bg-transparent"
+                onClick={togglePasswordVisibility}
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            {errors.password && (
+              <p className="text-sm text-destructive" role="alert">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading ? texts.signInButton_pending : texts.signInButton}
+          </Button>
+        </form>
+      </FormProvider>
+    </div>
   );
 }
 // src/components/authentication/login-form.tsx

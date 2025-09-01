@@ -1,25 +1,22 @@
 // src/components/authentication/sign-up-form/SignUpEmailField.tsx
 /**
- * @file src/components/authentication/sign-up-form/SignUpEmailField.tsx
- * @description Aparato de UI atómico y de presentación puro. Su única responsabilidad
- *              es renderizar el campo de entrada de email, su etiqueta, y el mensaje
- *              de error de validación para el formulario de registro.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @file SignUpEmailField.tsx
+ * @description Aparato de UI atómico y de presentación 100% puro. Renderiza el
+ *              campo de email, recibiendo todo su contenido y estado vía props,
+ *              e integrando un icono para una UX de élite.
+ * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @version 2.0.0
+ * @see .docs-espejo/components/authentication/sign-up-form/SignUpEmailField.tsx.md
  */
 "use client";
 
 import { type FieldErrors, type UseFormRegister } from "react-hook-form";
-import { useTranslations } from "next-intl";
+import { Mail } from "lucide-react";
 import { type z } from "zod";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { type SignUpSchema } from "@/lib/validators";
 
 type FormData = z.infer<typeof SignUpSchema>;
@@ -28,63 +25,53 @@ export interface SignUpEmailFieldProps {
   register: UseFormRegister<FormData>;
   errors: FieldErrors<FormData>;
   isPending: boolean;
+  label: string;
+  placeholder: string;
+  errorMessage?: string;
 }
 
 /**
  * @public
  * @component SignUpEmailField
- * @description Renderiza el campo de email con su etiqueta y mensaje de error.
- *              Es un componente controlado que recibe su estado de `react-hook-form`.
- * @param {SignUpEmailFieldProps} props - Propiedades para conectar con el formulario padre.
+ * @description Renderiza el campo de email. Es un componente controlado y puro.
+ * @param {SignUpEmailFieldProps} props - Propiedades para conectar con el formulario.
  * @returns {React.ReactElement}
  */
 export function SignUpEmailField({
   register,
   errors,
   isPending,
+  label,
+  placeholder,
+  errorMessage,
 }: SignUpEmailFieldProps): React.ReactElement {
-  const t = useTranslations("app.[locale].signup.page");
-  const tErrors = useTypedTranslations("shared.ValidationErrors");
-
   clientLogger.trace(
-    "[SignUpEmailField] Renderizando componente de campo de email."
+    "[SignUpEmailField] Renderizando componente de campo de email puro."
   );
 
   return (
     <div className="space-y-1">
-      <Label htmlFor="email">{t("email_label")}</Label>
-      <Input
-        id="email"
-        type="email"
-        autoComplete="email"
-        disabled={isPending}
-        aria-invalid={!!errors.email}
-        {...register("email")}
-        hasError={!!errors.email}
-      />
-      {errors.email && (
+      <Label htmlFor="email">{label}</Label>
+      <div className="relative">
+        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          id="email"
+          type="email"
+          placeholder={placeholder}
+          autoComplete="email"
+          disabled={isPending}
+          aria-invalid={!!errors.email}
+          className="pl-9"
+          {...register("email")}
+          hasError={!!errors.email}
+        />
+      </div>
+      {errorMessage && (
         <p className="text-sm text-destructive" role="alert">
-          {tErrors(errors.email.message as any)}
+          {errorMessage}
         </p>
       )}
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @section Melhorias Futuras
- * 1. ((Vigente)) **Icono de Estado de Validación:** Añadir un icono de `Check` o `AlertTriangle` dentro del `Input` para proporcionar un feedback visual instantáneo sobre la validez del email, cambiando dinámicamente al validar el campo `onBlur`.
- * 2. ((Vigente)) **Sugerencias de Dominio:** Para errores de tipeo comunes en dominios (ej. `gmal.com`), se podría integrar una librería ligera que sugiera la corrección ("¿Quisiste decir gmail.com?"), mejorando la tasa de éxito del registro.
- *
- * =====================================================================
- */
 // src/components/authentication/sign-up-form/SignUpEmailField.tsx

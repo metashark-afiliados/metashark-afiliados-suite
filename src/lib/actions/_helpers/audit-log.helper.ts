@@ -2,17 +2,17 @@
 /**
  * @file src/lib/actions/_helpers/audit-log.helper.ts
  * @description Helper atómico y reutilizable para registrar eventos de auditoría.
- *              Esta es una pieza crucial para la seguridad, la observabilidad y la
- *              trazabilidad de acciones críticas en toda la plataforma.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ *              Alineado con la arquitectura de logging de élite (pino).
+ * @author @author RaZ Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @see .docs-espejo/lib/actions/_helpers/audit-log.helper.ts.md
  */
 "use server";
 import "server-only";
 
 import { headers } from "next/headers";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 import { type Json } from "@/lib/types/database";
 
@@ -20,15 +20,13 @@ import { type Json } from "@/lib/types/database";
  * @public
  * @async
  * @function createAuditLog
- * @description Registra un evento de auditoría en la tabla `audit_logs` de la base de datos.
- *              Captura la acción, el actor, la entidad objetivo, metadatos adicionales
- *              y la dirección IP de la petición.
- * @param {string} action - El nombre de la acción realizada (ej. "user.login", "site.created").
- * @param {object} details - Un objeto que contiene los detalles del evento.
- * @param {string} [details.userId] - El ID del usuario que realizó la acción.
- * @param {string} [details.targetEntityId] - El ID de la entidad afectada por la acción.
- * @param {string} [details.targetEntityType] - El tipo de la entidad afectada.
- * @param {Json} [details.metadata] - Metadatos adicionales relevantes en formato JSON.
+ * @description Registra un evento de auditoría en la tabla `audit_logs`.
+ * @param {string} action - El nombre de la acción realizada (ej. "user.login").
+ * @param {object} details - Detalles del evento.
+ * @param {string} [details.userId] - ID del usuario actor.
+ * @param {string} [details.targetEntityId] - ID de la entidad afectada.
+ * @param {string} [details.targetEntityType] - Tipo de la entidad afectada.
+ * @param {Json} [details.metadata] - Metadatos adicionales en JSON.
  */
 export async function createAuditLog(
   action: string,
@@ -40,6 +38,7 @@ export async function createAuditLog(
     [key: string]: any;
   }
 ) {
+  logger.trace(`[AuditLogHelper] Intentando registrar acción: '${action}'`);
   try {
     const supabase = createClient();
     const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
@@ -54,33 +53,21 @@ export async function createAuditLog(
     });
 
     if (error) {
+      // Utiliza la nueva firma de logging de pino
       logger.error(
-        `[AuditLogHelper] No se pudo guardar el log de auditoría para la acción '${action}':`,
-        error
+        `[AuditLogHelper] No se pudo guardar el log de auditoría para la acción '${action}'`,
+        { err: error }
+      );
+    } else {
+      logger.trace(
+        `[AuditLogHelper] Log de auditoría para '${action}' guardado con éxito.`
       );
     }
   } catch (e) {
     logger.error(
-      `[AuditLogHelper] Fallo crítico al intentar guardar el log para la acción '${action}':`,
-      e
+      `[AuditLogHelper] Fallo crítico al intentar guardar el log para la acción '${action}'`,
+      { err: e }
     );
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Procesamiento Asíncrono**: ((Vigente)) Para acciones de muy alta frecuencia, la inserción del log podría ser delegada a una cola de trabajos (ej. Supabase Edge Functions con RabbitMQ o Vercel KV) para no añadir latencia a la respuesta de la Server Action principal.
- * 2. **Enriquecimiento Automático de Contexto**: ((Vigente)) El helper podría ser mejorado para obtener automáticamente el `userId` de la sesión activa si no se proporciona, simplificando su uso en las Server Actions.
- *
- * @subsection Melhorias Adicionadas
- * 1. **Fundamento de Segurança e Observabilidade**: ((Implementada)) Este helper estabelece a base para um sistema de auditoria robusto, uma dependência crítica para a maioria das Server Actions que modificam dados.
- * 2. **Manejo de Erros Resiliente**: ((Implementada)) A função utiliza um bloco `try/catch` para garantir que uma falha no sistema de logging de auditoria nunca interrompa a execução da Server Action principal.
- * 3. **Tipagem Segura de Metadados**: ((Implementada)) O uso do tipo `Json` importado de `_shared.ts` garante que os metadados sejam sempre um tipo de dados válido para a coluna `jsonb` do PostgreSQL.
- *
- * =====================================================================
- */
 // src/lib/actions/_helpers/audit-log.helper.ts

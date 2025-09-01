@@ -1,16 +1,12 @@
 // src/lib/data/workspaces/management.data.ts
 /**
- * @file management.data.ts
+ * @file src/lib/data/workspaces/management.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de
- *              lectura para la gestión de workspaces (Dashboard). Ha sido
- *              refactorizado holísticamente para utilizar `unstable_cache` de
- *              `next/cache`, resolviendo el error de runtime y alineándose
- *              con la SSoT de cacheo canónica.
+ *              lectura para la gestión de workspaces. Sincronizado con la
+ *              arquitectura "Lean Database".
  * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-30
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 4.0.0
+ * @date 2025-09-01
  */
 "use server";
 import "server-only";
@@ -18,41 +14,27 @@ import "server-only";
 import { unstable_cache as cache } from "next/cache";
 import { type SupabaseClient } from "@supabase/supabase-js";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { type Tables } from "@/lib/types/database";
 import { type Workspace } from "./types";
 
-type Supabase = SupabaseClient<
-  import("@/lib/types/database").Database,
-  "public"
->;
+type Database = import("@/lib/types/database").Database;
+type Supabase = SupabaseClient<Database, "public">;
 
-/**
- * @public
- * @async
- * @function getWorkspacesByUserId
- * @description Obtiene todos los workspaces a los que pertenece un usuario.
- *              La consulta está envuelta en `unstable_cache`.
- * @param {string} userId - El ID del usuario.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
- * @returns {Promise<Workspace[]>} Un array con los workspaces del usuario.
- */
 export const getWorkspacesByUserId = cache(
-  async (userId: string, supabaseClient?: Supabase): Promise<Workspace[]> => {
-    logger.trace(`[Cache MISS] Cargando workspaces para usuario: ${userId}`);
-    const supabase = supabaseClient || createServerClient();
+  async (userId: string): Promise<Workspace[]> => {
+    logger.trace({ userId }, `[Cache MISS] Cargando workspaces para usuario.`);
+    const supabase = createServerClient();
     try {
       const { data, error } = await supabase
         .from("workspace_members")
         .select("workspaces(*)")
         .eq("user_id", userId);
-
       if (error) throw new Error("No se pudieron cargar los workspaces.");
-
       return data?.flatMap((item) => item.workspaces || []) || [];
     } catch (error) {
-      logger.error(`Error al obtener workspaces para ${userId}:`, error);
+      logger.error({ error }, `Error al obtener workspaces para ${userId}.`);
       return [];
     }
   },
@@ -60,39 +42,22 @@ export const getWorkspacesByUserId = cache(
   { tags: ["workspaces"] }
 );
 
-/**
- * @public
- * @async
- * @function getWorkspaceById
- * @description Obtiene los datos básicos de un workspace por su ID.
- *              La consulta está envuelta en `unstable_cache`.
- * @param {string} workspaceId - El ID del workspace a obtener.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
- * @returns {Promise<Pick<Workspace, "id" | "name" | "icon"> | null>}
- */
 export const getWorkspaceById = cache(
   async (
-    workspaceId: string,
-    supabaseClient?: Supabase
+    workspaceId: string
   ): Promise<Pick<Workspace, "id" | "name" | "icon"> | null> => {
-    logger.trace(`[Cache MISS] Cargando workspace por ID: ${workspaceId}`);
-    const supabase = supabaseClient || createServerClient();
+    logger.trace({ workspaceId }, `[Cache MISS] Cargando workspace por ID.`);
+    const supabase = createServerClient();
     try {
       const { data, error } = await supabase
         .from("workspaces")
         .select("id, name, icon")
         .eq("id", workspaceId)
         .single();
-
-      if (error) {
-        if (error.code !== "PGRST116") {
-          throw new Error(`Error al obtener el workspace ${workspaceId}.`);
-        }
-        return null;
-      }
+      if (error && error.code !== "PGRST116") throw error;
       return data;
     } catch (error) {
-      logger.error(`Error en getWorkspaceById para ${workspaceId}:`, error);
+      logger.error({ error }, `Error en getWorkspaceById para ${workspaceId}.`);
       return null;
     }
   },
@@ -100,39 +65,44 @@ export const getWorkspaceById = cache(
   { tags: ["workspaces"] }
 );
 
-/**
- * @public
- * @async
- * @function getWorkspaceMembers
- * @description Obtiene todos los miembros de un workspace específico.
- * @param {string} workspaceId - El ID del workspace.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase.
- * @returns {Promise<Tables<'workspace_members'>[]>} Un array de miembros del workspace.
- */
 export async function getWorkspaceMembers(
-  workspaceId: string,
-  supabaseClient?: Supabase
-): Promise<Tables<"workspace_members">[]> {
+  workspaceId: string
+): Promise<
+  (Tables<"workspace_members"> & {
+    profiles: Tables<"profiles"> | null;
+    workspace_roles: { name: string } | null;
+  })[]
+> {
   logger.trace(
-    `[DataLayer:Workspaces] Cargando miembros para workspace: ${workspaceId}`
+    { workspaceId },
+    `[DataLayer:Workspaces] Cargando miembros para workspace.`
   );
-  const supabase = supabaseClient || createServerClient();
+  const supabase = createServerClient();
   try {
     const { data, error } = await supabase
       .from("workspace_members")
-      .select("*, profiles(id, email, full_name, avatar_url)")
+      .select(
+        `
+        *,
+        profiles (id, email, full_name, avatar_url),
+        workspace_roles (name)
+      `
+      )
       .eq("workspace_id", workspaceId);
 
     if (error) {
       logger.error(
-        `Error al obtener miembros del workspace ${workspaceId}:`,
-        error
+        { error },
+        `Error al obtener miembros del workspace ${workspaceId}.`
       );
       throw new Error("No se pudieron obtener los miembros del workspace.");
     }
-    return (data as Tables<"workspace_members">[]) || [];
+    return data || [];
   } catch (error) {
-    logger.error(`Error en getWorkspaceMembers para ${workspaceId}:`, error);
+    logger.error(
+      { error },
+      `Error en getWorkspaceMembers para ${workspaceId}.`
+    );
     return [];
   }
 }

@@ -2,25 +2,25 @@
 /**
  * @file src/components/authentication/sign-up-form/SignUpConfirmPasswordField.tsx
  * @description Aparato de UI atómico y de presentación puro. Renderiza el campo
- *              de confirmación de contraseña, su etiqueta y el mensaje de error de
- *              validación para el formulario de registro.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              de confirmación de contraseña, incluyendo la funcionalidad de
+ *              visualización ("ojo").
+ * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @version 1.0.0
+ * @see .docs-espejo/components/authentication/sign-up-form/SignUpConfirmPasswordField.tsx.md
  */
 "use client";
 
+import React, { useState } from "react";
 import { type FieldErrors, type UseFormRegister } from "react-hook-form";
-import { useTranslations } from "next-intl";
+import { Eye, EyeOff, Lock } from "lucide-react";
 import { type z } from "zod";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { type SignUpSchema } from "@/lib/validators";
+import { cn } from "@/lib/utils";
 
 type FormData = z.infer<typeof SignUpSchema>;
 
@@ -28,63 +28,68 @@ export interface SignUpConfirmPasswordFieldProps {
   register: UseFormRegister<FormData>;
   errors: FieldErrors<FormData>;
   isPending: boolean;
+  label: string;
+  errorMessage?: string;
 }
 
 /**
  * @public
  * @component SignUpConfirmPasswordField
- * @description Renderiza el campo de confirmación de contraseña. Es un componente
- *              controlado que recibe su estado de `react-hook-form`.
- * @param {SignUpConfirmPasswordFieldProps} props - Propiedades para conectar con el formulario padre.
+ * @description Renderiza el campo de confirmación de contraseña con
+ *              funcionalidad de visualización. Es un componente controlado y puro.
+ * @param {SignUpConfirmPasswordFieldProps} props - Propiedades para conectar con el formulario.
  * @returns {React.ReactElement}
  */
 export function SignUpConfirmPasswordField({
   register,
   errors,
   isPending,
+  label,
+  errorMessage,
 }: SignUpConfirmPasswordFieldProps): React.ReactElement {
-  const t = useTranslations("app.[locale].signup.page");
-  const tErrors = useTypedTranslations("shared.ValidationErrors");
-
   clientLogger.trace(
-    "[SignUpConfirmPasswordField] Renderizando componente de campo de confirmación de contraseña."
+    "[SignUpConfirmPasswordField] Renderizando componente de campo de confirmação de senha puro."
   );
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   return (
     <div className="space-y-1">
-      <Label htmlFor="confirmPassword">{t("confirm_password_label")}</Label>
-      <Input
-        id="confirmPassword"
-        type="password"
-        autoComplete="new-password"
-        disabled={isPending}
-        aria-invalid={!!errors.confirmPassword}
-        {...register("confirmPassword")}
-        hasError={!!errors.confirmPassword}
-      />
-      {errors.confirmPassword && (
+      <Label htmlFor="confirmPassword">{label}</Label>
+      <div className="relative">
+        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          id="confirmPassword"
+          type={showPassword ? "text" : "password"}
+          autoComplete="new-password"
+          disabled={isPending}
+          aria-invalid={!!errors.confirmPassword}
+          className="pl-9 pr-10"
+          {...register("confirmPassword")}
+          hasError={!!errors.confirmPassword}
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:bg-transparent"
+          onClick={togglePasswordVisibility}
+          aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+        >
+          {showPassword ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+      {errorMessage && (
         <p className="text-sm text-destructive" role="alert">
-          {tErrors(errors.confirmPassword.message as any)}
+          {errorMessage}
         </p>
       )}
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @section Melhorias Futuras
- * 1. ((Vigente)) **Feedback Visual de Coincidencia en Tiempo Real:** Implementar una lógica que observe el valor de este campo y el del campo de contraseña principal. Cuando coincidan, mostrar un icono `Check` verde junto al campo y aplicar un borde verde. Si no coinciden después de que el campo pierda el foco (`onBlur`), mostrar un icono `X` y un borde rojo. Esta es una mejora de UX de alto impacto.
- * 2. ((Vigente)) **Conmutador de Visibilidad:** Al igual que el campo de contraseña principal, añadir un icono de "ojo" para alternar la visibilidad del texto.
- *
- * =====================================================================
- */
 // src/components/authentication/sign-up-form/SignUpConfirmPasswordField.tsx
