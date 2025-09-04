@@ -5,7 +5,7 @@
  *              Corregido para utilizar la API `request.postData()` de Playwright
  *              para la inspección del cuerpo de la petición, resolviendo el
  *              error de tipo `TS2339`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.1
  */
 import { test, expect, type Page } from "@playwright/test";

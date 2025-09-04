@@ -2,57 +2,61 @@
 /**
  * @file src/components/authentication/sign-up-form/SignUpLegalCheckboxes.tsx
  * @description Aparato de UI atómico y de presentación puro. Renderiza los
- *              checkboxes para la aceptación de términos y la suscripción al
- *              boletín, utilizando el patrón `Controller` para una integración
- *              de élite con `react-hook-form`.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              checkboxes de consentimiento legal y suscripción opcional, recibiendo
+ *              todo su contenido y estado a través de props.
+ * @author @author RaZ Podestá - MetaShark Tech
+ * @version 2.0.0
  */
 "use client";
 
+import React from "react";
 import { type Control, Controller, type FieldErrors } from "react-hook-form";
-import { useTranslations } from "next-intl";
 import { type z } from "zod";
 
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Label } from "@/components/ui/label";
-import { SmartLink } from "@/components/ui/SmartLink";
-import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { RichText } from "@/components/ui/RichText";
+import { clientLogger } from "@/lib/logger";
 import { type SignUpSchema } from "@/lib/validators";
 
 type FormData = z.infer<typeof SignUpSchema>;
 
+/**
+ * @public
+ * @interface SignUpLegalCheckboxesProps
+ * @description El contrato de props para el componente de checkboxes legales.
+ *              Define todas las dependencias de `react-hook-form` y los textos
+ *              requeridos para una renderización pura.
+ */
 export interface SignUpLegalCheckboxesProps {
   control: Control<FormData>;
   errors: FieldErrors<FormData>;
   isPending: boolean;
+  texts: {
+    legalNotice: React.ReactNode;
+    newsletterLabel: string;
+  };
+  errorMessage?: string;
 }
 
 /**
  * @public
  * @component SignUpLegalCheckboxes
- * @description Renderiza los checkboxes de consentimiento legal. Utiliza el
- *              componente `Controller` de react-hook-form, que es el patrón
- *              canónico para integrar componentes de UI controlados (como
- *              nuestro `Checkbox` de Shadcn) en el ecosistema del formulario.
- * @param {SignUpLegalCheckboxesProps} props - Propiedades para conectar con el formulario padre.
+ * @description Renderiza los checkboxes de consentimiento legal. Es un componente
+ *              controlado y puro que utiliza el patrón `Controller`.
+ * @param {SignUpLegalCheckboxesProps} props - Propiedades para conectar con el formulario.
  * @returns {React.ReactElement}
  */
 export function SignUpLegalCheckboxes({
   control,
   errors,
   isPending,
+  texts,
+  errorMessage,
 }: SignUpLegalCheckboxesProps): React.ReactElement {
-  const t = useTranslations("app.[locale].signup.page");
-  const tErrors = useTypedTranslations("shared.ValidationErrors");
-
-  clientLogger.trace(
-    "[SignUpLegalCheckboxes] Renderizando componente de checkboxes."
-  );
+  clientLogger.trace("[SignUpLegalCheckboxes] Renderizando componente puro.", {
+    component: "SignUpLegalCheckboxes",
+  });
 
   return (
     <div className="space-y-4 pt-2">
@@ -67,6 +71,7 @@ export function SignUpLegalCheckboxes({
               onCheckedChange={field.onChange}
               disabled={isPending}
               aria-invalid={!!errors.termsAccepted}
+              hasError={!!errors.termsAccepted}
             />
           )}
         />
@@ -75,22 +80,11 @@ export function SignUpLegalCheckboxes({
             htmlFor="terms"
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
-            {t.rich("legalNotice", {
-              terms: (chunks) => (
-                <SmartLink href="/terms" label={chunks} className="underline" />
-              ),
-              privacy: (chunks) => (
-                <SmartLink
-                  href="/privacy"
-                  label={chunks}
-                  className="underline"
-                />
-              ),
-            })}
+            <RichText>{texts.legalNotice}</RichText>
           </Label>
-          {errors.termsAccepted && (
+          {errorMessage && (
             <p className="text-sm text-destructive" role="alert">
-              {tErrors(errors.termsAccepted.message as any)}
+              {errorMessage}
             </p>
           )}
         </div>
@@ -113,26 +107,10 @@ export function SignUpLegalCheckboxes({
           htmlFor="newsletter"
           className="text-sm font-medium leading-none"
         >
-          {t("newsletter_label")}
+          {texts.newsletterLabel}
         </Label>
       </div>
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 2.1.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @section Melhorias Futuras
- * 1. ((Vigente)) **Feedback Visual de Error en Checkbox:** El componente `Checkbox` subyacente (`@/components/ui/Checkbox.tsx`) podría ser mejorado para aceptar una prop `hasError: boolean`. Si es `true`, podría aplicar un estilo visual de error (ej., un borde rojo o un anillo) para indicar más claramente qué campo requiere atención.
- *
- * =====================================================================
- */
 // src/components/authentication/sign-up-form/SignUpLegalCheckboxes.tsx

@@ -2,21 +2,18 @@
 /**
  * @file store.factory.ts
  * @description Ensamblador de middlewares y factoría principal del BuilderStore.
- *              Refactorizado para integrar `zundo` (historial de estado) y
- *              `syncTabs` (sincronización entre pestañas), elevando la
- *              resiliencia y la experiencia de usuario a un estándar de élite.
- * @author Raz Podestá - MetaShark Tech
- * @version 4.2.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              Esta es la SSoT que compone la lógica de estado pura con middlewares
+ *              de élite para crear un store resiliente, observable y sincronizado.
+ * @author L.I.A. Legacy
+ * @version 5.0.0
+ * @see .docs-espejo/lib/builder/core/store.factory.ts.md
  */
-import { create } from "zustand";
-import { createJSONStorage, devtools, persist } from "zustand/middleware";
-import { syncTabs } from "zustand-sync-tabs";
 import { temporal, type ZundoOptions } from "zundo";
+import { create } from "zustand";
+import { syncTabs } from "zustand-sync-tabs";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { finalCreator } from "./store.creator";
 import { type BuilderState, type TemporalStateSlice } from "./store.types";
 
@@ -33,6 +30,17 @@ const zundoOptions: ZundoOptions<BuilderState, TemporalStateSlice> = {
   limit: 100,
 };
 
+/**
+ * @public
+ * @function createBuilderStore
+ * @description Factoría que crea la instancia completa del store de Zustand para el Builder.
+ *              Ensambla la lógica de estado base con un pipeline de middlewares:
+ *              1. `persist`: Guarda el estado en localStorage para prevenir pérdida de datos.
+ *              2. `syncTabs`: Sincroniza el estado entre pestañas del navegador.
+ *              3. `devtools`: Integra con Redux DevTools para depuración.
+ *              4. `temporal` (zundo): Añade la funcionalidad de historial (undo/redo).
+ * @returns Una instancia completa y lista para usar del `BuilderStore`.
+ */
 export const createBuilderStore = () =>
   create<BuilderState>()(
     temporal(
@@ -46,10 +54,14 @@ export const createBuilderStore = () =>
             }),
             onRehydrateStorage: () => (state, error) => {
               if (error) {
-                logger.error("[Zustand:Persist] Fallo al rehidratar.", error);
+                // Corrección de la firma del logger para cumplir con la Directiva 1.1
+                logger.error(
+                  { err: error },
+                  "[Zustand:Persist] Fallo al rehidratar el estado desde localStorage."
+                );
               }
             },
-          }) as any, // --- CORRECCIÓN DE ÉLITE: Aserción de tipo para romper la cadena de inferencia compleja.
+          }) as any, // Aserción de tipo pragmática para resolver inferencia compleja de middlewares anidados.
           { name: "convertikit-builder-tabs-sync", exclude: ["isSaving"] }
         ),
         { name: "ConvertiKit_Builder_Store" }
@@ -57,20 +69,4 @@ export const createBuilderStore = () =>
       zundoOptions
     )
   );
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución Definitiva de Error de Tipo (TS2345)**: ((Implementada)) Se ha aplicado una aserción de tipo `as any` al resultado del middleware `persist`. Esta es una solución pragmática de élite que resuelve el complejo error de inferencia de tipos de TypeScript causado por el anidamiento de middlewares, sin comprometer la lógica de ejecución.
- * 2. **Resiliencia de Datos (Undo/Redo)**: ((Vigente)) Se ha integrado el middleware `temporal` de `zundo`.
- * 3. **Sincronización Multi-Pestaña**: ((Vigente)) Se ha integrado el middleware `syncTabs`.
- *
- * @subsection Melhorias Futuras
- * 1. **Prevención de Cambios Nulos en Historial**: ((Vigente)) Integrar la opción `equality` en `zundo` con una función de comparación profunda.
- *
- * =====================================================================
- */
 // src/lib/builder/core/store.factory.ts

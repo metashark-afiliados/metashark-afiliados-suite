@@ -8,18 +8,20 @@
  * @version 3.0.0
  * @date 2025-08-31
  */
-import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
+import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 
-import { createClient } from "@/lib/supabase/server";
-import { logger } from "@/lib/logging";
 import { ErrorStateCard } from "@/components/shared/error-state-card";
-import { PaginationControls } from "@/components/shared/pagination-controls";
+import {
+  PaginationControls,
+  type PaginationTexts,
+} from "@/components/shared/pagination-controls";
+import { logger } from "@/lib/logger";
+import { createClient } from "@/lib/supabase/server";
 import {
   VisitorLogsTable,
   type VisitorLogRow,
 } from "../components/VisitorLogsTable";
-import { type PaginationTexts } from "@/components/shared/pagination-controls";
 
 const LOGS_PER_PAGE = 25;
 

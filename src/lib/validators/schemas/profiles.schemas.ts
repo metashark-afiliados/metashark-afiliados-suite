@@ -4,7 +4,7 @@
  * @description Aparato de validación atómico y SSoT para la entidad 'profiles'.
  *              Este módulo encapsula el schema de Zod para las preferencias de UI
  *              del usuario, consumiendo el contrato de datos desde la capa de tipos.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 import { z } from "zod";

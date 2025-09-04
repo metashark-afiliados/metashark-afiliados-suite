@@ -2,32 +2,30 @@
 /**
  * @file lia.actions.ts
  * @description Server Action atómica para interactuar con el asistente de IA (L.I.A.).
- *              Esta acción simula la comunicación con un modelo de lenguaje
- *              y devuelve una respuesta. Ha sido refactorizada para corregir un
- *              error de tipo en el logging y para centralizar sus claves de error.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              Refactorizada para alinearse con la SSoT de autenticación, el contrato
+ *              `ActionResult`, la lógica de negocio desacoplada y las directivas de logging.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
  */
 "use server";
 import "server-only";
 
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 import {
   createAuditLog,
   createPersistentErrorLog,
-  getAuthenticatedUser,
 } from "@/lib/actions/_helpers";
-import { logger } from "@/lib/logging";
-import { type ActionResult } from "@/lib/validators";
+import { getAuthUser } from "@/lib/auth/get-auth-user";
+import { logger } from "@/lib/logger";
+// Oportunidad de atomización: Lógica de IA movida a un servicio simulado
+import { LiaAIService } from "@/lib/services/lia.ai.service";
+import { type ActionResult, type ValidationErrorKey } from "@/lib/validators";
 
 const SendMessageSchema = z.object({
   message: z
     .string()
-    .min(1, { message: "ValidationErrors.generic.message_required" }),
+    .min(1, { message: "generic.message_required" as ValidationErrorKey }),
 });
 
 export type LiaChatMessage = {
@@ -40,39 +38,28 @@ export type LiaChatMessage = {
  * @async
  * @function sendMessageToLiaAction
  * @description Envía un mensaje al asistente de IA (L.I.A.) y recibe una respuesta.
- *              Actualmente simula la respuesta.
+ *              Delega la generación de la respuesta a un servicio de IA desacoplado.
  * @param {FormData} formData - Los datos del formulario que contienen el mensaje del usuario.
  * @returns {Promise<ActionResult<LiaChatMessage>>} El resultado de la operación.
  */
 export async function sendMessageToLiaAction(
   formData: FormData
 ): Promise<ActionResult<LiaChatMessage>> {
-  const authResult = await getAuthenticatedUser();
-  if ("error" in authResult) return authResult.error;
-  const { user } = authResult;
+  const user = await getAuthUser();
+  if (!user) {
+    return { success: false, error: "generic.error_unauthenticated" };
+  }
 
   const rawData = Object.fromEntries(formData.entries());
+  const context = { userId: user.id, payload: rawData };
 
   try {
     const { message } = SendMessageSchema.parse(rawData);
+    context.payload.message = message;
 
-    logger.info(
-      `[LiaAction] Usuario ${user.id} envió mensaje a L.I.A.: "${message}"`
-    );
+    logger.info(context, "[LiaAction] Usuario envió mensaje a L.I.A.");
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    let aiResponseContent = "";
-    if (message.toLowerCase().includes("hola")) {
-      aiResponseContent =
-        "¡Hola! Soy L.I.A., tu asistente de marketing de afiliados. ¿En qué puedo ayudarte hoy?";
-    } else if (message.toLowerCase().includes("campaña")) {
-      aiResponseContent =
-        "Puedo ayudarte a generar ideas de campañas, escribir textos de anuncios o analizar el rendimiento de tus landings. ¿Qué tienes en mente?";
-    } else {
-      aiResponseContent =
-        "Disculpa, aún estoy aprendiendo. Por ahora, puedo conversar sobre marketing de afiliados y mis funcionalidades. ¡Pregúntame algo más específico!";
-    }
+    const aiResponseContent = await LiaAIService.generateResponse(message);
 
     await createAuditLog("lia.message_sent", {
       userId: user.id,
@@ -84,40 +71,24 @@ export async function sendMessageToLiaAction(
       data: { role: "assistant", content: aiResponseContent },
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { success: false, error: error.errors[0].message };
+    let errorKey: ValidationErrorKey = "generic.error_server_generic";
+    if (error instanceof ZodError) {
+      errorKey = error.errors[0].message as ValidationErrorKey;
     }
+
     const errorId = await createPersistentErrorLog(
       "sendMessageToLiaAction",
       error as Error,
-      { userId: user.id, payload: rawData }
+      context
     );
     logger.error(
-      `[LiaAction] Fallo al procesar mensaje de IA. Log ID: ${errorId}`,
-      { error }
+      { err: error, errorId, ...context },
+      "[LiaAction] Fallo al procesar mensaje de IA."
     );
     return {
       success: false,
-      error: "ValidationErrors.lia.api_failed",
+      error: errorKey,
     };
   }
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @section Melhorias Futuras
- * 1. ((Vigente)) **Integración con SDK de IA Real:** Reemplazar la lógica de simulación `if/else` con una integración real a un servicio de LLM (ej. Vercel AI SDK, OpenAI, Gemini) para permitir la generación dinámica de respuestas.
- * 2. ((Vigente)) **Manejo de Historial de Conversación:** Extender la acción para que acepte un historial de mensajes (`LiaChatMessage[]`) como parte del `formData`. Esto permitirá a la IA mantener el contexto de la conversación para respuestas más coherentes y precisas.
- * 3. ((Vigente)) **Streaming de Respuestas:** Para una UX de élite, refactorizar la acción para utilizar la API de `streaming` de Next.js. Esto permitiría enviar la respuesta de la IA palabra por palabra a la UI, en lugar de esperar la respuesta completa, mejorando la percepción de velocidad.
- *
- * =====================================================================
- */
 // src/lib/actions/lia.actions.ts

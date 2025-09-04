@@ -4,153 +4,173 @@
  * @description Aparato de datos atómico para la entidad de invitaciones.
  *              Esta es la Única Fuente de Verdad para las operaciones de escritura
  *              relacionadas con la tabla `invitations` y sus RPCs asociadas.
- *              Las operaciones de lectura se encuentran en `notifications.ts`.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ *              Refactorizado para alinearse con la arquitectura "Lean Database" y la
+ *              Constitución de Observabilidad.
+ * @author L.I.A Legacy
+ * @version 3.0.0
  */
 "use server";
 import "server-only";
 
 import { type SupabaseClient } from "@supabase/supabase-js";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient as createServerClient } from "@/lib/supabase/server";
-import { type Enums, type TablesInsert } from "@/lib/types/database";
+import { type Database, type TablesInsert } from "@/lib/types/database";
 
 type Supabase = SupabaseClient<any, "public", any>;
 
 /**
  * @public
- * @typedef {object} CreateInvitationPayload
- * @description Contrato de datos para crear una nueva inserción de invitación.
+ * @typedef {Omit<TablesInsert<"invitations">, "status">} CreateInvitationPayload
+ * @description Contrato de datos para crear una nueva invitación. Opera con `role_id`.
  */
-type CreateInvitationPayload = {
-  workspace_id: string;
-  invitee_email: string;
-  role: Enums<"workspace_role">;
-  invited_by: string;
-};
+export type CreateInvitationPayload = Omit<
+  TablesInsert<"invitations">,
+  "status"
+>;
 
 /**
  * @public
  * @async
  * @function createInvitation
  * @description Inserta un nuevo registro de invitación en la base de datos.
- * @param {CreateInvitationPayload} payload - Los datos para la nueva invitación.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
- * @returns {Promise<{ success: boolean; error?: { code: string; message: string } }>} Un objeto indicando el éxito o fallo de la operación.
+ * @param {CreateInvitationPayload} payload - Los datos para la nueva invitación (con role_id).
+ * @returns {Promise<{ success: boolean; error?: { code: string; message: string } }>}
  */
 export async function createInvitation(
-  payload: CreateInvitationPayload,
-  supabaseClient?: Supabase
+  payload: CreateInvitationPayload
 ): Promise<{ success: boolean; error?: { code: string; message: string } }> {
-  const supabase = supabaseClient || createServerClient();
+  const supabase = createServerClient();
   const invitationData: TablesInsert<"invitations"> = {
     ...payload,
     status: "pending",
   };
 
-  logger.trace("[DataLayer:Invitations] Intentando crear invitación.", {
-    payload,
-  });
+  logger.trace(
+    { payload: invitationData },
+    "[DataLayer:Invitations] Intentando crear invitación."
+  );
 
   const { error } = await supabase.from("invitations").insert(invitationData);
 
   if (error) {
-    logger.error("[DataLayer:Invitations] Error al crear invitación.", {
-      code: error.code,
-      message: error.message,
-    });
+    logger.error(
+      { err: error, payload: invitationData },
+      "[DataLayer:Invitations] Error al crear invitación."
+    );
     return {
       success: false,
       error: { code: error.code, message: error.message },
     };
   }
 
-  logger.info("[DataLayer:Invitations] Invitación creada con éxito.", {
-    invitee: payload.invitee_email,
-    workspaceId: payload.workspace_id,
-  });
+  logger.info(
+    { invitee: payload.invitee_email, workspaceId: payload.workspace_id },
+    "[DataLayer:Invitations] Invitación creada con éxito."
+  );
 
   return { success: true };
 }
 
 /**
  * @public
+ * @typedef {object} AcceptInvitationResult
+ * @description Contrato de retorno para la operación de aceptar invitación.
+ */
+export type AcceptInvitationResult = {
+  success: boolean;
+  error?: string;
+  message?: string;
+  workspaceId?: string;
+};
+
+/**
+ * @public
  * @async
  * @function acceptInvitation
  * @description Invoca la RPC segura para aceptar una invitación de workspace.
- *              Esta función encapsula la llamada a la lógica de base de datos que
- *              añade al usuario como miembro y actualiza el estado de la invitación.
  * @param {string} invitationId - El ID de la invitación a ser aceptada.
  * @param {string} acceptingUserId - El ID del usuario que está aceptando.
- * @param {Supabase} [supabaseClient] - Instancia opcional del cliente Supabase para inyección de dependencias.
- * @returns {Promise<{ success: boolean; error?: string; message?: string }>} Un objeto indicando el resultado de la operación.
+ * @returns {Promise<AcceptInvitationResult>}
  */
 export async function acceptInvitation(
   invitationId: string,
-  acceptingUserId: string,
-  supabaseClient?: Supabase
-): Promise<{ success: boolean; error?: string; message?: string }> {
-  const supabase = supabaseClient || createServerClient();
+  acceptingUserId: string
+): Promise<AcceptInvitationResult> {
+  const supabase = createServerClient();
+  const context = { invitationId, userId: acceptingUserId };
 
-  logger.trace("[DataLayer:Invitations] Intentando aceptar invitación.", {
-    invitationId,
-    userId: acceptingUserId,
-  });
+  logger.trace(
+    context,
+    "[DataLayer:Invitations] Intentando aceptar invitación."
+  );
 
   const { data, error } = await supabase.rpc("accept_workspace_invitation", {
-    invitation_id: invitationId,
-    accepting_user_id: acceptingUserId,
+    p_invitation_id: invitationId,
+    p_accepting_user_id: acceptingUserId,
   });
 
-  const rpcResult = data as {
-    success: boolean;
-    error: string;
-    message: string;
-  } | null;
-
   if (error) {
-    logger.error("[DataLayer:Invitations] RPC falló al aceptar invitación.", {
-      invitationId,
-      error,
-    });
-    return { success: false, error: "No se pudo procesar la aceptación." };
+    logger.error(
+      { err: error, ...context },
+      "[DataLayer:Invitations] RPC falló al aceptar invitación."
+    );
+    return { success: false, error: "generic.error_server_generic" };
   }
+
+  const rpcResult = data as AcceptInvitationResult | null;
 
   if (rpcResult && !rpcResult.success) {
     logger.warn(
-      "[DataLayer:Invitations] RPC devolvió un error de lógica de negocio.",
-      {
-        invitationId,
-        rpcError: rpcResult.error,
-      }
+      { ...context, rpcError: rpcResult.error },
+      "[DataLayer:Invitations] RPC devolvió un error de lógica de negocio."
     );
     return { success: false, error: rpcResult.error };
   }
 
-  logger.info("[DataLayer:Invitations] Invitación aceptada vía RPC.", {
-    invitationId,
-    userId: acceptingUserId,
-  });
+  logger.info(context, "[DataLayer:Invitations] Invitación aceptada vía RPC.");
 
-  return { success: true, message: rpcResult?.message };
+  return {
+    success: true,
+    message: rpcResult?.message,
+    workspaceId: rpcResult?.workspaceId,
+  };
 }
 
 /**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Función `revokeInvitation`**: ((Vigente)) Implementar una función que permita a un administrador de workspace revocar una invitación pendiente, cambiando su estado a 'revoked'.
- * 2. **Función `getInvitationById`**: ((Vigente)) Añadir una función para obtener los detalles de una invitación, que será útil para la futura acción de revocación y para mostrar más detalles en la UI.
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidade da Camada de Dados**: ((Implementada)) Este aparato isola completamente a lógica de escrita de convites, aderindo à arquitetura canônica e ao Princípio de Responsabilidade Única.
- * 2. **Segurança via RPC**: ((Implementada)) A lógica de aceitação de convite é delegada a uma função RPC, o que é uma prática de elite, pois garante que a lógica de negócio complexa (inserir em `workspace_members` e atualizar `invitations`) ocorra de forma atômica dentro de uma transação no banco de dados.
- * 3. **Observabilidade Completa**: ((Implementada)) Logs de `trace`, `info`, `warn` e `error` fornecem uma visibilidade completa sobre o ciclo de vida das operações de convite.
- *
- * =====================================================================
+ * @public
+ * @async
+ * @function getInvitationByWorkspaceAndEmail
+ * @description Verifica si ya existe una invitación o membresía para un email en un workspace.
+ * @param {string} workspaceId - El ID del workspace a verificar.
+ * @param {string} email - El email del invitado.
+ * @returns {Promise<boolean>} `true` si ya existe, `false` en caso contrario.
  */
+export async function getInvitationByWorkspaceAndEmail(
+  workspaceId: string,
+  email: string
+): Promise<boolean> {
+  const supabase = createServerClient();
+  const { data: existingMember } = await supabase
+    .from("workspace_members")
+    .select("profiles!inner(email)")
+    .eq("workspace_id", workspaceId)
+    .eq("profiles.email", email)
+    .maybeSingle();
+
+  if (existingMember) {
+    return true; // Ya es miembro
+  }
+
+  const { data: existingInvitation } = await supabase
+    .from("invitations")
+    .select("id")
+    .eq("workspace_id", workspaceId)
+    .eq("invitee_email", email)
+    .eq("status", "pending")
+    .maybeSingle();
+
+  return !!existingInvitation; // Ya está invitado
+}
 // src/lib/data/invitations.ts

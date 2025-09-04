@@ -22,7 +22,7 @@ import {
 } from "@/components/builder/ui";
 import { Label } from "@/components/ui/label";
 import { type BlockPropertyType, type PageBlock } from "@/lib/builder/types.d";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 const propertyComponentMap: Record<
   Exclude<BlockPropertyType, "array" | "icon">,

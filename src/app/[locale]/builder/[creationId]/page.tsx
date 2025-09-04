@@ -4,16 +4,17 @@
  * @description Página de servidor principal del constructor. Es el punto de
  *              entrada y orquestador de datos para el IDE del constructor.
  *              Su arquitectura sigue el patrón de "Carga de Datos en Servidor,
- * *            Hidratación Segura en Cliente". Refactorizado para incluir metadatos dinámicos.
+ *              Hidratación Segura en Cliente". Refactorizado para alinear el
+ *              logging con la firma canónica de Pino (AD-001).
  * @author Raz Podestá
- * @version 10.0.0
- * @date 2025-08-28
+ * @version 11.0.0
  */
-import { notFound, redirect } from "next/navigation";
-import React from "react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { notFound, redirect } from "next/navigation";
+import React from "react";
 
+import { BuilderLayout } from "@/app/[locale]/builder/[creationId]/BuilderLayout";
 import { BuilderStoreProvider } from "@/components/builder/BuilderStoreProvider";
 import { Canvas } from "@/components/builder/Canvas";
 import {
@@ -21,12 +22,9 @@ import {
   getBoilerplateCreation,
 } from "@/lib/builder/boilerplate";
 import { type CampaignConfig } from "@/lib/builder/types.d";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 import { type Tables } from "@/lib/types/database";
-// --- INICIO DE REFACTORIZACIÓN: Importación de BuilderLayout ---
-import { BuilderLayout } from "./BuilderLayout";
-// --- FIN DE REFACTORIZACIÓN ---
 
 /**
  * @private
@@ -52,8 +50,8 @@ async function getCreationById(
 
   if (error && error.code !== "PGRST116") {
     logger.error(
-      `[BuilderPageLoader] Error al obtener la 'creation' ${creationId}`,
-      error
+      { err: error, creationId, userId },
+      `[BuilderPageLoader] Error al obtener la 'creation'.`
     );
   }
   return data;
@@ -64,7 +62,7 @@ async function getCreationById(
  * @async
  * @function generateMetadata
  * @description Genera los metadatos de la página de forma dinámica, utilizando el nombre de la creación.
- * @param {object} props - Propiedades para la generación de metadatos, incluyendo los parámetros de la URL.
+ * @param {{ params: { creationId: string; locale: string } }} props - Propiedades para la generación de metadatos.
  * @returns {Promise<Metadata>} Los metadatos de la página.
  */
 export async function generateMetadata({
@@ -73,7 +71,7 @@ export async function generateMetadata({
   params: { creationId: string; locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "pages.BuilderPage" });
-  let creationName = t("metadata_default_title"); // Título por defecto
+  let creationName = t("metadata_default_title");
 
   try {
     let creationData: Tables<"creations"> | null = null;
@@ -98,8 +96,8 @@ export async function generateMetadata({
     }
   } catch (error) {
     logger.error(
-      `[BuilderPage:Metadata] Error al obtener datos para metadata:`,
-      error
+      { err: error, creationId },
+      `[BuilderPage:Metadata] Error al obtener datos para metadata.`
     );
   }
 
@@ -123,7 +121,7 @@ export default async function BuilderPage({
   params: { creationId: string };
 }): Promise<React.ReactElement> {
   const { creationId } = params;
-  logger.trace(`[BuilderPage] Iniciando carga para creationId: ${creationId}`);
+  logger.trace({ creationId }, "[BuilderPage] Iniciando carga.");
 
   let creationData: Tables<"creations"> | null;
 
@@ -132,7 +130,8 @@ export default async function BuilderPage({
     creationId === BOILERPLATE_CREATION_ID
   ) {
     logger.warn(
-      `[BuilderPage] MODO BOILERPLATE ACTIVO. Cargando datos simulados para ${creationId}`
+      { creationId },
+      `[BuilderPage] MODO BOILERPLATE ACTIVO. Cargando datos simulados.`
     );
     creationData = getBoilerplateCreation();
   } else {
@@ -143,36 +142,38 @@ export default async function BuilderPage({
 
     if (!user) {
       logger.warn(
-        `[BuilderPage] Usuario no autenticado intentando acceder a ${creationId}. Redirigiendo a login.`
+        { creationId },
+        `[BuilderPage] Usuario no autenticado intentando acceder. Redirigiendo a login.`
       );
       return redirect(`/login?next=/builder/${creationId}`);
     }
 
-    logger.trace(`[BuilderPage] Sesión de usuario validada, cargando datos.`, {
-      userId: user.id,
-    });
+    logger.trace(
+      { userId: user.id },
+      "[BuilderPage] Sesión de usuario validada, cargando datos."
+    );
     creationData = await getCreationById(creationId, user.id);
   }
 
   if (!creationData) {
     logger.warn(
-      `[BuilderPage] No se encontró la 'creation' o el usuario no tiene permisos.`,
-      { creationId }
+      { creationId },
+      `[BuilderPage] No se encontró la 'creation' o el usuario no tiene permisos.`
     );
     notFound();
   }
 
-  // Transforma los datos de la DB al formato que espera el store.
   const contentFromDb = (creationData.content as Partial<CampaignConfig>) || {};
   const creationConfig: CampaignConfig = {
     id: creationData.id,
     name: creationData.name,
-    site_id: null, // Las 'Creations' son soberanas y no tienen site_id.
+    site_id: null,
     theme: contentFromDb.theme || { globalFont: "Inter", globalColors: {} },
     blocks: contentFromDb.blocks || [],
   };
 
   logger.info(
+    { creationId: creationData.id },
     "[BuilderPage] Datos listos. Hidratando proveedor de estado del cliente."
   );
 
@@ -184,23 +185,4 @@ export default async function BuilderPage({
     </BuilderStoreProvider>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 10.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Futuras
- * 1. **Esqueleto de Carga (`loading.tsx`)**: ((Vigente)) Crear un archivo `loading.tsx` en este directorio con un esqueleto de carga de alta fidelidad del layout de 3 (o 4) columnas para proporcionar un feedback visual instantáneo al usuario mientras los datos se cargan, mejorando el LCP.
- * 2. **Internacionalización Completa de Metadata**: ((Vigente)) Las claves de i18n `metadata_default_title` y `metadata_editing_prefix` deben ser añadidas al schema de Zod de `pages.BuilderPage` y a los archivos de mensajes.
- *
- * @subsection Melhorias Adicionadas
- * 1. **Importación de `BuilderLayout`**: ((Implementada)) Se ha añadido la declaración de importación para `BuilderLayout`, resolviendo el error `TS2304`.
- *
- * =====================================================================
- */
 // src/app/[locale]/builder/[creationId]/page.tsx

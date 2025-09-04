@@ -6,7 +6,7 @@
  *              para aceptar el tipo de dato crudo de la base de datos y realizar
  *              la transformación de datos internamente, resolviendo la
  *              incompatibilidad de tipos.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  * @date 2025-08-29
  */

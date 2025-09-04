@@ -1,14 +1,13 @@
 // tests/mocks/data/database-state.ts
 /**
  * @file database-state.ts
- * @description Manifiesto de Datos y SSoT para la DB simulada. Ha sido
- *              sincronizado con el schema.sql canónico para incluir la propiedad
- *              'icon' en la entidad 'workspaces', resolviendo el error de tipo TS2741.
- * @author Raz Podestá - MetaShark Tech
- * @version 7.0.0
- * @date 2025-08-27
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Manifiesto de Datos y SSoT para la DB simulada. Sincronizado
+ *              con la arquitectura "Lean Database", utilizando `role_id` y
+ *              `status_id` para reflejar el esquema de producción.
+ * @author Raz Podesta - MetaShark Tech
+ * @version 8.0.0
+ * Florianópolis/SC, Brazil
+ * @see .docs/espejo/tests/mocks/data/database-state.ts.md
  */
 import { type Json, type Tables } from "@/lib/types/database";
 import { type User } from "@supabase/supabase-js";
@@ -30,7 +29,7 @@ export const DEV_WORKSPACE: Tables<"workspaces"> = {
   id: "dev-ws-001",
   name: "Development Workspace",
   owner_id: DEV_USER.id,
-  icon: "🚀", // <-- SINCRONIZADO
+  icon: "🚀",
   current_site_count: 1,
   created_at: new Date().toISOString(),
   updated_at: null,
@@ -67,7 +66,7 @@ export const db = {
       id: "wsm-001",
       workspace_id: DEV_WORKSPACE.id,
       user_id: DEV_USER.id,
-      role: "owner",
+      role_id: 1, // REFACTORIZADO: 'owner'
       created_at: new Date().toISOString(),
     },
   ] as Tables<"workspace_members">[],
@@ -81,7 +80,7 @@ export const db = {
       custom_domain: null,
       icon: "🔥",
       description: "Main dev site",
-      status: "published",
+      status_id: 2, // REFACTORIZADO: 'published'
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
@@ -94,7 +93,7 @@ export const db = {
       site_id: "site-001",
       name: "Landing Page V1",
       slug: "landing-v1",
-      status: "published",
+      status_id: 2, // REFACTORIZADO: 'published'
       affiliate_url: "https://aff.link/1",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -118,17 +117,4 @@ export const db = {
 };
 
 export const MOCKED_USER = DEV_USER;
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de Mocks (TS2741)**: ((Implementada)) Se ha añadido la propiedad `icon: "🚀"` al objeto `DEV_WORKSPACE`. Esta corrección alinea el estado de la base de datos simulada con el contrato de tipo `Tables<"workspaces">`, resolviendo el error de compilación.
- *
- * @subsection Melhorias Futuras
- * 1. **Factorías Dinámicas**: ((Vigente)) Para pruebas más robustas, este estado estático podría ser generado por factorías que utilicen `faker.js`, como las que ya existen en `context.factory.ts`. Esto permitiría crear múltiples estados de prueba diferentes.
- *
- * =====================================================================
- */
 // tests/mocks/data/database-state.ts

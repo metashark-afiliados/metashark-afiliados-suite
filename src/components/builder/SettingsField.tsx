@@ -11,14 +11,14 @@
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
-import React from "react";
 import { useTranslations } from "next-intl";
+import React from "react";
 
 import {
   type EditablePropertyDefinition,
   type PageBlock,
 } from "@/lib/builder/types.d";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { ArrayField } from "./settings-fields/ArrayField";
 import { IconField } from "./settings-fields/IconField";
 import { SimpleField } from "./settings-fields/SimpleField";

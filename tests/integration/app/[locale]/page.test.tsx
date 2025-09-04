@@ -3,24 +3,24 @@
  * @file page.test.tsx
  * @description Arnés de pruebas de integración de élite para la Landing Page (`HomePage`).
  *              Validado contra la nueva infraestructura de mocks de next-intl/server.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.2
  */
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import toast from "react-hot-toast";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import HomePage from "@/app/[locale]/page";
 import { subscribeToNewsletterAction } from "@/lib/actions/newsletter.actions";
-import { render, screen, waitFor } from "@tests/utils/render";
 import { redirectSpy } from "@tests/mocks/navigation.mock";
+import { render, screen, waitFor } from "@tests/utils/render";
 
 vi.mock("@/lib/actions/newsletter.actions", () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 const mockedSubscribeAction = vi.mocked(subscribeToNewsletterAction);
 
-vi.mock("@/lib/logging", () => ({
+vi.mock("@/lib/logger", () => ({
   logger: {
     trace: vi.fn(),
     info: vi.fn(),

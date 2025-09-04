@@ -2,29 +2,45 @@
 /**
  * @file updateSiteName.action.ts
  * @description Server Action atómica para actualizar el nombre de un sitio.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 1.0.0
- * @see .docs-espejo/lib/actions/sites/updateSiteName.action.ts.md
+ *              Refactorizada a un estándar de élite para adherirse a la firma
+ *              de logging canónica, el contrato `ActionResult` blindado y la
+ *              observabilidad completa.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
  */
 "use server";
 import "server-only";
 
 import { revalidatePath } from "next/cache";
+import { ZodError } from "zod";
 
 import {
   createAuditLog,
   createPersistentErrorLog,
 } from "@/lib/actions/_helpers";
 import { requireSitePermission } from "@/lib/auth/user-permissions";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, UpdateSiteNameSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  UpdateSiteNameSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
+/**
+ * @public
+ * @async
+ * @function updateSiteNameAction
+ * @description Actualiza el nombre de un sitio específico, validando los permisos del actor.
+ * @param {string} siteId - El UUID del sitio a actualizar.
+ * @param {string} newName - El nuevo nombre para el sitio.
+ * @returns {Promise<ActionResult<void>>} Un objeto `ActionResult`.
+ */
 export async function updateSiteNameAction(
   siteId: string,
   newName: string
 ): Promise<ActionResult<void>> {
-  let userIdForErrorLog: string | undefined;
+  const context: Record<string, any> = { siteId, newName };
 
   try {
     const validation = UpdateSiteNameSchema.safeParse({
@@ -32,15 +48,14 @@ export async function updateSiteNameAction(
       name: newName,
     });
     if (!validation.success) {
-      logger.warn(`[SitesActions:updateSiteName] Datos de entrada inválidos.`, {
-        errors: validation.error.flatten(),
-        siteId,
-        newName,
-      });
-      const firstError = validation.error.errors[0]?.message;
+      const firstError = validation.error.errors[0];
+      logger.warn(
+        { errors: validation.error.flatten(), ...context },
+        "[updateSiteNameAction] Datos de entrada inválidos."
+      );
       return {
         success: false,
-        error: firstError || "ValidationErrors.error_invalid_data",
+        error: firstError.message as ValidationErrorKey,
       };
     }
 
@@ -49,16 +64,15 @@ export async function updateSiteNameAction(
       "admin",
     ]);
     if (!permissionCheck.success) {
-      logger.warn(
-        `[SitesActions:updateSiteName] Permiso denegado para usuario ${permissionCheck.data?.user?.id} en sitio ${siteId}.`
-      );
+      context.userId = permissionCheck.data?.user?.id;
+      logger.warn(context, "[updateSiteNameAction] Permiso denegado.");
       return {
         success: false,
-        error: "ValidationErrors.sites_update_permission_denied",
+        error: "sites.update_permission_denied",
       };
     }
     const { user } = permissionCheck.data;
-    userIdForErrorLog = user.id;
+    context.userId = user.id;
 
     const supabase = createClient();
     const { error } = await supabase
@@ -79,25 +93,25 @@ export async function updateSiteNameAction(
 
     revalidatePath("/dashboard/sites");
     revalidatePath(`/dashboard/sites/${siteId}/campaigns`);
-
     logger.info(
-      `[SitesActions:updateSiteName] Nombre del sitio ${siteId} actualizado a '${newName}'.`,
-      { userId: user.id }
+      context,
+      "[updateSiteNameAction] Nombre del sitio actualizado."
     );
     return { success: true, data: undefined };
   } catch (error) {
     const errorId = await createPersistentErrorLog(
-      "updateSiteNameAction.unexpected",
+      "updateSiteNameAction",
       error as Error,
-      { siteId, newName, userId: userIdForErrorLog }
+      context
     );
     logger.error(
-      `[SitesActions:updateSiteName] Error inesperado. Log ID: ${errorId}`,
-      {
-        error: error instanceof Error ? error.message : String(error),
-      }
+      { err: error, errorId, ...context },
+      `[updateSiteNameAction] Error inesperado.`
     );
-    return { success: false, error: "ValidationErrors.error_server_generic" };
+    return {
+      success: false,
+      error: "generic.error_server_generic",
+    };
   }
 }
 // src/lib/actions/sites/updateSiteName.action.ts

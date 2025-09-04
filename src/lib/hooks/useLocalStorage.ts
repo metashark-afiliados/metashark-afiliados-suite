@@ -8,8 +8,8 @@
  */
 "use client";
 
-import { useState, useEffect } from "react";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
+import { useState } from "react";
 
 export function useLocalStorage<T>(
   key: string,

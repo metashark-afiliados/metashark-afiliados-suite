@@ -22,11 +22,11 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
   CardSkeleton,
+  CardTitle,
 } from "@/components/ui/card";
 import { useSubscriptionData } from "@/lib/hooks/useSubscriptionData";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

@@ -1,0 +1,22 @@
+
+{
+  "en-US": {
+    "success_duplicate": "You're already on the list! Thanks for being with us.",
+    "success_new": "Thanks for subscribing! Keep an eye on your inbox for updates.",
+    "error_invalid_email": "Please provide a valid email address.",
+    "error_unexpected": "An unexpected error occurred. Please try again."
+  },
+  "es-ES": {
+    "success_duplicate": "¡Ya estás en la lista! Gracias por estar con nosotros.",
+    "success_new": "¡Gracias por suscribirte! Mantente atento a tu bandeja de entrada para recibir actualizaciones.",
+    "error_invalid_email": "Por favor, proporciona una dirección de correo electrónico válida.",
+    "error_unexpected": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo."
+  },
+  "pt-BR": {
+    "success_duplicate": "Você já está na lista! Obrigado por estar conosco.",
+    "success_new": "Obrigado por se inscrever! Fique de olho na sua caixa de entrada para atualizações.",
+    "error_invalid_email": "Por favor, forneça um endereço de e-mail válido.",
+    "error_unexpected": "Ocorreu um erro inesperado. Por favor, tente novamente."
+  }
+}
+

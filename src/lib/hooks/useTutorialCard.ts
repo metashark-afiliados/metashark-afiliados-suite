@@ -4,13 +4,13 @@
  * @description Hook Soberano que encapsula la lógica de consumo de datos de i18n
  *              para el componente `DashboardTutorialCard`. Provee una API limpia,
  *              desacoplada y fuertemente tipada con todo el contenido necesario para la UI.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 "use client";
 
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { type Route } from "@/lib/navigation";
 
 /**

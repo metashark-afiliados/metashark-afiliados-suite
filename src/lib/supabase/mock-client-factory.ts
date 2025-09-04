@@ -2,24 +2,24 @@
 /**
  * @file src/lib/supabase/mock-client-factory.ts
  * @description Factoría de élite para el cliente Supabase simulado. Ha sido
- *              sincronizado con el contrato de datos de `workspaces` para
- *              incluir la propiedad 'icon', resolviendo el error de tipo TS2345
- *              en la simulación de la RPC.
- * @author L.I.A. Legacy & Raz Podestá
- * @version 4.0.0
- * @date 2025-08-27
+ *              sincronizado con la arquitectura "Lean Database", utilizando
+ *              `role_id` y `status_id` para una simulación de alta fidelidad.
+ * @author L.I.A. Legacy
+ * @version 5.0.0
  */
-import { type User } from "@supabase/supabase-js";
 import { faker } from "@faker-js/faker";
-import { logger } from "@/lib/logging";
+import { type User } from "@supabase/supabase-js";
+import { vi } from "vitest";
+
+import { WORKSPACE_ROLES } from "@/config/roles.config";
+import { logger } from "@/lib/logger";
 import { type Tables } from "@/lib/types/database";
+import { MOCKED_USER } from "@tests/mocks/data/database-state";
 import {
   getDbState,
   updateDbState,
   type MockDbState,
 } from "@tests/mocks/factories/kv-persistence";
-
-import { MOCKED_USER } from "@tests/mocks/data/database-state";
 
 interface MinimalCookieStore {
   has(name: string): boolean;
@@ -28,6 +28,7 @@ interface MinimalCookieStore {
 function createMockQueryBuilder<T extends { id: string | number }>(
   tableName: keyof MockDbState
 ) {
+  // ... (Lógica interna sin cambios)
   let filteredIds: Set<string | number> | null = null;
 
   const builder = {
@@ -97,7 +98,7 @@ export function createDevMockSupabaseClient(
   cookieStore?: MinimalCookieStore
 ): any {
   logger.info(
-    "[DEV_MODE] Usando cliente Supabase SIMULADO con persistencia Vercel KV."
+    "[DEV_MODE] Usando cliente Supabase SIMULADO con persistencia en memoria."
   );
 
   const hasDevSession = cookieStore?.has("dev_session") ?? true;
@@ -140,16 +141,17 @@ export function createDevMockSupabaseClient(
           id: newId,
           name: params.new_workspace_name,
           owner_id: params.owner_user_id,
-          icon: "🚀", // <-- SINCRONIZADO
-          current_site_count: 0,
+          icon: "🚀",
           created_at: new Date().toISOString(),
           updated_at: null,
-        });
+        } as Tables<"workspaces">);
         db.workspace_members.push({
           id: faker.string.uuid(),
           workspace_id: newId,
           user_id: params.owner_user_id,
-          role: "owner",
+          // --- INICIO DE REFACTORIZACIÓN: Alineación con Lean Database ---
+          role_id: WORKSPACE_ROLES.OWNER.id,
+          // --- FIN DE REFACTORIZACIÓN ---
           created_at: new Date().toISOString(),
         });
         await updateDbState(db);
@@ -162,7 +164,7 @@ export function createDevMockSupabaseClient(
         if (!originalCampaign) {
           return { data: null, error: { message: "Campaña no encontrada." } };
         }
-        const newCampaign = {
+        const newCampaign: Tables<"campaigns"> = {
           ...originalCampaign,
           id: faker.string.uuid(),
           name: params.new_name,
@@ -170,10 +172,12 @@ export function createDevMockSupabaseClient(
             originalCampaign.slug +
             "-copia-" +
             faker.string.alphanumeric(6).toLowerCase(),
-          status: "draft",
+          // --- INICIO DE REFACTORIZACIÓN: Alineación con Lean Database ---
+          status_id: 1, // 1 = 'draft'
+          // --- FIN DE REFACTORIZACIÓN ---
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        } as Tables<"campaigns">;
+        };
         db.campaigns.push(newCampaign);
         await updateDbState(db);
         return { data: [{ id: newCampaign.id }], error: null };
@@ -185,17 +189,4 @@ export function createDevMockSupabaseClient(
     },
   };
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error `TS2345` (`icon` property)**: ((Implementada)) Se ha añadido `icon: "🚀"` al objeto de workspace que se inserta en la simulación de la RPC. Esto alinea la lógica de la simulación con el contrato de datos `Tables<"workspaces">` y resuelve el último error de tipo de la Causa Raíz #2.
- *
- * @subsection Melhorias Futuras
- * 1. **Tipado Estricto de RPCs**: ((Vigente)) El mock de `rpc` podría ser refactorizado para usar un `switch` statement y tener tipos más estrictos para los `params` de cada RPC simulada, mejorando la seguridad de tipos interna del mock.
- *
- * =====================================================================
- */
 // src/lib/supabase/mock-client-factory.ts

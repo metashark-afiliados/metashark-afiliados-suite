@@ -4,14 +4,14 @@
  * @description Componente de campo de formulario atómico y soberano. Encapsula
  *              la lógica de presentación para un selector de rol y consume
  *              sus propias traducciones.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 "use client";
 
+import { useTranslations } from "next-intl";
 import React from "react";
 import { Controller, type Control, type FieldErrors } from "react-hook-form";
-import { useTranslations } from "next-intl";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

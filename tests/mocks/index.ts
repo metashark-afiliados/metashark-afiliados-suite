@@ -5,7 +5,7 @@
  *              Ha sido blindado con un mock para `React.cache` para garantizar la
  *              compatibilidad del entorno de pruebas de Vitest con la capa de datos
  *              que utiliza React Server Components APIs.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 9.0.0
  */
 import { vi } from "vitest";

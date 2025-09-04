@@ -3,7 +3,7 @@
  * @file Slot.tsx
  * @description Primitiva de UI. Corregida para consumir la prop `asChild` y
  *              evitar su fuga al DOM.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.1.0
  */
 import * as React from "react";

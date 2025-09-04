@@ -4,7 +4,7 @@
  * @description Arnés de pruebas E2E de diagnóstico para el flujo de creación
  *              de campañas. Valida el camino desde el dashboard hasta el
  *              resultado de la creación de la campaña.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { test, expect, type Page } from "@playwright/test";

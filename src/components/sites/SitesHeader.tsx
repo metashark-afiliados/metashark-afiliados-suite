@@ -16,7 +16,7 @@
 import React from "react";
 
 import { ResourcePageHeader } from "@/components/shared/ResourcePageHeader";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 import {
   SitesHeaderActions,

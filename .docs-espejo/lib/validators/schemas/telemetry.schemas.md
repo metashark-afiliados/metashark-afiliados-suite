@@ -2,7 +2,7 @@
 /**
  * @file telemetry.schemas.md
  * @description Documento Espejo y SSoT para los schemas de validación de telemetría.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Conceptual: Schemas de Validación de Telemetría

@@ -4,7 +4,7 @@
  * @description Componente de Tarjeta y sus sub-componentes. Ha sido refactorizado
  *              holísticamente para incluir un componente `CardSkeleton` de alta
  *              fidelidad para estados de carga, resolviendo un error de importación.
- * @author L.I.A. Legacy (Reconstrucción fiel de Shadcn/UI)
+ * @author Raz Podestá - MetaShark Tech (Reconstrucción fiel de Shadcn/UI)
  * @version 2.0.0
  */
 import * as React from "react";

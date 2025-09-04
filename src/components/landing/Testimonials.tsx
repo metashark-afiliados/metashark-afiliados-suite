@@ -4,19 +4,19 @@
  * @description Componente de presentación para la sección de testimonios.
  *              Implementa un carrusel interactivo y animado. Es un componente
  *              de cliente puro, agnóstico al contenido, y completamente internacionalizable.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 "use client";
 
-import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

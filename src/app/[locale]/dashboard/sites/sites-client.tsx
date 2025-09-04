@@ -10,11 +10,12 @@
  */
 "use client";
 
-import React from "react";
 import { AlertTriangle } from "lucide-react";
+import React from "react";
 
 import { ErrorStateCard } from "@/components/shared/error-state-card";
 import { PaginatedResourceView } from "@/components/shared/PaginatedResourceView";
+import { type PaginationTexts } from "@/components/shared/pagination-controls";
 import { CreateSiteForm } from "@/components/sites/CreateSiteForm";
 import { SitesGrid } from "@/components/sites/SitesGrid";
 import { SitesHeader } from "@/components/sites/SitesHeader";
@@ -28,8 +29,7 @@ import {
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
 import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
 import { useSitesPage } from "@/lib/hooks/useSitesPage";
-import { clientLogger } from "@/lib/logging";
-import { type PaginationTexts } from "@/components/shared/pagination-controls";
+import { clientLogger } from "@/lib/logger";
 
 interface SitesClientProps {
   initialSites: SiteWithCampaignCount[];

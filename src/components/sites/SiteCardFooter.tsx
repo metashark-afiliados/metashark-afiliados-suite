@@ -5,21 +5,21 @@
  *              consumir el hook de i18n de su dominio (`useSitesPageTranslations`),
  *              resolviendo un error de compilación crítico y reforzando la
  *              arquitectura de componentes soberanos.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 4.0.0
  */
 "use client";
 
-import React from "react";
 import { ExternalLink } from "lucide-react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { CardFooter as CardFooterPrimitive } from "@/components/ui/card";
-import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
-import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
-import { Link } from "@/lib/navigation";
 import { protocol, rootDomain } from "@/config/site.config";
-import { clientLogger } from "@/lib/logging";
+import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
+import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
+import { clientLogger } from "@/lib/logger";
+import { Link } from "@/lib/navigation";
 import { DeleteSiteDialog } from "./DeleteSiteDialog";
 
 export interface SiteCardFooterProps {

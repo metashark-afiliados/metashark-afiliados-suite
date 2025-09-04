@@ -10,8 +10,8 @@
  */
 import React from "react";
 
-import { Card as CardPrimitive, CardContent } from "@/components/ui/card";
-import { clientLogger } from "@/lib/logging";
+import { CardContent, Card as CardPrimitive } from "@/components/ui/card";
+import { clientLogger } from "@/lib/logger";
 
 interface SiteCardProps {
   headerSlot: React.ReactNode;

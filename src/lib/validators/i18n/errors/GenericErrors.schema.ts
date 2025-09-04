@@ -4,11 +4,9 @@
  * @description Aparato de validación atómico. Define el contrato de datos para
  *              mensajes de error de validación genéricos, sin un prefijo de
  *              dominio específico.
- * @author Raz Podestá - MetaShark Tech
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @see .docs-espejo/lib/validators/i18n/errors/GenericErrors.schema.ts.md
  */
 import { z } from "zod";
 
@@ -28,6 +26,7 @@ export const GenericErrorsSchema = z.object({
   fingerprint_required: z.string(),
   invalid_ip: z.string(),
   icon_required: z.string(),
+  message_required: z.string(),
   error_server_generic: z.string(),
   error_user_already_exists: z.string(),
   error_signup_failed: z.string(),
@@ -39,25 +38,8 @@ export const GenericErrorsSchema = z.object({
   error_delete_failed: z.string(),
   error_last_owner_cannot_delete: z.string(),
   error_no_active_workspace: z.string(),
+  error_too_many_requests: z.string(),
+  error_unexpected: z.string(),
   no_data_available: z.string(),
 });
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato encapsula los errores de validación genéricos, mejorando la modularidad y la organización de la capa de validación.
- * 2. **Base para Composición**: ((Implementada)) Al no tener prefijos de dominio, es la base ideal para ser compuesta en el `ValidationErrorsSchema` principal, donde se aplicarán los prefijos.
- *
- * @subsection Melhorias Futuras
- * 1. **Categorización de Errores**: ((Vigente)) Si la lista de errores genéricos crece, se podría considerar dividirlos aún más (ej., `FormErrors.schema.ts`, `SystemErrors.schema.ts`).
- *
- * =====================================================================
- */
+// src/lib/validators/i18n/errors/GenericErrors.schema.ts

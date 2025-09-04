@@ -4,7 +4,7 @@
  * @description Hook de React atómico y reutilizable para gestionar una cuenta regresiva
  *              que ejecuta un callback al finalizar. Ideal para redirecciones automáticas
  *              o para habilitar acciones después de un tiempo de espera.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  *
  * @param {number} initialCount - El número de segundos inicial desde el que empezar la cuenta regresiva.
@@ -14,8 +14,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-import { logger } from "@/lib/logging";
 
 export function useCountdownRedirect(
   initialCount: number,

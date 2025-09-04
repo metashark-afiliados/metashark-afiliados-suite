@@ -4,7 +4,7 @@
  * @description Define el contrato de datos atómico para el namespace 'Metrics'
  *              dentro de `landing.json`. Ha sido refactorizado para eliminar la
  *              dependencia de compilación con el archivo generado `lucide-icon-names.ts`.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 import { z } from "zod";

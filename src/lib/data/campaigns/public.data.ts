@@ -3,39 +3,49 @@
  * @file src/lib/data/campaigns/public.data.ts
  * @description Aparato de datos atómico. Su única responsabilidad es obtener
  *              datos de campañas para el renderizado de páginas públicas. Ha sido
- *              refactorizado para consumir la API de datos de sitios atomizada,
- *              resolviendo el error de módulo TS2306.
- * @author Raz Podestá
- * @version 2.0.0
- * @date 2025-08-27
+ *              refactorizado para alinearse con la firma de logging canónica.
+ * @author L.I.A. Legacy
+ * @version 3.0.0
+ * @see .docs-espejo/lib/data/campaigns/public.data.ts.md
  */
 "use server";
 import "server-only";
 
 import { unstable_cache as cache } from "next/cache";
 
-// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
-// Se importa el módulo 'sites' completo, que ahora contiene los namespaces.
 import { sites as sitesData } from "@/lib/data";
-// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 import { type Tables } from "@/lib/types/database";
 
+/**
+ * @public
+ * @async
+ * @function getPublishedCampaignByHostAndSlug
+ * @description Obtiene los datos de una campaña publicada, identificada por el
+ *              host de la petición y su slug. Esta función está optimizada para
+ *              el rendimiento mediante el uso de `React.cache`.
+ * @param {string} host - El host de la petición (ej. "mi-sitio.convertikit.dev").
+ * @param {string} slug - El slug de la campaña.
+ * @returns {Promise<Tables<'campaigns'> | null>} El objeto de la campaña si se
+ *          encuentra y está publicada, de lo contrario `null`.
+ */
 export async function getPublishedCampaignByHostAndSlug(
   host: string,
   slug: string
 ): Promise<Tables<"campaigns"> | null> {
   const cacheKey = `campaign-public:${host}:${slug}`;
   const cacheTags = [`campaign:${host}:${slug}`];
+  const context = { host, slug };
 
   return cache(
     async () => {
-      logger.info(`[Cache MISS] Buscando campaña pública para: ${cacheKey}`);
-      // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA ---
-      // La llamada ahora utiliza la API namespaced correcta.
+      logger.info(
+        context,
+        `[Cache MISS] Buscando campaña pública para: ${cacheKey}`
+      );
+
       const site = await sitesData.publicData.getSiteDataByHost(host);
-      // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
       if (!site) {
         return null;
       }
@@ -46,10 +56,11 @@ export async function getPublishedCampaignByHostAndSlug(
         .eq("site_id", site.id)
         .eq("slug", slug)
         .single();
+
       if (error && error.code !== "PGRST116") {
         logger.error(
-          `Error buscando campaña ${slug} en sitio ${site.id}`,
-          error
+          { err: error, ...context, siteId: site.id },
+          `[DataLayer:PublicCampaigns] Error buscando campaña.`
         );
         return null;
       }
@@ -59,18 +70,4 @@ export async function getPublishedCampaignByHostAndSlug(
     { tags: cacheTags }
   )();
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Resolución de Error de Módulo (TS2306)**: Se ha corregido la importación para consumir `sitesData` desde la SSoT `@/lib/data`.
- * 2. ((Implementada)) **Consumo de API Namespaced**: La llamada a `getSiteDataByHost` ha sido actualizada a `sitesData.publicData.getSiteDataByHost`, alineando este aparato con la nueva arquitectura de datos atomizada.
- *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Manejo de Status**: Actualmente, la función devuelve cualquier campaña que coincida con el slug. Debería ser refinada para devolver únicamente campañas con `status: 'published'`, asegurando que los borradores no sean accesibles públicamente.
- *
- * =====================================================================
- */
-// src/lib/data/campaigns/public.data.ts
+

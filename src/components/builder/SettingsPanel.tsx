@@ -1,27 +1,23 @@
 // src/components/builder/SettingsPanel.tsx
 /**
  * @file SettingsPanel.tsx
- * @description Panel de ajustes dinámico. Orquesta la visualización de los
- *              controles de edición para el bloque seleccionado, consumiendo el
- *              estado del `BuilderStore` y el manifiesto `blockEditorDefinitions`.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Panel de ajustes dinámico. Refactorizado para usar el
+ *              `clientLogger` con la firma correcta.
+ * @author L.I.A. Legacy
+ * @version 2.0.0
  */
 "use client";
 
-import React from "react";
 import { useTranslations } from "next-intl";
+import React from "react";
 import { shallow } from "zustand/shallow";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { blockEditorDefinitions } from "@/lib/builder/block-editor-definitions";
 import { type BuilderState } from "@/lib/builder/core";
 import { type PageBlock } from "@/lib/builder/types.d";
 import { useBuilderStore } from "@/lib/hooks/use-builder-store";
-import { logger } from "@/lib/logging";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { clientLogger } from "@/lib/logger";
 import { SettingsGroup } from "./SettingsGroup";
 
 const settingsPanelSelector = (state: BuilderState) => ({
@@ -41,7 +37,7 @@ export function SettingsPanel(): React.ReactElement {
     (b: PageBlock) => b.id === selectedBlockId
   );
 
-  logger.trace("[SettingsPanel] Renderizando panel de ajustes.", {
+  clientLogger.trace("[SettingsPanel] Renderizando panel de ajustes.", {
     selectedBlockId,
   });
 
@@ -104,18 +100,4 @@ export function SettingsPanel(): React.ReactElement {
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Panel de Edición Dinámico**: ((Implementada)) Este componente es el cerebro de la edición. Se adapta dinámicamente al bloque seleccionado y orquesta la renderización de sus controles.
- * 2. **Arquitectura Desacoplada**: ((Implementada)) Consume el estado global, el manifiesto de configuración y compone los `SettingsGroup`, actuando como un orquestador de alto nivel sin lógica de presentación de campos.
- *
- * @subsection Melhorias Futuras
- * 1. **Pestaña "Avanzado"**: ((Vigente)) Añadir una tercera pestaña para ajustes avanzados, como IDs de CSS, clases personalizadas o atributos de datos.
- *
- * =====================================================================
- */
 // src/components/builder/SettingsPanel.tsx

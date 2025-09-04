@@ -15,7 +15,7 @@
 import { BlockLibrary } from "@/components/builder/panels/BlockLibrary";
 import { type BuilderState } from "@/lib/builder/core";
 import { useBuilderStore } from "@/lib/hooks/use-builder-store";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 const activeToolSelector = (state: BuilderState) => state.activeTool;
 

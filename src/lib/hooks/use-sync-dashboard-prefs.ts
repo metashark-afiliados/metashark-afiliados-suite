@@ -2,10 +2,11 @@
 /**
  * @file use-sync-dashboard-prefs.ts
  * @description Hook soberano de efecto secundario. Persiste de forma asíncrona
- *              las preferencias de UI del usuario, ahora alineado con la SSoT de
- *              tipos literal, garantizando la seguridad de tipos.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 3.1.0
+ *              las preferencias de UI del usuario, validando el payload contra
+ *              la SSoT de schemas para máxima seguridad.
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
+ * @version 4.0.0
+ * @see .docs-espejo/lib/hooks/use-sync-dashboard-prefs.ts.md
  */
 "use client";
 
@@ -16,9 +17,12 @@ import { updateProfilePreferencesAction } from "@/lib/actions/profiles.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
-import { clientLogger } from "@/lib/logging";
-import { DashboardLayoutPreferencesSchema } from "@/lib/validators/schemas";
-import { type DashboardLayoutPreferences } from "@/lib/types/database/tables/profiles";
+import { clientLogger } from "@/lib/logger";
+import { DashboardLayoutPreferencesSchema } from "@/lib/validators";
+
+type DashboardLayoutPreferences = z.infer<
+  typeof DashboardLayoutPreferencesSchema
+>;
 
 export function useSyncDashboardPrefs() {
   const { profile } = useDashboard();
@@ -35,21 +39,33 @@ export function useSyncDashboardPrefs() {
     }
 
     const syncPreferences = async () => {
+      const context = { isSidebarCollapsed: debouncedIsSidebarCollapsed };
       clientLogger.trace(
-        "[SyncPrefs] Estado de UI debounced cambió. Sincronizando con la base de datos...",
-        { isSidebarCollapsed: debouncedIsSidebarCollapsed }
+        context,
+        "[SyncPrefs] Sincronizando preferencias con la base de datos."
       );
 
-      const currentPrefs = (profile?.dashboard_layout ||
-        {}) as Partial<DashboardLayoutPreferences>;
+      const currentPrefs =
+        (profile?.dashboard_layout as Partial<DashboardLayoutPreferences>) ||
+        {};
 
       const newPrefsPayload: Partial<DashboardLayoutPreferences> = {
         ...currentPrefs,
         isSidebarCollapsed: debouncedIsSidebarCollapsed,
       };
 
-      // La validación ahora funciona correctamente porque los tipos de origen son correctos.
-      await updateProfilePreferencesAction(newPrefsPayload);
+      const validation =
+        DashboardLayoutPreferencesSchema.partial().safeParse(newPrefsPayload);
+
+      if (!validation.success) {
+        clientLogger.error(
+          { errors: validation.error.flatten(), payload: newPrefsPayload },
+          "[SyncPrefs] Payload de preferencias inválido. Abortando sincronización."
+        );
+        return;
+      }
+
+      await updateProfilePreferencesAction(validation.data);
     };
 
     syncPreferences();

@@ -2,22 +2,18 @@
 /**
  * @file use-optimistic-resource-management.ts
  * @description Hook orquestador de élite. Ha sido refactorizado para ser
- *              100% genérico y agnóstico a la entidad. Ahora utiliza el patrón
- *              de Inversión de Control, aceptando una factoría `createOptimisticItem`
- *              y delegando el feedback de UI al hook consumidor.
- *              **Actualizado para exponer `updateOptimistic` y completar su API.**
+ *              100% genérico y agnóstico a la entidad y al contenido de la UI.
+ *              Utiliza el patrón de Inversión de Control, aceptando una factoría
+ *              `createOptimisticItem` y delegando el feedback de UI al hook consumidor.
  * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 6.1.0
+ * @see .docs-espejo/lib/hooks/use-optimistic-resource-management.ts.md
  */
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 
-import { type ActionResult } from "@/lib/validators";
+import { type ActionResult, isActionError } from "@/lib/validators";
 import { useOptimisticState } from "./use-optimistic-state";
 
 interface Resource {
@@ -47,7 +43,6 @@ export function useOptimisticResourceManagement<T extends Resource>({
 }) {
   const [isPending, startTransition] = useTransition();
   const [mutatingId, setMutatingId] = useState<string | null>(null);
-  const router = useRouter();
 
   const { items, addOptimistic, removeOptimistic, updateOptimistic, rollback } =
     useOptimisticState<T>(initialItems);
@@ -62,7 +57,7 @@ export function useOptimisticResourceManagement<T extends Resource>({
           return new Promise((resolve) => {
             startTransition(async () => {
               const result = await createAction(formData);
-              if (!result.success) {
+              if (isActionError(result)) {
                 rollback(previousItems);
               }
               setMutatingId(null);
@@ -77,10 +72,7 @@ export function useOptimisticResourceManagement<T extends Resource>({
         const idToDelete = (formData.get("siteId") ||
           formData.get("campaignId")) as string;
         if (!idToDelete) {
-          return {
-            success: false,
-            error: "ValidationErrors.error_invalid_data",
-          };
+          return { success: false, error: "generic.error_invalid_data" };
         }
 
         const previousItems = removeOptimistic(idToDelete);
@@ -89,7 +81,7 @@ export function useOptimisticResourceManagement<T extends Resource>({
         return new Promise((resolve) => {
           startTransition(async () => {
             const result = await deleteAction(formData);
-            if (!result.success) {
+            if (isActionError(result)) {
               rollback(previousItems);
             }
             setMutatingId(null);
@@ -108,20 +100,4 @@ export function useOptimisticResourceManagement<T extends Resource>({
     updateOptimistic,
   };
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Novas
- * 1. **Abstracción para `handleDelete`**: ((Vigente)) La lógica `formData.get("siteId") || formData.get("campaignId")` introduce un acoplamiento. Propondré refactorizar `handleDelete` para que acepte el ID del recurso directamente, o una función que extraiga el ID del `FormData`, en una futura épica de refactorización de hooks.
- * 2. **Soporte para `handleDuplicate`**: ((Pendiente)) El patrón de abstracción debe extenderse a la acción de duplicación para completar la genericidad del hook.
- *
- * =====================================================================
- */
 // src/lib/hooks/use-optimistic-resource-management.ts

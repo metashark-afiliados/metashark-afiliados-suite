@@ -15,7 +15,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, ArrowRight } from "lucide-react";
+import { ArrowRight, FileText } from "lucide-react";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -26,8 +26,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useRecentActivity } from "@/lib/hooks/useRecentActivity";
+import { clientLogger } from "@/lib/logger";
 import { Link } from "@/lib/navigation";
-import { clientLogger } from "@/lib/logging";
 
 /**
  * @public

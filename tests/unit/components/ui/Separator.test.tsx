@@ -2,7 +2,7 @@
 /**
  * @file Separator.test.tsx
  * @description Arnés de pruebas unitarias para el componente atómico Separator.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { describe, it, expect } from "vitest";

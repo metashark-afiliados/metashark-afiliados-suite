@@ -4,7 +4,7 @@
  * @description Mock de `next-intl` de élite. Refactorizado para simular las
  *              APIs de servidor (`unstable_setRequestLocale`, `getTranslations`),
  *              resolviendo errores de entorno de pruebas en Server Components.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 4.0.0
  */
 import { vi } from "vitest";

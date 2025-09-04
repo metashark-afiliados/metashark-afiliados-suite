@@ -4,7 +4,7 @@
  *              Esta es la SSoT que cataloga cada "pieza de LEGO" (Web Component)
  *              disponible en nuestro sistema, explicando su propósito de forma
  *              clara, completa y accesible para un público no técnico.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 3.0.0
  */
 # Wiki de Componentes v3.0: El Catálogo Completo de "Piezas LEGO"
@@ -230,4 +230,3 @@ Qué hace: Muestra columnas con el nombre del plan, precio, características y u
     *   **Qué hace:** Crea un sentido de urgencia para ofertas por tiempo limitado.
     *   **Cuándo usarlo:** En `Heros` o `CTAs` para lanzamientos de productos o promociones.
 
-    

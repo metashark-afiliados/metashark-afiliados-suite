@@ -4,7 +4,7 @@
  * @description Manifiesto (Barrel File) y API pública para las Server Actions
  *              del dominio de telemetría. Ensambla y exporta las
  *              acciones atómicas desde sus módulos soberanos.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 1.0.0
  * @see .docs-espejo/lib/actions/telemetry.actions.ts.md
  */

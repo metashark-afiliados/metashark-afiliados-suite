@@ -12,9 +12,9 @@
  */
 "use client";
 
+import { useTranslations } from "next-intl"; // <-- Importar useTranslations
 import React from "react";
 import toast from "react-hot-toast";
-import { useTranslations } from "next-intl"; // <-- Importar useTranslations
 
 import { Card, CardContent } from "@/components/ui/card";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
@@ -24,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"; // <-- Importaciones de Tooltip
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { pascalToKebabCase } from "@/lib/utils/text"; // <-- Importar utilidad
 
 interface IconCardProps {

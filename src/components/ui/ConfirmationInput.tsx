@@ -5,7 +5,7 @@
  *              es gestionar el estado y la lógica de un campo de entrada de texto
  *              para confirmación. Nivelado para incluir un `data-testid` para
  *              una testeabilidad de élite.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.1.0
  */
 "use client";
@@ -15,7 +15,7 @@ import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichText } from "@/components/ui/RichText";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 export interface ConfirmationInputProps {
   label: React.ReactNode;

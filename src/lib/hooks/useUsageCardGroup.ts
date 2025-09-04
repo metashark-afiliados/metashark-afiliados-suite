@@ -13,12 +13,12 @@
  */
 "use client";
 
-import { useMemo } from "react";
 import { type LucideIconName } from "@/config/lucide-icon-names";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { type Enums } from "@/lib/types/database";
+import { useMemo } from "react";
 
 /**
  * @public

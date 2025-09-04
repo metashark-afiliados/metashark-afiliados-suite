@@ -6,7 +6,7 @@
  *              (como layouts de página) a Client Components (como el futuro
  *              componente de breadcrumbs). Este patrón desacopla la obtención
  *              de datos del renderizado de la UI de navegación.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 "use client";

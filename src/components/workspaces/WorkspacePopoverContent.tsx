@@ -4,7 +4,7 @@
  * @description Componente de ensamblaje soberano y puro. Ha sido refactorizado
  *              para delegar la responsabilidad de la internacionalización a sus
  *              componentes hijos, eliminando el "prop drilling" de traducciones.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech
  * @version 5.0.0
  */
 "use client";
@@ -13,16 +13,14 @@ import React from "react";
 
 import { Command, CommandSeparator } from "@/components/ui/command";
 import { type Workspace } from "@/lib/data/workspaces";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import {
   WorkspaceActions,
   type WorkspaceActionsProps,
 } from "./WorkspaceActions";
 import { WorkspaceList } from "./WorkspaceList";
 
-export interface WorkspacePopoverContentProps
-  extends Omit<WorkspaceActionsProps, "t"> {
-  // La prop 't' ya no es necesaria
+export interface WorkspacePopoverContentProps extends WorkspaceActionsProps {
   workspaces: Workspace[];
   activeWorkspaceId: string | null;
   onWorkspaceSelect: (workspaceId: string) => void;
@@ -44,7 +42,8 @@ export function WorkspacePopoverContent({
   ...actionProps
 }: WorkspacePopoverContentProps): React.ReactElement {
   clientLogger.trace(
-    "[WorkspacePopoverContent] Renderizando ensamblador de UI puro."
+    { component: "WorkspacePopoverContent" },
+    "Renderizando ensamblador de UI puro."
   );
 
   return (

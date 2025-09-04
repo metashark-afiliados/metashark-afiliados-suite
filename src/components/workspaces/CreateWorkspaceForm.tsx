@@ -4,17 +4,17 @@
  * @description Formulario de cliente soberano que ensambla campos atómicos
  *              para la creación de workspaces. Ahora consume sus propias
  *              traducciones, resolviendo un error de tipo TS2339.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 3.1.0
  */
 "use client";
 
-import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { useCreateWorkspaceForm } from "@/lib/hooks/useCreateWorkspaceForm";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { WorkspaceNameInputField } from "./form-fields/WorkspaceNameInputField";
 
 interface CreateWorkspaceFormProps {

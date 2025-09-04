@@ -6,7 +6,7 @@
  *              diseño de élite fuerza a cada arnés de pruebas a ser explícito
  *              sobre las condiciones de red que requiere, añadiendo sus propios
  *              manejadores dinámicamente a través de `server.use()`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { type HttpHandler } from "msw";

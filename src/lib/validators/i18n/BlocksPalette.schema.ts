@@ -3,7 +3,7 @@
  * @file BlocksPalette.schema.ts
  * @description Define el contrato de datos para el namespace 'components.builder.BlocksPalette'.
  *              Sincronizado para incluir la clave de nombre para el bloque `Hero1`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import { z } from "zod";

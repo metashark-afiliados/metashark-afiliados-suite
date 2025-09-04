@@ -2,15 +2,15 @@
 /**
  * @file index.ts
  * @description Manifiesto (Barrel File) y API pública para los helpers de Server Actions.
- *              Utiliza exportaciones nombradas explícitas para una API robusta y
- *              clara, completando la atomización del módulo.
- * @author @author RaZ Podestá - MetaShark Tech
+ *              Este aparato ensambla y exporta utilidades de servidor transversales
+ *              y de bajo nivel que soportan la lógica de negocio en las Server Actions.
+ *              Utiliza exportaciones nombradas explícitas para una API robusta y clara.
+ * @author L.I.A. Legacy
  * @version 3.0.0
  * @see .docs-espejo/lib/actions/_helpers/index.ts.md
  */
 import "server-only";
 
-export { getAuthenticatedUser } from "./auth.helper";
 export { createAuditLog } from "./audit-log.helper";
 export { createPersistentErrorLog } from "./error-log.helper";
 export { EmailService } from "./email-service.helper";

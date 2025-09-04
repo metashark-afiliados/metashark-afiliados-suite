@@ -15,18 +15,17 @@
  */
 "use client";
 
-import { useCallback, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { useCallback, useTransition } from "react";
 import toast from "react-hot-toast";
-import { shallow } from "zustand/shallow";
 import { useStore } from "zustand";
+import { shallow } from "zustand/shallow";
 
 import { updateCreationContentAction } from "@/lib/actions/creations";
 import {
   useBuilderStore,
   useBuilderStoreApi,
 } from "@/lib/hooks/use-builder-store";
-import { logger } from "@/lib/logging";
 
 /**
  * @public

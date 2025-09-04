@@ -11,13 +11,13 @@
  */
 "use client";
 
-import React from "react";
-import { useTranslations } from "next-intl";
 import { Bot } from "lucide-react";
+import { useTranslations } from "next-intl";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { useLiaChatStore } from "@/lib/hooks/useLiaChatStore";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 import { LiaChatInterface } from "./LiaChatInterface";
 

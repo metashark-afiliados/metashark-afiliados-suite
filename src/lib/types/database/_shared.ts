@@ -3,7 +3,7 @@
  * @file _shared.ts
  * @description Helpers de tipo de Supabase. Ha sido reparado para corregir un error
  *              sintáctico crítico (`keyof`) que desestabilizaba el sistema de tipos.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 12.1.0 (Critical Syntax Fix)
  */
 import { type Database as DB } from "./index";

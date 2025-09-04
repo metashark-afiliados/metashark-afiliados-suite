@@ -2,20 +2,25 @@
 /**
  * @file enrichVisitorLog.action.ts
  * @description Server Action atómica para enriquecer un log de visitante
- *              existente con datos del navegador del cliente.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 1.0.0
- * @see .docs-espejo/lib/actions/telemetry/enrichVisitorLog.action.ts.md
+ *              existente con datos del navegador del cliente. Refactorizada
+ *              a un estándar de élite para cumplir con la Constitución.
+ * @author L.I.A Legacy
+ * @version 4.0.0
  */
 "use server";
 import "server-only";
 
 import { ZodError } from "zod";
 
-import { logger } from "@/lib/logging";
+import { createPersistentErrorLog } from "@/lib/actions/_helpers";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 import { type Json } from "@/lib/types/database";
-import { type ActionResult, ClientEnrichmentSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  ClientEnrichmentSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
 /**
  * @public
@@ -28,9 +33,11 @@ import { type ActionResult, ClientEnrichmentSchema } from "@/lib/validators";
 export async function enrichVisitorLogAction(
   payload: unknown
 ): Promise<ActionResult<void>> {
+  const context = { payload };
   try {
     const { sessionId, ...enrichmentData } =
       ClientEnrichmentSchema.parse(payload);
+    context.sessionId = sessionId;
 
     const browserContext = enrichmentData.browser_context as Json;
 
@@ -46,33 +53,44 @@ export async function enrichVisitorLogAction(
       .eq("session_id", sessionId);
 
     if (error) {
-      logger.error(
-        `[TelemetryAction] Error al enriquecer log para sesión ${sessionId}:`,
-        { error: error.message }
-      );
-      return {
-        success: false,
-        error: "ValidationErrors.generic.error_server_generic",
-      };
+      throw error;
     }
+
+    logger.trace(
+      context,
+      "[enrichVisitorLogAction] Log de visitante enriquecido."
+    );
+
     return { success: true, data: undefined };
   } catch (error) {
+    let errorKey: ValidationErrorKey = "generic.error_server_generic";
+
     if (error instanceof ZodError) {
-      logger.warn("[TelemetryAction] Payload de enriquecimiento inválido.", {
-        errors: error.flatten(),
-      });
+      errorKey = "generic.error_invalid_data";
+      logger.warn(
+        { errors: error.flatten(), ...context },
+        "[enrichVisitorLogAction] Payload de enriquecimiento inválido."
+      );
+      // No persistir errores de validación de cliente.
       return {
         success: false,
-        error: "ValidationErrors.generic.error_invalid_data",
+        error: errorKey,
       };
     }
-    logger.error(
-      "[TelemetryAction] Error inesperado en enrichVisitorLogAction:",
-      { error: error instanceof Error ? error.message : String(error) }
+
+    const errorId = await createPersistentErrorLog(
+      "enrichVisitorLogAction",
+      error as Error,
+      context
     );
+    logger.error(
+      { err: error, errorId, ...context },
+      "[enrichVisitorLogAction] Error inesperado."
+    );
+
     return {
       success: false,
-      error: "ValidationErrors.generic.error_unexpected",
+      error: errorKey,
     };
   }
 }

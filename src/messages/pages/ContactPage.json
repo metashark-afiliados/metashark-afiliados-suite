@@ -1,4 +1,3 @@
-
 {
   "en-US": {
     "hero": {
@@ -21,22 +20,22 @@
     },
     "contactInfo": {
       "title": "Other Ways to Reach Us",
-      "cards": [
-        {
+      "cards": {
+        "0": {
           "icon": "Mail",
           "title": "Email",
           "description": "For general inquiries.",
           "value": "contact@convertikit.com",
           "href": "mailto:contact@convertikit.com"
         },
-        {
+        "1": {
           "icon": "BookUser",
           "title": "Knowledge Base",
           "description": "Find answers yourself.",
           "value": "Explore Docs & FAQs",
           "href": "/docs"
         }
-      ]
+      }
     }
   },
   "es-ES": {
@@ -60,22 +59,22 @@
     },
     "contactInfo": {
       "title": "Otras Formas de Contactarnos",
-      "cards": [
-        {
+      "cards": {
+        "0": {
           "icon": "Mail",
           "title": "Correo Electrónico",
           "description": "Para consultas generales.",
           "value": "contacto@convertikit.com",
           "href": "mailto:contacto@convertikit.com"
         },
-        {
+        "1": {
           "icon": "BookUser",
           "title": "Base de Conocimiento",
           "description": "Encuentra respuestas por ti mismo.",
           "value": "Explorar Docs y FAQs",
           "href": "/docs"
         }
-      ]
+      }
     }
   },
   "pt-BR": {
@@ -99,23 +98,22 @@
     },
     "contactInfo": {
       "title": "Outras Formas de nos Alcançar",
-      "cards": [
-        {
+      "cards": {
+        "0": {
           "icon": "Mail",
           "title": "E-mail",
           "description": "Para consultas gerais.",
           "value": "contato@convertikit.com",
           "href": "mailto:contato@convertikit.com"
         },
-        {
+        "1": {
           "icon": "BookUser",
           "title": "Base de Conhecimento",
           "description": "Encontre respostas você mesmo.",
           "value": "Explorar Docs e FAQs",
           "href": "/docs"
         }
-      ]
+      }
     }
   }
 }
-

@@ -3,7 +3,7 @@
  * @description Aparato helper atómico y puro. Su única responsabilidad es actuar
  *              como una factoría para generar payloads de datos para nuevas campañas.
  *              Validado y alineado con el contrato de datos de `campaigns` v5.0.0.
- * @author L.I.A. Legacy & Raz Podestá
+ * @author Raz Podestá - MetaShark Tech & Raz Podestá
  * @version 2.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech

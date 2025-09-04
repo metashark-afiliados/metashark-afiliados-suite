@@ -5,7 +5,7 @@
  *              base de datos. Sincronizado con la arquitectura "Lean Database"
  *              (AD-002), eliminando los enums que fueron reemplazados por
  *              tablas de conversión.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @copilot RaZ WriTe
  * @version 4.1.0
  */

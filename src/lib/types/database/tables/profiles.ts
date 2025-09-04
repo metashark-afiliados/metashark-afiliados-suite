@@ -5,7 +5,7 @@
  *              Ha sido refactorizado holísticamente para definir localmente la interfaz
  *              `DashboardLayoutPreferences`, desacoplando la capa de tipos de la base
  *              de datos de la capa de validadores.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 6.0.0
  */
 import { type IconLibraryDefinition } from "@/config/icon-libraries.config";

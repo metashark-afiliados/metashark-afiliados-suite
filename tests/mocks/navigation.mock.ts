@@ -4,7 +4,7 @@
  * @description Mock de navegación de élite, definitivo y de máxima fidelidad.
  *              Refactorizado para exportar un mock funcional de `useSearchParams`
  *              y otros hooks de enrutamiento, resolviendo fallos sistémicos.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 10.0.0
  */
 import NextLink from "next/link";

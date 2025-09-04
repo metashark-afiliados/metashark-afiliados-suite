@@ -2,7 +2,7 @@
 /**
  * @file permissions-edge.md
  * @description Documento Espejo y SSoT para el aparato de permisos del Edge.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @copilot RaZ WriTe
  * @version 4.0.0
  */

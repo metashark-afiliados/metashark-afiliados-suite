@@ -6,7 +6,7 @@
  *              redirecciones para el flujo de inicio de sesión. Ha sido refactorizado
  *              para consumir la Única Fuente de Verdad (SSoT) de las acciones
  *              desde `@/lib/actions/auth.actions`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";

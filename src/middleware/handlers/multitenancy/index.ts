@@ -5,16 +5,25 @@
  *              subdominio contra un caché en el Edge (Vercel KV) antes de
  *              reescribir la URL, y está alineado con la infraestructura de
  *              logging canónica de la aplicación.
- * @author L.I.A. Legacy
- * @copilot RaZ WriTe
- * @version 3.0.0
+ * @author Raz Podesta - MetaShark Tech
+ * @version 4.0.0
+ * Florianópolis/SC, Brazil
  */
 import { type NextRequest, NextResponse } from "next/server";
 
+import { rootDomain } from "@/config/site.config";
 import { getSiteSubdomainStatus } from "@/lib/data/sites-edge";
 import { logger } from "@/lib/logger";
-import { rootDomain } from "@/lib/utils";
 
+/**
+ * @public
+ * @async
+ * @function handleMultitenancy
+ * @description Maneja el enrutamiento para subdominios y dominios personalizados.
+ * @param {NextRequest} request - La petición entrante.
+ * @param {NextResponse} response - La respuesta del manejador anterior.
+ * @returns {Promise<NextResponse>} La respuesta final (potencialmente modificada).
+ */
 export async function handleMultitenancy(
   request: NextRequest,
   response: NextResponse
@@ -29,7 +38,10 @@ export async function handleMultitenancy(
 
   if (isSubdomainRequest) {
     const subdomain = hostWithoutPort.replace(`.${rootDomainWithoutPort}`, "");
-    logger.trace({ subdomain }, "[MULTITENANCY_HANDLER] Subdominio detectado.");
+    logger.trace(
+      { subdomain },
+      "[MULTITENANCY_HANDLER] Subdominio detectado."
+    );
 
     const isValidSubdomain = await getSiteSubdomainStatus(subdomain);
 
@@ -57,6 +69,7 @@ export async function handleMultitenancy(
   }
 
   logger.trace(
+    {},
     "[MULTITENANCY_HANDLER] DECISION: No es un subdominio. Pasando al siguiente manejador."
   );
   return response;

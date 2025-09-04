@@ -2,11 +2,10 @@
 /**
  * @file signUp.action.ts
  * @description Server Action atómica para el registro de nuevos usuarios.
- *              Valida el payload, interactúa con Supabase Auth y gestiona el
- *              flujo de éxito (redirección) y error de forma robusta.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 1.0.0
- * @see .docs-espejo/lib/actions/auth/signUp.action.ts.md
+ *              Refactorizada para cumplir con el contrato de errores soberanos (AD-004),
+ *              observabilidad completa, y la firma de logging canónica de Pino.
+ * @author Raz Podesta - MetaShark Tech
+ * @version 4.0.0
  */
 "use server";
 import "server-only";
@@ -15,70 +14,102 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ZodError } from "zod";
 
-import { createPersistentErrorLog } from "@/lib/actions/_helpers";
+import {
+  createAuditLog,
+  createPersistentErrorLog,
+} from "@/lib/actions/_helpers";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, SignUpSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  SignUpSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
+/**
+ * @public
+ * @async
+ * @function signUpAction
+ * @description Procesa una solicitud de registro de nuevo usuario, validando los datos,
+ *              creando el usuario en Supabase, auditando el evento y manejando errores.
+ * @param {unknown} prevState - El estado anterior del formulario, requerido por `useFormState`.
+ * @param {FormData} formData - Los datos del formulario de registro.
+ * @returns {Promise<ActionResult<never>>} El resultado de la operación. En caso de éxito,
+ *          ejecuta una redirección y no retorna valor. En caso de fallo, retorna un
+ *          `ActionResult` de error con una `ValidationErrorKey`.
+ */
 export async function signUpAction(
   prevState: unknown,
   formData: FormData
 ): Promise<ActionResult<never>> {
   const origin = headers().get("origin");
   const rawData = Object.fromEntries(formData.entries());
+  const context = { payload: rawData, origin };
+
+  logger.trace(context, "[signUpAction] Iniciando acción de registro.");
 
   try {
+    // 1. Validación de Payload
     const parsedData = SignUpSchema.parse(rawData);
-    logger.trace("[AuthAction:SignUp] Payload de registro validado.", {
-      email: parsedData.email,
-    });
+    const { email, password } = parsedData;
 
+    // 2. Ejecución de Lógica de Negocio
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
-      email: parsedData.email,
-      password: parsedData.password,
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
       options: { emailRedirectTo: `${origin}/api/auth/callback` },
     });
 
     if (error) {
-      logger.error("[AuthAction:SignUp] Error al crear usuario en Supabase", {
-        errorMessage: error.message,
-        email: parsedData.email,
-      });
       if (error.message.includes("User already registered")) {
-        return {
-          success: false,
-          error: "ValidationErrors.generic.error_user_already_exists",
-        };
+        logger.warn(
+          { email, ...context },
+          "[signUpAction] Intento de registro con email duplicado."
+        );
+        return { success: false, error: "generic.error_user_already_exists" };
       }
-      return {
-        success: false,
-        error: "ValidationErrors.generic.error_signup_failed",
-      };
+      throw error; // Lanzar otros errores de Supabase para el catch genérico
+    }
+
+    // 3. Efectos Secundarios y Retorno
+    if (data.user) {
+      await createAuditLog("signup.success", {
+        userId: data.user.id,
+        metadata: { email: data.user.email },
+      });
     }
 
     logger.info(
-      `[AuthAction:SignUp] Registro exitoso iniciado para ${parsedData.email}. Redirigiendo...`
+      { email, userId: data.user?.id, ...context },
+      "[signUpAction] Registro iniciado con éxito."
     );
     redirect("/auth-notice?message=check-email-for-confirmation");
   } catch (error) {
+    let errorKey: ValidationErrorKey;
+
     if (error instanceof ZodError) {
-      logger.warn("[AuthAction:SignUp] Validación de payload fallida.", {
-        errors: error.flatten(),
-      });
-      return { success: false, error: error.errors[0].message };
+      // Propaga la clave de error directamente desde el schema de Zod
+      errorKey = error.errors[0].message as ValidationErrorKey;
+      logger.warn(
+        { errors: error.flatten(), ...context },
+        "[signUpAction] Validación de payload fallida."
+      );
+    } else {
+      errorKey = "generic.error_signup_failed";
     }
 
-    const emailForLog =
-      typeof rawData.email === "string" ? rawData.email : "invalid_email_type";
-    await createPersistentErrorLog("signUpAction", error as Error, {
-      email: emailForLog,
-    });
+    const errorId = await createPersistentErrorLog(
+      "signUpAction",
+      error as Error,
+      context
+    );
+    logger.error(
+      { err: error, errorId, ...context },
+      "[signUpAction] Fallo en la acción."
+    );
 
-    return {
-      success: false,
-      error: "ValidationErrors.generic.error_unexpected",
-    };
+    return { success: false, error: errorKey };
   }
 }
 // src/lib/actions/auth/signUp.action.ts

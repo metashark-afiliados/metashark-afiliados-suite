@@ -3,7 +3,7 @@
  * @file LandingFooter.md
  * @description Documento Espejo y SSoT para el pie de página de las páginas públicas,
  *              refactorizado a un componente de presentación puro.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 4.0.0
  */
 # Manifiesto Conceptual: Pie de Página de Landing Page v4.0

@@ -26,7 +26,6 @@ import { SettingsPanel } from "@/components/builder/SettingsPanel";
 import { PrimaryToolBar } from "@/components/builder/toolbar/PrimaryToolBar";
 import { useBuilderStore } from "@/lib/hooks/use-builder-store";
 import { useBuilderDnD } from "@/lib/hooks/useBuilderDnD";
-import { logger } from "@/lib/logging";
 import { cn } from "@/lib/utils";
 
 export function BuilderLayout({

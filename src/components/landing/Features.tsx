@@ -5,13 +5,13 @@
  *              Ha sido refactorizado a un Componente de Cliente (`"use client"`) para
  *              soportar animaciones con `framer-motion` y recibe todo su contenido
  *              dinámicamente a través de props.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 3.0.0
  */
 "use client";
 
-import React from "react";
 import { motion } from "framer-motion";
+import React from "react";
 
 import {
   Card,
@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

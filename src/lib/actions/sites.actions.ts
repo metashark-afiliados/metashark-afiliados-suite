@@ -4,7 +4,7 @@
  * @description Manifiesto (Barrel File) y API pública para las Server Actions
  *              del dominio de gestión de sitios. Ensambla y exporta las
  *              acciones atómicas desde sus módulos soberanos.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 1.0.0
  * @see .docs-espejo/lib/actions/sites.actions.ts.md
  */

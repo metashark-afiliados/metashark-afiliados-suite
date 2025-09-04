@@ -1,12 +1,10 @@
 // src/components/authentication/sign-up-form/SignUpPasswordField.tsx
 /**
  * @file src/components/authentication/sign-up-form/SignUpPasswordField.tsx
- * @description Aparato de UI atómico y de presentación puro. Renderiza el campo
- *              de contraseña, su etiqueta, medidor de fortaleza, mensaje de error
- *              y la funcionalidad de visualización ("ojo").
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 2.0.0
- * @see .docs-espejo/components/authentication/sign-up-form/SignUpPasswordField.tsx.md
+ * @description Aparato de UI atómico. Adaptado para propagar los textos de i18n
+ *              a su componente hijo `PasswordStrengthMeter`.
+ * @author L.I.A. Legacy
+ * @version 3.0.0
  */
 "use client";
 
@@ -15,13 +13,15 @@ import { type FieldErrors, type UseFormRegister } from "react-hook-form";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { type z } from "zod";
 
-import { PasswordStrengthMeter } from "@/components/authentication/PasswordStrengthMeter";
+import {
+  PasswordStrengthMeter,
+  type StrengthMeterTexts,
+} from "@/components/authentication/PasswordStrengthMeter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { clientLogger } from "@/lib/logger";
 import { type SignUpSchema } from "@/lib/validators";
-import { cn } from "@/lib/utils";
 
 type FormData = z.infer<typeof SignUpSchema>;
 
@@ -32,16 +32,13 @@ export interface SignUpPasswordFieldProps {
   passwordValue: string;
   label: string;
   errorMessage?: string;
+  ariaLabels: {
+    show: string;
+    hide: string;
+  };
+  strengthMeterTexts: StrengthMeterTexts; // <-- PROP AÑADIDA
 }
 
-/**
- * @public
- * @component SignUpPasswordField
- * @description Renderiza el campo de contraseña con su medidor de fortaleza y
- *              funcionalidad de visualización. Es un componente controlado y puro.
- * @param {SignUpPasswordFieldProps} props - Propiedades para conectar con el formulario.
- * @returns {React.ReactElement}
- */
 export function SignUpPasswordField({
   register,
   errors,
@@ -49,10 +46,9 @@ export function SignUpPasswordField({
   passwordValue,
   label,
   errorMessage,
+  ariaLabels,
+  strengthMeterTexts, // <-- PROP CONSUMIDA
 }: SignUpPasswordFieldProps): React.ReactElement {
-  clientLogger.trace(
-    "[SignUpPasswordField] Renderizando componente de campo de senha puro."
-  );
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
@@ -78,7 +74,7 @@ export function SignUpPasswordField({
           size="icon"
           className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:bg-transparent"
           onClick={togglePasswordVisibility}
-          aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+          aria-label={showPassword ? ariaLabels.hide : ariaLabels.show}
         >
           {showPassword ? (
             <EyeOff className="h-4 w-4" />
@@ -87,7 +83,10 @@ export function SignUpPasswordField({
           )}
         </Button>
       </div>
-      <PasswordStrengthMeter password={passwordValue} />
+      <PasswordStrengthMeter
+        password={passwordValue}
+        texts={strengthMeterTexts}
+      />
       {errorMessage && (
         <p className="text-sm text-destructive" role="alert">
           {errorMessage}

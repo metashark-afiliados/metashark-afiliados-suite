@@ -4,7 +4,7 @@
  * @description Un componente de presentación atómico y puro para mostrar un estado de error
  *              consistente en la UI. Es 100% agnóstico al contenido, recibiendo todos sus textos
  *              y el icono a través de su contrato de props explícito.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import React from "react";

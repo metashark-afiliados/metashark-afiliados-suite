@@ -4,7 +4,7 @@
  * @description Define el contrato de datos para el namespace 'components.builder.Canvas'.
  *              Este aparato atómico de validación es consumido por la infraestructura
  *              de i18n para garantizar la seguridad de tipos.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { z } from "zod";

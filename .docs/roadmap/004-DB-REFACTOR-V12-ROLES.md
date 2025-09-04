@@ -3,7 +3,7 @@
  * @file .docs/roadmap/004-DB-REFACTOR-V12-ROLES.md
  * @description Roadmap de Ejecución y SSoT para la Refactorización Holística de
  *              la Base de Datos a la Arquitectura v12.0 (Roles Extensibles).
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 12.0.0
  */
 # Roadmap de Tarea: Refactorización Holística de la Base de Datos v12.0 (Roles Extensibles)

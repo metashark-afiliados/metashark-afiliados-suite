@@ -2,9 +2,9 @@
 /**
  * @file page.tsx
  * @description Orquestador de UI soberano para la página de inicio de sesión.
- *              Ensambla el layout y el formulario, actuando como una capa de
- *              adaptación entre la i18n y los componentes de presentación puros.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ *              Ensambla el layout y el formulario. El `LoginForm` ahora es
+ *              soberano y no recibe props de texto.
+ * @author RaZ Podestá - MetaShark Tech
  * @version 2.0.0
  * @see .docs-espejo/app/[locale]/login/page.tsx.md
  */
@@ -13,10 +13,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 
-import {
-  LoginForm,
-  type LoginFormTexts,
-} from "@/components/authentication/login-form";
+import { LoginForm } from "@/components/authentication/login-form";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { clientLogger } from "@/lib/logger";
@@ -38,7 +35,6 @@ export default function LoginPage({
   );
   const t = useTranslations("app.[locale].login.page");
 
-  // --- Capa de Adaptación: i18n -> Props ---
   const bottomLink = t.rich("dontHaveAccount", {
     strong: (chunks) => (
       <SmartLink
@@ -49,21 +45,14 @@ export default function LoginPage({
     ),
   });
 
-  const loginFormTexts: LoginFormTexts = {
-    email_label: t("email_label"),
-    password_label: t("password_label"),
-    forgot_password_link: t("forgot_password_link"),
-    signInButton: t("signInButton"),
-    signInButton_pending: t("signInButton_pending"),
-    signInWith: t("signInWith"),
-    signInWithProvider: t("signInWithProvider"),
-  };
-
-  // --- Capa de Ensamblaje de UI ---
+  // --- INICIO DE REFACTORIZACIÓN (TS2322) ---
+  // Se elimina la construcción y el pasaje de `loginFormTexts` ya que
+  // `LoginForm` ahora es soberano y obtiene sus textos desde su propio hook.
   return (
     <AuthCardLayout bottomLink={bottomLink}>
-      <LoginForm texts={loginFormTexts} />
+      <LoginForm />
     </AuthCardLayout>
   );
+  // --- FIN DE REFACTORIZACIÓN (TS2322) ---
 }
 // src/app/[locale]/login/page.tsx

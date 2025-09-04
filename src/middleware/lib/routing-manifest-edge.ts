@@ -4,11 +4,13 @@
  * @description Manifiesto de Seguridad Declarativo para el Edge. Esta es la
  *              Única Fuente de Verdad para todas las reglas de seguridad de
  *              enrutamiento consumidas por el middleware.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @copilot RaZ WriTe
- * @version 3.0.0
+ * @version 4.0.0
  * @see .docs-espejo/middleware/lib/routing-manifest-edge.ts.md
  */
+import "server-only";
+
 import { type Database } from "@/lib/types/database";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
@@ -17,9 +19,6 @@ type AppRole = Database["public"]["Enums"]["app_role"];
  * @public
  * @typedef RouteClassification
  * @description Define los niveles de seguridad para una ruta.
- *              - `public`: Accesible para todos.
- *              - `auth`: Solo accesible para usuarios no autenticados (ej. /login).
- *              - `protected`: Requiere autenticación.
  */
 export type RouteClassification = "public" | "auth" | "protected";
 
@@ -37,11 +36,10 @@ export interface RouteSecurityRule {
 /**
  * @public
  * @constant ROUTE_MANIFEST
- * @description El array canónico de reglas de seguridad. El orden es crucial:
- *              las rutas más específicas deben ir antes que las más genéricas.
+ * @description El array canónico de reglas de seguridad. El orden es crucial.
  */
 export const ROUTE_MANIFEST: RouteSecurityRule[] = [
-  // --- Rutas de Máxima Restricción (Roles Específicos) ---
+  // --- Rutas de Máxima Restricción ---
   {
     path: "/dev-console",
     classification: "protected",
@@ -52,20 +50,16 @@ export const ROUTE_MANIFEST: RouteSecurityRule[] = [
     classification: "protected",
     requiredRoles: ["admin", "developer"],
   },
-
-  // --- Rutas Protegidas Generales (Requieren solo autenticación) ---
+  // --- Rutas Protegidas Generales ---
   { path: "/dashboard", classification: "protected" },
   { path: "/builder", classification: "protected" },
-  { path: "/welcome", classification: "protected" },
   { path: "/unauthorized", classification: "protected" },
-
-  // --- Rutas de Autenticación (Solo para usuarios NO autenticados) ---
+  // --- Rutas de Autenticación ---
   { path: "/login", classification: "auth" },
   { path: "/signup", classification: "auth" },
   { path: "/forgot-password", classification: "auth" },
   { path: "/reset-password", classification: "auth" },
-
-  // --- Ruta Pública Principal (Catch-all para rutas públicas) ---
+  // --- Ruta Pública Principal ---
   { path: "/", classification: "public" },
 ];
 // src/middleware/lib/routing-manifest-edge.ts

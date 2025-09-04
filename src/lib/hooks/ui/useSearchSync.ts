@@ -1,18 +1,19 @@
 // src/lib/hooks/ui/useSearchSync.ts
 /**
- * @file src/lib/hooks/ui/useSearchSync.ts
+ * @file useSearchSync.ts
  * @description Hook de UI atómico y reutilizable que encapsula la lógica de
  *              sincronizar un término de búsqueda con los `searchParams` de la URL,
  *              aplicando `debounce` para optimizar el rendimiento.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
+ * @see .docs-espejo/lib/hooks/ui/useSearchSync.ts.md
  */
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import { useDebounce } from "@/lib/hooks/use-debounce";
-import { logger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { usePathname, useRouter } from "@/lib/navigation";
 
 interface UseSearchSyncProps {
@@ -59,13 +60,12 @@ export const useSearchSync = ({
       params.delete(paramName);
     }
 
-    // Siempre resetear a la primera página al buscar
     if (params.has("page")) {
       params.set("page", "1");
     }
 
     const newUrl = `${pathname}?${params.toString()}`;
-    logger.trace(`[useSearchSync] Sincronizando URL de búsqueda.`, { newUrl });
+    clientLogger.trace({ newUrl }, `[useSearchSync] Sincronizando URL.`);
 
     startTransition(() => {
       if (replace) {
@@ -78,19 +78,4 @@ export const useSearchSync = ({
 
   return { searchTerm, setSearchTerm, isSyncing };
 };
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (Lógica de UI)**: ((Implementada)) Este nuevo aparato aísla completamente la lógica de sincronización de búsqueda, haciéndola reutilizable en cualquier página con funcionalidad de filtrado.
- * 2. **Rendimiento Optimizado**: ((Implementada)) El uso de `useDebounce` y `useTransition` asegura que las actualizaciones de la URL sean eficientes y no bloqueen la UI, proporcionando una experiencia de usuario fluida.
- * 3. **Reseteo de Paginación**: ((Implementada)) Incluye la lógica crítica de resetear la paginación a la página 1 cada vez que se realiza una nueva búsqueda, previniendo estados de UI inconsistentes donde el usuario podría quedar en una página que ya no existe para los nuevos resultados.
- *
- * @subsection Melhorias Futuras
- * 1. **Sincronización de Múltiples Parámetros**: ((Vigente)) El hook podría ser extendido para gestionar un objeto de `searchParams` en lugar de un único `paramName`, permitiendo sincronizar filtros complejos (ej. búsqueda, estado, ordenamiento) de una sola vez.
- *
- * =====================================================================
- */
 // src/lib/hooks/ui/useSearchSync.ts

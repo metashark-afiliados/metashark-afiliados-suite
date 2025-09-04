@@ -4,9 +4,9 @@
  * @description Proveedor de contexto para compartir datos globales a través de
  *              todos los componentes del dashboard. Ha sido refactorizado
  *              holísticamente para alinearse con la arquitectura "Lean Database".
- * @author Raz Podestá - MetaShark Tech
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 7.0.0
- * @date 2025-09-01
+ * @see .docs-espejo/lib/context/DashboardContext.tsx.md
  */
 "use client";
 
@@ -15,14 +15,13 @@ import { type User } from "@supabase/supabase-js";
 
 import { type FeatureModule } from "@/lib/data/modules";
 import { type Invitation } from "@/lib/data/notifications";
-import { type Tables, type Views } from "@/lib/types/database";
+import { type Tables } from "@/lib/types/database";
 
 // --- Tipos de Datos Sincronizados ---
 
 type Workspace = Tables<"workspaces">;
 type Profile = Tables<"profiles">;
 
-// El tipo `WorkspaceMember` ahora refleja la estructura de la DB: `role_id`
 export type WorkspaceMember = Tables<"workspace_members"> & {
   profiles: Profile | null;
   workspace_roles: { name: string } | null;
@@ -38,7 +37,7 @@ export interface DashboardContextProps {
   profile: Profile;
   workspaces: Workspace[];
   activeWorkspace: Workspace | null;
-  activeWorkspaceRoleId: number | null; // <-- REFACTORIZADO
+  activeWorkspaceRoleId: number | null; // <-- REFACTORIZADO: SSoT de rol
   pendingInvitations: Invitation[];
   modules: FeatureModule[];
   recentCampaigns: RecentCampaign[];

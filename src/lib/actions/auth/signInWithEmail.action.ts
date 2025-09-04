@@ -2,59 +2,108 @@
 /**
  * @file signInWithEmail.action.ts
  * @description Server Action atómica para el inicio de sesión con credenciales.
- *              Valida el payload, interactúa con Supabase Auth y gestiona el
- *              flujo de éxito (redirección) y error.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 1.0.0
- * @see .docs-espejo/lib/actions/auth/signInWithEmail.action.ts.md
+ *              Refactorizada para cumplir con el contrato de errores soberanos (AD-004),
+ *              observabilidad completa, y la firma de logging canónica de Pino.
+ * @author Raz Podesta - MetaShark Tech
+ * @version 4.0.0
  */
 "use server";
 import "server-only";
 
 import { redirect } from "next/navigation";
+import { ZodError } from "zod";
 
+import {
+  createAuditLog,
+  createPersistentErrorLog,
+} from "@/lib/actions/_helpers";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, SignInSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  SignInSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
+/**
+ * @public
+ * @async
+ * @function signInWithEmailAction
+ * @description Procesa una solicitud de inicio de sesión con email y contraseña. Sigue
+ *              el ciclo de vida canónico de una Server Action: valida, ejecuta, audita
+ *              y maneja errores.
+ * @param {unknown} prevState - El estado anterior del formulario, requerido por `useFormState`.
+ * @param {FormData} formData - Los datos del formulario de inicio de sesión.
+ * @returns {Promise<ActionResult<never>>} El resultado de la operación. En caso de éxito,
+ *          ejecuta una redirección y no retorna valor. En caso de fallo, retorna un
+ *          `ActionResult` de error.
+ */
 export async function signInWithEmailAction(
   prevState: unknown,
   formData: FormData
 ): Promise<ActionResult<never>> {
   const rawData = Object.fromEntries(formData.entries());
-  logger.trace("[AuthAction:SignIn] Intento de inicio de sesión con email.", {
-    email: rawData.email,
-  });
+  const context = { payload: rawData };
 
-  const validationResult = SignInSchema.safeParse(rawData);
+  logger.trace(context, "[signInWithEmailAction] Iniciando acción.");
 
-  if (!validationResult.success) {
-    logger.warn("[AuthAction:SignIn] Validación de payload fallida.", {
-      errors: validationResult.error.flatten(),
+  try {
+    // 1. Validación de Payload
+    const validationResult = SignInSchema.safeParse(rawData);
+    if (!validationResult.success) {
+      throw validationResult.error;
+    }
+    const { email, password } = validationResult.data;
+
+    // 2. Ejecución de Lógica de Negocio
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
-    return {
-      success: false,
-      error: "ValidationErrors.auth.login_invalid_credentials",
-    };
+
+    if (error) {
+      logger.warn(
+        { email, err: error },
+        "[signInWithEmailAction] Fallo de credenciales."
+      );
+      await createAuditLog("login.failed", {
+        metadata: { email, reason: "invalid_credentials" },
+      });
+      return { success: false, error: "auth.login_invalid_credentials" };
+    }
+
+    // 3. Efectos Secundarios y Retorno
+    await createAuditLog("login.success", { userId: data.user.id });
+    logger.info(
+      { userId: data.user.id },
+      "[signInWithEmailAction] Inicio de sesión exitoso. Redirigiendo."
+    );
+
+    redirect("/dashboard");
+  } catch (error) {
+    let errorKey: ValidationErrorKey = "generic.error_server_generic";
+
+    if (error instanceof ZodError) {
+      errorKey = "generic.error_invalid_data";
+      logger.warn(
+        { errors: error.flatten(), ...context },
+        "[signInWithEmailAction] Validación de payload fallida."
+      );
+    }
+
+    const errorId = await createPersistentErrorLog(
+      "signInWithEmailAction",
+      error as Error,
+      context
+    );
+
+    logger.error(
+      { err: error, errorId, ...context },
+      "[signInWithEmailAction] Fallo en la acción."
+    );
+
+    return { success: false, error: errorKey };
   }
-
-  const { email, password } = validationResult.data;
-  const supabase = createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error) {
-    logger.warn(`[AuthAction:SignIn] Fallo de credenciales para ${email}`, {
-      error: error.message,
-    });
-    return {
-      success: false,
-      error: "ValidationErrors.auth.login_invalid_credentials",
-    };
-  }
-
-  logger.info(
-    `[AuthAction:SignIn] Inicio de sesión exitoso para ${email}. Redirigiendo...`
-  );
-  redirect("/dashboard");
 }
 // src/lib/actions/auth/signInWithEmail.action.ts

@@ -2,7 +2,7 @@
 /**
  * @file ThemeProvider.md
  * @description Documento Espejo y SSoT para el proveedor de temas.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 # Manifiesto Conceptual: Proveedor de Temas

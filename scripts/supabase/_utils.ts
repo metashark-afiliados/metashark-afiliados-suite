@@ -10,7 +10,7 @@ import path from "path";
  *              variables de entorno canónicas, asegurando que las herramientas
  *              de diagnóstico y mantenimiento funcionen en un entorno local
  *              consistente con la nueva arquitectura de configuración.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
  */
 export function loadEnvironment(): void {

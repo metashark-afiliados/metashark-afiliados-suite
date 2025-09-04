@@ -5,7 +5,7 @@
  *              Integra todos los proveedores y simuladores para crear un
  *              entorno de renderizado de máxima fidelidad. Es la SSoT para
  *              el renderizado en toda la suite de pruebas.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 4.0.0
  */
 import React, { type ReactElement } from "react";

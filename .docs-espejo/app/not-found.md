@@ -2,7 +2,7 @@
 /**
  * @file not-found.md
  * @description Documento Espejo y SSoT para el manejador de errores 404 global.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Conceptual: Manejador de Errores 404

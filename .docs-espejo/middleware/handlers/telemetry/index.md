@@ -2,8 +2,7 @@
 /**
  * @file index.md
  * @description Documento Espejo y SSoT conceptual para el manejador de Telemetría.
- * @author L.I.A. Legacy
- * @copilot RaZ WriTe
+ * @author RaZ
  * @version 2.0.0
  */
 # Manifiesto Conceptual: Manejador de Telemetría
@@ -19,12 +18,16 @@ Este aparato es el **punto de origen para la observabilidad del visitante**. Su 
 3.  **Ejecución "Fire-and-Forget":** Invoca la `logVisitorAction` de forma asíncrona y sin `await`, con un bloque `.catch()` explícito. Este patrón es una optimización de rendimiento crítica que asegura que el registro de telemetría no añada latencia perceptible al pipeline del middleware. Cualquier fallo en la acción de logging se registra, pero no interrumpe el flujo de la petición principal del usuario.
 4.  **Establecimiento de Sesión:** Tras invocar la acción, establece la cookie `metashark_session_id` en la `response`, marcando la sesión como "logueada" para este manejador y garantizando que solo se ejecute una vez por sesión de navegador.
 
-## 3. Zona de Mejoras Futuras
+## Zona de Melhorias Futuras
 
-1.  **Manejo de `userId` en Middleware:** El `logPayload` actual no incluye `userId`. Para asociar la sesión con un usuario desde la primera visita (si ya está logueado), este handler necesitaría acceso a `authData`, lo que requeriría reordenarlo después del `handleAuth` en el pipeline de `middleware.ts`.
-2.  **Exclusión de Rutas de Assets:** El manejador podría ser optimizado para excluir rutas de assets (`_next/`, `favicon.ico`) añadiendo una guarda al principio, reduciendo ejecuciones innecesarias.
-3.  **Configuración de `maxAge` de Cookie:** La duración de la cookie (1 año) podría ser externalizada a una variable de entorno para una configuración más flexible.
-4.  **Tipado Estricto de `logPayload`:** El tipo del payload podría ser importado desde `VisitorLogSchema` para garantizar la consistencia.
-5.  **Servicio de Detección de Bots Avanzado:** La detección actual basada en User-Agent es básica. Podría integrarse con un servicio de terceros para una detección de bots más sofisticada.
-6.  **Internacionalización de la Documentación:** Traducir este documento espejo.
+1.  **Manejo de `userId` en Middleware**: El `logPayload` actual no incluye `userId`. Para asociar la sesión con un usuario desde la primera visita (si ya está logueado), este handler necesitaría acceso a `authData`, lo que requeriría reordenarlo después del `handleAuth` en el pipeline de `middleware.ts`.
+2.  **Exclusión de Rutas de Assets**: El manejador podría ser optimizado para excluir rutas de assets (`_next/`, `favicon.ico`) añadiendo una guarda al principio, reduciendo ejecuciones innecesarias.
+3.  **Configuración de `maxAge` de Cookie**: La duración de la cookie (1 año) podría ser externalizada a una variable de entorno para una configuración más flexible.
+4.  **Tipado Estricto de `logPayload`**: El tipo del payload podría ser importado desde `VisitorLogSchema` para garantizar la consistencia.
+5.  **Servicio de Detección de Bots Avanzado**: La detección actual basada en User-Agent es básica. Podría integrarse con un servicio de terceros para una detección de bots más sofisticada.
+6.  **Internacionalización de la Documentación**: Traducir este documento espejo.
+7.  **Asociación con `workspace_id`**: Si la sesión tiene un `active_workspace_id` en la cookie, el `logPayload` podría ser enriquecido con este dato.
+8.  **Pruebas de Integración**: Escribir pruebas que simulen una primera visita (sin cookie) y una visita subsecuente (con cookie) para validar que el manejador se ejecuta solo una vez.
+9.  **Helper de Detección de Bots**: Abstraer la lógica de detección de bots a un helper `isBot(userAgent)` si se necesita en otras partes de la aplicación.
+10. **Fallback de GeoIP**: Si `lookupIpAddress` falla, el `geo_data` podría ser enriquecido con los datos básicos de `request.geo` de Vercel como fallback.
 // .docs-espejo/middleware/handlers/telemetry/index.md

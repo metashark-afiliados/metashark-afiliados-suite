@@ -4,7 +4,7 @@
  * @description Manifiesto de Configuración Declarativo y SSoT para los
  *              enlaces de la barra de navegación primaria. Ha sido refactorizado
  *              con tipado explícito para resolver un error de tipo TS2322.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.1.0
  */
 import { FolderKanban, Home, LayoutTemplate, Library } from "lucide-react";

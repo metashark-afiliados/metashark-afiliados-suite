@@ -18,7 +18,7 @@ import { useMemo } from "react";
 import { type Subscription } from "@/components/dashboard/subscriptions/components/subscription-cards";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { type Enums } from "../types/database";
 
 /**

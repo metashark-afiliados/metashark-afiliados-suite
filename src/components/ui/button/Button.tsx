@@ -5,7 +5,7 @@
  *              Ha sido refactorizado para aceptar las props `isLoading` y `loadingText`
  *              directamente en su API, centralizando la lógica de estado de carga
  *              y mejorando la DX.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 12.0.0
  */
 import * as React from "react";

@@ -3,7 +3,7 @@
  * @file SidebarLogo.tsx
  * @description Aparato de UI atómico y soberano. Renderiza el logo y el nombre
  *              de la marca. Consume sus propias traducciones.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 "use client";
@@ -11,8 +11,8 @@
 import Image from "next/image";
 
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
+import { clientLogger } from "@/lib/logger";
 import { Link } from "@/lib/navigation";
-import { clientLogger } from "@/lib/logging";
 
 /**
  * @public

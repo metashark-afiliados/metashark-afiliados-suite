@@ -14,13 +14,13 @@
  */
 "use client";
 
+import { type useTranslations } from "next-intl";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
-import { type useTranslations } from "next-intl";
 import { ZodError } from "zod";
 
 import { createPersistentErrorLog } from "@/lib/actions/_helpers/error-log.helper";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { isActionError } from "@/lib/validators";
 
 interface UseHandleErrorsProps {

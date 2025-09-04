@@ -5,7 +5,7 @@
  *              Ha sido refactorizado a un componente de presentación 100% puro,
  *              recibiendo todos sus textos a través de props para alinearse
  *              con la arquitectura de "Mega-Orquestador" de la HomePage.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 4.0.0
  */
 "use client";

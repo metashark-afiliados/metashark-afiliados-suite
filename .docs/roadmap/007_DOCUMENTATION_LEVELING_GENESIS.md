@@ -5,7 +5,7 @@
  *              Esta es la hoja de ruta para la creación de todos los documentos
  *              espejo faltantes, alcanzando el 100% de cumplimiento con la
  *              Metodología "Sistema Espejo".
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Roadmap de Tarea: Nivelación Documental "Génesis" v1.0

@@ -4,7 +4,7 @@
  * @description Arnés de pruebas de integración para el `DashboardLayout`.
  *              Refactorizado con una aserción de redirección de alta fidelidad,
  *              alineada con el comportamiento del mock `next-router-mock`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.2
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";

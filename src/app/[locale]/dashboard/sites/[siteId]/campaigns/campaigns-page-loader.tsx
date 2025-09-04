@@ -10,15 +10,15 @@
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
-import React from "react";
-import { getTranslations } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import React from "react";
 
-import { createPersistentErrorLog } from "@/lib/actions/_helpers";
 import { ErrorStateCard } from "@/components/shared/error-state-card";
-import { campaignsData } from "@/lib/data";
+import { createPersistentErrorLog } from "@/lib/actions/_helpers";
 import { requireSitePermission } from "@/lib/auth/user-permissions";
-import { logger } from "@/lib/logging";
+import { campaignsData } from "@/lib/data";
+import { logger } from "@/lib/logger";
 
 import { CampaignsClient } from "./campaigns-client";
 

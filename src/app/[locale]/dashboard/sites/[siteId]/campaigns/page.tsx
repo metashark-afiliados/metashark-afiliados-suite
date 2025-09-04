@@ -12,9 +12,9 @@ import type { Metadata } from "next";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
-import { logger } from "@/lib/logging";
-import CampaignsPageSkeleton from "./loading";
+import { logger } from "@/lib/logger";
 import { CampaignsPageLoader } from "./campaigns-page-loader";
+import CampaignsPageSkeleton from "./loading";
 
 /**
  * @public
@@ -50,7 +50,9 @@ export default function CampaignsPage({
   searchParams: { page?: string; q?: string };
 }): JSX.Element {
   unstable_setRequestLocale(params.locale);
-  logger.trace("[CampaignsPage] Renderizando punto de entrada y Suspense boundary.");
+  logger.trace(
+    "[CampaignsPage] Renderizando punto de entrada y Suspense boundary."
+  );
   return (
     <Suspense fallback={<CampaignsPageSkeleton />}>
       <CampaignsPageLoader params={params} searchParams={searchParams} />

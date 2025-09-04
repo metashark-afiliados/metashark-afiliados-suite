@@ -6,7 +6,7 @@
  *              factorías para generar objetos de datos simulados, permitiendo que
  *              los flujos de UI se desarrollen y prueben de forma aislada sin
  *              depender de una base de datos.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
  */
 import { type Json, type Tables } from "@/lib/types/database";

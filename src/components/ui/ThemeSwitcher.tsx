@@ -4,7 +4,7 @@
  * @description Componente de cliente que permite al usuario cambiar entre
  *              los temas. Ha sido refactorizado para consumir el namespace
  *              de i18n canónico.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.1.0
  */
 "use client";

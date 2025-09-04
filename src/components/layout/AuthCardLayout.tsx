@@ -4,7 +4,7 @@
  * @description Aparato de layout de élite, atómico y reutilizable. Es la SSoT
  *              visual para el Portal de Acceso, proporcionando una estructura
  *              consistente e inmersiva para los formularios de autenticación.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ WriTe (Arquitecto)
  * @version 1.0.0
  * @see .docs-espejo/components/layout/AuthCardLayout.tsx.md
  */

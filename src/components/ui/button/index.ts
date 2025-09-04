@@ -4,7 +4,7 @@
  * @description Manifiesto público y único punto de entrada para el ecosistema Button.
  *              Exporta el componente compuesto `Button`, sus contratos de tipos y
  *              la SSoT de variantes para usos avanzados.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 9.0.0
  */
 export { Button, type ButtonProps } from "./Button";

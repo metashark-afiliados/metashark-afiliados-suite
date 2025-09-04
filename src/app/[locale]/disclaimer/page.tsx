@@ -5,7 +5,7 @@
  *              estándar de élite para pasar el nombre de ícono canónico y válido
  *              `OctagonAlert` al `LegalPageLayout`, eliminando la advertencia de
  *              build y garantizando la integridad visual.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import type { Metadata } from "next";

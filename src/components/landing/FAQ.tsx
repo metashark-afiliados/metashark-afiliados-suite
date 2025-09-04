@@ -4,14 +4,14 @@
  * @description Componente de presentación para la sección "Preguntas Frecuentes".
  *              Es un componente de cliente puro que gestiona una UI compleja con
  *              búsqueda, filtrado, sincronización con URL y un acordeón interactivo.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 7.1.0
  */
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Accordion,
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/accordion";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { useDebounce } from "@/lib/hooks/use-debounce";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @private

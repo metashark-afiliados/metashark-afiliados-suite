@@ -1,15 +1,18 @@
 // src/components/workspaces/WorkspaceSwitcher.tsx
 /**
  * @file WorkspaceSwitcher.tsx
- * @description Orquestador de UI soberano. Ha sido simplificado para delegar
- *              la lógica de edición en línea al componente `WorkspaceTrigger`,
- *              actuando como un orquestador de UI más puro y desacoplado.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 13.0.0
+ * @description Orquestador de UI soberano. Refactorizado para consumir la API
+ *              de callbacks completa de `useWorkspaceManager` y propagarla a
+ *              `WorkspacePopoverContent`, resolviendo el error de contrato TS2739.
+ * @author L.I.A. Legacy
+ * @version 16.0.0
+ * @see .docs-espejo/components/workspaces/WorkspaceSwitcher.tsx.md
  */
 "use client";
 
 import React from "react";
+
+import { CardSkeleton as Skeleton } from "@/components/ui/card";
 import {
   Popover,
   PopoverContent,
@@ -21,23 +24,25 @@ import {
   WorkspaceProvider,
 } from "@/lib/hooks/useWorkspaceContext.tsx";
 import { useWorkspaceManager } from "@/lib/hooks/useWorkspaceManager";
+import { clientLogger } from "@/lib/logger";
 import { WorkspacePopoverContent } from "./WorkspacePopoverContent";
-import { WorkspaceTrigger } from "./WorkspaceTrigger";
-import { clientLogger } from "@/lib/logging";
+import { WorkspaceTrigger } from "./trigger";
 
-/**
- * @private
- * @component WorkspaceSwitcherContent
- * @description Componente interno que consume los contextos y hooks para
- *              ensamblar la UI del selector de workspaces.
- * @returns {React.ReactElement}
- */
-const WorkspaceSwitcherContent = () => {
+const WorkspaceSwitcherSkeleton = (): React.ReactElement => (
+  <div className="px-4 py-2">
+    <Skeleton className="h-[40px] w-[220px] rounded-md" />
+  </div>
+);
+
+const WorkspaceSwitcherContent = React.memo((): React.ReactElement => {
   clientLogger.trace(
-    "[WorkspaceSwitcherContent] Ensamblando lógica y UI del switcher."
+    { component: "WorkspaceSwitcherContent" },
+    "Renderizando contenido memoizado del switcher."
   );
   const { workspaces, activeWorkspace } = useDashboard();
   const { canEdit, canDelete } = useWorkspaceContext();
+
+  // ANÁLISIS DE CÓDIGO: Se consume la API completa del hook soberano.
   const {
     popoverOpen,
     setPopoverOpen,
@@ -51,6 +56,7 @@ const WorkspaceSwitcherContent = () => {
         <WorkspaceTrigger />
       </PopoverTrigger>
       <PopoverContent className="w-[220px] p-0">
+        {/* ANÁLISIS DE CÓDIGO: Se propagan todos los callbacks requeridos a través de `...actionHandlers`. */}
         <WorkspacePopoverContent
           workspaces={workspaces}
           activeWorkspaceId={activeWorkspace!.id}
@@ -62,19 +68,16 @@ const WorkspaceSwitcherContent = () => {
       </PopoverContent>
     </Popover>
   );
-};
+});
+WorkspaceSwitcherContent.displayName = "WorkspaceSwitcherContent";
 
-/**
- * @public
- * @component WorkspaceSwitcher
- * @description Orquesta el contexto y la UI para el selector de workspaces.
- * @returns {React.ReactElement | null}
- */
-export function WorkspaceSwitcher(): React.ReactElement | null {
+export function WorkspaceSwitcher(): React.ReactElement {
   const { activeWorkspace } = useDashboard();
+
   if (!activeWorkspace) {
-    return null;
+    return <WorkspaceSwitcherSkeleton />;
   }
+
   return (
     <WorkspaceProvider>
       <WorkspaceSwitcherContent />

@@ -13,13 +13,13 @@
  */
 "use client";
 
-import { useTranslations } from "next-intl";
 import { ArrowLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
-import { Link } from "@/lib/navigation";
 import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
+import { Link } from "@/lib/navigation";
 
 export interface CampaignsPageTitleProps {
   site: Pick<SiteWithCampaignCount, "id" | "name" | "subdomain">;

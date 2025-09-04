@@ -13,11 +13,11 @@
  */
 "use client";
 
-import { useMemo } from "react";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useCommandPaletteStore } from "@/lib/hooks/use-command-palette";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
+import { useMemo } from "react";
 
 /**
  * @public

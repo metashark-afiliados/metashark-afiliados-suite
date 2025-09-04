@@ -14,7 +14,7 @@
 import React, { createContext, useContext, useMemo } from "react";
 
 import { type IconLibraryDefinition } from "@/config/icon-libraries.config";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 export interface IconLibraryContextValue {
   activeLibraryId: IconLibraryDefinition["id"];

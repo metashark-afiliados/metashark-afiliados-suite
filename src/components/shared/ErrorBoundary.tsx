@@ -1,12 +1,12 @@
 // src/components/shared/ErrorBoundary.tsx
 "use client";
 
-import React, { Component, type ErrorInfo, type ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 interface Props {
   children?: ReactNode;

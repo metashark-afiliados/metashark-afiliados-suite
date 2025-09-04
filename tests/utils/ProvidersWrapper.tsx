@@ -8,7 +8,7 @@
  *              `NextIntlClientProvider`, `MemoryRouterProvider`, `TooltipProvider`),
  *              inyectando datos simulados para crear un entorno de renderizado
  *              aislado y de alta fidelidad.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import React from "react";

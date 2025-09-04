@@ -13,10 +13,10 @@
  */
 "use client";
 
-import React from "react";
 import { ResourcePageHeader } from "@/components/shared/ResourcePageHeader";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
+import React from "react";
 
 export interface UsersPageHeaderProps {
   title: string;

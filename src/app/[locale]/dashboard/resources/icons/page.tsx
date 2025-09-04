@@ -3,10 +3,9 @@
  * @file page.tsx
  * @description Server Component para la Galería de Iconos. Lee la SSoT de iconos,
  *              los agrupa por prefijo y pasa los datos al componente cliente.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
-import React from "react";
 import type { Metadata } from "next";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 
@@ -15,7 +14,7 @@ import {
   type IconGroup,
 } from "@/components/resources/IconGalleryClient";
 import { lucideIconNames } from "@/config/lucide-icon-names";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 export async function generateMetadata({
   params: { locale },

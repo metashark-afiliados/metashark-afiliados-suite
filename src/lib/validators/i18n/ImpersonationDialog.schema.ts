@@ -4,7 +4,7 @@
  * @description Define el contrato de datos para el namespace 'app.dev-console.ImpersonationDialog'.
  *              Este aparato atómico de validación garantiza la seguridad de tipos
  *              para el modal de suplantación de identidad.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { z } from "zod";

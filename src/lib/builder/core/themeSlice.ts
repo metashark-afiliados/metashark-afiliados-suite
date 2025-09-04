@@ -4,23 +4,21 @@
  * @description Slice de Zustand atómico. Su única responsabilidad es gestionar
  *              las mutaciones del objeto `theme` de la `Creation`, que incluye
  *              los estilos globales como la fuente y la paleta de colores.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-24
- * @license MIT
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              Refactorizado para alinearse con la firma de logging canónica.
+ * @author L.I.A. Legacy
+ * @version 2.0.0
+ * @see .docs-espejo/lib/builder/core/themeSlice.ts.md
  */
 import { type StateCreator } from "zustand";
 
 import { setNestedProperty } from "@/lib/helpers/set-nested-property.helper";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { type CampaignConfig } from "../types";
 
 /**
  * @public
  * @interface ThemeSlice
- * @description Define el contrato de estado y acciones para este slice.
+ * @description Define el contrato de estado y acciones para el slice de tema.
  */
 export interface ThemeSlice {
   /** Referencia al estado principal, será inyectada por el store ensamblador. */
@@ -28,7 +26,8 @@ export interface ThemeSlice {
   /**
    * @action updateGlobalStyle
    * @description Actualiza una propiedad de estilo global en el objeto `theme`.
-   *              Maneja rutas de propiedades anidadas (ej. 'globalColors.primary').
+   *              Maneja rutas de propiedades anidadas (ej. 'globalColors.primary')
+   *              de forma segura e inmutable.
    * @param {string} propertyPath - La ruta de la propiedad a actualizar.
    * @param {string} value - El nuevo valor para la propiedad.
    */
@@ -51,20 +50,22 @@ export const createThemeSlice: StateCreator<ThemeSlice, [], [], ThemeSlice> = (
     set((state) => {
       if (!state.campaignConfig) {
         logger.warn(
+          { propertyPath, value },
           "[ThemeSlice] Intento de actualizar estilo global sin configuración de campaña cargada."
         );
         return {};
       }
 
-      logger.trace("[ThemeSlice] Actualizando estilo global.", {
-        property: propertyPath,
-        newValue: value,
-      });
+      logger.trace(
+        { property: propertyPath, newValue: value },
+        "[ThemeSlice] Actualizando estilo global."
+      );
 
-      // Crear una copia profunda del objeto theme para asegurar la inmutabilidad.
+      // Se crea una copia profunda del objeto theme para garantizar la inmutabilidad
+      // antes de pasarla al helper de mutación.
       const newTheme = JSON.parse(JSON.stringify(state.campaignConfig.theme));
 
-      // Utilizar el helper para asignar el valor en la ruta anidada.
+      // Se utiliza el helper para asignar el valor en la ruta anidada.
       setNestedProperty(newTheme, propertyPath, value);
 
       const newConfig = {
@@ -75,21 +76,3 @@ export const createThemeSlice: StateCreator<ThemeSlice, [], [], ThemeSlice> = (
       return { campaignConfig: newConfig };
     }),
 });
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad de Estado (SRP)**: ((Implementada)) Este nuevo slice aísla completamente la lógica de mutación del tema, mejorando la organización del store y adhiriéndose al Principio de Responsabilidad Única.
- * 2. **Manejo de Anidamiento Robusto**: ((Implementada)) Utiliza el helper `setNestedProperty` para manejar de forma segura la actualización de propiedades anidadas como `globalColors.primary`, haciendo la acción `updateGlobalStyle` potente y flexible.
- * 3. **Inmutabilidad Garantizada**: ((Implementada)) Utiliza `JSON.parse(JSON.stringify(...))` para crear una copia profunda del objeto `theme`, garantizando que el estado se actualice de forma inmutable y previniendo efectos secundarios inesperados.
- *
- * @subsection Melhorias Futuras
- * 1. **Acción `applyBrandKit`**: ((Vigente)) Añadir una nueva acción `applyBrandKit(brandKit: BrandKit)` que reemplace el objeto `theme` completo con los colores y fuentes de un "Brand Kit" cargado desde la base de datos.
- * 2. **Validación de Propiedades**: ((Vigente)) La acción `updateGlobalStyle` podría validar `propertyPath` contra las claves permitidas en `CampaignThemeSchema` de Zod antes de aplicar la actualización, para una mayor seguridad de datos.
- *
- * =====================================================================
- */
-// src/lib/builder/core/themeSlice.ts

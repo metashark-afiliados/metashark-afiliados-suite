@@ -8,8 +8,8 @@
  */
 "use client";
 
-import { useState, useCallback } from "react";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
+import { useCallback, useState } from "react";
 
 /**
  * @public

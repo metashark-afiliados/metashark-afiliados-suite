@@ -1,11 +1,11 @@
 // src/app/[locale]/signup/page.tsx
 /**
  * @file page.tsx
- * @description Orquestador de UI soberano para la página de registro. Ensambla
- *              el layout y el formulario, actuando como una capa de adaptación
- *              entre la i18n y los componentes de presentación puros.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 2.0.0
+ * @description Orquestador de UI soberano para la página de registro.
+ *              Refactorizado para proveer el contrato de `props` de texto
+ *              completo requerido por el componente `SignupForm`.
+ * @author RaZ Podestá - MetaShark Tech
+ * @version 2.1.0
  * @see .docs-espejo/app/[locale]/signup/page.tsx.md
  */
 "use client";
@@ -38,7 +38,6 @@ export default function SignupPage({
   );
   const t = useTranslations("app.[locale].signup.page");
 
-  // --- Capa de Adaptación: i18n -> Props ---
   const bottomLink = t.rich("alreadyHaveAccount", {
     strong: (chunks) => (
       <SmartLink
@@ -49,14 +48,30 @@ export default function SignupPage({
     ),
   });
 
+  // --- INICIO DE REFACTORIZACIÓN (TS2739) ---
+  // Se reconstruye el objeto `signupFormTexts` para que contenga todas las
+  // propiedades requeridas por el contrato `SignupFormTexts`.
   const signupFormTexts: SignupFormProps["texts"] = {
     oauth: {
-      signInWith: t("signInWith"),
       signInWithProvider: t("signInWithProvider"),
     },
+    signUpButton: t("signUpButton"),
+    signUpButton_pending: t("signUpButton_pending"),
+    fields: {
+      email: {
+        label: t("email_label"),
+        placeholder: "m@example.com", // Placeholder genérico no depende de i18n
+      },
+      password: {
+        label: t("password_label"),
+      },
+      confirmPassword: {
+        label: t("confirm_password_label"),
+      },
+    },
   };
+  // --- FIN DE REFACTORIZACIÓN (TS2739) ---
 
-  // --- Capa de Ensamblaje de UI ---
   return (
     <AuthCardLayout bottomLink={bottomLink}>
       <SignupForm texts={signupFormTexts} />

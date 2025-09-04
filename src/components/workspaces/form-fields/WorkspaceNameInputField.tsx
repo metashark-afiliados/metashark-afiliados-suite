@@ -3,18 +3,18 @@
  * @file WorkspaceNameInputField.tsx
  * @description Aparato de UI atómico y soberano. Es la SSoT para el campo de
  *              entrada del nombre de un workspace.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 "use client";
 
+import { useTranslations } from "next-intl";
 import React from "react";
 import { type FieldErrors, type UseFormRegister } from "react-hook-form";
-import { useTranslations } from "next-intl";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public
@@ -41,7 +41,9 @@ export function WorkspaceNameInputField({
   isPending,
   fieldName = "workspaceName",
 }: WorkspaceNameInputFieldProps): React.ReactElement {
-  clientLogger.trace("[WorkspaceNameInputField] Renderizando componente soberano.");
+  clientLogger.trace(
+    "[WorkspaceNameInputField] Renderizando componente soberano."
+  );
   const tForm = useTranslations(
     "components.workspaces.WorkspaceSwitcher.create_form"
   );
@@ -67,6 +69,5 @@ export function WorkspaceNameInputField({
       )}
     </div>
   );
-  
 }
 // src/components/workspaces/form-fields/WorkspaceNameInputField.tsx

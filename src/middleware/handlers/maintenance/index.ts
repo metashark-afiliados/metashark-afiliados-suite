@@ -2,10 +2,10 @@
 /**
  * @file src/middleware/handlers/maintenance/index.ts
  * @description Manejador de middleware para el modo de mantenimiento. Alineado
- *              con la infraestructura de logging canónica de la aplicación.
- * @author L.I.A. Legacy
- * @copilot RaZ WriTe
- * @version 2.0.0
+ *              con la firma de logging de élite de Pino y corregido para un
+ *              manejo de flujo de control robusto.
+ * @author @author RaZ Podestá - MetaShark Tech
+ * @version 3.0.0
  */
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -14,9 +14,9 @@ import { logger } from "@/lib/logger";
 /**
  * @private
  * @function isIpWhitelisted
- * @description Verifica si una IP dada está presente en la lista blanca.
- * @param {string | undefined} requestIp - La IP del solicitante.
- * @returns {boolean} `true` si la IP está en la lista blanca.
+ * @description Verifica si una IP está en la lista blanca de mantenimiento.
+ * @param {string | undefined} requestIp - La IP de la petición.
+ * @returns {boolean} True si la IP está en la lista blanca.
  */
 function isIpWhitelisted(requestIp: string | undefined): boolean {
   if (!requestIp) return false;
@@ -39,16 +39,16 @@ function isIpWhitelisted(requestIp: string | undefined): boolean {
 /**
  * @public
  * @function handleMaintenance
- * @description Si el modo de mantenimiento está activado, reescribe la petición
- *              a la página estática `/maintenance.html`, a menos que la IP del
- *              solicitante esté en la lista blanca.
- * @param {NextRequest} request - El objeto de la petición entrante.
- * @returns {NextResponse | null} Una respuesta de reescritura o `null`.
+ * @description El manejador principal del modo de mantenimiento.
+ * @param {NextRequest} request - La petición entrante.
+ * @returns {NextResponse | null} Una respuesta de reescritura si el sitio está en
+ *          mantenimiento, o null para continuar con el pipeline.
  */
 export function handleMaintenance(request: NextRequest): NextResponse | null {
   const isMaintenanceMode = process.env.MAINTENANCE_MODE === "true";
   if (!isMaintenanceMode) {
     logger.trace(
+      {},
       "[MAINTENANCE_HANDLER] DECISION: Modo inactivo. Pasando al siguiente manejador."
     );
     return null;
@@ -68,7 +68,8 @@ export function handleMaintenance(request: NextRequest): NextResponse | null {
   }
 
   logger.trace(
-    "[MAINTENANCE_HANDLER] DECISION: Acceso permitido. Pasando al siguiente manejador."
+    { path: pathname, ip, isBypassed, isMaintenancePage },
+    "[MAINTENANCE_HANDLER] DECISION: Petición permitida. Pasando al siguiente manejador."
   );
   return null;
 }

@@ -5,7 +5,7 @@
  *              Ha sido refactorizado para ser agnóstico al contenido, recibiendo
  *              todos sus textos y datos estructurados, incluyendo los del
  *              `NewsletterForm`, a través de su contrato de props.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 4.0.0
  */
 "use client";
@@ -15,8 +15,8 @@ import React from "react";
 
 import { NewsletterForm } from "@/components/landing/NewsletterForm";
 import { type NavLinkItem, SmartLink } from "@/components/ui/SmartLink";
+import { clientLogger } from "@/lib/logger";
 import { Link } from "@/lib/navigation";
-import { clientLogger } from "@/lib/logging";
 
 export interface LandingFooterProps {
   brandName: string;

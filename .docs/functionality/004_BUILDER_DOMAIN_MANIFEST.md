@@ -4,7 +4,7 @@
  * @description Manifiesto Funcional y Arquitectónico del Dominio "Builder & Creations" v1.0.
  *              Esta es la SSoT que define la arquitectura y lógica para el
  *              constructor visual. Reemplaza a la versión anterior.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Funcional y Arquitectónico: Dominio "Builder & Creations"

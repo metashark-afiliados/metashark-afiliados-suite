@@ -3,7 +3,7 @@
  * @file Input.test.tsx
  * @description Arnés de pruebas unitarias para el componente atómico Input.
  *              Actualizado para validar el nuevo estado visual de `hasError`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import { axe } from "jest-axe";

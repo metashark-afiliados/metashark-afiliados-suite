@@ -2,10 +2,10 @@
 /**
  * @file src/lib/actions/campaigns/_helpers.ts
  * @description Aparatos helper atómicos para las Server Actions de campañas.
- *              Refactorizado para contener únicamente funciones asíncronas
- *              compatibles con la directiva "use server".
- * @author Raz Podestá
- * @version 2.0.0
+ *              Alineado con la SSoT de autenticación soberana.
+ * @author Raz Podesta - MetaShark Tech
+ * @version 4.0.0
+ * Florianópolis/SC, Brazil
  */
 "use server";
 import "server-only";
@@ -13,26 +13,19 @@ import "server-only";
 import { revalidatePath } from "next/cache";
 import { type User } from "@supabase/supabase-js";
 
+import { createAuditLog } from "@/lib/actions/_helpers";
+import { getAuthenticatedUser } from "@/lib/actions/_helpers/auth.helper";
 import { requireSitePermission } from "@/lib/auth/user-permissions";
-import { type ActionResult } from "@/lib/validators";
+import { type ActionResult, type ValidationErrorKey } from "@/lib/validators";
 
-import { createAuditLog, getAuthenticatedUser } from "../_helpers";
-
-/**
- * @public
- * @async
- * @function validateCampaignCreationPermissions
- * @description Valida que el usuario esté autenticado y, si se provee un siteId,
- *              que tenga permisos para crear campañas en ese sitio.
- * @param {string} [siteId] - El ID opcional del sitio.
- * @returns {Promise<ActionResult<{ user: User }>>} El objeto de usuario si es exitoso.
- */
 export async function validateCampaignCreationPermissions(
   siteId?: string
 ): Promise<ActionResult<{ user: User }>> {
   const authResult = await getAuthenticatedUser();
-  if ("error" in authResult) return authResult.error;
-  const { user } = authResult;
+  if (!authResult.success) {
+    return authResult;
+  }
+  const { user } = authResult.data;
 
   if (siteId) {
     const permissionCheck = await requireSitePermission(siteId, [
@@ -43,20 +36,14 @@ export async function validateCampaignCreationPermissions(
     if (!permissionCheck.success) {
       return {
         success: false,
-        error: "CampaignsPage.errors.permission_denied",
+        error: "sites.create_permission_denied" as ValidationErrorKey,
+        data: null,
       };
     }
   }
   return { success: true, data: { user } };
 }
 
-/**
- * @public
- * @async
- * @function handlePostCreationEffects
- * @description Encapsula los efectos secundarios post-creación: auditoría y revalidación.
- * @param {object} params - Los parámetros necesarios para los efectos.
- */
 export async function handlePostCreationEffects({
   newCampaignId,
   userId,
@@ -81,16 +68,4 @@ export async function handlePostCreationEffects({
   }
   revalidatePath("/dashboard", "layout");
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error de Build**: ((Implementada)) Se ha eliminado la función síncrona `generateCampaignPayload`, resolviendo la causa del error.
- * 2. **Cohesión Arquitectónica**: ((Implementada)) El módulo ahora cumple estrictamente con el contrato de "use server".
- *
- * =====================================================================
- */
 // src/lib/actions/campaigns/_helpers.ts

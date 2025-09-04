@@ -5,17 +5,17 @@
  *              principal. Ha sido refactorizado para aceptar y propagar
  *              props al `NewsletterForm`, alineándose con la arquitectura
  *              de componentes puros.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 3.2.0
  */
 "use client";
 
-import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
+import React from "react";
 
+import { clientLogger } from "@/lib/logger";
 import { NewsletterForm } from "./NewsletterForm";
-import { clientLogger } from "@/lib/logging";
 
 /**
  * @public

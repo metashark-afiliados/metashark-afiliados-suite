@@ -4,7 +4,7 @@
  * @description Manifiesto Funcional y Arquitectónico del Dominio "Monetization" v1.0.
  *              Esta es la SSoT que define la arquitectura para el sistema de
  *              facturación y suscripciones. Reemplaza a la versión anterior.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Funcional y Arquitectónico: Dominio "Monetization"

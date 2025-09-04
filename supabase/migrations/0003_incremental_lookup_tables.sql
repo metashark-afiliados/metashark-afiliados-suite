@@ -4,7 +4,7 @@
  * @description Script de migración incremental y no destructivo a la v11.0.
  *              Transforma ENUMs a Lookup Tables sin pérdida de datos.
  * @version 11.0.0
- * @author L.I.A. Legacy & Raz Podestá
+ * @author Raz Podestá - MetaShark Tech & Raz Podestá
  */
 
 BEGIN;

@@ -7,8 +7,8 @@
  * @author Raz Podestá
  * @version 1.1.0
  */
+import { clientLogger } from "@/lib/logger";
 import { create } from "zustand";
-import { clientLogger } from "@/lib/logging";
 
 // --- INICIO DE CORRECCIÓN ---
 export type WorkspaceDialogType =

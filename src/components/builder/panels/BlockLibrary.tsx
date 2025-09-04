@@ -11,8 +11,8 @@
  */
 "use client";
 
-import React from "react";
 import { useTranslations } from "next-intl";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
@@ -21,7 +21,7 @@ import {
   type BlockCategoryId,
 } from "@/config/block-categories.config";
 import { useTemplateGalleryStore } from "@/lib/hooks/useTemplateGalleryStore";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 export function BlockLibrary(): React.ReactElement {
   const t = useTranslations("pages.BuilderPage.BlockLibrary");

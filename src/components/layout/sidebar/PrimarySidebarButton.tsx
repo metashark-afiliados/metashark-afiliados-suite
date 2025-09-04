@@ -4,7 +4,7 @@
  * @description Aparato de UI atómico y puro. Ha sido refactorizado con una
  *              aserción de tipo explícita (`as any`) en la prop `href` del
  *              componente Link para resolver un error de tipo complejo de `next-intl`.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.2.0
  */
 "use client";
@@ -17,9 +17,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { clientLogger } from "@/lib/logger";
 import { Link, type Route } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import { clientLogger } from "@/lib/logging";
 
 const buttonVariants = cva(
   "flex flex-col items-center justify-center h-16 w-full gap-1 rounded-lg text-muted-foreground transition-colors hover:text-foreground",

@@ -2,7 +2,7 @@
 /**
  * @file layout.md
  * @description Documento Espejo y SSoT para el layout del dashboard.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 # Manifiesto Conceptual: Layout del Dashboard

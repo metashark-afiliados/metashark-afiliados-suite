@@ -14,15 +14,15 @@
  */
 "use client";
 
-import { useRef } from "react";
 import { motion } from "framer-motion";
+import { useRef } from "react";
 
-import { useActionDock } from "@/lib/hooks/useActionDock";
-import { clientLogger } from "@/lib/logging";
 import {
   ActionDockButton,
   type ActionDockButtonProps,
 } from "@/components/dashboard/ActionDockButton";
+import { useActionDock } from "@/lib/hooks/useActionDock";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

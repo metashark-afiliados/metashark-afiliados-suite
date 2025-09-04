@@ -3,7 +3,7 @@
  * @file NavLink.tsx
  * @description Componente de enlace de navegación atómico. Refactorizado para
  *              usar Inyección de Dependencias, haciéndolo robusto y testeable.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
  */
 import React from "react";

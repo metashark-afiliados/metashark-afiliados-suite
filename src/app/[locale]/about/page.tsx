@@ -9,12 +9,10 @@
  * @author Raz Podestá
  * @version 4.0.0
  */
-import React from "react";
 import type { Metadata } from "next";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 
-import { type TeamMember } from "@/components/about/TeamMemberCard";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 import { AboutPageClient, type AboutPageData } from "./about-page-client";
 

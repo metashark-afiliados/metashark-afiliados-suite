@@ -3,7 +3,7 @@
  * @file .docs/roadmap/002-CODE-REFACTOR-V9.md
  * @description Roadmap de Ejecución y SSoT para la Sincronización de Código
  *              con la Arquitectura de Base de Datos v9.0 ("Lean Database").
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Roadmap de Tarea: Sincronización de Código con la Arquitectura de DB v9.0

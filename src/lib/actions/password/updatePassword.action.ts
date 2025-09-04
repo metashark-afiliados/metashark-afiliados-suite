@@ -1,48 +1,56 @@
 // src/lib/actions/password/updatePassword.action.ts
 /**
  * @file updatePassword.action.ts
- * @description Server Action atómica para actualizar la contraseña del usuario,
- *              generalmente como el paso final del flujo de recuperación.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 1.0.0
- * @see .docs-espejo/lib/actions/password/updatePassword.action.ts.md
+ * @description Server Action atómica para actualizar la contraseña del usuario.
+ *              Refactorizada para adherirse estrictamente a la arquitectura
+ *              de "Errores Soberanos Codificados" y la firma de logging canónica.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 4.0.0
  */
 "use server";
 import "server-only";
 
-import { z, ZodError } from "zod";
-
-import {
-  createAuditLog,
-  createPersistentErrorLog,
-  getAuthenticatedUser,
-} from "@/lib/actions/_helpers";
-import { logger } from "@/lib/logging";
+import { createPersistentErrorLog } from "@/lib/actions/_helpers";
+import { getAuthUser } from "@/lib/auth/get-auth-user";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, PasswordSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  ResetPasswordSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
-const ResetPasswordSchema = z
-  .object({
-    password: PasswordSchema,
-    confirmPassword: PasswordSchema,
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "ValidationErrors.generic.passwords_do_not_match",
-    path: ["confirmPassword"],
-  });
-
+/**
+ * @public
+ * @async
+ * @function updatePasswordAction
+ * @description Actualiza la contraseña del usuario actualmente autenticado (a través
+ *              del token de recuperación en la URL). Cierra todas las demás sesiones
+ *              activas por seguridad.
+ * @param {unknown} prevState - El estado anterior del formulario, requerido por `useFormState`.
+ * @param {FormData} formData - Los datos del formulario que contienen la nueva contraseña.
+ * @returns {Promise<ActionResult<{ messageKey: ValidationErrorKey }>>} El resultado de la operación.
+ */
 export async function updatePasswordAction(
   prevState: unknown,
   formData: FormData
-): Promise<ActionResult<{ messageKey: string }>> {
+): Promise<ActionResult<{ messageKey: ValidationErrorKey }>> {
   const rawData = Object.fromEntries(formData);
+  const context = { payload: rawData };
+  logger.trace(context, "[updatePasswordAction] Iniciando acción.");
+
   try {
     const validation = ResetPasswordSchema.safeParse(rawData);
     if (!validation.success) {
-      logger.warn("[PasswordActions:Update] Validación de payload fallida.", {
-        errors: validation.error.flatten(),
-      });
-      return { success: false, error: validation.error.errors[0].message };
+      const firstError = validation.error.errors[0];
+      logger.warn(
+        { errors: validation.error.flatten(), ...context },
+        "[updatePasswordAction] Validación de payload fallida."
+      );
+      return {
+        success: false,
+        error: firstError.message as ValidationErrorKey,
+      };
     }
 
     const supabase = createClient();
@@ -52,48 +60,47 @@ export async function updatePasswordAction(
 
     if (error) {
       logger.error(
-        "[PasswordActions:Update] Error al actualizar contraseña en Supabase.",
-        {
-          errorMessage: error.message,
-        }
+        { err: error, ...context },
+        "[updatePasswordAction] Error al actualizar contraseña en Supabase."
       );
       if (error.message.includes("token has expired")) {
         return {
           success: false,
-          error: "ValidationErrors.password.update_expired_link",
+          error: "password.update_expired_link",
         };
       }
       return {
         success: false,
-        error: "ValidationErrors.password.update_failed",
+        error: "password.update_failed",
       };
     }
 
-    // Efectos secundarios de seguridad
-    const authResult = await getAuthenticatedUser();
-    if ("user" in authResult) {
-      const { user } = authResult;
-      await createAuditLog("password_reset_success", { userId: user.id });
-      // Cierra todas las demás sesiones para invalidar tokens potencialmente comprometidos
+    const user = await getAuthUser();
+    if (user) {
       await supabase.auth.signOut({ scope: "others" });
+      logger.info(
+        { userId: user.id },
+        "[updatePasswordAction] Todas las otras sesiones del usuario han sido cerradas."
+      );
     }
 
     return {
       success: true,
-      data: { messageKey: "ValidationErrors.password.update_success" },
+      data: { messageKey: "password.update_success" },
     };
   } catch (error) {
     const errorId = await createPersistentErrorLog(
-      "updatePasswordAction.unexpected",
+      "updatePasswordAction",
       error as Error,
-      { payload: rawData }
+      context
     );
     logger.error(
-      `[PasswordActions:Update] Error inesperado. Log ID: ${errorId}`
+      { err: error, errorId, ...context },
+      "[updatePasswordAction] Error inesperado."
     );
     return {
       success: false,
-      error: "ValidationErrors.generic.error_server_generic",
+      error: "generic.error_server_generic",
     };
   }
 }

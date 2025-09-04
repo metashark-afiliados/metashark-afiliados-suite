@@ -1,28 +1,20 @@
 // src/lib/data/campaigns/index.ts
 /**
- * @file src/lib/data/campaigns/index.ts
- * @description Manifiesto (Barrel File) para los módulos de datos de campañas.
- *              Exporta los módulos atomizados bajo namespaces para un consumo
- *              limpio y organizado en las capas superiores. Este aparato es el
- *              ensamblador que faltaba en la arquitectura de datos.
- * @author Raz Podestá
- * @version 1.0.0
+ * @file index.ts
+ * @description Manifiesto (Barrel File) y API pública para el módulo de datos de
+ *              campañas. Ensambla los aparatos de datos atomizados en una
+ *              interfaz namespaced cohesiva.
+ * @author L.I.A Legacy
+ * @version 2.0.0
  */
-import * as editor from "./editor.data";
+import "server-only";
+
+import * as auth from "./auth.data";
+import * as dashboard from "./dashboard.data";
 import * as management from "./management.data";
+import * as mutations from "./mutations.data";
 import * as publicData from "./public.data";
 
-export { editor, management, publicData };
+export { auth, dashboard, management, mutations, publicData };
 export * from "./types";
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Cohesión Arquitectónica**: ((Implementada)) Este nuevo aparato completa la atomización de la capa de datos de campañas, proporcionando una API de datos namespaced y organizada.
- *
- * =====================================================================
- */
 // src/lib/data/campaigns/index.ts

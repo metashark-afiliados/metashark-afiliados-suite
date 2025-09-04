@@ -1,0 +1,52 @@
+
+{
+  "en-US": {
+    "permission_denied": "You do not have permission to access or modify this campaign.",
+    "permission_denied_site": "You do not have permission to modify the selected site.",
+    "assignment_not_allowed": "This campaign cannot be assigned. It may already belong to a site, or you are not the original creator.",
+    "not_found": "The requested campaign could not be found.",
+    "create_failed": "Failed to create the campaign. Please try again.",
+    "update_failed": "Failed to update the campaign. Please try again.",
+    "delete_failed": "Failed to delete the campaign. Please try again.",
+    "archive_failed": "Failed to archive the campaign.",
+    "duplicate_failed": "Failed to duplicate the campaign. Please try again.",
+    "invalid_id": "Invalid Campaign ID provided.",
+    "create_success": "Campaign created successfully!",
+    "archive_success": "Campaign archived successfully.",
+    "delete_success": "Campaign deleted successfully.",
+    "duplicate_success": "Campaign duplicated successfully."
+  },
+  "es-ES": {
+    "permission_denied": "No tienes permiso para acceder o modificar esta campaña.",
+    "permission_denied_site": "No tienes permiso para modificar el sitio seleccionado.",
+    "assignment_not_allowed": "Esta campaña no puede ser asignada. Puede que ya pertenezca a un sitio, o que no seas el creador original.",
+    "not_found": "No se pudo encontrar la campaña solicitada.",
+    "create_failed": "No se pudo crear la campaña. Por favor, inténtalo de nuevo.",
+    "update_failed": "No se pudo actualizar la campaña. Por favor, inténtalo de nuevo.",
+    "delete_failed": "No se pudo eliminar la campaña. Por favor, inténtalo de nuevo.",
+    "archive_failed": "No se pudo archivar la campaña.",
+    "duplicate_failed": "No se pudo duplicar la campaña. Por favor, inténtalo de nuevo.",
+    "invalid_id": "ID de Campaña proporcionado inválido.",
+    "create_success": "¡Campaña creada con éxito!",
+    "archive_success": "Campaña archivada con éxito.",
+    "delete_success": "Campaña eliminada con éxito.",
+    "duplicate_success": "Campaña duplicada con éxito."
+  },
+  "pt-BR": {
+    "permission_denied": "Você не tem permissão para acessar ou modificar esta campanha.",
+    "permission_denied_site": "Você не tem permissão para modificar o site selecionado.",
+    "assignment_not_allowed": "Esta campanha não pode ser atribuída. Ela já pode pertencer a um site, ou você não é o criador original.",
+    "not_found": "A campanha solicitada não pôde ser encontrada.",
+    "create_failed": "Falha ao criar a campanha. Por favor, tente novamente.",
+    "update_failed": "Falha ao atualizar a campanha. Por favor, tente novamente.",
+    "delete_failed": "Falha ao excluir a campanha. Por favor, tente novamente.",
+    "archive_failed": "Falha ao arquivar a campanha.",
+    "duplicate_failed": "Falha ao duplicar a campanha. Por favor, tente novamente.",
+    "invalid_id": "ID de Campanha fornecido inválido.",
+    "create_success": "Campanha criada com sucesso!",
+    "archive_success": "Campanha arquivada com sucesso.",
+    "delete_success": "Campanha excluída com sucesso.",
+    "duplicate_success": "Campanha duplicada com sucesso."
+  }
+}
+

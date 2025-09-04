@@ -3,7 +3,7 @@
  * @file tests/mocks/server.ts
  * @description Aparato de infraestructura atómico y SSoT
  *              para la instancia del servidor de MSW.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { setupServer } from "msw/node";

@@ -4,13 +4,13 @@
  * @description Componente de presentación 100% puro y soberano. Ha sido
  *              refactorizado a un estándar de élite para ser autocontenido en
  *              su consumo de internacionalización.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech
  * @version 6.0.0
  */
 "use client";
 
-import React from "react";
 import { FileEdit, PlusCircle, Settings, Trash2, UserPlus } from "lucide-react";
+import React from "react";
 
 import {
   CommandGroup,
@@ -18,7 +18,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 export interface WorkspaceActionsProps {
   canEdit: boolean;
@@ -48,7 +48,8 @@ export function WorkspaceActions({
   onSelectDelete,
 }: WorkspaceActionsProps): React.ReactElement {
   clientLogger.trace(
-    "[WorkspaceActions] Renderizando componente de acciones soberano."
+    { component: "WorkspaceActions", canEdit, canDelete },
+    "Renderizando componente de acciones soberano."
   );
   const { tWorkspaces } = useDashboardTranslations();
 

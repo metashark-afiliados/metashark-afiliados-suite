@@ -5,7 +5,7 @@
  *              Esta es la SSoT que describe los principios y la estructura de
  *              la aplicación. Ha sido refactorizado para alinear su contenido con
  *              los manifiestos de dominio atómicos y detallados.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 # Manifiesto de Pilares Arquitectónicos de ConvertiKit v2.0

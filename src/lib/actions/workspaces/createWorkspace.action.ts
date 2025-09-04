@@ -2,10 +2,13 @@
 /**
  * @file createWorkspace.action.ts
  * @description Server Action atómica para la creación de un nuevo workspace.
- *              ADVERTENCIA: La implementación actual no es transaccional y presenta
- *              un riesgo de inconsistencia de datos. Debe ser migrada a una RPC.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 1.0.0
+ *              Refactorizada a un estándar de élite para utilizar una RPC de
+ *              PostgreSQL (`create_workspace_with_owner`), garantizando la
+ *              atomicidad transaccional. Alineada con la SSoT de "Lean Database",
+ *              errores soberanos y la Constitución de Observabilidad.
+ * @author L.I.A. Legacy
+ * @version 3.0.0
+ * @see .docs/debt/001_LEAN_DB_ABSTRACTION_LEAK.md
  * @see .docs-espejo/lib/actions/workspaces/createWorkspace.action.ts.md
  */
 "use server";
@@ -17,76 +20,87 @@ import { ZodError } from "zod";
 import {
   createAuditLog,
   createPersistentErrorLog,
-  getAuthenticatedUser,
 } from "@/lib/actions/_helpers";
-import { logger } from "@/lib/logging";
+import { getAuthUser } from "@/lib/auth/get-auth-user";
+import { WORKSPACE_ROLES } from "@/config/roles.config";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, CreateWorkspaceSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  CreateWorkspaceSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
 export async function createWorkspaceAction(
   formData: FormData
-): Promise<ActionResult<{ id: string; messageKey: string }>> {
-  const authResult = await getAuthenticatedUser();
-  if ("error" in authResult) return authResult.error;
-  const { user } = authResult;
+): Promise<ActionResult<{ id: string; messageKey: ValidationErrorKey }>> {
+  const user = await getAuthUser();
+  if (!user) {
+    return { success: false, error: "generic.error_unauthenticated" };
+  }
 
-  const rawData = Object.fromEntries(formData);
+  const rawData = Object.fromEntries(formData.entries());
+  const context = { userId: user.id, payload: rawData };
+  logger.trace(context, "[createWorkspaceAction] Iniciando acción.");
+
   try {
     const { workspaceName } = CreateWorkspaceSchema.parse(rawData);
-
     const supabase = createClient();
-    const { data: newWorkspace, error: creationError } = await supabase
-      .from("workspaces")
-      .insert({ name: workspaceName, owner_id: user.id })
+
+    // Invocación de la RPC transaccional
+    const { data: newWorkspace, error: rpcError } = await supabase
+      .rpc("create_workspace_with_owner", {
+        p_owner_user_id: user.id,
+        p_new_workspace_name: workspaceName,
+        p_owner_role_id: WORKSPACE_ROLES.OWNER.id,
+      })
       .select("id")
       .single();
 
-    if (creationError) throw creationError;
+    if (rpcError) throw rpcError;
+    if (!newWorkspace)
+      throw new Error("RPC did not return the new workspace ID");
 
-    // Asignar rol de 'owner'. En una DB relacional, se buscaría el ID del rol 'owner'.
-    const { error: memberError } = await supabase
-      .from("workspace_members")
-      .insert({
-        workspace_id: newWorkspace.id,
-        user_id: user.id,
-        role: "owner",
-      });
-
-    if (memberError) {
-      // Rollback manual (anti-patrón)
-      await supabase.from("workspaces").delete().eq("id", newWorkspace.id);
-      logger.error(
-        `[WorkspacesAction] Rollback: Fallo al añadir miembro para el nuevo workspace ${newWorkspace.id}.`,
-        memberError
-      );
-      throw memberError;
-    }
-
-    await createAuditLog("workspace_created", {
+    await createAuditLog("workspace.created", {
       userId: user.id,
       targetEntityId: newWorkspace.id,
       targetEntityType: "workspace",
       metadata: { workspaceName },
     });
+
     revalidatePath("/dashboard", "layout");
+
+    logger.info(
+      { ...context, workspaceId: newWorkspace.id },
+      "[createWorkspaceAction] Workspace creado con éxito vía RPC."
+    );
+
     return {
       success: true,
       data: {
         id: newWorkspace.id,
-        messageKey: "ValidationErrors.workspaces.create_success",
+        messageKey: "workspaces.create_success",
       },
     };
   } catch (error) {
+    let errorKey: ValidationErrorKey = "workspaces.create_failed";
     if (error instanceof ZodError) {
-      return { success: false, error: error.errors[0].message };
+      errorKey = error.errors[0].message as ValidationErrorKey;
     }
-    await createPersistentErrorLog("createWorkspaceAction", error as Error, {
-      userId: user.id,
-      payload: rawData,
-    });
+
+    const errorId = await createPersistentErrorLog(
+      "createWorkspaceAction",
+      error as Error,
+      context
+    );
+    logger.error(
+      { err: error, errorId, ...context },
+      "[createWorkspaceAction] Fallo en la acción."
+    );
+
     return {
       success: false,
-      error: "ValidationErrors.workspaces.create_failed",
+      error: errorKey,
     };
   }
 }

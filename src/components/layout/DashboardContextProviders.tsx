@@ -21,7 +21,7 @@ import {
 import { DashboardProvider } from "@/lib/context/DashboardContext";
 import { IconLibraryProvider } from "@/lib/context/IconLibraryContext";
 import { WorkspaceProvider } from "@/lib/hooks/useWorkspaceContext.tsx";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { type DashboardLayoutPreferencesSchema } from "@/lib/validators/schemas";
 import { type DashboardLayoutData } from "./dashboard.loader";
 

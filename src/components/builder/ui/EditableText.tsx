@@ -10,9 +10,8 @@
  */
 "use client";
 
-import * as React from "react";
-import { clientLogger } from "@/lib/logging";
 import { cn } from "@/lib/utils";
+import * as React from "react";
 
 type AllowedTags =
   | "h1"

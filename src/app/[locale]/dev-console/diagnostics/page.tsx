@@ -4,7 +4,7 @@
  * @description Orquestador de servidor para la página de Diagnóstico del Sistema.
  *              Obtiene las traducciones y las pasa al componente de cliente.
  *              Corregido para utilizar una importación explícita con extensión.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  * @see .docs-espejo/app/[locale]/dev-console/diagnostics/page.tsx.md
  */

@@ -4,9 +4,8 @@
  * @description Manifiesto (Barrel File) y API pública para los componentes de campo
  *              atómicos del formulario de registro. Utiliza exportaciones nombradas
  *              explícitas para una API robusta y libre de ambigüedades.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 2.0.0
- * @see .docs-espejo/components/authentication/sign-up-form/index.ts.md
  */
 export {
   SignUpEmailField,

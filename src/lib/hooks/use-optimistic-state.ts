@@ -1,9 +1,24 @@
 // src/lib/hooks/use-optimistic-state.ts
+/**
+ * @file use-optimistic-state.ts
+ * @description Hook de lógica pura y atómico para gestionar un estado de array
+ *              con actualizaciones optimistas y capacidad de rollback. Refactorizado
+ *              para utilizar el `clientLogger` canónico, resolviendo errores críticos
+ *              de importación de módulos y de tipos.
+ * @author L.I.A. Legacy
+ * @version 2.0.0
+ */
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { logger } from "@/lib/logging";
+import { useCallback, useEffect, useState } from "react";
+import { clientLogger } from "@/lib/logger";
 
+/**
+ * @private
+ * @interface Resource
+ * @description Contrato base para los elementos gestionados por este hook,
+ *              garantizando que cada elemento tenga un identificador único.
+ */
 interface Resource {
   id: string;
   [key: string]: any;
@@ -14,11 +29,9 @@ interface Resource {
  * @function useOptimisticState
  * @description Hook de lógica pura y atómica para gestionar un estado de array
  *              con actualizaciones optimistas y capacidad de rollback.
- * @template T - El tipo del recurso en el array.
+ * @template T - El tipo del recurso en el array, debe extender de `Resource`.
  * @param {T[]} initialItems - El array inicial de items.
  * @returns La API para manipular el estado optimista.
- * @version 1.0.0
- * @author Raz Podestá
  */
 export function useOptimisticState<T extends Resource>(initialItems: T[]) {
   const [items, setItems] = useState<T[]>(initialItems);
@@ -31,7 +44,7 @@ export function useOptimisticState<T extends Resource>(initialItems: T[]) {
     (item: T) => {
       const previousItems = items;
       setItems((current) => [...current, item]);
-      logger.trace("[OptimisticState] Ítem añadido de forma optimista.", {
+      clientLogger.trace("[OptimisticState] Ítem añadido de forma optimista.", {
         id: item.id,
       });
       return previousItems;
@@ -43,9 +56,10 @@ export function useOptimisticState<T extends Resource>(initialItems: T[]) {
     (itemId: string) => {
       const previousItems = items;
       setItems((current) => current.filter((item) => item.id !== itemId));
-      logger.trace("[OptimisticState] Ítem eliminado de forma optimista.", {
-        itemId,
-      });
+      clientLogger.trace(
+        "[OptimisticState] Ítem eliminado de forma optimista.",
+        { itemId }
+      );
       return previousItems;
     },
     [items]
@@ -59,16 +73,19 @@ export function useOptimisticState<T extends Resource>(initialItems: T[]) {
           item.id === itemId ? { ...item, ...update } : item
         )
       );
-      logger.trace("[OptimisticState] Ítem actualizado de forma optimista.", {
-        itemId,
-      });
+      clientLogger.trace(
+        "[OptimisticState] Ítem actualizado de forma optimista.",
+        { itemId, update }
+      );
       return previousItems;
     },
     [items]
   );
 
   const rollback = useCallback((previousItems: T[]) => {
-    logger.warn("[OptimisticState] Revirtiendo estado a la versión anterior.");
+    clientLogger.warn(
+      "[OptimisticState] Revirtiendo estado a la versión anterior."
+    );
     setItems(previousItems);
   }, []);
 
@@ -80,14 +97,4 @@ export function useOptimisticState<T extends Resource>(initialItems: T[]) {
     rollback,
   };
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (Lógica Pura)**: ((Implementada)) Este hook aísla perfectamente la gestión del estado optimista, cumpliendo el SRP al más alto nivel.
- *
- * =====================================================================
- */
+// src/lib/hooks/use-optimistic-state.ts

@@ -15,8 +15,8 @@
 
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
+import { clientLogger } from "@/lib/logger";
 import { useRouter } from "@/lib/navigation";
-import { clientLogger } from "@/lib/logging";
 import { useFormatter } from "next-intl";
 
 /**

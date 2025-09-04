@@ -4,7 +4,7 @@
  * @description Arnés de pruebas de integración para `signUpAction`.
  *              Utiliza un mock local para `next/headers` para simular
  *              el request scope de Next.js.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";

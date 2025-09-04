@@ -7,7 +7,7 @@
  * @author Raz Podestá
  * @version 9.2.0
  */
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { DashboardClient } from "./dashboard-client";
 
 /**

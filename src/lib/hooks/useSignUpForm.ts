@@ -4,10 +4,10 @@
  * @description Hook Soberano que encapsula la lógica de negocio y estado
  *              para el componente `SignupForm`. Orquesta `react-hook-form`,
  *              la Server Action `signUpAction` y el feedback al usuario.
- *              Ahora también provee las traducciones para sus campos hijos.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 2.0.0
- * @see .docs-espejo/lib/hooks/useSignUpForm.ts.md
+ *              Corregido para resolver un error de inferencia de tipos en su
+ *              firma de retorno.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
  */
 "use client";
 
@@ -25,25 +25,21 @@ import { useTranslations } from "next-intl";
 import { signUpAction } from "@/lib/actions/auth.actions";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
 import { clientLogger } from "@/lib/logger";
-import { isActionError, SignUpSchema } from "@/lib/validators";
+import {
+  isActionError,
+  SignUpSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
 type FormData = z.infer<typeof SignUpSchema>;
-
-interface UseSignUpFormReturn {
-  form: UseFormReturn<FormData>;
-  isLoading: boolean;
-  processSubmit: SubmitHandler<FormData>;
-  t: ReturnType<typeof useTranslations>;
-  tErrors: ReturnType<typeof useTypedTranslations>;
-}
 
 /**
  * @public
  * @function useSignUpForm
  * @description Hook Soberano que encapsula la lógica para el formulario de registro.
- * @returns {UseSignUpFormReturn} Un objeto con la instancia del formulario y la lógica.
+ * @returns Un objeto con la instancia del formulario, la lógica, y las funciones de traducción.
  */
-export function useSignUpForm(): UseSignUpFormReturn {
+export function useSignUpForm() {
   const t = useTranslations("app.[locale].signup.page");
   const tErrors = useTypedTranslations("shared.ValidationErrors");
   const [isPending, startTransition] = useTransition();
@@ -66,8 +62,8 @@ export function useSignUpForm(): UseSignUpFormReturn {
 
   const processSubmit: SubmitHandler<FormData> = (data) => {
     clientLogger.trace(
-      "[useSignUpForm] Iniciando envío de formulario de registro.",
-      { email: data.email }
+      { email: data.email },
+      "[useSignUpForm] Iniciando envío de formulario de registro."
     );
 
     startTransition(async () => {
@@ -83,9 +79,10 @@ export function useSignUpForm(): UseSignUpFormReturn {
           defaultValue: result.error,
         });
         toast.error(errorMessage);
-        clientLogger.warn("[useSignUpForm] Fallo en el registro.", {
-          error: result.error,
-        });
+        clientLogger.warn(
+          { error: result.error },
+          "[useSignUpForm] Fallo en el registro."
+        );
       }
     });
   };

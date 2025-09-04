@@ -6,7 +6,7 @@
  *              de extremo a extremo para el logging, monitoreo de errores,
  *              auditoría y telemetría en los entornos de SERVIDOR y CLIENTE.
  *              Establece el Estándar de Élite para todas las refactorizaciones.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 # Manifiesto Canónico de Observabilidad v2.0

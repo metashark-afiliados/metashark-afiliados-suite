@@ -6,7 +6,7 @@
  *              Única Fuente de Verdad para el estado de la base de datos mockeada,
  *              permitiendo que las pruebas de integración manipulen y persistan
  *              datos simulados de forma consistente.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.1
  */
 import { afterEach, vi } from "vitest"; // <-- CORRECCIÓN: Importar afterEach

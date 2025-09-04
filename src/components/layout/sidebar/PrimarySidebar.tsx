@@ -4,7 +4,7 @@
  * @description Orquestador de UI para la barra de navegación primaria.
  *              Ha sido refactorizado para componer aparatos hijos soberanos
  *              sin pasar props de contenido o lógica, resolviendo errores de tipo.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 7.2.0
  */
 "use client";
@@ -18,7 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { primaryNavLinks } from "./primary-sidebar.config";
 import { PrimarySidebarButton } from "./PrimarySidebarButton";
 import { SidebarCreateButton } from "./SidebarCreateButton";

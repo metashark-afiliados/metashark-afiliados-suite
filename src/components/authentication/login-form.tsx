@@ -2,11 +2,9 @@
 /**
  * @file login-form.tsx
  * @description Componente de UI puro que ensambla el formulario de inicio de sesión.
- *              Delega toda la lógica a su hook soberano `useLoginForm` y recibe
- *              los textos como props. Implementa funcionalidad de UX de élite.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ *              Delega toda la lógica a su hook soberano `useLoginForm`.
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 3.0.0
- * @see .docs-espejo/components/authentication/login-form.tsx.md
  */
 "use client";
 
@@ -21,11 +19,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useLoginForm } from "@/lib/hooks/useLoginForm";
+import { useLoginForm, type LoginFormTexts } from "@/lib/hooks/useLoginForm";
 import { clientLogger } from "@/lib/logger";
 import { Link } from "@/lib/navigation";
-
-export type { LoginFormTexts } from "@/lib/hooks/useLoginForm";
 
 /**
  * @public
@@ -36,7 +32,8 @@ export type { LoginFormTexts } from "@/lib/hooks/useLoginForm";
  */
 export function LoginForm(): React.ReactElement {
   clientLogger.trace(
-    "[LoginForm] Renderizando componente de presentación puro."
+    "[LoginForm] Renderizando componente de presentación puro.",
+    { component: "LoginForm" }
   );
 
   const { form, isLoading, processSubmit, texts } = useLoginForm();
@@ -47,7 +44,14 @@ export function LoginForm(): React.ReactElement {
   } = form;
 
   const [showPassword, setShowPassword] = useState(false);
-  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
+  const togglePasswordVisibility = () => {
+    const newVisibility = !showPassword;
+    setShowPassword(newVisibility);
+    clientLogger.info("[LoginForm] Visibilidad de contraseña alternada.", {
+      newVisibility,
+    });
+  };
 
   const oauthButtonGroupTexts: OAuthButtonGroupProps["texts"] = {
     signInWithProvider: texts.signInWithProvider,

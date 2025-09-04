@@ -6,7 +6,7 @@
  *              de élite para toda la lógica de negocio del servidor, expandiendo
  *              el Pilar 3 de la Constitución Arquitectónica. Consolida y reemplaza
  *              a `.docs/003_SERVER_ACTIONS_ARCHITECTURE_MANIFEST.md`.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 # Manifiesto Canónico de Arquitectura de Server Actions v2.0

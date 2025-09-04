@@ -13,7 +13,6 @@
  */
 "use client";
 
-import React from "react";
 import { PlusCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,7 @@ import {
   type ViewMode,
 } from "@/lib/data/sites";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { SiteFilters } from "./SiteFilters";
 import { ViewSwitcher } from "./ViewSwitcher";
 

@@ -1,43 +1,46 @@
 // src/pages/api/health.ts
-
-import { apiHandler } from "@/lib/api/api-handler";
-import { HttpStatus } from "@/lib/errors";
-import { NextApiRequest, NextApiResponse } from "next";
-
 /**
- * @author RaZ Podestá - MetaShark Tech
- * @description Endpoint de Health Check para verificar la disponibilidad y el estado
- * operativo de la aplicación. Es un endpoint público y no autenticado.
+ * @file health.ts
+ * @description Endpoint de Health Check. Refactorizado para ser autónomo,
+ *              eliminando la dependencia del obsoleto `api-handler` y utilizando
+ *              la API nativa de Next.js y el `logger` canónico.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
  */
+import { type NextApiRequest, type NextApiResponse } from "next";
+import { logger } from "@/lib/logger";
 
 /**
- * @function getHealthStatus
- * @description Maneja las peticiones GET para el health check.
- * Devuelve un estado 'ok' junto con la fecha y hora actual en formato ISO.
- * @param {NextApiRequest} _req - El objeto de la solicitud (no utilizado).
+ * @public
+ * @async
+ * @function handler
+ * @description Maneja las peticiones a la API de health check.
+ * @param {NextApiRequest} req - El objeto de la solicitud.
  * @param {NextApiResponse} res - El objeto de la respuesta.
  */
-const getHealthStatus = async (
-  _req: NextApiRequest,
+export default async function handler(
+  req: NextApiRequest,
   res: NextApiResponse
-): Promise<void> => {
-  const healthData = {
-    status: "ok",
-    timestamp: new Date().toISOString(),
-  };
+) {
+  if (req.method !== "GET") {
+    res.setHeader("Allow", ["GET"]);
+    return res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
 
-  res.status(HttpStatus.OK).json(healthData);
-};
-
-/**
- * @default
- * @description Exporta el manejador de la API route, configurado para
- * aceptar únicamente peticiones GET. Cualquier otro método será
- * automáticamente rechazado con un error 405 Method Not Allowed
- * por el apiHandler.
- */
-export default apiHandler({
-  GET: getHealthStatus,
-});
-
+  try {
+    const healthData = {
+      status: "ok",
+      timestamp: new Date().toISOString(),
+    };
+    return res.status(200).json(healthData);
+  } catch (error) {
+    logger.error(
+      { err: error },
+      "[API:Health] Fallo inesperado en el health check."
+    );
+    return res
+      .status(500)
+      .json({ status: "error", message: "Internal Server Error" });
+  }
+}
 // src/pages/api/health.ts

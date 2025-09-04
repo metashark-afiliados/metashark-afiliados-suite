@@ -4,7 +4,7 @@
  * @description Barra lateral contextual. Refactorizada a un ensamblador puro
  *              que compone componentes soberanos y está instrumentada con
  *              observabilidad y documentación de élite.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 12.0.0
  */
 "use client";
@@ -12,9 +12,9 @@
 import React from "react";
 
 import { WorkspaceSwitcher } from "@/components/workspaces/WorkspaceSwitcher";
+import { clientLogger } from "@/lib/logger";
 import { NavList } from "./sidebar/NavList";
 import { SidebarLogo } from "./sidebar/SidebarLogo";
-import { clientLogger } from "@/lib/logging";
 
 /**
  * @public

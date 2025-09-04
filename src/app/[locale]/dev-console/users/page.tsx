@@ -11,16 +11,16 @@
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
+import { AlertTriangle } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { AlertTriangle } from "lucide-react";
 import { Suspense } from "react";
 
+import { ErrorStateCard } from "@/components/shared/error-state-card";
 import { requireAppRole } from "@/lib/auth/user-permissions";
 import { admin as adminData } from "@/lib/data";
-import { logger } from "@/lib/logging";
-import { ErrorStateCard } from "@/components/shared/error-state-card";
+import { logger } from "@/lib/logger";
 import { UsersClient } from "./users-client";
 
 const USERS_PER_PAGE = 20;

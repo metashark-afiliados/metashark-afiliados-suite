@@ -4,9 +4,9 @@
  * @description Motor de reglas de autorización de élite para el middleware.
  *              Implementa un patrón de "respuesta encadenada" para garantizar
  *              la integridad de la sesión y las cookies a través del pipeline.
- * @author L.I.A. Legacy
- * @copilot RaZ WriTe
- * @version 8.0.0
+ *              Alineado con la firma de logging canónica de Pino.
+ * @author Raz Podestá
+ * @version 8.1.0
  * @see .docs-espejo/middleware/handlers/auth/index.md
  */
 import { type NextRequest, NextResponse } from "next/server";
@@ -21,6 +21,16 @@ import {
   type RouteSecurityRule,
 } from "@/middleware/lib/routing-manifest-edge";
 
+/**
+ * @private
+ * @function createRedirectResponse
+ * @description Factoría para crear una respuesta de redirección localizada.
+ * @param {NextRequest} request - La petición original.
+ * @param {string} locale - El locale actual.
+ * @param {string} path - La ruta de destino (sin locale).
+ * @param {URLSearchParams} [searchParams] - Parámetros de búsqueda opcionales.
+ * @returns {NextResponse} Una respuesta de redirección.
+ */
 function createRedirectResponse(
   request: NextRequest,
   locale: string,
@@ -34,12 +44,25 @@ function createRedirectResponse(
   return NextResponse.redirect(redirectUrl);
 }
 
+/**
+ * @private
+ * @function findMatchingRouteRule
+ * @description Busca la primera regla de seguridad que coincida con el pathname.
+ * @param {string} pathname - La ruta de la petición.
+ * @returns {RouteSecurityRule | undefined} La regla encontrada o undefined.
+ */
 function findMatchingRouteRule(
   pathname: string
 ): RouteSecurityRule | undefined {
   return ROUTE_MANIFEST.find((rule) => pathname.startsWith(rule.path));
 }
 
+/**
+ * @private
+ * @function handleUnauthenticated
+ * @description Lógica de manejo para usuarios no autenticados.
+ * @returns {NextResponse | null} Una respuesta de redirección o null.
+ */
 function handleUnauthenticated(
   request: NextRequest,
   rule: RouteSecurityRule,
@@ -57,6 +80,12 @@ function handleUnauthenticated(
   return null;
 }
 
+/**
+ * @private
+ * @function handleAuthenticated
+ * @description Lógica de manejo para usuarios autenticados.
+ * @returns {NextResponse | null} Una respuesta de redirección o null.
+ */
 function handleAuthenticated(
   request: NextRequest,
   authData: UserAuthData,
@@ -90,6 +119,15 @@ function handleAuthenticated(
   return null;
 }
 
+/**
+ * @public
+ * @async
+ * @function handleAuth
+ * @description El manejador de autenticación principal del middleware.
+ * @param {NextRequest} request - La petición entrante.
+ * @param {NextResponse} response - La respuesta del manejador anterior.
+ * @returns {Promise<NextResponse>} La respuesta final (potencialmente modificada).
+ */
 export async function handleAuth(
   request: NextRequest,
   response: NextResponse
@@ -99,6 +137,7 @@ export async function handleAuth(
 
   if (process.env.DEV_MODE_AUTH_BYPASS === "true") {
     logger.warn(
+      {},
       "[AUTH_HANDLER] MODO BYPASS ACTIVO. Se omitirá la lógica de autorización."
     );
     return response;

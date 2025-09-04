@@ -1,10 +1,12 @@
 // src/lib/actions/_helpers/error-log.helper.ts
 /**
  * @file error-log.helper.ts
- * @description Helper atómico para registrar errores críticos persistentes. Sanitiza
- *              robustamente los metadatos para garantizar la serialización JSON.
- * @author @author RaZ Podestá - MetaShark Tech
- * @version 2.0.0
+ * @description Aparato de ayuda atómico para registrar errores críticos persistentes.
+ *              Esta es la SSoT para la persistencia de errores del sistema.
+ *              Implementa saneamiento robusto de metadatos para garantizar la
+ *              serialización JSON y se alinea con la firma de logging de élite de Pino.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
  * @see .docs-espejo/lib/actions/_helpers/error-log.helper.ts.md
  */
 "use server";
@@ -18,6 +20,7 @@ import { type Json, type TablesInsert } from "@/lib/types/database";
  * @private
  * @function sanitizeForJson
  * @description Sanea recursivamente un objeto para asegurar que sea serializable a JSON.
+ *              Evita la fuga de datos sensibles o no serializables a los logs o DB.
  * @param {any} data - Los datos a sanear.
  * @returns {Json} Los datos saneados y listos para ser serializados.
  */
@@ -53,19 +56,22 @@ function sanitizeForJson(data: any): Json {
  * @async
  * @function createPersistentErrorLog
  * @description Inserta un registro de error en la tabla `system_errors` y devuelve su ID.
- * @param {string} source - El módulo donde se originó el error (ej. "createSiteAction").
+ *              Esta función es un pilar del "Escudo de Resiliencia" de la aplicación.
+ * @param {string} source - El módulo o acción donde se originó el error (ej. "createSiteAction").
  * @param {Error} error - El objeto de error capturado.
- * @param {Record<string, any>} [metadata] - Datos contextuales adicionales que serán saneados.
+ * @param {Record<string, any>} [metadata={}] - Datos contextuales adicionales que serán saneados.
  * @returns {Promise<string>} El ID del log de error creado, o una cadena genérica si la operación falla.
  */
 export async function createPersistentErrorLog(
   source: string,
   error: Error,
-  metadata?: Record<string, any>
+  metadata: Record<string, any> = {}
 ): Promise<string> {
+  const sanitizedMetadata = sanitizeForJson(metadata);
+  const context = { source, metadata: sanitizedMetadata };
+
   try {
     const supabase = createClient();
-    const sanitizedMetadata = metadata ? sanitizeForJson(metadata) : {};
 
     const logData: TablesInsert<"system_errors"> = {
       source,
@@ -83,21 +89,23 @@ export async function createPersistentErrorLog(
 
     if (insertError) {
       logger.error(
-        `[ErrorLogHelper] FALLO AL REGISTRAR FALLO PERSISTENTE. Origen: ${source}`,
-        { err: insertError }
+        { err: insertError, ...context },
+        "[ErrorLogHelper] FALLO AL REGISTRAR FALLO PERSISTENTE."
       );
       return "log-failed";
     }
 
     const errorId = String(data.id);
     logger.info(
-      `[ErrorLogHelper] Error persistente registrado con ID: ${errorId}`
+      { errorId, ...context },
+      "[ErrorLogHelper] Error persistente registrado con éxito."
     );
     return errorId;
   } catch (e) {
+    const err = e instanceof Error ? e : new Error(String(e));
     logger.error(
-      `[ErrorLogHelper] FALLO CRÍTICO irrecuperable en el helper. Origen: ${source}`,
-      { err: e }
+      { err, ...context },
+      "[ErrorLogHelper] FALLO CRÍTICO irrecuperable en el helper."
     );
     return "log-critical-failure";
   }

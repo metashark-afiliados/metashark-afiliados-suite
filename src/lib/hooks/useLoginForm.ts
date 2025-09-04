@@ -2,10 +2,10 @@
 /**
  * @file useLoginForm.ts
  * @description Hook Soberano que encapsula toda la lógica y contenido para el
- *              formulario de inicio de sesión. Es la SSoT para este flujo.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ *              formulario de inicio de sesión. Es la SSoT para este flujo,
+ *              incluyendo la definición del tipo `LoginFormTexts`.
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 2.0.0
- * @see .docs-espejo/lib/hooks/useLoginForm.ts.md
  */
 "use client";
 
@@ -23,7 +23,23 @@ import { signInWithEmailAction } from "@/lib/actions/auth.actions";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
 import { clientLogger } from "@/lib/logger";
 import { isActionError, SignInSchema } from "@/lib/validators";
-import { type LoginFormTexts } from "@/components/authentication/login-form";
+
+/**
+ * @public
+ * @interface LoginFormTexts
+ * @description El contrato de datos para todas las cadenas de texto requeridas
+ *              por el componente de presentación `LoginForm`. Esta es la SSoT
+ *              de contenido para este aparato.
+ */
+export interface LoginFormTexts {
+  email_label: string;
+  password_label: string;
+  forgot_password_link: string;
+  signInButton: string;
+  signInButton_pending: string;
+  signInWith: string;
+  signInWithProvider: string;
+}
 
 type FormData = z.infer<typeof SignInSchema>;
 
@@ -45,6 +61,10 @@ export function useLoginForm(): UseLoginFormReturn {
   const tErrors = useTypedTranslations("shared.ValidationErrors");
   const [isPending, startTransition] = useTransition();
 
+  clientLogger.trace("[useLoginForm] Hook soberano inicializado.", {
+    hook: "useLoginForm",
+  });
+
   const form = useForm<FormData>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -59,7 +79,7 @@ export function useLoginForm(): UseLoginFormReturn {
   } = form;
 
   const processSubmit: SubmitHandler<FormData> = (data) => {
-    clientLogger.trace(
+    clientLogger.info(
       "[useLoginForm] Iniciando envío de formulario de login.",
       { email: data.email }
     );
@@ -69,8 +89,6 @@ export function useLoginForm(): UseLoginFormReturn {
       formData.append("email", data.email);
       formData.append("password", data.password);
 
-      // El primer argumento `prevState` es null porque no estamos usando el estado
-      // para pasar errores, sino el objeto de retorno.
       const result = await signInWithEmailAction(null, formData);
 
       if (isActionError(result)) {
@@ -82,13 +100,11 @@ export function useLoginForm(): UseLoginFormReturn {
           error: result.error,
         });
       }
-      // El caso de éxito es manejado por un `redirect` en la Server Action.
     });
   };
 
   const isLoading = isSubmitting || isPending;
 
-  // Construir el objeto de textos para la UI de presentación pura.
   const texts: LoginFormTexts = {
     email_label: t("email_label"),
     password_label: t("password_label"),

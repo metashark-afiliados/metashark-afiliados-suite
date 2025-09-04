@@ -3,7 +3,7 @@
  * @file .docs/roadmap/001-DB-REFACTOR-V9.md
  * @description Roadmap de Ejecución y SSoT para la Refactorización Holística de
  *              la Base de Datos a la Arquitectura v9.0.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Roadmap de Tarea: Refactorización Holística de la Base de Datos v9.0

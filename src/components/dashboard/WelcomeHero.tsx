@@ -20,7 +20,7 @@ import React from "react";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWelcomeHero } from "@/lib/hooks/useWelcomeHero";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

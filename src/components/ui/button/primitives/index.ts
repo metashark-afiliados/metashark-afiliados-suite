@@ -3,7 +3,7 @@
  * @file index.ts
  * @description Manifiesto público (Barrel File) para el sub-módulo de primitivas.
  *              Exporta todas las primitivas atómicas de renderizado del botón.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 export * from "./Base";

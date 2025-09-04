@@ -6,7 +6,7 @@
  *              refleje el formato de los tipos de tabla (`{ Row: ... }`) y para
  *              utilizar la sintaxis de acceso a tipos correcta para `Enums`,
  *              resolviendo una cascada de errores de tipo.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @copilot RaZ WriTe
  * @version 3.0.0
  * @see .docs-espejo/lib/types/database/views.ts.md

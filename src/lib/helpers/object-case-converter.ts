@@ -5,7 +5,7 @@
  *              de claves de objetos. Esta es una pieza fundamental para la
  *              sincronización entre la lógica de la aplicación (camelCase) y la
  *              capa de la base de datos (snake_case).
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.1.0
  */
 

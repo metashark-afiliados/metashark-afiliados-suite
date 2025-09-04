@@ -1,0 +1,17 @@
+{
+  "en-US": {
+    "title": "Access Denied",
+    "description": "You do not have the necessary permissions to view this page. If you believe this is an error, please contact your workspace administrator.",
+    "back_to_dashboard_button": "Back to Dashboard"
+  },
+  "es-ES": {
+    "title": "Acceso Denegado",
+    "description": "No tienes los permisos necesarios para ver esta página. Si crees que esto es un error, por favor, contacta al administrador de tu workspace.",
+    "back_to_dashboard_button": "Volver al Dashboard"
+  },
+  "pt-BR": {
+    "title": "Acesso Negado",
+    "description": "Você не possui as permissões necessárias para visualizar esta página. Se você acredita que isso é um erro, por favor, entre em contato com o administrador do seu workspace.",
+    "back_to_dashboard_button": "Voltar para o Painel"
+  }
+}

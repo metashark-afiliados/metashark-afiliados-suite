@@ -13,14 +13,14 @@
  */
 "use client";
 
+import { clientLogger } from "@/lib/logger";
 import { create, type StateCreator } from "zustand";
+import { syncTabs } from "zustand-sync-tabs";
 import {
   createJSONStorage,
   persist,
   type PersistOptions,
 } from "zustand/middleware";
-import { syncTabs } from "zustand-sync-tabs";
-import { clientLogger } from "@/lib/logging";
 
 interface DashboardUIState {
   isSidebarCollapsed: boolean;

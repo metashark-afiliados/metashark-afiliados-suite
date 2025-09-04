@@ -1,247 +1,65 @@
-
 {
   "en-US": {
     "title": "Privacy and Personal Data Protection Policy",
-    "content": [
-      {
+    "content": {
+      "0": {
         "title": "1. Introduction",
-        "body": [
-          "MetaShark Tech, through its business processes, understands, respects, and protects the Privacy and Personal Data of its Clients, Collaborators, Suppliers, Service Providers, Third Parties, or other Related Parties, regardless of the format and medium (physical documents and digital documents) of Processing.",
-          "In this context, this Privacy and Personal Data Protection Policy aims to clearly indicate the guidelines and main rules for the Processing of Personal Data by MetaShark Tech, in accordance with applicable legislation.",
-          "This Policy may be updated at any time, without prior notice."
-        ]
+        "body": {
+          "0": "MetaShark Tech, through its business processes, understands, respects, and protects the Privacy and Personal Data of its Clients, Collaborators, Suppliers, Service Providers, Third Parties, or other Related Parties, regardless of the format and medium (physical documents and digital documents) of Processing.",
+          "1": "In this context, this Privacy and Personal Data Protection Policy aims to clearly indicate the guidelines and main rules for the Processing of Personal Data by MetaShark Tech, in accordance with applicable legislation.",
+          "2": "This Policy may be updated at any time, without prior notice."
+        }
       },
-      {
+      "1": {
         "title": "2. Scope",
-        "body": [
-          "This Policy applies to the Processing of Personal Data collected and processed in Brazil, regardless of whether the Processing occurs in national territory or abroad.",
-          "This Policy is applicable to all companies of MetaShark Tech, as well as to all Clients, Collaborators, Partners, and Third Parties of MetaShark Tech and/or any natural or legal person who may play the role of Data Controller and/or Operator, where MetaShark Tech has the role of Controller and/or Operator.",
-          "This Policy is an integral part of the Terms of Use and Conditions available on all MetaShark Tech platforms and subjects all Personal Data Processing activities under the responsibility of MetaShark Tech."
-        ]
-      },
-      {
-        "title": "3. Definitions",
-        "body": [
-          "Anonymization: use of reasonable technical means available at the time of processing, through which a piece of data loses the possibility of direct or indirect association with an individual, so that the person ceases to be identified or identifiable;",
-          "Database: structured set of Personal Data, established in one or several locations, in electronic or physical support;",
-          "Personal Data: information related to an identified or identifiable natural person, including: name, registration numbers (ID, tax ID), age, alias, e-mail, address, etc.;",
-          "Sensitive Personal Data: Personal Data about racial or ethnic origin, religious conviction, political opinion, affiliation to a union or to a religious, philosophical, or political organization, data concerning health or sexual life, genetic or biometric data, when linked to a natural person;",
-          "DPO (Data Protection Officer): person appointed by the Controller, who acts as a communication channel between the Controller and the Data Subjects and between the Controller and the National Data Protection Authority ('ANPD')."
-        ]
-      },
-      {
-        "title": "4. How We Collect Personal Data",
-        "body": [
-          "The collection of Personal Data by MetaShark Tech can occur in various ways, directly or indirectly, including but not limited to:",
-          "(i) From registration data filled out by the Client on the MetaShark Tech Platforms;",
-          "(ii) From receiving electronic or printed resumes, delivered or sent by the Data Subject to MetaShark Tech;",
-          "(iii) From registration for participation in events and social programs promoted by MetaShark Tech."
-        ]
-      },
-      {
-        "title": "5. Purposes of Data Processing",
-        "body": [
-          "Personal Data must be collected only for specific, explicit, and legitimate purposes and may not be processed in a manner incompatible with these purposes.",
-          "The Personal Data of Clients and Third Parties may be processed for the following purposes:",
-          "(i) To identify and authenticate Clients, manage and process requests, promotions, and movements in the registration, aiming to comply with the obligations arising from the use of our services and the purchase of our products;",
-          "(ii) To inform Clients about news, products, services, functionalities, content, promotions, news, and other events promoted by MetaShark Tech, its Partners and/or relevant Third Parties;",
-          "(iii) To create Client profiles according to the data provided and operations carried out, to personalize the services, products, and benefits offered, as well as the communication and disclosure of these to Clients;",
-          "(iv) To personalize your internet navigation by capturing cookies from your device, when authorized."
-        ]
-      },
-      {
-        "title": "6. Legal Bases for Processing",
-        "body": [
-          "Depending on the Personal Data processed by MetaShark Tech and its respective purposes, the Processing may be authorized by one of the following legal bases: (i) consent of the Data Subject; (ii) legal or regulatory obligation; (iii) contractual obligation or pre-contractual procedures involving the Data Subject; (iv) regular exercise of rights by MetaShark Tech in judicial, administrative, and arbitration proceedings."
-        ]
-      },
-      {
-        "title": "7. Data Retention Period",
-        "body": [
-          "Personal Data will be stored as long as required by law or for the time necessary for the effective fulfillment of the purpose of the processing."
-        ]
-      },
-      {
-        "title": "8. Rights of Data Subjects",
-        "body": [
-          "Data Subjects may exercise their rights to confirm the existence of Processing, access to data, correction of incomplete or outdated data; anonymization, blocking or deletion, and revocation of consent by email address at the end of this Policy."
-        ]
-      },
-      {
-        "title": "9. Obligations of Data Subjects",
-        "body": [
-          "The Data Subject is responsible for the truthfulness, accuracy, and confirmation of the Personal Data informed by them at the time of registration. It is strongly recommended that the Data Subject does not share logins, passwords, or any type of credential with third parties."
-        ]
-      },
-      {
-        "title": "10. Security Measures",
-        "body": [
-          "MetaShark Tech informs that it adopts organizational and technical controls and procedures to ensure the security of Personal Data under its Processing and to prevent unauthorized access or disclosure, which could potentially result in alteration, accidental or illegal destruction, loss of data, and against all other illegal forms of Processing."
-        ]
+        "body": {
+          "0": "This Policy applies to the Processing of Personal Data collected and processed in Brazil, regardless of whether the Processing occurs in national territory or abroad.",
+          "1": "This Policy is applicable to all companies of MetaShark Tech, as well as to all Clients, Collaborators, Partners, and Third Parties of MetaShark Tech and/or any natural or legal person who may play the role of Data Controller and/or Operator, where MetaShark Tech has the role of Controller and/or Operator.",
+          "2": "This Policy is an integral part of the Terms of Use and Conditions available on all MetaShark Tech platforms and subjects all Personal Data Processing activities under the responsibility of MetaShark Tech."
+        }
       }
-    ]
+    }
   },
   "es-ES": {
     "title": "Política de Privacidad y Protección de Datos Personales",
-    "content": [
-      {
+    "content": {
+      "0": {
         "title": "1. Introducción",
-        "body": [
-          "MetaShark Tech, a través de sus procesos de negocio, entiende, respeta y protege la Privacidad y los Datos Personales de sus Clientes, Colaboradores, Proveedores, Prestadores de Servicios, Terceros u otras Partes Relacionadas, independientemente del formato y medio (documentos físicos y documentos digitales) de Tratamiento.",
-          "En este contexto, la presente Política de Privacidad y Protección de Datos Personales tiene como objetivo indicar de forma clara las directrices y principales reglas para el Tratamiento de Datos Personales por parte de MetaShark Tech, de acuerdo con la legislación aplicable.",
-          "La presente Política podrá ser actualizada en cualquier momento, sin previo aviso."
-        ]
+        "body": {
+          "0": "MetaShark Tech, a través de sus procesos de negocio, entiende, respeta y protege la Privacidad y los Datos Personales de sus Clientes, Colaboradores, Proveedores, Prestadores de Servicios, Terceros u otras Partes Relacionadas, independientemente del formato y medio (documentos físicos y documentos digitales) de Tratamiento.",
+          "1": "En este contexto, la presente Política de Privacidad y Protección de Datos Personales tiene como objetivo indicar de forma clara las directrices y principales reglas para el Tratamiento de Datos Personales por parte de MetaShark Tech, de acuerdo con la legislación aplicable.",
+          "2": "La presente Política podrá ser actualizada en cualquier momento, sin previo aviso."
+        }
       },
-      {
+      "1": {
         "title": "2. Alcance",
-        "body": [
-          "La presente Política se aplica al Tratamiento de Datos Personales recopilados y tratados en Brasil, independientemente de si el Tratamiento ocurre en territorio nacional o en el extranjero.",
-          "Esta Política es aplicable a todas las empresas de MetaShark Tech, así como a todos los Clientes, Colaboradores, Socios y Terceros de MetaShark Tech y/o a cualquier persona física o jurídica que desempeñe el papel de Titular y/o Encargado del Tratamiento de Datos Personales, donde MetaShark Tech tenga el papel de Responsable y/o Encargado.",
-          "Esta Política es parte integrante de los Términos de Uso y Condiciones disponibles en todas las plataformas de MetaShark Tech y sujeta todas las actividades de Tratamiento de Datos Personales bajo la responsabilidad de MetaShark Tech."
-        ]
-      },
-      {
-        "title": "3. Definiciones",
-        "body": [
-          "Anonimización: utilización de medios técnicos razonables y disponibles en el momento del tratamiento, por medio de los cuales un dato pierde la posibilidad de asociación, directa o indirecta, a una persona, de modo que la persona deja de ser identificada o identificable;",
-          "Base de Datos: conjunto estructurado de Datos Personales, establecido en uno o en varios locales, en soporte electrónico o físico;",
-          "Dato Personal: información relacionada con una persona física identificada o identificable, incluyendo: nombre, números de registro (DNI, NIF), edad, apodo, e-mail, dirección, etc.;",
-          "Dato Personal Sensible: Dato Personal sobre origen racial o étnico, convicción religiosa, opinión política, afiliación a un sindicato o a una organización de carácter religioso, filosófico o político, dato referente a la salud o a la vida sexual, dato genético o biométrico, cuando esté vinculado a una persona natural;",
-          "Delegado de Protección de Datos (DPD): persona indicada por el Responsable, que actúa como canal de comunicación entre el Responsable y los Titulares y entre el Responsable y la Autoridad Nacional de Protección de Datos ('ANPD')."
-        ]
-      },
-      {
-        "title": "4. Cómo Recopilamos Datos Personales",
-        "body": [
-          "La recopilación de Datos Personales por parte de MetaShark Tech puede darse de diversas maneras, de forma directa o indirecta, incluyendo, pero no exclusivamente, a través de:",
-          "(i) Los datos de registro rellenados por el Cliente en las Plataformas de MetaShark Tech;",
-          "(ii) La recepción de currículums electrónicos o impresos, entregados o enviados por el Titular a MetaShark Tech;",
-          "(iii) El registro para la participación en eventos y programas sociales promovidos por MetaShark Tech."
-        ]
-      },
-      {
-        "title": "5. Finalidades del Tratamiento de Datos",
-        "body": [
-          "Los Datos Personales deben ser recopilados solo para finalidades específicas, explícitas y legítimas y no pueden ser tratados de forma incompatible con dichas finalidades.",
-          "Los Datos Personales de Clientes y Terceros podrán ser tratados para las siguientes finalidades:",
-          "(i) Identificar y autenticar a los Clientes, administrar y procesar pedidos, promociones y movimientos en el registro, con el fin de cumplir las obligaciones derivadas del uso de nuestros servicios y la compra de nuestros productos;",
-          "(ii) Informar a los Clientes sobre novedades, productos, servicios, funcionalidades, contenidos, promociones, noticias y demás eventos promovidos por MetaShark Tech, sus Socios y/o Terceros relevantes;",
-          "(iii) Elaborar perfiles de Clientes conforme a los datos proporcionados y las operaciones realizadas, para personalizar los servicios, productos y beneficios ofrecidos, así como la comunicación y divulgación de estos a los Clientes;",
-          "(iv) Personalizar su navegación por internet mediante la captación de cookies de su dispositivo, cuando esté autorizado."
-        ]
-      },
-      {
-        "title": "6. Bases Legales para el Tratamiento",
-        "body": [
-          "Dependiendo de los Datos Personales tratados por MetaShark Tech y sus respectivas finalidades, el Tratamiento podrá estar autorizado por una de las siguientes bases legales: (i) consentimiento del Titular; (ii) obligación legal o reglamentaria; (iii) obligación contractual o procedimientos precontractuales que involucren al Titular; (iv) ejercicio regular de derechos por MetaShark Tech en procesos judiciales, administrativos y arbitrales."
-        ]
-      },
-      {
-        "title": "7. Plazo de Conservación de los Datos",
-        "body": [
-          "Los Datos Personales serán conservados durante el tiempo que exija la ley o por el tiempo necesario para el efectivo cumplimiento de la finalidad del tratamiento."
-        ]
-      },
-      {
-        "title": "8. Derechos de los Titulares de los Datos",
-        "body": [
-          "Los Titulares podrán ejercer sus derechos de confirmación de la existencia de Tratamiento, acceso a los datos, corrección de datos incompletos o desactualizados; anonimización, bloqueo o supresión, y revocación del consentimiento a través de la dirección de correo electrónico al final de esta Política."
-        ]
-      },
-      {
-        "title": "9. Obligaciones de los Titulares de los Datos",
-        "body": [
-          "El Titular es responsable de la veracidad, exactitud y confirmación de los Datos Personales que informa en el momento del registro. Se recomienda encarecidamente que el Titular no comparta con terceros, incluidos familiares y amigos, inicios de sesión, contraseñas o cualquier tipo de credencial."
-        ]
-      },
-      {
-        "title": "10. Medidas de Seguridad",
-        "body": [
-          "MetaShark Tech informa que adopta controles y procedimientos organizativos y técnicos para garantizar la seguridad de los Datos Personales bajo su Tratamiento y evitar el acceso o divulgación no autorizados, que podrían resultar potencialmente en la alteración, destrucción accidental o ilegal, pérdida de los datos y contra todas las demás formas ilegales de Tratamiento."
-        ]
+        "body": {
+          "0": "La presente Política se aplica al Tratamiento de Datos Personales recopilados y tratados en Brasil, independientemente de si el Tratamiento ocurre en territorio nacional o en el extranjero.",
+          "1": "Esta Política es aplicable a todas las empresas de MetaShark Tech, así como a todos los Clientes, Colaboradores, Socios y Terceros de MetaShark Tech y/o a cualquier persona física o jurídica que desempeñe el papel de Titular y/o Encargado del Tratamiento de Datos Personales, donde MetaShark Tech tenga el papel de Responsable y/o Encargado.",
+          "2": "Esta Política es parte integrante de los Términos de Uso y Condiciones disponibles en todas las plataformas de MetaShark Tech y sujeta todas las actividades de Tratamiento de Datos Personales bajo la responsabilidad de MetaShark Tech."
+        }
       }
-    ]
+    }
   },
   "pt-BR": {
     "title": "Política de Privacidade e Proteção de Dados Pessoais",
-    "content": [
-      {
+    "content": {
+      "0": {
         "title": "1. Introdução",
-        "body": [
-          "A MetaShark Tech, por seus processos de negócio, entende, respeita e protege a Privacidade e os Dados Pessoais, sejam dados de seus Clientes, Colaboradores, Fornecedores, Prestadores de Serviços, Terceiros ou de outras Partes Relacionadas, independente do formato e meio (documentos físicos e documentos digitais) de Tratamento.",
-          "Nesse contexto, a presente Política de Privacidade e Proteção de Dados Pessoais tem como objetivo indicar de forma clara as diretrizes e principais regras para o Tratamento de Dados Pessoais pela MetaShark Tech, nos termos da legislação aplicável.",
-          "A presente Política poderá ser atualizada a qualquer momento, sem aviso prévio."
-        ]
+        "body": {
+          "0": "A MetaShark Tech, por seus processos de negócio, entende, respeita e protege a Privacidade e os Dados Pessoais, sejam dados de seus Clientes, Colaboradores, Fornecedores, Prestadores de Serviços, Terceiros ou de outras Partes Relacionadas, independente do formato e meio (documentos físicos e documentos digitais) de Tratamento.",
+          "1": "Nesse contexto, a presente Política de Privacidade e Proteção de Dados Pessoais tem como objetivo indicar de forma clara as diretrizes e principais regras para o Tratamento de Dados Pessoais pela MetaShark Tech, nos termos da legislação aplicável.",
+          "2": "A presente Política poderá ser atualizada a qualquer momento, sem aviso prévio."
+        }
       },
-      {
+      "1": {
         "title": "2. A quem se aplica a Política?",
-        "body": [
-          "A presente Política se aplica ao Tratamento de Dados Pessoais coletados e tratados no Brasil, independentemente se o Tratamento ocorrer em território nacional ou no exterior.",
-          "Esta Política é aplicável a todas as empresas da MetaShark Tech, bem como a todos os Clientes, Colaboradores, Parceiros e Terceiros da MetaShark Tech e/ou a qualquer pessoa física ou jurídica que venha desempenhar o papel de Titular e/ou Operador de Dados Pessoais, onde a MetaShark Tech tenha o papel de Controlador e/ou Operador.",
-          "Esta Política é parte integrante dos Termos de Uso e Condições disponíveis em todas as plataformas da MetaShark Tech e sujeita todas as atividades de Tratamento de Dados Pessoais sob responsabilidade da MetaShark Tech."
-        ]
-      },
-      {
-        "title": "3. Definições",
-        "body": [
-          "Anonimização: utilização de meios técnicos razoáveis e disponíveis no momento do tratamento, por meio dos quais um dado perde a possibilidade de associação, direta ou indireta, a uma pessoa, de modo que a pessoa deixa de ser identificada ou identificável;",
-          "Banco de Dados: conjunto estruturado de Dados Pessoais, estabelecido em um ou em vários locais, em suporte eletrônico ou físico;",
-          "Dado Pessoal: informação relacionada a pessoa física identificada ou identificável, incluindo: nome, número do Registro Geral (RG), número do Cadastro Nacional de Pessoa Física (CPF), idade, apelido, e-mail, endereço, etc.;",
-          "Dado Pessoal Sensível: Dado Pessoal sobre origem racial ou étnica, convicção religiosa, opinião política, filiação a sindicato ou a organização de caráter religioso, filosófico ou político, dado referente à saúde ou à vida sexual, dado genético ou biométrico, quando vinculado a uma pessoa natural;",
-          "Encarregado/DPO: pessoa indicada pelo Controlador, que atua como canal de comunicação entre o Controlador e os Titulares e entre o Controlador e a Autoridade Nacional de Proteção de Dados ('ANPD')."
-        ]
-      },
-      {
-        "title": "4. Como a MetaShark Tech coleta Dados Pessoais?",
-        "body": [
-          "A coleta de Dados Pessoais pela MetaShark Tech pode se dar de diversas maneiras, de forma direta ou indireta, por exemplo, mas não exclusivamente, por meio:",
-          "(i) Dos dados cadastrais preenchidos pelo Cliente na Plataformas da MetaShark Tech;",
-          "(ii) Do recebimento de currículo eletrônico ou impresso, entregue ou enviado pelo Titular à MetaShark Tech;",
-          "(iii) Do cadastro para a participação em eventos e programas sociais promovidos pela MetaShark Tech."
-        ]
-      },
-      {
-        "title": "5. Para que finalidades são coletados e tratados Dados Pessoais?",
-        "body": [
-          "Os Dados Pessoais devem ser coletados apenas para finalidades específicas, explícitas e legítimas e não podem ser tratados de forma incompatível com essas finalidades.",
-          "Os Dados Pessoais de Clientes e Terceiros poderão ser tratados para as seguintes finalidades:",
-          "(i) Identificar e autenticar Clientes, administrar e processar pedidos, promoções e movimentações no cadastro, visando cumprir as obrigações decorrentes do uso de nossos serviços e compra dos nossos produtos;",
-          "(ii) Informar aos Clientes sobre novidades, produtos, serviços, funcionalidades, conteúdos, promoções, notícias e demais eventos promovidos pela MetaShark Tech, seus Parceiros e/ou Terceiros relevantes;",
-          "(iii) Elaborar perfis de Clientes conforme dados fornecidos e operações realizadas, para personalizar os serviços, produtos e benefícios oferecidos, bem como a comunicação e a divulgação destes aos Clientes;",
-          "(iv) Personalizar a sua navegação pela internet via captação de cookies de seu dispositivo, quando autorizado;"
-        ]
-      },
-      {
-        "title": "6. Quais as bases legais que autorizam o Tratamento dos Dados Pessoais?",
-        "body": [
-          "A depender dos Dados Pessoais tratados pela MetaShark Tech e suas respectivas finalidades, o Tratamento poderá estar autorizado por uma das seguintes bases legais: (i) consentimento do Titular; (ii) obrigação legal ou regulatória; (iii) obrigação contratual ou procedimentos pré-contratuais que envolvam o Titular; (iv) exercício regular do direto pela MetaShark Tech, em processos judiciais, administrativos e arbitrais."
-        ]
-      },
-      {
-        "title": "7. Por quanto tempo os Dados Pessoais ficam armazenados?",
-        "body": [
-          "Os Dados Pessoais serão armazenados enquanto a lei o exigir ou pelo tempo necessário para o efetivo cumprimento da finalidade de tratamento."
-        ]
-      },
-      {
-        "title": "8. Quais são os direitos dos Titulares?",
-        "body": [
-          "Os Titulares poderão exercer os seus direitos de confirmação de existência de Tratamento, acesso aos dados, correção de dados incompletos ou desatualizados; anonimização, bloqueio ou exclusão e revogação do consentimento pelo endereço de email ao final dessa Política."
-        ]
-      },
-      {
-        "title": "9. Quais as Obrigações dos Titulares?",
-        "body": [
-          "O Titular é responsável pela veracidade, exatidão e confirmação dos Dados Pessoais por ele informados no momento do cadastro. Recomenda-se fortemente que o Titular não compartilhe com terceiros, incluindo familiares e amigos, logins, senhas ou qualquer tipo de credencial."
-        ]
-      },
-      {
-        "title": "10. Quais as Medidas de Segurança adotadas?",
-        "body": [
-          "A MetaShark Tech informa que adota os controles e procedimentos organizacionais e técnicos para garantir a segurança dos Dados Pessoais sob seu Tratamento e evitar acesso ou divulgação não autorizados, que potencialmente poderiam resultar em alteração, destruição acidental ou ilegal, perda dos dados e contra todas as demais formas ilegais de Tratamento."
-        ]
+        "body": {
+          "0": "A presente Política se aplica ao Tratamento de Dados Pessoais coletados e tratados no Brasil, independentemente se o Tratamento ocorrer em território nacional ou no exterior.",
+          "1": "Esta Política é aplicável a todas as empresas da MetaShark Tech, bem como a todos os Clientes, Colaboradores, Parceiros e Terceiros da MetaShark Tech e/ou a qualquer pessoa física ou jurídica que venha desempenhar o papel de Titular e/ou Operador de Dados Pessoais, onde a MetaShark Tech tenha o papel de Controlador e/ou Operador.",
+          "2": "Esta Política é parte integrante dos Termos de Uso e Condições disponíveis em todas as plataformas da MetaShark Tech e sujeita todas as atividades de Tratamento de Dados Pessoais sob responsabilidade da MetaShark Tech."
+        }
       }
-    ]
+    }
   }
 }
-

@@ -1,35 +1,34 @@
 // src/lib/hooks/use-campaigns-page.ts
 /**
  * @file use-campaigns-page.ts
- * @description Orquestador de hooks de élite. Ha sido blindado con un contrato
- *              de props explícito y exportado (`UseCampaignsPageProps`), resolviendo
- *              el error de módulo TS2724 en su consumidor.
+ * @description Hook orquestador soberano. Sincronizado para consumir el contrato
+ *              de API puro de `useOptimisticResourceManagement`, resolviendo el error
+ *              de tipo TS2345 y alineándose con la arquitectura de composición de hooks.
  * @author Raz Podestá - MetaShark Tech
- * @version 8.0.0
- * @date 2025-08-27
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 11.0.0
+ * @see .docs-espejo/lib/hooks/use-campaigns-page.ts.md
  */
 "use client";
 
-import { useTransition, useCallback } from "react";
-import { useTranslations } from "next-intl";
-import toast from "react-hot-toast";
+import { useFormatter, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useCallback, useTransition } from "react";
+import toast from "react-hot-toast";
 
 import {
+  archiveCampaignAction,
   createCampaignAction,
   deleteCampaignAction,
-  archiveCampaignAction,
   duplicateCampaignAction,
 } from "@/lib/actions/campaigns.actions";
 import { type CampaignMetadata } from "@/lib/data/campaigns";
-import { useOptimisticResourceManagement } from "@/lib/hooks/use-optimistic-resource-management";
 import { useUrlStateSync } from "@/lib/hooks/ui/useUrlStateSync";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
+import { isActionError, type ValidationErrorKey } from "@/lib/validators";
+import { useOptimisticResourceManagement } from "./use-optimistic-resource-management";
 
 type CampaignStatus = "draft" | "published" | "archived";
-type SortByOption = "updated_at_desc" | "name_asc";
+type SortByOption = "updated_at_desc" | "name_asc" | "name_desc";
 
 type CampaignFiltersState = {
   q: string;
@@ -37,7 +36,6 @@ type CampaignFiltersState = {
   sort: SortByOption;
 };
 
-// --- INICIO DE CORRECCIÓN DE CONTRATO (TS2724) ---
 export interface UseCampaignsPageProps {
   initialCampaigns: CampaignMetadata[];
   initialSearchQuery: string;
@@ -45,8 +43,14 @@ export interface UseCampaignsPageProps {
   initialStatus?: CampaignStatus;
   initialSortBy?: SortByOption;
 }
-// --- FIN DE CORRECCIÓN DE CONTRATO (TS2724) ---
 
+/**
+ * @public
+ * @function useCampaignsPage
+ * @description Orquesta toda la lógica de estado y de negocio para la página de gestión de campañas.
+ * @param {UseCampaignsPageProps} props - Propiedades iniciales para el hook.
+ * @returns La API completa para gestionar la UI de la página de campañas.
+ */
 export function useCampaignsPage({
   initialCampaigns,
   initialSearchQuery,
@@ -54,7 +58,9 @@ export function useCampaignsPage({
   initialSortBy,
   siteId,
 }: UseCampaignsPageProps) {
+  clientLogger.trace({}, "[useCampaignsPage] Hook soberano inicializado.");
   const t = useTranslations("CampaignsPage");
+  const tErrors = useTranslations("shared.ValidationErrors");
   const router = useRouter();
   const [isActionPending, startActionTransition] = useTransition();
 
@@ -79,9 +85,11 @@ export function useCampaignsPage({
       slug: name.toLowerCase().replace(/\s+/g, "-"),
       site_id: siteId,
       status: "draft",
+      status_id: 1,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       affiliate_url: null,
+      creation_id: `optimistic-creation-${Date.now()}`,
     };
   };
 
@@ -102,43 +110,57 @@ export function useCampaignsPage({
     if (!handleCreate) return;
     const result = await handleCreate(formData);
     if (result.success) {
-      toast.success(t("toasts.create_success"));
+      toast.success(tErrors("campaigns.create_success"));
       router.refresh();
-    } else {
-      toast.error(t(`errors.${result.error}` as any) || t("errors.unexpected"));
+    } else if (isActionError(result)) {
+      toast.error(tErrors(result.error, { defaultValue: result.error }));
     }
   };
 
   const handleArchiveCampaign = useCallback(
     (campaignId: string) => {
+      clientLogger.trace(
+        { campaignId },
+        "[useCampaignsPage] Archivando campaña."
+      );
       startActionTransition(() => {
         toast.promise(archiveCampaignAction(campaignId), {
           loading: t("toasts.archiving"),
-          success: () => {
+          success: (result) => {
+            if (isActionError(result)) throw new Error(result.error);
             router.refresh();
-            return t("toasts.archive_success");
+            return tErrors(result.data.messageKey);
           },
-          error: t("errors.archive_failed"),
+          error: (err) =>
+            tErrors(err.message, { defaultValue: t("errors.archive_failed") }),
         });
       });
     },
-    [router, t]
+    [router, t, tErrors]
   );
 
   const handleDuplicateCampaign = useCallback(
     (campaignId: string) => {
+      clientLogger.trace(
+        { campaignId },
+        "[useCampaignsPage] Duplicando campaña."
+      );
       startActionTransition(() => {
         toast.promise(duplicateCampaignAction(campaignId), {
           loading: t("toasts.duplicating"),
-          success: () => {
+          success: (result) => {
+            if (isActionError(result)) throw new Error(result.error);
             router.refresh();
-            return t("toasts.duplicate_success");
+            return tErrors("campaigns.duplicate_success");
           },
-          error: t("errors.duplication_failed"),
+          error: (err) =>
+            tErrors(err.message, {
+              defaultValue: t("errors.duplication_failed"),
+            }),
         });
       });
     },
-    [router, t]
+    [router, t, tErrors]
   );
 
   return {
@@ -164,16 +186,4 @@ export function useCampaignsPage({
     handleDuplicateCampaign,
   };
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Factoría de Items Optimistas Atómica**: ((Vigente)) La lógica de `createOptimisticCampaign` podría ser extraída a un helper `optimisticItemFactory.ts` para una máxima reutilización si otros hooks necesitaran crear campañas optimistas.
- * 2. **Tipado de Errores con `isActionError`**: ((Vigente)) El `toast.error` en `handleCreateCampaign` utiliza `as any`. Para una seguridad de tipos de élite, se debería usar el guardián de tipo `isActionError` para asegurar que el `result.error` es una clave de i18n válida antes de pasarlo a `t()`.
- *
- * =====================================================================
- */
 // src/lib/hooks/use-campaigns-page.ts

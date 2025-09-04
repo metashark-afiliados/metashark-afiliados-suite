@@ -4,7 +4,7 @@
  * @description Manifiesto de Gestión y Optimización de Activos v2.0.
  *              Esta es la SSoT que define la arquitectura completa para la ingesta,
  *              procesamiento, almacenamiento y entrega de imágenes en ConvertiKit.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 # Manifiesto de Gestión y Optimización de Activos v2.0

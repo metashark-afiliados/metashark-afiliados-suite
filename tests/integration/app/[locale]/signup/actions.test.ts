@@ -5,7 +5,7 @@
  *              Valida la lógica de negocio, la interacción con Supabase y las
  *              redirecciones para el flujo de registro. Ha sido refactorizado
  *              para consumir la SSoT de acciones desde `@/lib/actions/auth.actions`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";

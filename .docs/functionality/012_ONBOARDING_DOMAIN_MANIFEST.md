@@ -2,7 +2,7 @@
 /**
  * @file .docs/espejo/functionality/012_ONBOARDING_DOMAIN_MANIFEST.md
  * @description Documento Espejo y SSoT conceptual para el Manifiesto del Dominio "Onboarding y Guías".
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Conceptual: Dominio "Onboarding y Guías Interactivas"

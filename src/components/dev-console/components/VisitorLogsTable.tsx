@@ -7,9 +7,10 @@
  */
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
 import { Eye, Globe, MoreHorizontal, User } from "lucide-react";
+import { useFormatter, useTranslations } from "next-intl";
 
+import { JsonViewerDialog } from "@/components/dev-console/components/JsonViewerDialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -26,9 +27,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { type Json } from "@/lib/types/database";
-import { JsonViewerDialog } from "@/components/dev-console/components/JsonViewerDialog";
 
 export type VisitorLogRow = {
   id: string;

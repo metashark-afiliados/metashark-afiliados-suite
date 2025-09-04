@@ -5,14 +5,14 @@
  *              Ha sido nivelado a un estándar de élite para ser 100% puro,
  *              desacoplado de activos locales, y enriquecido con microinteracciones
  *              y animaciones para una UX superior.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.1.0
  */
 "use client";
 
-import React from "react";
+import { clientLogger } from "@/lib/logger";
 import { motion } from "framer-motion";
-import { clientLogger } from "@/lib/logging";
+import React from "react";
 
 /**
  * @public

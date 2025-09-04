@@ -1,17 +1,16 @@
 // src/app/api/auth/callback/route.ts
 /**
  * @file src/app/api/auth/callback/route.ts
- * @description Route Handler de élite para el callback de autenticación. Ha sido
- *              refactorizado con una lógica de sondeo resiliente para eliminar la
- *              condición de carrera entre la creación de la sesión y la ejecución
- *              del trigger de la base de datos, garantizando un onboarding robusto.
- * @author Raz Podestá
- * @version 5.0.0
+ * @description Route Handler para el callback de autenticación. Refactorizado
+ *              para alinear el logging con la firma canónica, resolviendo
+ *              el error de tipo TS2345.
+ * @author L.I.A. Legacy
+ * @version 6.0.0
  */
-import { type NextRequest, NextResponse } from "next/server";
 import { type User } from "@supabase/supabase-js";
+import { type NextRequest, NextResponse } from "next/server";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 import { type Tables } from "@/lib/types/database";
 
@@ -21,15 +20,6 @@ const isValidRedirect = (path: string): boolean => {
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * @private
- * @async
- * @function waitForProfile
- * @description Sondea la tabla de perfiles hasta que se encuentre un perfil
- *              para el usuario o se agoten los reintentos.
- * @param {User} user - El objeto de usuario de Supabase.
- * @returns {Promise<Tables<'profiles'> | null>} El perfil encontrado o null.
- */
 async function waitForProfile(user: User): Promise<Tables<"profiles"> | null> {
   const supabase = createClient();
   let attempts = 0;
@@ -42,7 +32,8 @@ async function waitForProfile(user: User): Promise<Tables<"profiles"> | null> {
     if (profile) return profile;
     attempts++;
     logger.trace(
-      `[AuthCallback] Perfil para ${user.id} no encontrado (intento ${attempts}). Esperando 300ms...`
+      { userId: user.id, attempt: attempts },
+      `[AuthCallback] Perfil no encontrado. Esperando 300ms...`
     );
     await delay(300);
   }
@@ -65,14 +56,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && session) {
-      logger.info("[AuthCallback] Sesión creada. Esperando perfil...", {
-        userId: session.user.id,
-      });
+      logger.info(
+        { userId: session.user.id },
+        "[AuthCallback] Sesión creada. Esperando perfil..."
+      );
 
       const profile = await waitForProfile(session.user);
       if (!profile) {
         logger.error(
-          `[AuthCallback] INCONSISTENCIA CRÍTICA: Perfil para ${session.user.id} no fue creado por el trigger a tiempo.`
+          { userId: session.user.id },
+          "[AuthCallback] INCONSISTENCIA CRÍTICA: Perfil no fue creado a tiempo."
         );
         await supabase.auth.signOut();
         const errorUrl = new URL(`${origin}/login`);
@@ -105,21 +98,4 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   errorUrl.searchParams.set("message", "error_oauth_failed");
   return NextResponse.redirect(errorUrl);
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Condición de Carrera**: ((Implementada)) Se ha introducido la función `waitForProfile` que sondea la base de datos, eliminando la causa raíz del fallo de redirección al garantizar que el perfil del usuario exista antes de continuar. Esto resuelve el error `error_profile_creation_failed`.
- * 2. **Resiliencia Mejorada**: ((Implementada)) Si el perfil no se crea después de los reintentos, se cierra la sesión (`signOut`) y se redirige al usuario con un mensaje de error claro, evitando estados de sesión corruptos.
- * 3. **Full Observabilidad**: ((Implementada)) Se ha añadido `logger.trace` para monitorear los intentos de sondeo y `logger.error` para el caso de fallo crítico, proporcionando visibilidad completa del flujo.
- *
- * @subsection Melhorias Futuras
- * 1. **Sondeo Exponencial (Exponential Backoff)**: ((Vigente)) Para una resiliencia de élite, el `delay` podría aumentar exponencialmente en cada reintento (ej. 100ms, 200ms, 400ms), lo que puede ser más eficiente bajo alta carga.
- * 2. **Webhooks de Supabase**: ((Vigente)) La solución definitiva y de máximo rendimiento sería utilizar un webhook de Supabase. El trigger de la base de datos podría llamar a una Edge Function que emita un evento (ej. a través de Supabase Realtime o Vercel KV) cuando el perfil esté listo, y el `callback` podría esperar ese evento en lugar de sondear.
- *
- * =====================================================================
- */
 // src/app/api/auth/callback/route.ts

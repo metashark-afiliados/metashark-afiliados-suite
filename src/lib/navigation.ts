@@ -4,9 +4,9 @@
  * @description Manifiesto de Enrutamiento y SSoT. Define todas las rutas,
  *              configuración de i18n, y exporta utilidades de navegación.
  *              Refactorizado para eliminar la ruta obsoleta /welcome.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @copilot RaZ WriTe
- * @version 9.2.0
+ * @version 10.0.0
  * @see .docs-espejo/lib/navigation.ts.md
  */
 import {
@@ -65,6 +65,7 @@ export const pathnames = {
   "/dev-console/logs": "/dev-console/logs",
   "/dev-console/telemetry": "/dev-console/telemetry",
   "/dev-console/users": "/dev-console/users",
+  "/dev-console/diagnostics": "/dev-console/diagnostics",
 
   // --- Rutas Especiales y de Sistema ---
   "/unauthorized": "/unauthorized",

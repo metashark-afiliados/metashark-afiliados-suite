@@ -4,16 +4,14 @@
  * @description Aparato de datos atómico. Responsable de las operaciones de
  *              lectura de alto privilegio para la gestión de todos los sitios
  *              de la plataforma, para uso exclusivo en el Dev Console.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @author L.I.A. Legacy
+ * @version 2.0.0
+ * @see .docs-espejo/lib/data/admin/sites.data.ts.md
  */
 "use server";
 import "server-only";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createAdminClient } from "@/lib/supabase/server";
 import { type SiteWithCampaignsCount } from "./types";
 
@@ -38,7 +36,9 @@ export async function getAllSites({
   page?: number;
   limit?: number;
 }): Promise<{ sites: SiteWithCampaignsCount[]; totalCount: number }> {
+  const context = { page, limit };
   logger.trace(
+    context,
     "[DataLayer:AdminSites] Iniciando obtención de todos los sitios."
   );
   try {
@@ -63,23 +63,10 @@ export async function getAllSites({
     };
   } catch (error) {
     logger.error(
-      `[DataLayer:AdminSites] Error crítico al obtener todos los sitios:`,
-      error
+      { err: error as Error, context },
+      "[DataLayer:AdminSites] Error crítico al obtener todos los sitios."
     );
     throw new Error("No se pudieron obtener los datos de los sitios.");
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Búsqueda y Filtrado**: Para una funcionalidad de administración completa, esta función debería ser extendida para aceptar un `query` y otros parámetros de filtro (ej. por `status` o `owner_id`) para permitir la búsqueda en el Dev Console.
- * 2. **Cacheo de Datos**: Para dashboards de administración con mucho tráfico, se podría envolver esta función en `React.cache` con una revalidación basada en etiquetas para optimizar el rendimiento.
- * 3. **Consumo de Vista Materializada**: Asegurar que la vista `sites_with_campaign_counts` esté implementada y sea materializada en la base de datos para garantizar que esta consulta de alto rendimiento no degrade el rendimiento de la base de datos principal.
- * 4. **Tipado de Retorno con Zod**: En lugar de la aserción `as`, crear un `SiteWithCampaignsCountSchema` y usar `.parse()` para garantizar la forma de los datos en tiempo de ejecución.
- * 5. **Ordenamiento Dinámico**: Añadir un parámetro `sort` para permitir ordenar los resultados por diferentes columnas (ej. `name`, `campaign_count`, `created_at`).
- * =====================================================================
- */
 // src/lib/data/admin/sites.data.ts

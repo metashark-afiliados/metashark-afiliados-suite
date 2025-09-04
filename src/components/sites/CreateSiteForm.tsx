@@ -11,17 +11,17 @@
  */
 "use client";
 
-import { type SubmitHandler, useForm } from "react-hook-form";
-import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import type { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { clientLogger } from "@/lib/logger";
 import { CreateSiteClientSchema } from "@/lib/validators";
-import { clientLogger } from "@/lib/logging";
 import { SubdomainInput } from "./SubdomainInput";
 
 interface CreateSiteFormProps {

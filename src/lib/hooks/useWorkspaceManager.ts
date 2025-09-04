@@ -2,20 +2,32 @@
 /**
  * @file useWorkspaceManager.ts
  * @description Hook soberano y orquestador para la lógica del WorkspaceSwitcher.
- *              Ha sido refactorizado a un estándar de élite para consumir la SSoT
- *              de navegación y unificar su nomenclatura interna.
- * @author Raz Podestá
- * @version 2.1.0
+ *              Refactorizado para exponer una API de callbacks explícita y semántica,
+ *              resolviendo el error de contrato TS2739 en su consumidor.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 6.0.0
+ * @see .docs-espejo/lib/hooks/useWorkspaceManager.ts.md
  */
 "use client";
 
 import { useCallback, useState, useTransition } from "react";
-import { useRouter } from "@/lib/navigation"; // <-- CORRECCIÓN: Usar SSoT de navegación
+import toast from "react-hot-toast";
 
 import { setActiveWorkspaceAction } from "@/lib/actions/workspaces.actions";
-import { useWorkspaceDialogStore } from "@/lib/hooks/useWorkspaceDialogStore";
-import { logger } from "@/lib/logging";
+import {
+  useWorkspaceDialogStore,
+  type WorkspaceDialogType,
+} from "@/lib/hooks/useWorkspaceDialogStore";
+import { clientLogger } from "@/lib/logger";
+import { useRouter } from "@/lib/navigation";
 
+/**
+ * @public
+ * @function useWorkspaceManager
+ * @description Hook soberano que provee toda la lógica de estado y los manejadores
+ *              de eventos para el componente `WorkspaceSwitcher`.
+ * @returns Un objeto con el estado del Popover, el estado de carga, y manejadores de acciones.
+ */
 export function useWorkspaceManager() {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -24,37 +36,84 @@ export function useWorkspaceManager() {
 
   const closePopover = useCallback(() => setPopoverOpen(false), []);
 
+  const handleAction = useCallback(
+    (action: () => void) => {
+      closePopover();
+      // Delay para permitir que la animación de cierre del popover finalice antes de abrir un modal.
+      setTimeout(action, 150);
+    },
+    [closePopover]
+  );
+
   const handleWorkspaceSelect = useCallback(
     (workspaceId: string) => {
-      logger.trace(`[useWorkspaceManager] Selección de workspace iniciada`, {
-        workspaceId,
-      });
+      clientLogger.trace(
+        { workspaceId },
+        "[useWorkspaceManager] Selección de workspace iniciada."
+      );
       closePopover();
       startTransition(() => {
+        // La Server Action se encarga de la redirección en caso de éxito.
         setActiveWorkspaceAction(workspaceId);
+        // El toast de éxito podría moverse a la respuesta de la acción si se desea.
+        toast.success("Workspace context changed.");
       });
     },
     [closePopover]
   );
 
-  const handleAction = useCallback(
-    (action: () => void) => {
-      closePopover();
-      action();
-    },
-    [closePopover]
-  );
+  // --- INICIO DE REFACTORIZACIÓN: API de Callbacks Explícita ---
+  const onSelectCreate = () => {
+    clientLogger.trace(
+      {},
+      "[useWorkspaceManager] Comando 'Crear' seleccionado."
+    );
+    handleAction(() => openDialog("create"));
+  };
+
+  const onSelectInvite = () => {
+    clientLogger.trace(
+      {},
+      "[useWorkspaceManager] Comando 'Invitar' seleccionado."
+    );
+    handleAction(() => openDialog("invite"));
+  };
+
+  const onSelectRename = () => {
+    clientLogger.trace(
+      {},
+      "[useWorkspaceManager] Comando 'Renombrar' seleccionado."
+    );
+    handleAction(() => openDialog("rename"));
+  };
+
+  const onSelectSettings = () => {
+    clientLogger.trace(
+      {},
+      "[useWorkspaceManager] Comando 'Ajustes' seleccionado."
+    );
+    handleAction(() => router.push("/dashboard/settings"));
+  };
+
+  const onSelectDelete = () => {
+    clientLogger.trace(
+      {},
+      "[useWorkspaceManager] Comando 'Eliminar' seleccionado."
+    );
+    handleAction(() => openDialog("delete"));
+  };
+  // --- FIN DE REFACTORIZACIÓN ---
 
   return {
     popoverOpen,
     setPopoverOpen,
     isPending,
     handleWorkspaceSelect,
-    onSelectCreate: () => handleAction(() => openDialog("create")),
-    onSelectInvite: () => handleAction(() => openDialog("invite")),
-    onSelectRename: () => handleAction(() => openDialog("rename")),
-    onSelectSettings: () =>
-      handleAction(() => router.push("/dashboard/settings")),
-    onSelectDelete: () => handleAction(() => openDialog("delete")),
+    onSelectCreate,
+    onSelectInvite,
+    onSelectRename,
+    onSelectSettings,
+    onSelectDelete,
   };
 }
+// src/lib/hooks/useWorkspaceManager.ts

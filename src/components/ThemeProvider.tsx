@@ -5,7 +5,7 @@
  *              Este componente encapsula `next-themes` para proporcionar la funcionalidad
  *              de cambio de tema a toda la aplicación. Se ha corregido la importación
  *              de tipos para alinearla con las versiones modernas de la librería.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.1.0 (Protocol Aligned)
  */
 "use client";

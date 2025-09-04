@@ -5,7 +5,7 @@
  *              Este aparato atómico de validación garantiza la seguridad de tipos
  *              para la cabecera del constructor.
  *              **Actualizado para incluir la clave `empty_campaign_name_placeholder`**.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.1.0
  */
 import { z } from "zod";

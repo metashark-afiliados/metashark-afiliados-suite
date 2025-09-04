@@ -4,7 +4,7 @@
  * @description Aparato de lógica de sesión para el Edge Runtime. Utiliza Vercel KV
  *              para un cacheo de roles de alto rendimiento y se alinea con el
  *              patrón de "respuesta encadenada" para una funcionalidad robusta.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @copilot RaZ WriTe
  * @version 4.0.0
  * @see .docs-espejo/middleware/lib/permissions-edge.md

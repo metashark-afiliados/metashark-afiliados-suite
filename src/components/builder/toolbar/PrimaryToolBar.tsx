@@ -2,12 +2,9 @@
 /**
  * @file PrimaryToolBar.tsx
  * @description Orquestador de UI para la barra de herramientas principal.
- *              Sincronizado para consumir la nueva clave de i18n `add_content`.
- * @author Raz Podestá - MetaShark Tech
- * @version 3.1.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              Refactorizado para usar el `clientLogger` con la firma correcta.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
  */
 "use client";
 
@@ -16,7 +13,7 @@ import { shallow } from "zustand/shallow";
 
 import { type BuilderState } from "@/lib/builder/core";
 import { useBuilderStore } from "@/lib/hooks/use-builder-store";
-import { logger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import {
   PRIMARY_TOOLS_CONFIG,
   type ContextualPanelType,
@@ -35,14 +32,16 @@ export function PrimaryToolBar(): React.ReactElement {
     shallow
   );
 
-  logger.trace("[PrimaryToolBar] Renderizando barra de herramientas.", {
+  clientLogger.trace("[PrimaryToolBar] Renderizando barra de herramientas.", {
     activeTool,
   });
 
   const handleToolSelect = (toolId: ContextualPanelType) => {
     const newTool = activeTool === toolId ? null : toolId;
     setActiveTool(newTool);
-    logger.info(`[PrimaryToolBar] Herramienta activa cambiada a: ${newTool}`);
+    clientLogger.info(
+      `[PrimaryToolBar] Herramienta activa cambiada a: ${newTool || "ninguna"}`
+    );
   };
 
   return (
@@ -60,15 +59,4 @@ export function PrimaryToolBar(): React.ReactElement {
     </nav>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Cero Regresiones**: ((Implementada)) El componente se mantiene funcionalmente idéntico, simplemente consumiendo las nuevas claves semánticas desde sus manifiestos actualizados.
- *
- * =====================================================================
- */
 // src/components/builder/toolbar/PrimaryToolBar.tsx

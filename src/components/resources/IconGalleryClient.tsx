@@ -6,7 +6,7 @@
  *              **virtualización de cuadrícula con `@tanstack/react-virtual`**,
  *              garantizando una renderización óptima y una experiencia de usuario
  *              fluida incluso con miles de iconos.
- * @author L.I.A. Legacy & Raz Podestá
+ * @author Raz Podestá - MetaShark Tech & Raz Podestá
  * @version 2.0.0
  * @date 2025-08-28
  * @contact raz.metashark.tech
@@ -14,14 +14,14 @@
  */
 "use client";
 
-import React, { useMemo, useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual"; // <-- Importación para virtualización
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { SearchInput } from "@/components/ui/SearchInput";
 import { useDebounce } from "@/lib/hooks/use-debounce";
-import { IconCard } from "./IconCard";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
+import { IconCard } from "./IconCard";
 
 export interface IconGroup {
   category: string;

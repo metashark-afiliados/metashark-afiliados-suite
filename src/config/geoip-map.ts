@@ -6,7 +6,7 @@
  *              Externalizar esta configuración permite una gestión y expansión más
  *              sencillas sin modificar la lógica del servicio que la consume. Adhiere
  *              estrictamente al principio de "Configuración sobre Código".
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { type AppLocale } from "@/lib/navigation";

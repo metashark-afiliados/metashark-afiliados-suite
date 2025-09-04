@@ -1,58 +1,47 @@
 // src/components/authentication/sign-up-form.tsx
 /**
- * @file sign-up-form.tsx
- * @description Orquestador de UI y ensamblador 100% puro para el formulario de registro.
- *              Delega toda la lógica a su hook soberano `useSignUpForm` y recibe todos
- *              los textos a través de props, adhiriendo al patrón de componente de
- *              presentación puro.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @file src/components/authentication/sign-up-form.tsx
+ * @description Orquestador de UI para el formulario de registro. Corregido para
+ *              utilizar importaciones relativas directas, resolviendo la
+ *              dependencia circular `TS2303`.
+ * @author L.I.A. Legacy
  * @version 2.0.0
- * @see .docs-espejo/components/authentication/sign-up-form.tsx.md
  */
 "use client";
 
 import React from "react";
 import { FormProvider } from "react-hook-form";
 import { Loader2 } from "lucide-react";
+
 import {
   OAuthButtonGroup,
   type OAuthButtonGroupProps,
 } from "@/components/authentication";
 import { Button } from "@/components/ui/button";
-import { clientLogger } from "@/lib/logger";
 import { useSignUpForm } from "@/lib/hooks/useSignUpForm";
-import {
-  SignUpConfirmPasswordField,
-  SignUpEmailField,
-  SignUpLegalCheckboxes,
-  SignUpPasswordField,
-} from "./"; // Importa desde el barrel file
+import { clientLogger } from "@/lib/logger";
 
-export interface SignupFormTexts {
-  oauth: OAuthButtonGroupProps["texts"];
-  signUpButton: string;
-  signUpButton_pending: string;
-  fields: {
-    email: { label: string; placeholder: string };
-    password: { label: string };
-    confirmPassword: { label: string };
+// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (Rutas Relativas) ---
+import { SignUpConfirmPasswordField } from "./sign-up-form/SignUpConfirmPasswordField";
+import { SignUpEmailField } from "./sign-up-form/SignUpEmailField";
+import { SignUpLegalCheckboxes } from "./sign-up-form/SignUpLegalCheckboxes";
+import { SignUpPasswordField } from "./sign-up-form/SignUpPasswordField";
+// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
+
+export interface SignupFormProps {
+  texts: {
+    oauth: OAuthButtonGroupProps["texts"];
+    signUpButton: string;
+    signUpButton_pending: string;
+    fields: {
+      email: { label: string; placeholder: string };
+      password: { label: string };
+      confirmPassword: { label: string };
+    };
   };
 }
 
-export interface SignupFormProps {
-  texts: SignupFormTexts;
-}
-
-/**
- * @public
- * @component SignupForm
- * @description Orquesta la UI para el formulario de registro.
- * @param {SignupFormProps} props - Propiedades para configurar los textos.
- * @returns {React.ReactElement}
- */
 export function SignupForm({ texts }: SignupFormProps): React.ReactElement {
-  clientLogger.trace("[SignupForm] Renderizando ensamblador de UI puro.");
-
   const { form, isLoading, processSubmit, t, tErrors } = useSignUpForm();
   const {
     register,
@@ -63,10 +52,11 @@ export function SignupForm({ texts }: SignupFormProps): React.ReactElement {
   } = form;
   const passwordValue = watch("password");
 
+  clientLogger.trace("[SignupForm] Renderizando orquestador de UI.");
+
   return (
     <div className="space-y-4 p-6">
       <OAuthButtonGroup providers={["google"]} texts={texts.oauth} />
-
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
@@ -77,9 +67,8 @@ export function SignupForm({ texts }: SignupFormProps): React.ReactElement {
           </span>
         </div>
       </div>
-
       <FormProvider {...form}>
-        <form onSubmit={handleSubmit(processSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(processSubmit)} className="grid gap-4">
           <SignUpEmailField
             register={register}
             errors={errors}
@@ -103,6 +92,24 @@ export function SignupForm({ texts }: SignupFormProps): React.ReactElement {
                 ? tErrors(errors.password.message as any)
                 : undefined
             }
+            ariaLabels={{
+              show: "Mostrar contraseña",
+              hide: "Ocultar contraseña",
+            }}
+            strengthMeterTexts={{
+              strength_weak: t.rich("strength_weak", {
+                strong: (chunks) => <strong>{chunks}</strong>,
+              }),
+              strength_fair: t.rich("strength_fair", {
+                strong: (chunks) => <strong>{chunks}</strong>,
+              }),
+              strength_good: t.rich("strength_good", {
+                strong: (chunks) => <strong>{chunks}</strong>,
+              }),
+              strength_strong: t.rich("strength_strong", {
+                strong: (chunks) => <strong>{chunks}</strong>,
+              }),
+            }}
           />
           <SignUpConfirmPasswordField
             register={register}
@@ -114,13 +121,36 @@ export function SignupForm({ texts }: SignupFormProps): React.ReactElement {
                 ? tErrors(errors.confirmPassword.message as any)
                 : undefined
             }
+            ariaLabels={{
+              show: "Mostrar contraseña",
+              hide: "Ocultar contraseña",
+            }}
           />
           <SignUpLegalCheckboxes
             control={control}
             errors={errors}
             isPending={isLoading}
+            texts={{
+              legalNotice: t.rich("legalNotice", {
+                terms: (chunks) => (
+                  <a href="/terms" className="underline">
+                    {chunks}
+                  </a>
+                ),
+                privacy: (chunks) => (
+                  <a href="/privacy" className="underline">
+                    {chunks}
+                  </a>
+                ),
+              }),
+              newsletterLabel: t("newsletter_label"),
+            }}
+            errorMessage={
+              errors.termsAccepted?.message
+                ? tErrors(errors.termsAccepted.message as any)
+                : undefined
+            }
           />
-
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isLoading ? texts.signUpButton_pending : texts.signUpButton}

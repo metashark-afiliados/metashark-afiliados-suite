@@ -13,11 +13,11 @@
  */
 "use client";
 
-import { useMemo } from "react";
 import { useFormatter } from "next-intl";
+import { useMemo } from "react";
 
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

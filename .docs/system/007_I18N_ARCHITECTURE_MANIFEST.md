@@ -5,7 +5,7 @@
  *              Esta es la SSoT que define la estrategia para una i18n tipo-segura,
  *              modular y mantenible. Expande el Pilar 7 de la Constitución
  *              Arquitectónica y reemplaza a `.docs/007_IMAS_ARCHITECTURE_MANIFEST_V2.md`.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto de Arquitectura de Internacionalización (IMAS) v1.0

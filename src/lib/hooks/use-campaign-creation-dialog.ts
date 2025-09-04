@@ -2,15 +2,20 @@
 /**
  * @file use-campaign-creation-dialog.ts
  * @description Hook Soberano que encapsula la lógica de estado y las acciones
- *              para el diálogo de creación de campañas.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ *              para el diálogo de creación de campañas. Refactorizado para
+ *              alinearse con el contrato de datos de "Lean Database" y la
+ *              Constitución de Observabilidad.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
  */
 "use client";
 
-import { useDialogState } from "@/lib/hooks/ui/useDialogState";
-import { logger } from "@/lib/logging";
+import { useTranslations } from "next-intl";
+import toast from "react-hot-toast";
+
 import { type CampaignMetadata } from "@/lib/data/campaigns";
+import { useDialogState } from "@/lib/hooks/ui/useDialogState";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public
@@ -37,6 +42,7 @@ export function useCampaignCreationDialog({
   siteId,
   handleCreate,
 }: UseCampaignCreationDialogProps) {
+  const t = useTranslations("CampaignsPage.toasts");
   const {
     isOpen: isCreateDialogOpen,
     open: openCreateDialog,
@@ -46,22 +52,29 @@ export function useCampaignCreationDialog({
 
   const handleCreateCampaign = (formData: FormData) => {
     const name = formData.get("name") as string;
-    logger.trace(
-      `[useCampaignCreationDialog] Iniciando creación de campaña optimista`,
-      { name, siteId }
+    // --- INICIO DE REFACTORIZACIÓN: Firma de Logging Canónica ---
+    clientLogger.trace(
+      { name, siteId },
+      `[useCampaignCreationDialog] Iniciando creación de campaña optimista`
     );
+    // --- FIN DE REFACTORIZACIÓN ---
 
+    // --- INICIO DE REFACTORIZACIÓN: Alineación con Contrato de Datos ---
     const optimisticCampaign: Omit<CampaignMetadata, "id"> = {
       name,
       slug: name.toLowerCase().replace(/\s+/g, "-"),
       site_id: siteId,
-      status: "draft",
+      status: "draft", // Simula el JOIN de la capa de datos
+      status_id: 1, // ID canónico para 'draft'
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       affiliate_url: null,
+      creation_id: `optimistic-creation-${Date.now()}`,
     };
+    // --- FIN DE REFACTORIZACIÓN ---
 
     handleCreate(formData, optimisticCampaign);
+    toast.success(t("create_success"));
     closeCreateDialog();
   };
 
@@ -72,20 +85,4 @@ export function useCampaignCreationDialog({
     handleCreateCampaign,
   };
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (Lógica de UI)**: ((Implementada)) Este nuevo aparato aísla completamente la lógica de creación de campañas, haciendo que el componente `CampaignsPageHeader` pueda ser refactorizado a un presentador puro.
- * 2. **Desacoplamiento y Reutilización**: ((Implementada)) Al ser un hook, esta lógica puede ser reutilizada por el `ActionDock` para permitir la creación de campañas desde el dashboard principal.
- * 3. **Full Observabilidad**: ((Implementada)) La acción principal del hook está instrumentada con `logger.trace`.
- *
- * @subsection Melhorias Futuras
- * 1. **Soporte para Creación desde Plantilla**: ((Vigente)) El hook puede ser extendido para manejar un `templateId` opcional, que se pasaría a la `createCampaignAction` para crear una campaña con una estructura predefinida.
- *
- * =====================================================================
- */
 // src/lib/hooks/use-campaign-creation-dialog.ts

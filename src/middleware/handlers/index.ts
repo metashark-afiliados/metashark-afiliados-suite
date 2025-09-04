@@ -6,7 +6,7 @@
  *              todos los aparatos de lógica atómicos del directorio, adhiriéndose
  *              a la "Filosofía LEGO" y proveyendo una fachada limpia para el
  *              orquestador principal.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @copilot RaZ WriTe
  * @version 2.0.0
  */

@@ -1,16 +1,26 @@
 // src/lib/hooks/use-campaign-actions.ts
+/**
+ * @file use-campaign-actions.ts
+ * @description Hook de React atómico que encapsula la lógica para ejecutar acciones
+ *              sobre campañas, como archivar y duplicar, incluyendo el feedback
+ *              al usuario a través de `react-hot-toast`.
+ * @author Raz Podestá
+ * @version 2.0.0
+ * @see .docs-espejo/lib/hooks/use-campaign-actions.ts.md
+ */
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
 
 import {
   archiveCampaignAction,
   duplicateCampaignAction,
 } from "@/lib/actions/campaigns.actions";
-import { logger } from "@/lib/logging";
 import { type CampaignMetadata } from "@/lib/data/campaigns";
+import { clientLogger } from "@/lib/logger";
+import { isActionError } from "@/lib/validators";
 
 interface UseCampaignActionsProps {
   handleUpdate?: (
@@ -24,11 +34,9 @@ interface UseCampaignActionsProps {
  * @public
  * @function useCampaignActions
  * @description Hook atómico que encapsula la lógica para ejecutar acciones sobre
- *              campañas, como archivar y duplicar, incluyendo el feedback al usuario.
+ *              campañas.
  * @param {UseCampaignActionsProps} props - Los callbacks del hook optimista.
  * @returns Los manejadores de acciones listos para ser consumidos por la UI.
- * @version 1.1.0
- * @author Raz Podestá
  */
 export function useCampaignActions({
   handleUpdate,
@@ -38,12 +46,17 @@ export function useCampaignActions({
 
   const handleArchiveCampaign = useCallback(
     (campaignId: string) => {
-      logger.trace(`[useCampaignActions] Archivando campaña`, { campaignId });
-      handleUpdate?.(campaignId, { status: "archived" });
+      const context = { campaignId };
+      clientLogger.trace(context, "[useCampaignActions] Archivando campaña.");
+      handleUpdate?.(campaignId, { status: "archived", status_id: 3 });
       toast.promise(archiveCampaignAction(campaignId), {
         loading: t("toasts.archiving"),
-        success: t("toasts.archive_success"),
-        error: t("errors.archive_failed"),
+        success: (result) => {
+          if (isActionError(result)) throw new Error(result.error);
+          return t("toasts.archive_success");
+        },
+        error: (err) =>
+          t(`errors.${err.message}`) || t("errors.archive_failed"),
       });
     },
     [handleUpdate, t]
@@ -51,12 +64,17 @@ export function useCampaignActions({
 
   const handleDuplicateCampaign = useCallback(
     (campaignId: string) => {
-      logger.trace(`[useCampaignActions] Duplicando campaña`, { campaignId });
+      const context = { campaignId };
+      clientLogger.trace(context, "[useCampaignActions] Duplicando campaña.");
       handleDuplicate?.(campaignId);
       toast.promise(duplicateCampaignAction(campaignId), {
         loading: t("toasts.duplicating"),
-        success: t("toasts.duplicate_success"),
-        error: t("errors.duplication_failed"),
+        success: (result) => {
+          if (isActionError(result)) throw new Error(result.error);
+          return t("toasts.duplicate_success");
+        },
+        error: (err) =>
+          t(`errors.${err.message}`) || t("errors.duplication_failed"),
       });
     },
     [handleDuplicate, t]
@@ -67,14 +85,4 @@ export function useCampaignActions({
     handleDuplicateCampaign,
   };
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Contrato de API**: ((Implementada)) Se ha corregido la firma de `handleUpdate` para que coincida con la del hook `useOptimisticResourceManagement`, resolviendo el error de tipo.
- *
- * =====================================================================
- */
+// src/lib/hooks/use-campaign-actions.ts

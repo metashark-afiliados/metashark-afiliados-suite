@@ -12,11 +12,10 @@
  */
 "use client";
 
-import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 import toast from "react-hot-toast";
 
-import { completeOnboardingAction } from "@/lib/actions/onboarding.actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,8 +25,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { completeOnboardingAction } from "@/lib/actions/onboarding.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 export function WelcomeModal() {
   const { user } = useDashboard();

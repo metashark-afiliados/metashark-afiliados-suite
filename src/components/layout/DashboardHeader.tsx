@@ -12,8 +12,8 @@
  */
 "use client";
 
-import React from "react";
 import { ChevronLeft, Menu, Search } from "lucide-react";
+import React from "react";
 
 import { Breadcrumbs } from "@/components/dashboard/Breadcrumbs";
 import { InvitationBell } from "@/components/dashboard/InvitationBell";
@@ -24,8 +24,8 @@ import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
 import { useCommandPaletteStore } from "@/lib/hooks/use-command-palette";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
+import { clientLogger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
-import { clientLogger } from "@/lib/logging";
 import { DashboardSidebar } from "./DashboardSidebar";
 
 /**

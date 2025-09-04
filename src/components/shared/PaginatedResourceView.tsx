@@ -10,15 +10,15 @@
  */
 "use client";
 
-import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import React from "react";
 
 import {
   PaginationControls,
   type PaginationTexts,
 } from "@/components/shared/pagination-controls";
 import { Card } from "@/components/ui/card";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 export interface PaginatedResourceViewProps<T> {
   viewKey: string;

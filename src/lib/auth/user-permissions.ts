@@ -1,11 +1,11 @@
 // src/lib/auth/user-permissions.ts
 /**
  * @file user-permissions.ts
- * @description Guardián de seguridad de élite y SSoT para la obtención de datos de
- *              sesión en el servidor. Sincronizado con la arquitectura "Lean Database".
- * @author @author RaZ Podestá - MetaShark Tech
- * @version 6.0.0
- * @see .docs-espejo/lib/auth/user-permissions.md
+ * @description Guardián de seguridad de élite y SSoT para la obtención y
+ *              enriquecimiento de datos de sesión en el servidor. Sincronizado
+ *              con la arquitectura de datos atomizada.
+ * @author L.I.A. Legacy
+ * @version 9.0.0
  */
 "use server";
 import "server-only";
@@ -14,16 +14,17 @@ import { unstable_cache as cache } from "next/cache";
 import { cookies } from "next/headers";
 import { type User } from "@supabase/supabase-js";
 
+import { getAuthUser } from "@/lib/auth/get-auth-user";
+import { type WorkspaceRoleName } from "@/config/roles.config";
 import {
-  sites as sitesData,
   permissions as permissionsData,
-  campaignsData,
+  sites as sitesData,
+  campaignsData, // Importar el namespace principal
 } from "@/lib/data";
 import { type SiteBasicInfo } from "@/lib/data/sites/types";
 import { logger } from "@/lib/logger";
-import { createClient as createServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { type Database } from "@/lib/types/database";
-import { type WorkspaceRoleName } from "@/config/roles.config";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
@@ -31,79 +32,64 @@ export type UserAuthData = {
   user: User;
   appRole: AppRole;
   activeWorkspaceId: string | null;
+  activeWorkspaceRoleId: number | null;
 };
 
 type AuthResultSuccess<T> = { success: true; data: T };
 type AuthResultError =
   | { success: false; error: "SESSION_NOT_FOUND"; data: null }
-  | { success: false; error: "PERMISSION_DENIED"; data: UserAuthData }
+  | {
+      success: false;
+      error: "PERMISSION_DENIED";
+      data: UserAuthData;
+    }
   | { success: false; error: "NOT_FOUND"; data: null };
 
 export type AuthResult<T> = AuthResultSuccess<T> | AuthResultError;
 
-const getCachedUserAndProfile = cache(
-  async (sessionId: string | undefined) => {
-    logger.trace("[AuthCache] Miss: Obteniendo datos de usuario y perfil.");
-    const supabase = createServerClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+const getCachedEnrichedAuthData = cache(
+  async (userId: string | undefined): Promise<UserAuthData | null> => {
+    logger.trace(
+      { userId },
+      "[AuthCache] Miss: Obteniendo datos enriquecidos."
+    );
+    const user = await getAuthUser();
+    if (!user) return null;
 
-    if (!user) {
-      return null;
-    }
+    const cookieStore = cookies();
+    const supabase = createClient();
+    const activeWorkspaceId =
+      cookieStore.get("active_workspace_id")?.value || null;
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("app_role")
-      .eq("id", user.id)
-      .single();
+    const [profile, memberRole] = await Promise.all([
+      supabase.from("profiles").select("app_role").eq("id", user.id).single(),
+      activeWorkspaceId
+        ? supabase
+            .from("workspace_members")
+            .select("role_id")
+            .eq("user_id", user.id)
+            .eq("workspace_id", activeWorkspaceId)
+            .single()
+        : Promise.resolve({ data: null }),
+    ]);
 
     return {
       user,
-      appRole: profile?.app_role || "user",
+      appRole: profile.data?.app_role || "user",
+      activeWorkspaceId,
+      activeWorkspaceRoleId: memberRole.data?.role_id || null,
     };
   },
-  ["user-profile-cache"],
+  ["enriched-auth-data"],
   { tags: ["auth-data"], revalidate: 60 }
 );
 
 export async function getAuthenticatedUserAuthData(): Promise<UserAuthData | null> {
-  const cookieStore = cookies();
-  const sessionId = cookieStore.get(
-    `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split(".")[0].replace("https://", "")}-auth-token`
-  )?.value;
-
-  const cachedData = await getCachedUserAndProfile(sessionId);
-
-  if (!cachedData) {
-    return null;
-  }
-
-  const activeWorkspaceId =
-    cookieStore.get("active_workspace_id")?.value || null;
-
-  return {
-    ...cachedData,
-    activeWorkspaceId,
-  };
-}
-
-/**
- * @public
- * @async
- * @function getRequiredAuthData
- * @description Obtiene los datos de sesión de un usuario autenticado. Lanza un error
- *              si no se encuentra una sesión válida. Es el reemplazo canónico
- *              para el obsoleto `getAuthenticatedUser`.
- * @returns {Promise<AuthResult<UserAuthData>>}
- */
-export async function getRequiredAuthData(): Promise<AuthResult<UserAuthData>> {
-  const authData = await getAuthenticatedUserAuthData();
-  if (!authData) {
-    return { success: false, error: "SESSION_NOT_FOUND", data: null };
-  }
-  return { success: true, data: authData };
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return getCachedEnrichedAuthData(user?.id);
 }
 
 export async function requireAppRole(
@@ -114,11 +100,14 @@ export async function requireAppRole(
     return { success: false, error: "SESSION_NOT_FOUND", data: null };
   }
   if (!requiredRoles.includes(authData.appRole)) {
-    logger.warn(`[AuthGuard] VIOLACIÓN DE ROL: Acceso a recurso denegado.`, {
-      userId: authData.user.id,
-      role: authData.appRole,
-      required: requiredRoles,
-    });
+    logger.warn(
+      {
+        userId: authData.user.id,
+        role: authData.appRole,
+        required: requiredRoles,
+      },
+      "[AuthGuard] VIOLACIÓN DE ROL: Acceso denegado."
+    );
     return { success: false, error: "PERMISSION_DENIED", data: authData };
   }
   return { success: true, data: authData };
@@ -127,20 +116,28 @@ export async function requireAppRole(
 export async function requireWorkspacePermission(
   workspaceId: string,
   requiredRoles: WorkspaceRoleName[]
-): Promise<AuthResult<UserAuthData>> {
+): Promise<AuthResult<{ user: User }>> {
   const authData = await getAuthenticatedUserAuthData();
   if (!authData) {
     return { success: false, error: "SESSION_NOT_FOUND", data: null };
   }
+  const { user } = authData;
+
   const isAuthorized = await permissionsData.hasWorkspacePermission(
-    authData.user.id,
+    user.id,
     workspaceId,
     requiredRoles
   );
+
   if (!isAuthorized) {
+    logger.warn(
+      { userId: user.id, workspaceId, requiredRoles },
+      "[AuthGuard] VIOLACIÓN DE WORKSPACE: Acceso denegado."
+    );
     return { success: false, error: "PERMISSION_DENIED", data: authData };
   }
-  return { success: true, data: authData };
+
+  return { success: true, data: { user } };
 }
 
 export async function requireSitePermission(
@@ -162,16 +159,11 @@ export async function requireSitePermission(
     requiredRoles
   );
   if (!isAuthorized) {
-    logger.warn(`[AuthGuard] VIOLACIÓN DE SITIO: Acceso denegado.`, {
-      userId: user.id,
-      siteId,
-      workspaceId: site.workspace_id,
-    });
-    return {
-      success: false,
-      error: "PERMISSION_DENIED",
-      data: authData as any,
-    };
+    logger.warn(
+      { userId: user.id, siteId, workspaceId: site.workspace_id },
+      "[AuthGuard] VIOLACIÓN DE SITIO: Acceso denegado."
+    );
+    return { success: false, error: "PERMISSION_DENIED", data: authData };
   }
   return { success: true, data: { user, site } };
 }
@@ -186,13 +178,12 @@ export async function requireCampaignPermission(
   }
   const { user } = authData;
 
+  // --- INICIO DE CORRECCIÓN (TS2305) ---
   const campaignInfo =
-    await campaignsData.management.getCampaignSiteInfoById(campaignId);
+    await campaignsData.auth.getCampaignSiteInfoById(campaignId);
+  // --- FIN DE CORRECCIÓN ---
+
   if (!campaignInfo || !campaignInfo.workspace_id) {
-    logger.warn(
-      `[AuthGuard] Fallo de permiso de campaña: Campaña no encontrada o sin workspace.`,
-      { campaignId }
-    );
     return { success: false, error: "NOT_FOUND", data: null };
   }
 
@@ -203,11 +194,6 @@ export async function requireCampaignPermission(
   );
 
   if (!isAuthorized) {
-    logger.warn(`[AuthGuard] VIOLACIÓN DE CAMPAÑA: Acceso denegado.`, {
-      userId: user.id,
-      campaignId,
-      workspaceId: campaignInfo.workspace_id,
-    });
     return { success: false, error: "PERMISSION_DENIED", data: authData };
   }
 

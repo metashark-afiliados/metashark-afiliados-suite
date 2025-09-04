@@ -7,7 +7,7 @@
  *              utilizar rutas de importación absolutas, resolviendo un fallo crítico
  *              de compilación en el Edge Runtime causado por la migración a la
  *              estructura de directorios `src/`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import * as Sentry from "@sentry/nextjs";

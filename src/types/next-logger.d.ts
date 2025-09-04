@@ -5,7 +5,7 @@
  *              Este aparato enseña a TypeScript la forma del objeto `logger`
  *              exportado por la librería, resolviendo el error TS7016 y restaurando
  *              la seguridad de tipos en nuestra capa de logging.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 declare module "next-logger" {

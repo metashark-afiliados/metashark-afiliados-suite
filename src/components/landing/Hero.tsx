@@ -5,7 +5,7 @@
  *              Ha sido refactorizado para ser 100% agnóstico al contenido,
  *              recibiendo todos sus textos a través de props desde el
  *              orquestador de servidor.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 3.0.0
  */
 "use client";
@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { Link } from "@/lib/navigation";
 
 /**

@@ -1,16 +1,15 @@
 // src/messages/manifest.ts
 /**
  * @file manifest.ts
- * @description Manifiesto de Importación Dinámica y SSoT. Esta versión ha sido
- *              sincronizada holísticamente para reflejar la estructura de archivos
- *              real del proyecto, resolviendo errores de módulos no encontrados y omisiones.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 28.0.0
+ * @description Manifiesto de Importación Dinámica y SSoT. Sincronizado para
+ *              reflejar la estructura de archivos real del proyecto, resolviendo
+ *              errores de módulos no encontrados.
+ * @author L.I.A. Legacy
+ * @version 29.0.0
  */
 import { type ManifestModule } from "./types";
 
 export const messagesManifest: Record<string, ManifestModule> = {
-  // --- Namespaces a Nivel de App ---
   "app.dev-console.CampaignsTable": () =>
     import("./app/[locale]/dev-console/CampaignsTable.json"),
   "app.dev-console.ImpersonationDialog": () =>
@@ -27,13 +26,8 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./app/[locale]/dashboard/sites/[siteId]/campaigns/page.json"),
   "app.[locale].login.page": () => import("./app/[locale]/login/page.json"),
   "app.[locale].signup.page": () => import("./app/[locale]/signup/page.json"),
-
-  // --- Namespaces de Componentes (Sincronizado) ---
-  "components.auth.LoginForm": () => import("./components/auth/LoginForm.json"),
   "components.auth.OAuthButton": () =>
     import("./components/auth/OAuthButton.json"),
-  "components.auth.SupabaseAuthUI": () =>
-    import("./components/auth/SupabaseAuthUI.json"),
   "components.builder.BlocksPalette": () =>
     import("./components/builder/BlocksPalette.json"),
   "components.builder.BuilderHeader": () =>
@@ -43,6 +37,8 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./components/builder/SettingsPanel.json"),
   "components.builder.SiteAssignmentControl": () =>
     import("./components/builder/SiteAssignmentControl.json"),
+  "components.dashboard.DashboardSubscriptionCard": () =>
+    import("./components/dashboard/DashboardSubscriptionCard.json"),
   "components.dashboard.DashboardTeamMembersCard": () =>
     import("./components/dashboard/DashboardTeamMembersCard.json"),
   "components.dashboard.DashboardTutorialCard": () =>
@@ -79,8 +75,6 @@ export const messagesManifest: Record<string, ManifestModule> = {
     import("./components/ui/ThemeSwitcher.json"),
   "components.workspaces.WorkspaceSwitcher": () =>
     import("./components/workspaces/WorkspaceSwitcher.json"),
-
-  // --- Namespaces de Páginas ---
   "pages.AboutPage": () => import("./pages/AboutPage.json"),
   "pages.AuthNoticePage": () => import("./pages/AuthNoticePage.json"),
   "pages.BlogPage": () => import("./pages/BlogPage.json"),
@@ -96,8 +90,6 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "pages.TemplateGallery": () => import("./pages/TemplateGallery.json"),
   "pages.TermsOfServicePage": () => import("./pages/TermsOfServicePage.json"),
   "pages.landing": () => import("./pages/landing.json"),
-
-  // --- Namespaces Compartidos ---
   "shared.ActionDock": () => import("./shared/ActionDock.json"),
   "shared.ValidationErrors": () => import("./shared/ValidationErrors.json"),
   "shared.WelcomeModal": () => import("./shared/WelcomeModal.json"),

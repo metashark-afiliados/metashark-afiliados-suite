@@ -2,9 +2,10 @@
 /**
  * @file deleteSite.action.ts
  * @description Server Action atómica para la eliminación de un sitio.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 1.0.0
- * @see .docs-espejo/lib/actions/sites/deleteSite.action.ts.md
+ *              Refactorizada para adherirse al contrato `ActionResult` blindado,
+ *              la Constitución de Observabilidad y la SSoT de seguridad.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
  */
 "use server";
 import "server-only";
@@ -17,33 +18,45 @@ import {
   createPersistentErrorLog,
 } from "@/lib/actions/_helpers";
 import { requireSitePermission } from "@/lib/auth/user-permissions";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, DeleteSiteSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  DeleteSiteSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
+/**
+ * @public
+ * @async
+ * @function deleteSiteAction
+ * @description Orquesta la eliminación de un sitio, validando que el actor
+ *              sea el 'owner' del workspace asociado.
+ * @param {FormData} formData - Los datos del formulario que contienen `siteId`.
+ * @returns {Promise<ActionResult<{ messageKey: ValidationErrorKey }>>} El resultado de la operación.
+ */
 export async function deleteSiteAction(
   formData: FormData
-): Promise<ActionResult<{ message: string }>> {
-  let siteId: string | undefined;
+): Promise<ActionResult<{ messageKey: ValidationErrorKey }>> {
   const rawData = Object.fromEntries(formData);
-  let userIdForErrorLog: string | undefined;
+  let context: Record<string, any> = { payload: rawData };
 
   try {
-    const parsedData = DeleteSiteSchema.parse(rawData);
-    siteId = parsedData.siteId;
+    const { siteId } = DeleteSiteSchema.parse(rawData);
+    context.siteId = siteId;
 
     const permissionCheck = await requireSitePermission(siteId, ["owner"]);
     if (!permissionCheck.success) {
-      logger.warn(
-        `[SitesActions:deleteSite] Permiso denegado para usuario ${permissionCheck.data?.user?.id} en sitio ${siteId}.`
-      );
+      const userId = permissionCheck.data?.user?.id;
+      context.userId = userId;
+      logger.warn(context, `[deleteSiteAction] Permiso denegado.`);
       return {
         success: false,
-        error: "ValidationErrors.sites_delete_permission_denied",
+        error: "sites.delete_permission_denied",
       };
     }
     const { user, site } = permissionCheck.data;
-    userIdForErrorLog = user.id;
+    context.userId = user.id;
 
     const supabase = createClient();
     const { error } = await supabase.from("sites").delete().eq("id", siteId);
@@ -60,42 +73,37 @@ export async function deleteSiteAction(
     });
 
     revalidatePath("/dashboard/sites");
-    logger.info(
-      `[SitesActions:deleteSite] Sitio ${site.subdomain} eliminado con éxito.`,
-      { siteId, userId: user.id }
-    );
+    logger.info(context, `[deleteSiteAction] Sitio eliminado con éxito.`);
     return {
       success: true,
-      data: { message: "Sitio eliminado correctamente." }, // NOTA: Mensaje para toast de admin.
+      data: { messageKey: "sites.delete_success" },
     };
   } catch (error) {
+    let errorKey: ValidationErrorKey;
+
     if (error instanceof ZodError) {
-      logger.warn(`[SitesActions:deleteSite] ID de sitio inválido:`, {
-        errors: error.flatten(),
-      });
-      const firstError = error.errors[0]?.message;
-      return {
-        success: false,
-        error: firstError || "ValidationErrors.sites_delete_invalid_id",
-      };
+      errorKey = error.errors[0]?.message as ValidationErrorKey;
+      logger.warn(
+        { errors: error.flatten(), ...context },
+        `[deleteSiteAction] ID de sitio inválido.`
+      );
+    } else {
+      errorKey = "generic.error_server_generic";
     }
 
     const errorId = await createPersistentErrorLog(
-      "deleteSiteAction.unexpected",
+      "deleteSiteAction",
       error as Error,
-      {
-        siteId: siteId ?? "unknown",
-        userId: userIdForErrorLog,
-        payload: rawData,
-      }
+      context
     );
     logger.error(
-      `[SitesActions:deleteSite] Error inesperado. Log ID: ${errorId}`,
-      {
-        error,
-      }
+      { err: error, errorId, ...context },
+      `[deleteSiteAction] Error inesperado.`
     );
-    return { success: false, error: "ValidationErrors.error_server_generic" };
+    return {
+      success: false,
+      error: errorKey,
+    };
   }
 }
 // src/lib/actions/sites/deleteSite.action.ts

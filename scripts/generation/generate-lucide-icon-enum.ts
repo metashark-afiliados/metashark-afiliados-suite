@@ -4,7 +4,7 @@
  * @description Script de automatización de élite para la DX. Lee la SSoT
  *              de iconos de lucide-react y genera un schema de Zod y un tipo
  *              de TypeScript para los nombres de iconos.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import fs from "fs";

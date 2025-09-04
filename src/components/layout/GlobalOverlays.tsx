@@ -9,8 +9,6 @@
  */
 "use client";
 
-import React from "react";
-
 import { TemplateGalleryModal } from "@/components/builder/panels/TemplateGalleryModal";
 import { CommandPalette } from "@/components/feedback/CommandPalette";
 import { LiaChatWidget } from "@/components/feedback/LiaChatWidget";
@@ -22,7 +20,7 @@ import {
   RenameWorkspaceDialog,
 } from "@/components/workspaces/dialogs";
 import { useDashboard } from "@/lib/context/DashboardContext";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 export function GlobalOverlays() {
   const { profile } = useDashboard() ?? { profile: null };

@@ -13,10 +13,10 @@
  */
 "use client";
 
-import React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
+import React from "react";
 
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 const headerVariants = cva("flex gap-4 relative", {

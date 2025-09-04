@@ -14,7 +14,7 @@ import React from "react";
 
 import { EditableText } from "@/components/builder/ui/EditableText";
 import { type LinkItem } from "@/lib/builder/types.d";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 export interface Footer1Props {
   blockId: string;

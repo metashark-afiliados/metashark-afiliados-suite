@@ -12,15 +12,14 @@
  */
 "use client";
 
-import React from "react";
 import Image from "next/image";
+import React from "react";
 // --- INICIO DE CORRECCIÓN DE ERROR DE TIPEO ---
 import { useDraggable } from "@dnd-kit/core";
 // --- FIN DE CORRECCIÓN DE ERROR DE TIPEO ---
 import { useTranslations } from "next-intl";
 
 import { type TemplateDefinition } from "@/config/template-manifest.config";
-import { logger } from "@/lib/logging";
 
 export interface TemplateCardProps {
   template: TemplateDefinition;

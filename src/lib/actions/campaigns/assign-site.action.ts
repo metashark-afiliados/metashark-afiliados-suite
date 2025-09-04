@@ -1,40 +1,51 @@
 // src/lib/actions/campaigns/assign-site.action.ts
+/**
+ * @file assign-site.action.ts
+ * @description Server Action atómica para asignar una campaña a un sitio.
+ *              Alineada con la arquitectura de errores soberanos, la
+ *              observabilidad canónica y la SSoT de autenticación.
+ * @author L.I.A Legacy
+ * @version 5.0.0
+ */
 "use server";
 import "server-only";
 
 import { revalidatePath } from "next/cache";
 
-import { requireSitePermission } from "@/lib/auth/user-permissions";
-import { logger } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/server";
-import { type ActionResult } from "@/lib/validators";
 import {
   createAuditLog,
   createPersistentErrorLog,
-  getAuthenticatedUser,
-} from "../_helpers";
+} from "@/lib/actions/_helpers";
+import { getAuthenticatedUserOrThrow } from "@/lib/actions/_helpers/auth.helper";
+import { requireSitePermission } from "@/lib/auth/user-permissions";
+import { logger } from "@/lib/logger";
+import { createClient } from "@/lib/supabase/server";
+import { type ActionResult, type ValidationErrorKey } from "@/lib/validators";
 
 /**
  * @public
  * @async
  * @function assignSiteToCampaignAction
- * @description [Arquitectura v12.0] Asigna una campaña "huérfana" a un sitio,
- *              validando que el usuario tenga permisos sobre el sitio de destino y
- *              sea el creador de la campaña.
+ * @description Asigna una campaña (a través de su `creationId`) a un sitio específico.
+ *              Esta acción es crítica para el flujo de publicación. Valida que:
+ *              1. El usuario tenga permisos de edición sobre el sitio de destino.
+ *              2. La campaña no esté ya asignada a otro sitio.
+ *              3. El usuario sea el creador original del diseño (`Creation`).
  * @param {string} campaignId - El ID de la campaña a asignar.
- * @param {string} siteId - El ID del sitio de destino.
+ * @param {string} siteId - El ID del sitio al que se asignará la campaña.
  * @returns {Promise<ActionResult<void>>} El resultado de la operación.
  */
 export async function assignSiteToCampaignAction(
   campaignId: string,
   siteId: string
 ): Promise<ActionResult<void>> {
-  const authResult = await getAuthenticatedUser();
-  if ("error" in authResult) return authResult.error;
-  const { user } = authResult;
-
+  const context = { campaignId, siteId };
   try {
-    // 1. Validar permiso sobre el sitio de destino
+    const user = await getAuthenticatedUserOrThrow();
+    context.userId = user.id;
+
+    logger.trace(context, "[assignSiteToCampaignAction] Iniciando acción.");
+
     const sitePermissionCheck = await requireSitePermission(siteId, [
       "owner",
       "admin",
@@ -43,47 +54,51 @@ export async function assignSiteToCampaignAction(
     if (!sitePermissionCheck.success) {
       return {
         success: false,
-        error: "CampaignsPage.errors.permission_denied_site",
+        error: "campaigns.permission_denied_site",
       };
     }
     const { site } = sitePermissionCheck.data;
 
-    // 2. Obtener campaña y validar reglas de negocio
     const supabase = createClient();
     const { data: campaign, error: campaignError } = await supabase
       .from("campaigns")
-      .select("id, name, site_id, created_by")
+      .select("id, name, site_id, creation_id")
       .eq("id", campaignId)
       .single();
 
     if (campaignError || !campaign) {
       return {
         success: false,
-        error: "CampaignsPage.errors.campaign_not_found",
+        error: "campaigns.not_found",
       };
     }
 
-    if (campaign.created_by !== user.id || campaign.site_id !== null) {
+    const { data: creation } = await supabase
+      .from("creations")
+      .select("created_by")
+      .eq("id", campaign.creation_id)
+      .single();
+
+    if (creation?.created_by !== user.id || campaign.site_id !== null) {
       logger.warn(
-        `[SEGURIDAD] VIOLACIÓN DE ASIGNACIÓN: Usuario ${user.id} intentó asignar la campaña ${campaignId} sin ser el propietario o la campaña ya está asignada.`
+        context,
+        "[assignSiteToCampaignAction] VIOLACIÓN: Intento de asignación no permitida (ya asignada o no es propietario)."
       );
       return {
         success: false,
-        error: "CampaignsPage.errors.assignment_not_allowed",
+        error: "campaigns.assignment_not_allowed",
       };
     }
 
-    // 3. Ejecutar la mutación
     const { error: updateError } = await supabase
       .from("campaigns")
-      .update({ site_id: siteId })
+      .update({ site_id: siteId, updated_at: new Date().toISOString() })
       .eq("id", campaignId);
 
     if (updateError) {
       throw updateError;
     }
 
-    // 4. Auditoría y Revalidación
     await createAuditLog("campaign.site_assigned", {
       userId: user.id,
       targetEntityId: campaignId,
@@ -98,33 +113,22 @@ export async function assignSiteToCampaignAction(
     revalidatePath(`/builder/${campaignId}`);
     revalidatePath(`/dashboard/sites/${siteId}/campaigns`);
 
+    logger.info(context, "[assignSiteToCampaignAction] Asignación exitosa.");
     return { success: true, data: undefined };
   } catch (error) {
     const errorId = await createPersistentErrorLog(
       "assignSiteToCampaignAction",
       error as Error,
-      { userId: user.id, siteId, campaignId }
+      context
     );
     logger.error(
-      `Error inesperado en assignSiteToCampaignAction. Log ID: ${errorId}`
+      { err: error, errorId, ...context },
+      "[assignSiteToCampaignAction] Fallo en la acción."
     );
-    return { success: false, error: "CampaignsPage.errors.unexpected" };
+    return {
+      success: false,
+      error: "campaigns.update_failed",
+    };
   }
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Lógica de Asignación Segura**: ((Implementada)) La acción implementa una doble verificación de permisos: el usuario debe ser el creador de la campaña "huérfana" Y tener permisos sobre el sitio de destino.
- * 2. **Atomicidad (SRP)**: ((Implementada)) Este aparato encapsula una única y crítica operación de negocio.
- * 3. **Full Observabilidad y Resiliencia**: ((Implementada)) El flujo completo está envuelto en `try/catch` con registro de errores persistente, y cada punto de decisión lógico es registrado.
- *
- * @subsection Melhorias Futuras
- * 1. **Contrato de Error I18n**: ((Implementada)) Los mensajes de error son claves que deben ser añadidas al schema de i18n para su correcta traducción en la UI.
- * 2. **Transacciones RPC**: ((Vigente)) Si en el futuro esta acción necesitara realizar más de una operación de escritura, debería ser migrada a una función RPC de PostgreSQL para garantizar la atomicidad transaccional.
- *
- * =====================================================================
- */
 // src/lib/actions/campaigns/assign-site.action.ts

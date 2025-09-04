@@ -12,9 +12,8 @@
  */
 "use client";
 
-import React from "react";
-import { useTranslations } from "next-intl";
 import { PlusCircle, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { SettingsField } from "@/components/builder/SettingsField";
 import {
@@ -29,7 +28,7 @@ import {
   type EditablePropertyDefinition,
   type PageBlock,
 } from "@/lib/builder/types.d";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 export interface ArrayFieldProps {
   block: PageBlock;

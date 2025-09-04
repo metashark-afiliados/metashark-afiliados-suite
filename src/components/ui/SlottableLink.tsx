@@ -22,7 +22,7 @@ export interface SlottableLinkProps
  * @component SlottableLink
  * @description Componente adaptador de élite. Reenvía `ref` y props al `Link`
  *              de nuestra SSoT de navegación, permitiendo una composición segura.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
  */
 export const SlottableLink = React.forwardRef<

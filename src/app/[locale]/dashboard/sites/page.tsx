@@ -10,10 +10,10 @@
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
-import { Suspense } from "react";
 import { unstable_setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import SitesPageSkeleton from "./loading";
 import { SitesPageLoader } from "./sites-page-loader";
 

@@ -6,7 +6,7 @@
  *              patrones para todas las pruebas en ConvertiKit. Expande la
  *              capa de Verificación del Sistema Espejo y reemplaza a
  *              `.docs/008_TESTING_ARCHITECTURE_MANIFEST.md`.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Canónico de Arquitectura de Pruebas v1.0

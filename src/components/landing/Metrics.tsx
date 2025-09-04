@@ -4,16 +4,16 @@
  * @description Componente de presentación para la sección de métricas.
  *              Implementa contadores animados e iconos contextuales para una
  *              experiencia de usuario dinámica y visualmente atractiva.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.1.0
  */
 "use client";
 
-import React, { useEffect, useRef } from "react";
 import { animate, motion, useInView } from "framer-motion";
+import React, { useEffect } from "react";
 
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

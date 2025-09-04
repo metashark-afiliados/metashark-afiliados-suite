@@ -4,9 +4,8 @@
  * @description Aparato de UI atómico y de presentación 100% puro. Renderiza el
  *              campo de email, recibiendo todo su contenido y estado vía props,
  *              e integrando un icono para una UX de élite.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 2.0.0
- * @see .docs-espejo/components/authentication/sign-up-form/SignUpEmailField.tsx.md
  */
 "use client";
 
@@ -21,6 +20,13 @@ import { type SignUpSchema } from "@/lib/validators";
 
 type FormData = z.infer<typeof SignUpSchema>;
 
+/**
+ * @public
+ * @interface SignUpEmailFieldProps
+ * @description El contrato de props para el componente de campo de email.
+ *              Define todas las dependencias de `react-hook-form` y los textos
+ *              requeridos para una renderización pura.
+ */
 export interface SignUpEmailFieldProps {
   register: UseFormRegister<FormData>;
   errors: FieldErrors<FormData>;
@@ -45,9 +51,9 @@ export function SignUpEmailField({
   placeholder,
   errorMessage,
 }: SignUpEmailFieldProps): React.ReactElement {
-  clientLogger.trace(
-    "[SignUpEmailField] Renderizando componente de campo de email puro."
-  );
+  clientLogger.trace("[SignUpEmailField] Renderizando componente puro.", {
+    component: "SignUpEmailField",
+  });
 
   return (
     <div className="space-y-1">

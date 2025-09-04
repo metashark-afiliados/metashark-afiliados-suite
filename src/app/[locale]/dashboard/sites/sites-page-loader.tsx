@@ -5,29 +5,43 @@
  *              refactorizado a un estándar de élite para consumir la API de datos
  *              atómica, validar los parámetros de la URL con guardianes de tipo,
  *              y manejar errores de forma resiliente.
- * @author L.I.A. Legacy & Raz Podestá
- * @version 4.1.0
- * @date 2025-08-27
+ * @author Raz Podestá - MetaShark Tech & Raz Podestá
+ * @version 5.0.0
  */
+"use server";
+import "server-only";
+
+import { AlertTriangle } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
-import { AlertTriangle } from "lucide-react";
 import React from "react";
 
 import { ErrorStateCard } from "@/components/shared/error-state-card";
 import { createPersistentErrorLog } from "@/lib/actions/_helpers";
-// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (TS2305) ---
 import { sites as sitesData } from "@/lib/data";
 import { isSiteSortOption, isSiteStatusFilter } from "@/lib/data/sites/types";
-// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 
 import { SitesClient } from "./sites-client";
 
 const SITES_PER_PAGE = 9;
 
+/**
+ * @public
+ * @async
+ * @component SitesPageLoader
+ * @description Orquestador de servidor para la página "Mis Sitios". Responsable de:
+ *              1. Validar la sesión y el contexto del workspace.
+ *              2. Sanear y validar los parámetros de búsqueda de la URL.
+ *              3. Obtener los datos paginados de los sitios desde la capa de datos.
+ *              4. Manejar errores críticos y mostrar un estado de error resiliente.
+ *              5. Pasar los datos obtenidos al componente de cliente `SitesClient`.
+ * @param {object} props - Propiedades del componente.
+ * @param {{ page?: string; q?: string; status?: string; sort?: string; }} props.searchParams - Parámetros de la URL.
+ * @returns {Promise<React.ReactElement>} El componente `SitesClient` hidratado o un `ErrorStateCard`.
+ */
 export async function SitesPageLoader({
   searchParams,
 }: {
@@ -43,6 +57,7 @@ export async function SitesPageLoader({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   if (!user) {
     return redirect("/login?next=/dashboard/sites");
   }
@@ -50,32 +65,31 @@ export async function SitesPageLoader({
   const workspaceId = cookieStore.get("active_workspace_id")?.value;
   if (!workspaceId) {
     logger.warn(
-      `[SitesPageLoader] Usuario ${user.id} sin workspace activo. Redirigiendo a /welcome.`
+      { userId: user.id },
+      "[SitesPageLoader] Usuario sin workspace activo. Redirigiendo a /welcome."
     );
     return redirect("/welcome");
   }
 
   const page = Number(searchParams.page) || 1;
   const searchQuery = searchParams.q || "";
-
-  // --- INICIO DE BLINDAJE CON GUARDIANES DE TIPO (TS2724) ---
   const statusFilter = isSiteStatusFilter(searchParams.status)
     ? searchParams.status
     : "all";
-
   const sortOption = isSiteSortOption(searchParams.sort)
     ? searchParams.sort
     : "created_at_desc";
-  // --- FIN DE BLINDAJE CON GUARDIANES DE TIPO ---
 
-  logger.trace("[SitesPageLoader] Cargando datos para la página de sitios.", {
+  const context = {
     userId: user.id,
     workspaceId,
     page,
     searchQuery,
     statusFilter,
     sortOption,
-  });
+  };
+
+  logger.trace(context, "[SitesPageLoader] Cargando datos para la página.");
 
   try {
     const { sites, totalCount } =
@@ -86,6 +100,7 @@ export async function SitesPageLoader({
         status: statusFilter,
         sort: sortOption,
       });
+
     return (
       <SitesClient
         initialSites={sites}
@@ -101,12 +116,12 @@ export async function SitesPageLoader({
     const errorId = await createPersistentErrorLog(
       "SitesPageLoader.critical",
       error as Error,
-      { workspaceId, searchParams }
+      context
     );
 
     logger.error(
-      `[SitesPageLoader] Fallo crítico al cargar sitios para workspace ${workspaceId}. Error ID: ${errorId}`,
-      { error: error instanceof Error ? error.message : String(error) }
+      { err: error, errorId, ...context },
+      "[SitesPageLoader] Fallo crítico al cargar sitios."
     );
     const t = await getTranslations("SitesPage.errorState");
     return (
@@ -118,20 +133,4 @@ export async function SitesPageLoader({
     );
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de Errores de Módulo (TS2305, TS2724)**: ((Implementada)) Se ha corregido la importación para que consuma desde `@/lib/data` (que exporta el módulo `sites` atomizado) y se han corregido las importaciones de los guardianes de tipo.
- * 2. **Resolución de Error de Propiedad (`TS2339`)**: ((Implementada)) Al consumir la API namespaced `sites.management.getSitesByWorkspaceId`, se resuelve el error de que `management` no existe.
- * 3. **Blindaje de Parámetros de URL**: ((Implementada)) Se utilizan los guardianes de tipo para validar y acotar los `searchParams`, eliminando la necesidad de aserciones de tipo inseguras.
- *
- * @subsection Melhorias Futuras
- * 1. **Validación de `page` y `q`**: ((Vigente)) Para una seguridad absoluta, los parámetros `page` y `q` también podrían ser validados con schemas de Zod.
- *
- * =====================================================================
- */
 // src/app/[locale]/dashboard/sites/sites-page-loader.tsx

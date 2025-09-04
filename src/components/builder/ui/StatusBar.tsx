@@ -12,18 +12,16 @@
  */
 "use client";
 
-import { useEffect, useState } from "react";
-import { useFormatter, useTranslations } from "next-intl";
 import { Check, Cloud, Wifi, WifiOff } from "lucide-react";
-import { shallow } from "zustand/shallow";
+import { useFormatter, useTranslations } from "next-intl";
 import { useStore } from "zustand";
+import { shallow } from "zustand/shallow";
 
 import {
   useBuilderStore,
   useBuilderStoreApi,
 } from "@/lib/hooks/use-builder-store";
-import { clientLogger } from "@/lib/logging";
-import { cn } from "@/lib/utils";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

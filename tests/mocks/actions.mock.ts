@@ -16,7 +16,7 @@
  *   - **Observabilidad**: Al ser `vi.fn`, cada llamada a una acción es rastreada,
  *     permitiendo aserciones como `expect(mockActions.workspaces.createWorkspaceAction).toHaveBeenCalled()`.
  *
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import { vi } from "vitest";

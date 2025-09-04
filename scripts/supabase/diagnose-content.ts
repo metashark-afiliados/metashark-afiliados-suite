@@ -10,7 +10,7 @@ import { loadEnvironment } from "./_utils";
  * @description Herramienta de auditoría de contenido. Invoca la RPC
  *              `get_content_diagnostics` y presenta un resumen en consola y en
  *              un archivo JSON. Blindado con guardianes de tipo.
- * @author L.I.A. Legacy & Raz Podestá
+ * @author Raz Podestá - MetaShark Tech & Raz Podestá
  * @version 3.1.0
  * @usage pnpm diag:content
  */

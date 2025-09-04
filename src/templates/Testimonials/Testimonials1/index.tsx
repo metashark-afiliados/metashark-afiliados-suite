@@ -10,12 +10,12 @@
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
-import React from "react";
 import Image from "next/image";
+import React from "react";
 
 import { EditableText } from "@/components/builder/ui/EditableText";
 import { type TestimonialItem } from "@/lib/builder/types.d";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

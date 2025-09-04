@@ -5,10 +5,11 @@
  *              factoría para crear nuevos objetos `PageBlock`. Es la Única Fuente de Verdad
  *              para la inicialización de bloques, consumiendo el manifiesto `blockEditorDefinitions`
  *              para ensamblar un nuevo bloque con sus propiedades y estilos por defecto.
- * @author Raz Podestá
- * @version 1.0.0
+ * @author L.I.A Legacy
+ * @version 2.0.0
+ * @see .docs-espejo/lib/builder/block-initializer.helper.ts.md
  */
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { blockEditorDefinitions } from "./block-editor-definitions";
 import { type PageBlock } from "./types.d";
 
@@ -28,7 +29,8 @@ export function initializeNewBlock(
 
   if (!blockDefinition) {
     logger.warn(
-      `[BlockInitializer] Se intentó inicializar un tipo de bloque no definido: "${blockType}"`
+      { blockType },
+      `[BlockInitializer] Se intentó inicializar un tipo de bloque no definido.`
     );
     return null;
   }
@@ -56,28 +58,12 @@ export function initializeNewBlock(
     styles: { ...defaultStyles },
   };
 
-  logger.trace(`[BlockInitializer] Nuevo bloque inicializado.`, {
-    type: blockType,
-    id: newBlock.id,
-  });
+  // Corrección de la firma del logger para cumplir con la Directiva 1.1
+  logger.trace(
+    { type: blockType, id: newBlock.id },
+    "[BlockInitializer] Nuevo bloque inicializado."
+  );
 
   return newBlock;
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (Factoría)**: ((Implementada)) Este aparato aísla perfectamente la lógica de creación de bloques, cumpliendo la "Filosofía LEGO" y el principio DRY.
- * 2. **Fuente Única de Verdad**: ((Implementada)) Es el único lugar donde se interpreta `blockEditorDefinitions` para la creación de bloques, centralizando la lógica.
- * 3. **ID de Bloque Robusto**: ((Implementada)) El ID ahora incluye un componente aleatorio para reducir drásticamente la probabilidad de colisiones en interacciones rápidas.
- * 4. **Full Observabilidad**: ((Implementada)) La creación de cada bloque se registra con `logger.trace`, proporcionando visibilidad completa.
- *
- * @subsection Melhorias Futuras
- * 1. **Soporte para Plantillas de Bloque**: ((Vigente)) Extender la función para aceptar un `templateId` opcional que pueda obtener una estructura de props y estilos predefinida desde una nueva tabla en la base de datos.
- *
- * =====================================================================
- */
 // src/lib/builder/block-initializer.helper.ts

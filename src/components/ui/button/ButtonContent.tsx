@@ -28,7 +28,7 @@ export interface ButtonContentProps {
  * @component ButtonContent
  * @description Componente de presentación atómico y puro. Su única responsabilidad es
  *              orquestar el layout del contenido interno de un botón basado en su estado.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 export const ButtonContent: React.FC<ButtonContentProps> = ({

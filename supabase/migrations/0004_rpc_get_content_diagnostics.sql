@@ -3,7 +3,7 @@
  * @file 0004_rpc_get_content_diagnostics.sql
  * @description Script de migración incremental que crea la RPC de diagnóstico de contenido.
  * @version 12.0.0
- * @author L.I.A. Legacy & Raz Podestá
+ * @author Raz Podestá - MetaShark Tech & Raz Podestá
  */
 
 BEGIN;

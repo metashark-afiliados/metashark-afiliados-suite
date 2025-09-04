@@ -14,10 +14,10 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { usePagination, DOTS } from "@/lib/hooks/ui/use-pagination";
+import { DOTS, usePagination } from "@/lib/hooks/ui/use-pagination";
+import { clientLogger } from "@/lib/logger";
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import { clientLogger } from "@/lib/logging";
 
 export interface PaginationTexts {
   previous: string;

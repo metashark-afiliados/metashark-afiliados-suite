@@ -2,23 +2,21 @@
 /**
  * @file context.factory.ts
  * @description Factoría de élite para la creación de mocks. Sincronizada con la
- *              arquitectura "Lean Database".
- * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-09-01
+ *              arquitectura "Lean Database", utilizando `role_id` y `status_id`
+ *              para una simulación de alta fidelidad.
+ * @author L.I.A. Legacy
+ * @version 5.0.0
  */
 import { faker } from "@faker-js/faker";
 import { type User } from "@supabase/supabase-js";
 
+import { WORKSPACE_ROLES } from "@/config/roles.config";
 import { type DashboardContextProps } from "@/lib/context/DashboardContext";
 import { type FeatureModule } from "@/lib/data/modules";
 import { type Tables } from "@/lib/types/database";
-import { WORKSPACE_ROLES } from "@/config/roles.config";
-
 import { DEV_USER, DEV_WORKSPACE } from "../data/database-state";
 
 export function createMockUser(overrides?: Partial<User>): User {
-  // ... (función sin cambios)
   return {
     id: faker.string.uuid(),
     email: faker.internet.email(),
@@ -36,7 +34,6 @@ export function createMockUser(overrides?: Partial<User>): User {
 export function createMockProfile(
   overrides?: Partial<Tables<"profiles">>
 ): Tables<"profiles"> {
-  // ... (función sin cambios)
   const user = createMockUser({ id: overrides?.id });
   return {
     id: user.id,
@@ -56,12 +53,12 @@ export function createMockProfile(
 export function createMockWorkspace(
   overrides?: Partial<Tables<"workspaces">>
 ): Tables<"workspaces"> {
-  // ... (función sin cambios)
   return {
     id: faker.string.uuid(),
     name: faker.company.name(),
     owner_id: faker.string.uuid(),
     icon: "🏢",
+    current_site_count: 0, // <-- REFACTORIZACIÓN: Añadido valor por defecto
     created_at: faker.date.recent().toISOString(),
     updated_at: faker.date.recent().toISOString(),
     ...overrides,
@@ -71,7 +68,6 @@ export function createMockWorkspace(
 export function createMockFeatureModule(
   overrides?: Partial<FeatureModule>
 ): FeatureModule {
-  // ... (función sin cambios)
   return {
     id: faker.string.uuid(),
     title: faker.lorem.words({ min: 2, max: 4 }),
@@ -112,7 +108,9 @@ export function createMockDashboardContext(
     profile,
     workspaces: [activeWorkspace, createMockWorkspace()],
     activeWorkspace,
+    // --- INICIO DE REFACTORIZACIÓN: Alineación con Lean Database ---
     activeWorkspaceRoleId: WORKSPACE_ROLES.OWNER.id,
+    // --- FIN DE REFACTORIZACIÓN ---
     pendingInvitations: [],
     modules: [
       createMockFeatureModule({
@@ -128,10 +126,12 @@ export function createMockDashboardContext(
         id: faker.string.uuid(),
         workspace_id: activeWorkspace.id,
         user_id: user.id,
+        // --- INICIO DE REFACTORIZACIÓN: Alineación con Lean Database ---
         role_id: WORKSPACE_ROLES.OWNER.id,
         created_at: new Date().toISOString(),
         profiles: profile,
-        workspace_roles: { name: WORKSPACE_ROLES.OWNER.name },
+        workspace_roles: { name: WORKSPACE_ROLES.OWNER.name }, // Simula el JOIN
+        // --- FIN DE REFACTORIZACIÓN ---
       },
     ],
     activeSitesCount: 1,

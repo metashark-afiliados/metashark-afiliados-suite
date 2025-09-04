@@ -16,7 +16,7 @@
 import { ActionDock } from "@/components/dashboard/ActionDock";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { WelcomeHero } from "@/components/dashboard/WelcomeHero";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 export function DashboardClient(): JSX.Element {
   clientLogger.trace(

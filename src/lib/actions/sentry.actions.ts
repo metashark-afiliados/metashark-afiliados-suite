@@ -6,7 +6,7 @@
  *              controlado en el entorno del servidor (Node.js). Su propósito es
  *              verificar que la configuración de Sentry está capturando y reportando
  *              correctamente las excepciones que ocurren en las Server Actions.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 "use server";

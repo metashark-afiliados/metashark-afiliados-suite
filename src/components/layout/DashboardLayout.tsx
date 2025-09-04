@@ -15,13 +15,13 @@
 
 import React, { type ReactNode } from "react";
 
-import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
 import { useSyncDashboardPrefs } from "@/lib/hooks/use-sync-dashboard-prefs";
+import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
+import { clientLogger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { PrimarySidebar } from "./sidebar/PrimarySidebar";
-import { clientLogger } from "@/lib/logging";
 
 /**
  * @public

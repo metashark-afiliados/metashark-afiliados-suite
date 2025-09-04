@@ -4,7 +4,7 @@
  * @description Define el contrato de datos para el namespace 'pages.TemplateGallery'.
  *              Este aparato atómico de validación garantiza la seguridad de tipos
  *              para la internacionalización del modal de la galería de plantillas.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  * @date 2025-08-25
  * @contact raz.metashark.tech

@@ -1,20 +1,23 @@
 // src/lib/validators/i18n.schema.ts
 /**
  * @file i18n.schema.ts
- * @description Manifiesto de Tipos y SSoT para el contrato de i18n. Esta versión
- *              finaliza la refactorización de SSR al consolidar los schemas de la
- *              Landing Page bajo un único namespace y eliminar las referencias obsoletas.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 53.0.0
+ * @description Manifiesto de Tipos y SSoT para el contrato de i18n. Sincronizado
+ *              para ensamblar el nuevo schema atómico `SitesHeaderSchema`.
+ * @author L.I.A. Legacy
+ * @version 55.0.0
  */
 import { z } from "zod";
 
 import { AboutPageSchema } from "./i18n/AboutPage.schema";
 import { ActionDockSchema } from "./i18n/ActionDock.schema";
+import { AuthLayoutSchema } from "./i18n/AuthLayout.schema";
 import { AuthNoticePageSchema } from "./i18n/AuthNoticePage.schema";
 import { BlogPageSchema } from "./i18n/BlogPage.schema";
+import { BlocksPaletteSchema } from "./i18n/BlocksPalette.schema";
+import { BuilderHeaderSchema } from "./i18n/BuilderHeader.schema";
 import { CampaignsPageSchema } from "./i18n/CampaignsPage.schema";
 import { CampaignsTableSchema } from "./i18n/CampaignsTable.schema";
+import { CanvasSchema } from "./i18n/Canvas.schema";
 import { CommandPaletteSchema } from "./i18n/CommandPalette.schema";
 import { ContactPageSchema } from "./i18n/ContactPage.schema";
 import { CookiePolicyPageSchema } from "./i18n/CookiePolicyPage.schema";
@@ -43,6 +46,7 @@ import { NotFoundPageSchema } from "./i18n/NotFoundPage.schema";
 import { PrivacyPolicyPageSchema } from "./i18n/PrivacyPolicyPage.schema";
 import { RecentActivitySchema } from "./i18n/RecentActivity.schema";
 import { ResetPasswordPageSchema } from "./i18n/ResetPasswordPage.schema";
+import { SettingsPanelSchema } from "./i18n/SettingsPanel.schema";
 import { SignUpPageSchema } from "./i18n/SignUpPage.schema";
 import { SiteAssignmentControlSchema } from "./i18n/SiteAssignmentControl.schema";
 import { SitesHeaderSchema } from "./i18n/SitesHeader.schema";
@@ -69,6 +73,10 @@ export const i18nSchema = z.object({
   "app.[locale].login.page": LoginPageSchema,
   "app.[locale].signup.page": SignUpPageSchema,
   "components.auth.SupabaseAuthUI": SupabaseAuthUISchema,
+  "components.builder.BlocksPalette": BlocksPaletteSchema,
+  "components.builder.BuilderHeader": BuilderHeaderSchema,
+  "components.builder.Canvas": CanvasSchema,
+  "components.builder.SettingsPanel": SettingsPanelSchema,
   "components.builder.SiteAssignmentControl": SiteAssignmentControlSchema,
   "components.dashboard.DashboardSubscriptionCard":
     DashboardSubscriptionCardSchema,
@@ -83,6 +91,7 @@ export const i18nSchema = z.object({
   "components.dev-console.JsonViewerDialog": JsonViewerDialogSchema,
   "components.feedback.CommandPalette": CommandPaletteSchema,
   "components.feedback.LiaChatWidget": LiaChatWidgetSchema,
+  "components.layout.AuthLayout": AuthLayoutSchema,
   "components.layout.DashboardHeader": DashboardHeaderSchema,
   "components.layout.DashboardSidebar": DashboardSidebarSchema,
   "components.sites.SitesHeader": SitesHeaderSchema,

@@ -6,7 +6,7 @@
  *              Esta es la SSoT que define la estrategia holística para
  *              ConvertiKit, incorporando un sistema de errores codificados y
  *              una observabilidad de sesión completa.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 11.0.0
  */
 # Manifiesto de Arquitectura v11.0: Ecosistema de Datos, Estado y Observabilidad de Élite

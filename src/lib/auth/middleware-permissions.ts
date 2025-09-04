@@ -5,7 +5,7 @@
  *              Esta es la Única Fuente de Verdad para obtener el contexto de autenticación
  *              del usuario dentro del middleware. NO UTILIZA `React.cache`, ya que no
  *              está disponible en el Edge Runtime, garantizando la compatibilidad.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import "server-only";

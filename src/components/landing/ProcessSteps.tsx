@@ -4,17 +4,17 @@
  * @description Componente de presentación para la sección "Pasos del Proceso".
  *              Es un componente de cliente puro, animado y completamente
  *              agnóstico al contenido, que recibe sus datos vía props.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 "use client";
 
-import React from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import React from "react";
 
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

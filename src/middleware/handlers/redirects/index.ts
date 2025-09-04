@@ -2,10 +2,10 @@
 /**
  * @file src/middleware/handlers/redirects/index.ts
  * @description Manejador de middleware para redirecciones canónicas (SEO).
- *              Alineado con la infraestructura de logging canónica de la aplicación.
- * @author L.I.A. Legacy
- * @copilot RaZ WriTe
- * @version 2.0.0
+ *              Alineado con la firma de logging de élite de Pino.
+ * @author Raz Podesta - MetaShark Tech
+ * @version 3.0.0
+ * Florianópolis/SC, Brazil
  */
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -14,11 +14,9 @@ import { logger } from "@/lib/logger";
 /**
  * @public
  * @function handleRedirects
- * @description Comprueba si el host de la petición comienza con 'www.' y, si es así,
- *              devuelve una respuesta de redirección permanente (301) al dominio
- *              canónico sin 'www.', preservando la ruta y los parámetros de búsqueda.
- * @param {NextRequest} request - El objeto de la petición entrante.
- * @returns {NextResponse | null} Una respuesta de redirección si es necesario, o null para continuar el pipeline.
+ * @description Inspecciona el host y redirige de `www.` al dominio canónico.
+ * @param {NextRequest} request - La petición entrante.
+ * @returns {NextResponse | null} Una respuesta de redirección 301 o null.
  */
 export function handleRedirects(request: NextRequest): NextResponse | null {
   const { host, pathname, search } = request.nextUrl;
@@ -35,6 +33,7 @@ export function handleRedirects(request: NextRequest): NextResponse | null {
   }
 
   logger.trace(
+    {},
     "[REDIRECTS_HANDLER] DECISION: No se necesita redirección. Pasando al siguiente manejador."
   );
   return null;

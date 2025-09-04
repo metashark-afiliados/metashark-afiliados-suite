@@ -4,20 +4,20 @@
  * @description Aparato de UI atómico y soberano. Renderiza la lista de
  *              navegación principal y de desarrollador. Consume sus propias
  *              traducciones y contexto para la lógica de renderizado condicional.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 6.0.0
  */
 "use client";
 
-import React from "react";
-import { usePathname } from "next/navigation";
 import { Palette, ShieldCheck } from "lucide-react";
+import { usePathname } from "next/navigation";
+import React from "react";
 
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
+import { clientLogger } from "@/lib/logger";
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import { clientLogger } from "@/lib/logging";
 import { primaryNavLinks } from "./primary-sidebar.config";
 
 /**

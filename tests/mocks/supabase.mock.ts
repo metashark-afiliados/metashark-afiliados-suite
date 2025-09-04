@@ -18,7 +18,7 @@
  *     encadenamiento de métodos (`supabase.from(...).select(...)`) tal como
  *     ocurre en el código de producción.
  *
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { type User } from "@supabase/supabase-js";

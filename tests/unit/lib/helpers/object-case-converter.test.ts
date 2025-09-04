@@ -5,7 +5,7 @@
  *              Valida la conversión recursiva de claves en objetos planos, anidados
  *              y arrays de objetos, incluyendo la validación de inmutabilidad para
  *              garantizar que la función es pura.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { describe, expect, it } from "vitest";

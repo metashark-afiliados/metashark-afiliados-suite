@@ -2,7 +2,7 @@
 /**
  * @file LandingHeader.md
  * @description Documento Espejo y SSoT conceptual para el encabezado de las páginas públicas.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 # Manifiesto Conceptual: Encabezado de Landing Page

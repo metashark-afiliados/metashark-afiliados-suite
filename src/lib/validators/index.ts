@@ -2,58 +2,61 @@
 /**
  * @file validators/index.ts
  * @description Manifiesto de Validadores de Élite. Refactorizado para
- *              enriquecer el contrato `ActionResult`, permitiendo que los
- *              resultados de error devuelvan un payload de datos opcional.
- *              Esto resuelve errores de tipo sistémicos y permite un manejo
- *              de errores más rico.
- * @author Raz Podestá
- * @version 26.0.0
+ *              blindar el contrato `ActionResult` y elevar `isActionSuccess`
+ *              a un guardián de tipo genérico para máxima seguridad de tipos.
+ * @author RaZ Podestá - MetaShark Tech
+ * @version 27.1.0
+ * @see .docs-espejo/lib/validators/index.ts.md
  */
+import { z } from "zod";
 
+import { type NestedKeyOf } from "@/lib/i18n/types";
+import { ValidationErrorsSchema } from "./i18n/ValidationErrors.schema";
+
+// --- RE-EXPORTACIÓN DE LA BIBLIOTECA DE SCHEMAS ---
 export * from "./schemas";
 export * from "./i18n.schema";
 
-/**
- * @public
- * @typedef ActionResult
- * @description Contrato de tipo genérico para el retorno de todas las Server Actions.
- *              La rama de error ahora puede incluir un `data` opcional.
- * @template TSuccess - El tipo de los datos en caso de éxito.
- * @template TErrorData - El tipo de los datos opcionales en caso de error.
- */
+// --- CONTRATOS DE ERROR TIPO-SEGUROS (AD-004) ---
+
+type ValidationErrorsMessages = z.infer<typeof ValidationErrorsSchema>;
+
+export type ValidationErrorKey = NestedKeyOf<ValidationErrorsMessages>;
+
 export type ActionResult<TSuccess, TErrorData = unknown> =
   | { success: true; data: TSuccess }
-  | { success: false; error: string; data?: TErrorData };
+  | { success: false; error: ValidationErrorKey; data?: TErrorData };
 
-/**
- * @public
- * @function isActionError
- * @description Guardián de tipo que verifica si un valor es un `ActionResult` de error.
- * @param {unknown} result - El valor a verificar.
- * @returns {result is { success: false; error: string; data?: unknown }}
- */
 export function isActionError(
   result: unknown
-): result is { success: false; error: string; data?: unknown } {
-  if (typeof result !== "object" || result === null) {
-    return false;
-  }
-  const obj = result as Record<string, unknown>;
-  return obj.success === false && typeof obj.error === "string";
+): result is { success: false; error: ValidationErrorKey; data?: unknown } {
+  return (
+    typeof result === "object" &&
+    result !== null &&
+    "success" in result &&
+    result.success === false &&
+    "error" in result &&
+    typeof result.error === "string"
+  );
 }
 
 /**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución Sistémica de Errores de Tipo**: ((Implementada)) Se ha modificado el contrato `ActionResult` para permitir un `data` opcional en el caso de error. Esta es la corrección fundamental que resuelve la causa raíz de los errores `TS2339` y `TS2353`.
- * 2. **Contrato de Datos Flexible y Robusto**: ((Implementada)) El nuevo contrato genérico (`ActionResult<TSuccess, TErrorData>`) permite un tipado estricto tanto para los datos de éxito como para los de error, mejorando la seguridad de tipos en toda la aplicación.
- *
- * @subsection Melhorias Futuras
- * 1. **Guardián `isActionSuccess`**: ((Vigente)) Complementar con un guardián de tipo `isActionSuccess` para verificar los resultados exitosos de forma segura.
- *
- * =====================================================================
+ * @public
+ * @function isActionSuccess
+ * @description Guardián de tipo genérico que verifica si un `ActionResult` es un resultado de éxito.
+ *              Preserva el tipo del payload `data`.
+ * @template TSuccess - El tipo del payload de éxito esperado.
+ * @param {unknown} result - El valor a verificar.
+ * @returns {result is { success: true; data: TSuccess }} `true` si es un éxito.
  */
+export function isActionSuccess<TSuccess>(
+  result: unknown
+): result is { success: true; data: TSuccess } {
+  return (
+    typeof result === "object" &&
+    result !== null &&
+    "success" in result &&
+    result.success === true
+  );
+}
 // src/lib/validators/index.ts

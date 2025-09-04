@@ -17,7 +17,7 @@ export interface ButtonGroupProps
  * @description Componente de layout que agrupa una serie de botones, utilizando
  *              selectores CSS avanzados para aplicar estilos a los elementos hijos
  *              (ej. remover bordes redondeados intermedios).
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 export const ButtonGroup: React.FC<ButtonGroupProps> = ({

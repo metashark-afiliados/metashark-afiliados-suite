@@ -3,7 +3,7 @@
  * @file NotFoundPage.schema.ts
  * @description Define el contrato de datos para el namespace 'NotFoundPage'.
  *              Este schema valida las cadenas de texto utilizadas en la página 404.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { z } from "zod";

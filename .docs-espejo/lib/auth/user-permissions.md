@@ -1,39 +1,66 @@
-// .docs-espejo/lib/auth/user-permissions.md
+// .docs-espejo/lib/auth/user-permissions.ts.md
 /**
- * @file user-permissions.md
- * @description Documento Espejo y SSoT para el guardián de seguridad de la aplicación (Node.js).
- *              Este aparato es ahora la Única Fuente de Verdad para la obtención de
- *              datos de sesión en el servidor, reemplazando a `auth.helper.ts`.
- * @author @author RaZ Podestá - MetaShark Tech
- * @version 4.0.0
+ * @file .docs-espejo/lib/auth/user-permissions.ts.md
+ * @description Documento Espejo y SSoT conceptual para el guardián de seguridad `user-permissions`.
+ * @author L.I.A. Legacy
+ * @version 1.0.0
  */
-# Manifiesto Conceptual: Guardián de Permisos de Usuario (Node.js) v4.0
+# Manifiesto Conceptual: Guardián de Seguridad `user-permissions`
 
 ## 1. Rol Estratégico y Propósito
-Este aparato es el **guardián de seguridad de alto nivel** para el **runtime de servidor Node.js**. Su única responsabilidad es orquestar la obtención de datos de sesión y la verificación de permisos, proveyendo una API de "guardianes" (`getRequiredAuthData`, `requireAppRole`, etc.) que abstraen la complejidad de la lógica de autorización.
 
-## 2. Arquitectura y Lógica de Operación
-1.  **Cacheo de Sesión de Élite:** Utiliza `unstable_cache` de Next.js para cachear los datos de sesión (usuario y perfil) por petición. Esto previene consultas duplicadas a la base de datos y optimiza drásticamente el rendimiento en Server Components y Actions que necesitan datos de sesión múltiples veces.
-2.  **Patrón de Guardián (`Guard Pattern`):** Las funciones `require...` y `getRequired...` siguen un patrón consistente: obtienen el contexto de sesión, verifican permisos y devuelven un objeto `AuthResult` de tipo seguro o lanzan un error controlado.
-3.  **Contrato de Retorno Robusto:** El tipo `AuthResult` es una unión discriminada que permite a los consumidores manejar los diferentes resultados de la autorización de forma tipo-segura, eliminando la necesidad de `try/catch` en la capa de acciones para los flujos de autorización.
-4.  **Flujo de Datos Seguro (Estático vs. Dinámico):** La lógica de obtención de datos está correctamente separada. `getCachedUserAndProfile` cachea datos que solo dependen del token de sesión. `getAuthenticatedUserAuthData` lee las cookies dinámicas (`active_workspace_id`) y las fusiona con los datos cacheados, cumpliendo con las reglas de cacheo de Next.js.
+Este aparato es el **Guardián de Seguridad** de la capa de servidor. Su única responsabilidad (PRU) es actuar como la SSoT para obtener el contexto de sesión de un usuario y verificar sus permisos de acceso a los recursos. Es la implementación de la **arquitectura de defensa en profundidad** y el principio de **Seguridad por Defecto**.
 
-## 3. Zona de Melhorias Futuras
-1.  **Permisos a Nivel de Recurso Más Granulares:** Extender el patrón para incluir guardianes como `requireCampaignPermission(campaignId, requiredRoles)`.
-2.  **Invalidación de Caché por Etiqueta:** Las Server Actions que modifican roles (`updateUserRoleAction`) deben invocar `revalidateTag('auth-data')` para invalidar activamente el caché de permisos.
-3.  **Abstracción del Tipo `AuthResult`:** El tipo `AuthResult` podría ser abstraído a un tipo `Result<TSuccess, TError>` más genérico para ser reutilizado en toda la aplicación.
-4.  **Logging de Auditoría:** Integrar `createAuditLog` en los casos de `PERMISSION_DENIED` para registrar intentos de acceso no autorizado.
-5.  **Inyección de Dependencias para Pruebas:** Refactorizar los guardianes para que acepten dependencias opcionales (como `supabaseClient`) para facilitar las pruebas unitarias aisladas.
-6.  **Soporte para Múltiples Workspaces Activos:** Si la aplicación soportara múltiples contextos de workspace, el `AuthResult` podría devolver un array de `activeWorkspaces`.
-7.  **Manejo de "Suplantación" (Impersonation):** Integrar la lógica para que, si un administrador está suplantando a un usuario, los guardianes devuelvan los datos del usuario suplantado.
-8.  **Tipos de Error de Permiso Granulares:** En lugar de un solo `PERMISSION_DENIED`, el tipo `AuthResultError` podría incluir `ROLE_MISMATCH`, `OWNERSHIP_REQUIRED`, etc.
-9.  **Integración con Feature Flags:** El `AuthResult` podría ser enriquecido con los feature flags activos para el usuario.
-10. **Documentación Multilingüe:** Traducir este documento espejo.
+Estratégicamente, este módulo:
+*   **Centraliza la Lógica de Autorización:** Proporciona un conjunto de funciones (`require...Permission`) que las Server Actions DEBEN usar para validar el acceso, garantizando que la lógica de permisos sea consistente y no esté duplicada.
+*   **Implementa Cacheo de Sesión:** Utiliza `unstable_cache` de Next.js para cachear los datos de sesión enriquecidos por cada petición, optimizando drásticamente el rendimiento al reducir las consultas a la base de datos.
+*   **Provee un Contrato de Respuesta Seguro:** Exporta el tipo `AuthResult`, que es el contrato de comunicación canónico para todas las funciones de validación de permisos.
 
-// .docs-espejo/lib/auth/user-permissions.md```
+## 2. Arquitectura y Flujo de Ejecución
 
-### **2. Aparato de Código (`user-permissions.ts`)**
+El módulo expone una jerarquía de guardianes que consumen una función de datos base cacheada.
 
-Esta es la versión refactorizada del SSoT de permisos, ahora con una API de obtención de datos más simple y robusta.
+```mermaid
+sequenceDiagram
+    participant Action as Server Action
+    participant Guardian as require...Permission
+    participant Cache as getCachedEnrichedAuthData
+    participant DataLayer as permissionsData
+    participant Logger as logger
 
-```typescript
+    Action->>Guardian: Invoca guardián con (resourceId, requiredRoles)
+    Guardian->>Cache: Obtiene datos de sesión del usuario
+    alt Cache HIT
+        Cache-->>Guardian: Retorna datos cacheados
+    else Cache MISS
+        Cache->>DataLayer: Obtiene perfil y rol de la DB
+        DataLayer-->>Cache: Retorna datos
+        Cache-->>Guardian: Retorna y cachea datos
+    end
+    Guardian->>DataLayer: Verifica permisos (`hasWorkspacePermission`)
+    alt No Autorizado
+        DataLayer-->>Guardian: Retorna `false`
+        Guardian->>Logger: logger.warn({context}, "VIOLACIÓN...")
+        Guardian-->>Action: Retorna `AuthResult` de error
+    else Autorizado
+        DataLayer-->>Guardian: Retorna `true`
+        Guardian-->>Action: Retorna `AuthResult` de éxito
+    end
+3. Contrato de API
+Salidas Principales
+getAuthenticatedUserAuthData(): Promise<UserAuthData | null>
+requireAppRole(...): Promise<AuthResult<UserAuthData>>
+requireWorkspacePermission(...): Promise<AuthResult<{ user: User }>>
+requireSitePermission(...): Promise<AuthResult<{ user: User; site: SiteBasicInfo }>>
+4. Zona de Melhorias Futuras
+Cacheo Negativo: Implementar una estrategia de cacheo negativo donde los fallos de autorización también se cachean por un corto período para mitigar ataques de fuerza bruta.
+Inyección de Dependencias: Refactorizar los guardianes para que sus dependencias (como permissionsData) puedan ser inyectadas, facilitando las pruebas unitarias aisladas.
+Permisos Basados en Atributos (ABAC): Evolucionar hacia un modelo ABAC donde los permisos se basan en atributos dinámicos (ej. "el usuario puede editar el sitio si es de día y el sitio está en su mismo país"), en lugar de solo roles estáticos.
+Logging de Latencia de Caché: Medir y registrar la latencia de las operaciones de caché (HIT vs MISS) para monitorizar el rendimiento de la capa de autorización.
+Revalidación de Caché Basada en Eventos: Utilizar webhooks o Supabase Realtime para invalidar proactivamente el caché de permisos de un usuario cuando sus roles cambian, en lugar de depender únicamente del TTL.
+Guardián requireOwnership: Crear un guardián de conveniencia que encapsule la lógica común de verificar si user.id === resource.owner_id.
+Soporte para Múltiples Workspaces Activos: En un futuro, si la UI permite operar en múltiples workspaces simultáneamente, la lógica de activeWorkspaceId necesitaría ser expandida.
+Contexto de Petición en Logging: Pasar el pathname o actionName a los guardianes para que los logs de denegación de permisos sean más contextuales.
+Tipos AuthResult más Específicos: Crear tipos de error más específicos que PERMISSION_DENIED, como ROLE_MISMATCH o OWNERSHIP_REQUIRED, para un manejo de errores más granular.
+Internacionalización de Mensajes de Log: Aunque son internos, los mensajes en los logs de advertencia podrían usar claves de i18n para equipos de desarrollo multilingües.
+// .docs-espejo/lib/auth/user-permissions.ts.md

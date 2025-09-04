@@ -4,7 +4,7 @@
  * @description Aparato de UI atómico. Ha sido refactorizado a un componente
  *              soberano que consume sus propias traducciones y contexto de datos,
  *              desacoplándolo de su componente padre.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 4.0.0
  */
 "use client";
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
 import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

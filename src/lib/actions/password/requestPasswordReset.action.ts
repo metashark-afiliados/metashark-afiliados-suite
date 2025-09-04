@@ -1,16 +1,19 @@
 // src/lib/actions/password/requestPasswordReset.action.ts
 /**
  * @file requestPasswordReset.action.ts
- * @description Server Action atómica para el inicio del flujo de recuperación de contraseña.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 1.0.0
- * @see .docs-espejo/lib/actions/password/requestPasswordReset.action.ts.md
+ * @description Server Action atómica para el inicio del flujo de recuperación
+ *              de contraseña. Refactorizada para unificar su comportamiento de
+ *              redirección, mejorando la seguridad y adhiriéndose al
+ *              contrato `ActionResult` y la Constitución de Observabilidad.
+ * @author L.I.A. Legacy
+ * @version 3.0.0
  */
 "use server";
 import "server-only";
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import toast from "react-hot-toast";
 
 import {
   checkRateLimit,
@@ -18,10 +21,26 @@ import {
   createPersistentErrorLog,
   EmailService,
 } from "@/lib/actions/_helpers";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createAdminClient } from "@/lib/supabase/server";
-import { type ActionResult, EmailSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  EmailSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
+/**
+ * @public
+ * @async
+ * @function requestPasswordResetAction
+ * @description Inicia el flujo de restablecimiento de contraseña. Por seguridad,
+ *              siempre redirige a una página de notificación para prevenir
+ *              ataques de enumeración de usuarios.
+ * @param {unknown} prevState - El estado anterior, requerido por `useFormState`.
+ * @param {FormData} formData - Los datos del formulario.
+ * @returns {Promise<ActionResult<null>>} Retorna un ActionResult solo si falla
+ *          el rate limiter o en caso de un error crítico del servidor.
+ */
 export async function requestPasswordResetAction(
   prevState: unknown,
   formData: FormData
@@ -32,63 +51,65 @@ export async function requestPasswordResetAction(
   if (!limit.success) {
     return {
       success: false,
-      error: limit.error || "ValidationErrors.password.reset_too_many_requests",
+      error: "generic.error_too_many_requests",
     };
   }
 
-  const rawData = Object.fromEntries(formData);
-  const emailResult = EmailSchema.safeParse(rawData.email);
-  if (!emailResult.success) {
-    logger.warn("[PasswordActions] Intento de reseteo con email inválido.", {
-      email: rawData.email,
-    });
-    // Se redirige igualmente para no revelar si el formato es el problema.
-    redirect("/auth-notice?message=check-email-for-reset");
-  }
-
-  const email = emailResult.data;
-  const adminSupabase = createAdminClient();
-  const origin = headers().get("origin");
+  const rawData = Object.fromEntries(formData.entries());
+  const context = { payload: rawData, ip };
 
   try {
+    const emailResult = EmailSchema.safeParse(rawData.email);
+
+    if (!emailResult.success) {
+      logger.warn(
+        { email: rawData.email, ...context },
+        "[PasswordActions] Intento de reseteo con email inválido."
+      );
+      // Redirigir igualmente para no revelar el motivo del fallo.
+      redirect("/auth-notice?message=check-email-for-reset");
+    }
+
+    const email = emailResult.data;
+    const adminSupabase = createAdminClient();
+    const origin = headers().get("origin");
+
     const { data, error } = await adminSupabase.auth.admin.generateLink({
       type: "recovery",
       email,
       options: { redirectTo: `${origin}/reset-password` },
     });
 
-    // Seguridad por oscuridad: No revelamos si el usuario existe o no.
-    // Si hay un error, lo registramos, pero el flujo de UI es el mismo.
     if (error) {
-      // Este error puede ocurrir si el usuario no existe, lo cual es esperado.
-      // Lo registramos como `trace` para no generar ruido en producción.
       logger.trace(
-        `[PasswordActions] No se pudo generar el enlace de reseteo para ${email}. Puede que el usuario no exista.`,
-        { error: error.message }
+        { email, err: error, ...context },
+        "[PasswordActions] No se pudo generar enlace (posible usuario inexistente)."
       );
     } else {
-      // Solo enviamos el email si el enlace se generó correctamente.
       await EmailService.sendPasswordResetEmail(
         email,
         data.properties.action_link
       );
     }
 
-    await createAuditLog("password_reset_request", {
+    await createAuditLog("password_reset.request_sent", {
       metadata: { targetEmail: email, ipAddress: ip },
     });
 
     redirect("/auth-notice?message=check-email-for-reset");
   } catch (error) {
-    await createPersistentErrorLog(
-      "requestPasswordResetAction.unexpected",
+    const errorId = await createPersistentErrorLog(
+      "requestPasswordResetAction",
       error as Error,
-      { payload: rawData }
+      context
     );
-    logger.error("[PasswordActions] Error inesperado en reseteo.", { error });
+    logger.error(
+      { err: error, errorId, ...context },
+      "[PasswordActions] Error inesperado en reseteo."
+    );
     return {
       success: false,
-      error: "ValidationErrors.generic.error_server_generic",
+      error: "generic.error_server_generic",
     };
   }
 }

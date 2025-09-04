@@ -5,7 +5,7 @@
  *              específicamente diseñado para el entorno de Middleware de Next.js (Edge Runtime).
  *              Implementa el patrón de "respuesta encadenada" para una gestión de
  *              cookies robusta e inmutable.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @copilot RaZ WriTe
  * @version 6.0.0
  * @see .docs-espejo/lib/supabase/middleware.md

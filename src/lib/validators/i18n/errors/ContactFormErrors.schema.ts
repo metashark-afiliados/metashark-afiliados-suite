@@ -2,12 +2,12 @@
 /**
  * @file ContactFormErrors.schema.ts
  * @description Aparato de validación atómico. Define el contrato de datos para
- *              mensajes de error de validación específicos del formulario de contacto
- *              sin un prefijo de dominio. Esta es la SSoT para los errores de este formulario.
- * @author Raz Podestá - MetaShark Tech
+ *              mensajes de feedback (éxito y error) específicos del formulario
+ *              de contacto, sin un prefijo de dominio. Esta es la SSoT para los
+ *              errores y éxitos de este formulario.
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 1.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
+ * @see .docs-espejo/lib/validators/i18n/errors/ContactFormErrors.schema.ts.md
  */
 import { z } from "zod";
 
@@ -24,13 +24,4 @@ export const ContactFormErrorsSchema = z.object({
   invalid_data: z.string(),
   success_toast: z.string(),
 });
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Errores de Rate Limiting**: ((Vigente)) Si el formulario de contacto implementa `rate limiting` en el futuro, se añadirán aquí los errores relacionados.
- * =====================================================================
- */
 // src/lib/validators/i18n/errors/ContactFormErrors.schema.ts

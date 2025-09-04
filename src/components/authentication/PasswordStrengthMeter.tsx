@@ -1,38 +1,45 @@
 // src/components/authentication/PasswordStrengthMeter.tsx
 /**
  * @file PasswordStrengthMeter.tsx
- * @description Componente de UI atómico y de presentación puro que visualiza la
- *              fortaleza de una contraseña en tiempo real. Migrado al directorio
- *              canónico `/authentication`.
- * @author Raz Podestá
- * @version 2.0.0
+ * @description Componente de UI atómico y de presentación 100% puro.
+ *              Refactorizado para ser agnóstico al contenido, recibiendo
+ *              sus textos a través de props.
+ * @author L.I.A. Legacy
+ * @version 3.0.0
  */
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
 import { zxcvbn, type ZxcvbnResult } from "@zxcvbn-ts/core";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
+
+export interface StrengthMeterTexts {
+  strength_weak: React.ReactNode;
+  strength_fair: React.ReactNode;
+  strength_good: React.ReactNode;
+  strength_strong: React.ReactNode;
+}
 
 interface PasswordStrengthMeterProps {
   password?: string;
+  texts: StrengthMeterTexts;
 }
 
 const strengthLevels = [
-  { labelKey: "strength_weak", color: "bg-destructive" }, // score 0
-  { labelKey: "strength_weak", color: "bg-destructive" }, // score 1
-  { labelKey: "strength_fair", color: "bg-yellow-500" }, // score 2
-  { labelKey: "strength_good", color: "bg-green-500" }, // score 3
-  { labelKey: "strength_strong", color: "bg-green-500" }, // score 4
+  { labelKey: "strength_weak", color: "bg-destructive" },
+  { labelKey: "strength_weak", color: "bg-destructive" },
+  { labelKey: "strength_fair", color: "bg-yellow-500" },
+  { labelKey: "strength_good", color: "bg-green-500" },
+  { labelKey: "strength_strong", color: "bg-green-500" },
 ];
 
 export function PasswordStrengthMeter({
   password,
+  texts,
 }: PasswordStrengthMeterProps) {
-  const t = useTranslations("SignUpPage");
   const [strength, setStrength] = useState<ZxcvbnResult | null>(null);
 
   useEffect(() => {
@@ -40,9 +47,7 @@ export function PasswordStrengthMeter({
       const result = zxcvbn(password);
       clientLogger.trace(
         "[PasswordStrengthMeter] Fortaleza de contraseña calculada.",
-        {
-          score: result.score,
-        }
+        { score: result.score }
       );
       setStrength(result);
     } else {
@@ -56,6 +61,7 @@ export function PasswordStrengthMeter({
 
   const score = strength?.score ?? 0;
   const { labelKey, color } = strengthLevels[score];
+  const labelText = texts[labelKey as keyof StrengthMeterTexts];
 
   return (
     <div className="space-y-1">
@@ -74,31 +80,8 @@ export function PasswordStrengthMeter({
           </div>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground">
-        {t.rich(labelKey as any, {
-          strong: (chunks) => (
-            <strong className={cn(score > 1 && "text-foreground")}>
-              {chunks}
-            </strong>
-          ),
-        })}
-      </p>
+      <p className="text-xs text-muted-foreground">{labelText}</p>
     </div>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Migración a Directorio Canónico**: ((Implementada)) El componente ha sido movido de `src/components/auth` a `src/components/authentication`, consolidando la SSoT de la UI de autenticación.
- * 2. **Full Observabilidad**: ((Implementada)) Se ha añadido `clientLogger.trace` para registrar el cálculo de la fortaleza de la contraseña, mejorando la visibilidad en desarrollo.
- *
- * @subsection Melhorias Futuras
- * 1. **Sugerencias de Mejora**: ((Vigente)) La librería `zxcvbn-ts` devuelve sugerencias (`strength?.feedback?.suggestions`). Se podría mostrar este texto para ayudar al usuario a crear una contraseña más fuerte.
- *
- * =====================================================================
- */
 // src/components/authentication/PasswordStrengthMeter.tsx

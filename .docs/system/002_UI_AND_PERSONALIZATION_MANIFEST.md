@@ -6,7 +6,7 @@
  *              completamente personalizable, expandiendo el Pilar 6 de la
  *              Constitución Arquitectónica. Consolida y reemplaza a los
  *              manifiestos de branding duplicados.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Canónico de UI y Personalización v1.0

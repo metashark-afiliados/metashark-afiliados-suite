@@ -4,7 +4,7 @@
  * @description Arnés de pruebas de integración de élite para el Route Handler
  *              del callback de autenticación. Valida los flujos de sesión
  *              y la lógica crítica de establecimiento de la cookie del workspace.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { NextRequest } from "next/server";

@@ -5,7 +5,7 @@
  *              Su única responsabilidad es renderizar una estructura de tabla
  *              funcional (`<table>`) usando `@tanstack/react-table` para cualquier
  *              conjunto de datos y definiciones de columna.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import {

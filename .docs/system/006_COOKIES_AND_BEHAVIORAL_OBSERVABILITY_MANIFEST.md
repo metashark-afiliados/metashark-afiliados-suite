@@ -4,7 +4,7 @@
  * @description Manifiesto de Cookies y Observabilidad del Comportamiento v2.0.
  *              Esta es la SSoT que define la estrategia completa de gestión de
  *              cookies y la arquitectura para el tracking de eventos de usuario.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 # Manifiesto de Cookies y Observabilidad del Comportamiento v2.0

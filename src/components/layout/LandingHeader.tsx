@@ -4,22 +4,22 @@
  * @description Componente de presentación puro. Ha sido revertido para utilizar
  *              enlaces de navegación (`<Link>`) para la autenticación, restaurando
  *              el flujo de navegación original del proyecto.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 4.0.0
  */
 "use client";
 
-import React from "react";
-import Image from "next/image";
 import { Menu } from "lucide-react";
+import Image from "next/image";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { type NavLinkItem, SmartLink } from "@/components/ui/SmartLink";
 import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
+import { clientLogger } from "@/lib/logger";
 import { Link } from "@/lib/navigation";
-import { clientLogger } from "@/lib/logging";
 
 export interface LandingHeaderProps {
   navLinks: NavLinkItem[];

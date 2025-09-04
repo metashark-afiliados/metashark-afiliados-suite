@@ -2,8 +2,9 @@
 /**
  * @file updateWorkspaceName.action.ts
  * @description Server Action atómica para actualizar el nombre de un workspace.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
- * @version 1.0.0
+ *              Refactorizada para adherirse al contrato `ActionResult` blindado.
+ * @author RaZ Podestá - MetaShark Tech
+ * @version 2.0.0
  * @see .docs-espejo/lib/actions/workspaces/updateWorkspaceName.action.ts.md
  */
 "use server";
@@ -17,19 +18,28 @@ import {
   createPersistentErrorLog,
 } from "@/lib/actions/_helpers";
 import { requireWorkspacePermission } from "@/lib/auth/user-permissions";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, UpdateWorkspaceNameSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  UpdateWorkspaceNameSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
 export async function updateWorkspaceNameAction(
   workspaceId: string,
   newName: string
-): Promise<ActionResult<{ messageKey: string }>> {
+): Promise<ActionResult<{ messageKey: ValidationErrorKey }>> {
   const permissionCheck = await requireWorkspacePermission(workspaceId, [
     "owner",
     "admin",
   ]);
-  if (!permissionCheck.success) return permissionCheck;
+  if (!permissionCheck.success) {
+    return {
+      success: false,
+      error: "workspaces.update_name_permission_denied",
+    };
+  }
 
   const { user } = permissionCheck.data;
 
@@ -51,11 +61,15 @@ export async function updateWorkspaceNameAction(
     revalidatePath("/dashboard", "layout");
     return {
       success: true,
-      data: { messageKey: "ValidationErrors.workspaces.update_name_success" },
+      data: { messageKey: "workspaces.update_name_success" },
     };
   } catch (error) {
     if (error instanceof ZodError) {
-      return { success: false, error: error.errors[0].message };
+      const firstError = error.errors[0];
+      return {
+        success: false,
+        error: firstError.message as ValidationErrorKey,
+      };
     }
     await createPersistentErrorLog(
       "updateWorkspaceNameAction",
@@ -64,7 +78,7 @@ export async function updateWorkspaceNameAction(
     );
     return {
       success: false,
-      error: "ValidationErrors.workspaces.update_name_failed",
+      error: "workspaces.update_name_failed",
     };
   }
 }

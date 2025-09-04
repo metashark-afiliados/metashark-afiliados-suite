@@ -1,54 +1,88 @@
 // src/lib/actions/_helpers/auth.helper.ts
 /**
- * @file auth.helper.ts
- * @description Helper atómico para obtener la sesión. Restaurado a su estado
- *              de producción, eliminando el bypass de desarrollo global.
- * @author Raz Podestá
- * @version 3.0.0 (Production Ready)
+ * @file Provee helpers atómicos y soberanos para la gestión de autenticación.
+ *       Este aparato es autónomo y no requiere inyección de dependencias.
+ * @author Raz Podesta - MetaShark Tech
+ * @version 3.0.0
+ * Florianópolis/SC, Brazil
  */
 "use server";
 import "server-only";
 
 import { type User } from "@supabase/supabase-js";
 
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult } from "@/lib/validators";
-import { logger } from "@/lib/logging";
+import { type ValidationErrorKey } from "@/lib/validators";
+
+type AuthResultSuccess = {
+  success: true;
+  data: { user: User };
+};
+
+type AuthResultError = {
+  success: false;
+  error: ValidationErrorKey;
+  data: null;
+};
+
+export type AuthResult = AuthResultSuccess | AuthResultError;
+
+export class AuthenticationError extends Error {
+  public readonly code: ValidationErrorKey;
+
+  constructor(
+    message: string = "User is not authenticated.",
+    code: ValidationErrorKey = "generic.error_unauthenticated"
+  ) {
+    super(message);
+    this.name = "AuthenticationError";
+    this.code = code;
+  }
+}
 
 /**
  * @public
  * @async
  * @function getAuthenticatedUser
- * @description Obtiene el usuario autenticado de la sesión de Supabase.
- * @returns {Promise<{ user: User } | { error: ActionResult<never> }>}
+ * @description Obtiene el usuario autenticado. No requiere inyección de cliente.
+ * @returns {Promise<AuthResult>} Un objeto `AuthResult`.
  */
-export async function getAuthenticatedUser(): Promise<
-  { user: User } | { error: ActionResult<never> }
-> {
-  logger.trace("[AuthHelper] Buscando sesión de usuario real en Supabase...");
+export async function getAuthenticatedUser(): Promise<AuthResult> {
+  logger.trace({}, "Verificando sesión de usuario autenticado.");
   const supabase = createClient();
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    logger.warn("[AuthHelper] No se encontró una sesión de usuario válida.");
-    return { error: { success: false, error: "error_unauthenticated" } };
+  if (error || !user) {
+    logger.warn({ err: error }, "Fallo en la verificación de autenticación.");
+    return {
+      success: false,
+      error: "generic.error_unauthenticated",
+      data: null,
+    };
   }
 
-  logger.trace("[AuthHelper] Sesión de usuario real encontrada.", {
-    userId: user.id,
-  });
-  return { user };
+  return { success: true, data: { user } };
 }
+
 /**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Seguridad Restaurada**: ((Implementada)) Se ha eliminado el bypass global. El helper ahora siempre realiza una comprobación de autenticación real, haciendo que la base de código sea más segura por defecto.
- *
- * =====================================================================
+ * @public
+ * @async
+ * @function getAuthenticatedUserOrThrow
+ * @description Obtiene el usuario autenticado o lanza un `AuthenticationError`.
+ * @returns {Promise<User>} El objeto `User` si está autenticado.
+ * @throws {AuthenticationError} Si el usuario no está autenticado.
  */
+export async function getAuthenticatedUserOrThrow(): Promise<User> {
+  const authResult = await getAuthenticatedUser();
+
+  if (!authResult.success) {
+    throw new AuthenticationError();
+  }
+
+  return authResult.data.user;
+}
 // src/lib/actions/_helpers/auth.helper.ts

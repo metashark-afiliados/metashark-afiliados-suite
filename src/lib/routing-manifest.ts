@@ -4,7 +4,7 @@
  * @description Manifiesto de Seguridad Declarativo. Sincronizado para utilizar
  *              la nueva nomenclatura de ruta del constructor, resolviendo un
  *              conflicto de enrutamiento.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
  */
 import { type Database } from "@/lib/types/database";

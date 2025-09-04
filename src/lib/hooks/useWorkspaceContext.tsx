@@ -1,25 +1,25 @@
 // src/lib/hooks/useWorkspaceContext.tsx
 /**
  * @file useWorkspaceContext.tsx
- * @description Contexto de permisos de élite para el workspace activo. Este
- *              aparato consume el DashboardContext global y provee un contexto
- *              más específico y computado, que incluye los flags de permisos
- *              (canEdit, canDelete), para ser consumido por componentes hijos.
- * @author Raz Podestá
- * @version 1.0.1 (File Extension Fix)
+ * @description Contexto de permisos de élite. Consume el `activeWorkspaceRoleId`
+ *              y computa los flags de permisos (`canEdit`, `canDelete`), pagando
+ *              la deuda técnica de "Fuga de Abstracción".
+ * @author @author RaZ Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @see .docs-espejo/lib/hooks/useWorkspaceContext.tsx.md
  */
 "use client";
 
 import React, { createContext, useContext, type ReactNode } from "react";
 import { type User } from "@supabase/supabase-js";
 
+import { WORKSPACE_ROLES } from "@/config/roles.config";
 import { useDashboard } from "@/lib/context/DashboardContext";
-import { type Enums } from "@/lib/types/database";
 
 interface WorkspaceContextValue {
   user: User;
   activeWorkspaceId: string;
-  activeWorkspaceRole: Enums<"workspace_role"> | null;
+  activeWorkspaceRoleId: number | null;
   canEdit: boolean;
   canDelete: boolean;
 }
@@ -36,7 +36,7 @@ const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 export const WorkspaceProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user, activeWorkspace, activeWorkspaceRole } = useDashboard();
+  const { user, activeWorkspace, activeWorkspaceRoleId } = useDashboard();
 
   if (!user || !activeWorkspace) {
     return null;
@@ -45,9 +45,11 @@ export const WorkspaceProvider: React.FC<{ children: ReactNode }> = ({
   const value: WorkspaceContextValue = {
     user,
     activeWorkspaceId: activeWorkspace.id,
-    activeWorkspaceRole,
-    canEdit: activeWorkspaceRole === "owner" || activeWorkspaceRole === "admin",
-    canDelete: activeWorkspaceRole === "owner",
+    activeWorkspaceRoleId,
+    canEdit:
+      activeWorkspaceRoleId === WORKSPACE_ROLES.OWNER.id ||
+      activeWorkspaceRoleId === WORKSPACE_ROLES.ADMIN.id,
+    canDelete: activeWorkspaceRoleId === WORKSPACE_ROLES.OWNER.id,
   };
 
   return (
@@ -73,20 +75,4 @@ export const useWorkspaceContext = (): WorkspaceContextValue => {
   }
   return context;
 };
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Correção de Sintaxe de Build**: ((Implementada)) A extensão do arquivo foi alterada de `.ts` para `.tsx`, resolvendo o erro de transformação.
- * 2. **Contexto de Permisos Granular**: ((Vigente)) Este aparato crea un contexto específico para los permisos del workspace, desacoplando la lógica de permisos de los componentes de UI.
- * 3. **Lógica Computada**: ((Vigente)) Los flags `canEdit` y `canDelete` se calculan una sola vez en el proveedor, optimizando el rendimiento y simplificando los componentes consumidores.
- *
- * @subsection Melhorias Futuras
- * 1. **Permisos a Nivel de Característica**: ((Vigente)) El contexto podría enriquecerse con un objeto de permisos más detallado (ej. `permissions: { canInviteMembers: boolean, canChangeSettings: boolean }`) si los roles se vuelven más complejos.
- *
- * =====================================================================
- */
 // src/lib/hooks/useWorkspaceContext.tsx

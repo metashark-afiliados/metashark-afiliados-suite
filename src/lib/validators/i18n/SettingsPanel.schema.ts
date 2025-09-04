@@ -3,7 +3,7 @@
  * @file SettingsPanel.schema.ts
  * @description Define el contrato de datos para el namespace 'components.builder.SettingsPanel'.
  *              Sincronizado para incluir todas las claves del "Arsenal de Conversión".
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 4.0.0
  */
 import { z } from "zod";

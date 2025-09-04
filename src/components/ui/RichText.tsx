@@ -6,7 +6,7 @@
  *              `<span>`, garantizando que siempre se pase un solo elemento React
  *              a los componentes hijos. Esta es la solución arquitectónica para
  *              erradicar el error `React.Children.only`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import React from "react";

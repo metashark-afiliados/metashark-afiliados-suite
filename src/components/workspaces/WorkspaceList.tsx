@@ -4,13 +4,13 @@
  * @description Componente de UI 100% puro y soberano. Ha sido refactorizado a
  *              un estándar de élite para ser autocontenido en su consumo de
  *              internacionalización.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 5.0.0
  */
 "use client";
 
-import React from "react";
 import { Check, LayoutGrid } from "lucide-react";
+import React from "react";
 
 import {
   CommandEmpty,
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/command";
 import { type Workspace } from "@/lib/data/workspaces";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 interface WorkspaceListProps {

@@ -6,7 +6,7 @@
  *              persistencia de datos, la gestión de estado y la sincronización.
  *              Expande los Pilares 1 y 2 de la Constitución Arquitectónica y
  *              reemplaza a `.docs/004_DATA_AND_STATE_ARCHITECTURE_MANIFEST.md`.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Canónico de Arquitectura de Datos y Estado v1.0

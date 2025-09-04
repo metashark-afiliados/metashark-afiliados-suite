@@ -4,7 +4,7 @@
  * @description Arnés de pruebas unitarias de élite para el componente Button.
  *              Valida todos los casos de uso, incluyendo el nuevo estado `isLoading`
  *              centralizado.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.2.0
  */
 import { ArrowRight } from "lucide-react";

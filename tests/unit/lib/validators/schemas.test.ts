@@ -4,7 +4,7 @@
  * @description Arnés de pruebas unitarias de élite para la biblioteca de schemas
  *              de Zod. Valida los casos de éxito y fallo para las reglas de
  *              negocio más críticas, incluyendo el nuevo `SignUpSchema`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { describe, it, expect } from "vitest";

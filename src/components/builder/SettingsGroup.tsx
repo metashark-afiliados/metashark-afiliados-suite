@@ -1,15 +1,10 @@
 // src/components/builder/SettingsGroup.tsx
 /**
  * @file SettingsGroup.tsx
- * @description Aparato de UI de ensamblaje ("Capataz"). Su única responsabilidad
- *              es renderizar un grupo de campos de configuración, iterando sobre
- *              un objeto de definiciones y delegando el renderizado de cada campo
- *              individual al átomo `SettingsField`.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-25
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Aparato de UI de ensamblaje. Refactorizado para usar el
+ *              `clientLogger` con la firma correcta.
+ * @author L.I.A. Legacy
+ * @version 2.0.0
  */
 import React from "react";
 
@@ -17,7 +12,7 @@ import {
   type BlockPropertiesSchema,
   type PageBlock,
 } from "@/lib/builder/types.d";
-import { logger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { SettingsField } from "./SettingsField";
 
 export interface SettingsGroupProps {
@@ -27,20 +22,13 @@ export interface SettingsGroupProps {
   updateFn: (blockId: string, propertyKey: string, value: any) => void;
 }
 
-/**
- * @public
- * @component SettingsGroup
- * @description Renderiza una lista de campos de configuración para una sección (ej. 'Contenido' o 'Estilo').
- * @param {SettingsGroupProps} props - Propiedades para configurar el grupo.
- * @returns {React.ReactElement}
- */
 export function SettingsGroup({
   block,
   definitions,
   values,
   updateFn,
 }: SettingsGroupProps): React.ReactElement {
-  logger.trace("[SettingsGroup] Renderizando grupo de ajustes.", {
+  clientLogger.trace("[SettingsGroup] Renderizando grupo de ajustes.", {
     blockId: block.id,
     definitionKeys: Object.keys(definitions),
   });
@@ -60,18 +48,4 @@ export function SettingsGroup({
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Composición Atómica (LEGO)**: ((Implementada)) Este aparato es un ensamblador puro que delega el trabajo pesado a `SettingsField`, cumpliendo la "Filosofía LEGO".
- * 2. **Full Observabilidad**: ((Implementada)) Incluye logging para trazar su renderizado, proporcionando visibilidad sobre qué grupo de ajustes se está mostrando.
- *
- * @subsection Melhorias Futuras
- * 1. **Renderizado Condicional de Grupos**: ((Vigente)) Añadir una prop `title` opcional que, si se proporciona, renderice un `<h4 class="font-semibold">{title}</h4>` sobre el grupo de campos para una mejor organización visual.
- *
- * =====================================================================
- */
 // src/components/builder/SettingsGroup.tsx

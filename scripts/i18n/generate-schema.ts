@@ -6,7 +6,7 @@
  *              el ensamblador principal `i18n.schema.ts`. Este script construye
  *              un objeto Zod aplanado, donde cada clave es el namespace completo,
  *              resolviendo sistémicamente los problemas de inferencia de tipos.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import fs from "fs";

@@ -13,12 +13,12 @@
  */
 "use client";
 
-import { useState, useEffect, useTransition, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
 import { useDebounce } from "@/lib/hooks/use-debounce";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { usePathname, useRouter } from "@/lib/navigation";
 import isEqual from "microdiff";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState, useTransition } from "react";
 
 export interface UseUrlStateSyncProps<T extends Record<string, string>> {
   initialState: T;

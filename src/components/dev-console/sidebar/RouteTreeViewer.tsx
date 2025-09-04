@@ -3,7 +3,7 @@
  * @file RouteTreeViewer.tsx
  * @description Componente de presentación puro para renderizar el árbol de rutas.
  *              Recibe los datos como props.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import React from "react";

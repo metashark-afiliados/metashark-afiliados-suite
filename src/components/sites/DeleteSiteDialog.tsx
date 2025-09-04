@@ -13,15 +13,15 @@
  */
 "use client";
 
-import * as React from "react";
 import { ShieldAlert } from "lucide-react";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
+import { Button } from "@/components/ui/button";
 import { ConfirmationDialogContent } from "@/components/ui/ConfirmationDialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { clientLogger } from "@/lib/logger";
 import { Trash2 } from "lucide-react";
-import { clientLogger } from "@/lib/logging";
 
 interface SimpleSite {
   id: string;

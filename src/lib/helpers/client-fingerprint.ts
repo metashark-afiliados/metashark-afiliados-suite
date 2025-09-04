@@ -5,13 +5,14 @@
  *              del cliente utilizando `@fingerprintjs/fingerprintjs`. Gestiona la
  *              carga diferida y el manejo de errores.
  * @author Raz Podestá
- * @version 1.0.0
+ * @version 2.0.0
+ * @see .docs-espejo/lib/helpers/client-fingerprint.ts.md
  */
 "use client";
 
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 
-import { logger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 let fpPromise: ReturnType<typeof FingerprintJS.load> | null = null;
 
@@ -28,37 +29,25 @@ let fpPromise: ReturnType<typeof FingerprintJS.load> | null = null;
 export async function getClientFingerprint(): Promise<string | null> {
   try {
     if (!fpPromise) {
-      logger.trace("[Fingerprint] Cargando instancia de FingerprintJS...");
+      clientLogger.trace(
+        {},
+        "[Fingerprint] Cargando instancia de FingerprintJS."
+      );
       fpPromise = FingerprintJS.load();
     }
     const fp = await fpPromise;
     const result = await fp.get();
-    logger.trace("[Fingerprint] Huella digital del cliente generada.", {
-      visitorId: result.visitorId,
-    });
+    clientLogger.trace(
+      { visitorId: result.visitorId },
+      "[Fingerprint] Huella digital del cliente generada."
+    );
     return result.visitorId;
   } catch (error) {
-    logger.error(
-      "[Fingerprint] Error al generar la huella digital del cliente:",
-      error
+    clientLogger.error(
+      { err: error },
+      "[Fingerprint] Error al generar huella digital."
     );
     return null;
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Carga Diferida y Cacheo**: ((Implementada)) La librería se carga de forma asíncrona y se cachea en una promesa global, asegurando una única inicialización y un rendimiento óptimo.
- * 2. **Manejo de Errores Robusto**: ((Implementada)) Incluye `try/catch` para gestionar errores, evitando que un fallo en la telemetría afecte la experiencia del usuario.
- * 3. **Full Observabilidad**: ((Implementada)) Registra eventos de `trace` y `error` para una visibilidad completa.
- *
- * @subsection Melhorias Futuras
- * 1. **Contexto de Confianza**: ((Vigente)) La librería `FingerprintJS` proporciona una puntuación de `confidence`. Este valor podría ser enviado a la Server Action para evaluar la fiabilidad de la huella, útil para la detección avanzada de fraudes.
- *
- * =====================================================================
- */
 // src/lib/helpers/client-fingerprint.ts

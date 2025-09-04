@@ -3,10 +3,10 @@
  * @file messages.manifest.mock.ts
  * @description Manifiesto de Importación Dinámica para el entorno de pruebas.
  *              Esta es la SSoT para cargar los archivos de mensajes .json en Vitest.
- *              ESTE ARCHIVO DEBE MANTENERSE SINCRONIZADO CON `src/messages/manifest.ts`.
- * @author L.I.A. Legacy (Reconstrucción)
- * @version 1.0.0
- * @see .docs-espejo/tests/mocks/messages.manifest.mock.ts.md
+ *              Refactorizado para eliminar entradas de namespaces inexistentes
+ *              y restaurar la sincronización con la estructura de producción.
+ * @author L.I.A. Legacy
+ * @version 2.0.0
  */
 import { type ManifestModule } from "@/messages/types";
 
@@ -35,8 +35,16 @@ export const mockedMessagesManifest: Record<string, ManifestModule> = {
     import("../../src/messages/app/[locale]/login/page.json"),
   "app.[locale].signup.page": () =>
     import("../../src/messages/app/[locale]/signup/page.json"),
-  "components.auth.SupabaseAuthUI": () =>
-    import("../../src/messages/components/auth/SupabaseAuthUI.json"),
+  "components.auth.OAuthButton": () =>
+    import("../../src/messages/components/auth/OAuthButton.json"),
+  "components.builder.BlocksPalette": () =>
+    import("../../src/messages/components/builder/BlocksPalette.json"),
+  "components.builder.BuilderHeader": () =>
+    import("../../src/messages/components/builder/BuilderHeader.json"),
+  "components.builder.Canvas": () =>
+    import("../../src/messages/components/builder/Canvas.json"),
+  "components.builder.SettingsPanel": () =>
+    import("../../src/messages/components/builder/SettingsPanel.json"),
   "components.builder.SiteAssignmentControl": () =>
     import("../../src/messages/components/builder/SiteAssignmentControl.json"),
   "components.dashboard.DashboardSubscriptionCard": () =>
@@ -69,6 +77,8 @@ export const mockedMessagesManifest: Record<string, ManifestModule> = {
     import("../../src/messages/components/feedback/CommandPalette.json"),
   "components.feedback.LiaChatWidget": () =>
     import("../../src/messages/components/feedback/LiaChatWidget.json"),
+  "components.layout.AuthLayout": () =>
+    import("../../src/messages/components/layout/AuthLayout.json"),
   "components.layout.DashboardHeader": () =>
     import("../../src/messages/components/layout/DashboardHeader.json"),
   "components.layout.DashboardSidebar": () =>

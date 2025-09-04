@@ -4,7 +4,7 @@
  * @description Manifiesto de Despliegue Continuo y Gestión de Entorno v1.0.
  *              Esta es la SSoT que define el flujo de trabajo para desplegar
  *              ConvertiKit. Reemplaza a `.docs/009_CICD_AND_ENVIRONMENT_MANIFEST.md`.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto de CI/CD y Gestión de Entorno v1.0

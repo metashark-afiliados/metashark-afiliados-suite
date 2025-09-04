@@ -5,15 +5,15 @@
  *              es gestionar y mostrar la interfaz para las notificaciones de
  *              invitaciones de workspace. Ha sido refactorizado para alinear los
  *              contratos de datos con su hook soberano.
- * @author L.I.A. Legacy & Raz Podestá
+ * @author Raz Podestá - MetaShark Tech & Raz Podestá
  * @version 3.0.0
  * @date 2025-08-29
  */
 "use client";
 
+import { Bell, Check, LayoutGrid } from "lucide-react";
 import React, { useTransition } from "react";
 import toast from "react-hot-toast";
-import { Bell, Check, LayoutGrid } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ import { invitations as invitationActions } from "@/lib/actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useRealtimeInvitations } from "@/lib/hooks/use-realtime-invitations";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { isActionError } from "@/lib/validators";
 
 /**

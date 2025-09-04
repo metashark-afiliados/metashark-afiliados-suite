@@ -4,9 +4,8 @@
  * @description Aparato de UI atómico y de presentación puro. Renderiza el campo
  *              de confirmación de contraseña, incluyendo la funcionalidad de
  *              visualización ("ojo").
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @author @author RaZ Podestá - MetaShark Tech
  * @version 1.0.0
- * @see .docs-espejo/components/authentication/sign-up-form/SignUpConfirmPasswordField.tsx.md
  */
 "use client";
 
@@ -20,16 +19,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { clientLogger } from "@/lib/logger";
 import { type SignUpSchema } from "@/lib/validators";
-import { cn } from "@/lib/utils";
 
 type FormData = z.infer<typeof SignUpSchema>;
 
+/**
+ * @public
+ * @interface SignUpConfirmPasswordFieldProps
+ * @description El contrato de props para el componente de campo de confirmación
+ *              de contraseña. Define todas las dependencias de `react-hook-form`
+ *              y los textos requeridos para una renderización pura.
+ */
 export interface SignUpConfirmPasswordFieldProps {
   register: UseFormRegister<FormData>;
   errors: FieldErrors<FormData>;
   isPending: boolean;
   label: string;
   errorMessage?: string;
+  ariaLabels: {
+    show: string;
+    hide: string;
+  };
 }
 
 /**
@@ -46,13 +55,27 @@ export function SignUpConfirmPasswordField({
   isPending,
   label,
   errorMessage,
+  ariaLabels,
 }: SignUpConfirmPasswordFieldProps): React.ReactElement {
   clientLogger.trace(
-    "[SignUpConfirmPasswordField] Renderizando componente de campo de confirmação de senha puro."
+    "[SignUpConfirmPasswordField] Renderizando componente de campo puro.",
+    { component: "SignUpConfirmPasswordField" }
   );
   const [showPassword, setShowPassword] = useState(false);
 
-  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  /**
+   * @private
+   * @function togglePasswordVisibility
+   * @description Alterna el estado de visibilidad de la contraseña.
+   */
+  const togglePasswordVisibility = () => {
+    const newVisibility = !showPassword;
+    setShowPassword(newVisibility);
+    clientLogger.info(
+      "[SignUpConfirmPasswordField] Visibilidad de contraseña alternada.",
+      { newVisibility }
+    );
+  };
 
   return (
     <div className="space-y-1">
@@ -75,7 +98,7 @@ export function SignUpConfirmPasswordField({
           size="icon"
           className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:bg-transparent"
           onClick={togglePasswordVisibility}
-          aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+          aria-label={showPassword ? ariaLabels.hide : ariaLabels.show}
         >
           {showPassword ? (
             <EyeOff className="h-4 w-4" />

@@ -1,4 +1,3 @@
-
 {
   "en-US": {
     "hero": {
@@ -7,8 +6,8 @@
     },
     "searchPlaceholder": "Search articles...",
     "allPostsTitle": "All Posts",
-    "posts": [
-      {
+    "posts": {
+      "0": {
         "slug": "mastering-ai-copywriting",
         "title": "Mastering AI Copywriting for Higher Conversions",
         "excerpt": "Discover the prompts and techniques that turn our AI into a world-class copywriter, boosting your campaign's ROI.",
@@ -17,7 +16,7 @@
         "author": "L.I.A. Legacy",
         "date": "August 15, 2025"
       },
-      {
+      "1": {
         "slug": "bridge-page-anatomy",
         "title": "The Anatomy of a Perfect Bridge Page",
         "excerpt": "We break down the essential components of a bridge page that builds trust and drives clicks, based on data from thousands of campaigns.",
@@ -26,7 +25,7 @@
         "author": "Raz Podestá",
         "date": "August 10, 2025"
       }
-    ],
+    },
     "readMore": "Read More",
     "featuredPostTitle": "Featured Post",
     "readFullStory": "Read Full Story"
@@ -38,8 +37,8 @@
     },
     "searchPlaceholder": "Buscar artículos...",
     "allPostsTitle": "Todos los Artículos",
-    "posts": [
-      {
+    "posts": {
+      "0": {
         "slug": "dominando-copywriting-ia",
         "title": "Dominando el Copywriting con IA para Mayores Conversiones",
         "excerpt": "Descubre los prompts y técnicas que convierten a nuestra IA en un redactor de clase mundial, impulsando el ROI de tu campaña.",
@@ -48,7 +47,7 @@
         "author": "L.I.A. Legacy",
         "date": "15 de Agosto, 2025"
       },
-      {
+      "1": {
         "slug": "anatomia-bridge-page",
         "title": "La Anatomía de una Bridge Page Perfecta",
         "excerpt": "Desglosamos los componentes esenciales de una bridge page que genera confianza e impulsa los clics, basándonos en datos de miles de campañas.",
@@ -57,7 +56,7 @@
         "author": "Raz Podestá",
         "date": "10 de Agosto, 2025"
       }
-    ],
+    },
     "readMore": "Leer Más",
     "featuredPostTitle": "Artículo Destacado",
     "readFullStory": "Leer Historia Completa"
@@ -69,8 +68,8 @@
     },
     "searchPlaceholder": "Buscar artigos...",
     "allPostsTitle": "Todos os Artigos",
-    "posts": [
-      {
+    "posts": {
+      "0": {
         "slug": "dominando-copywriting-ia",
         "title": "Dominando o Copywriting com IA para Maiores Conversões",
         "excerpt": "Descubra os prompts e técnicas que transformam nossa IA em um redator de classe mundial, impulsionando o ROI de sua campanha.",
@@ -79,7 +78,7 @@
         "author": "L.I.A. Legacy",
         "date": "15 de Agosto, 2025"
       },
-      {
+      "1": {
         "slug": "anatomia-bridge-page",
         "title": "A Anatomia de uma Bridge Page Perfeita",
         "excerpt": "Analisamos os componentes essenciais de uma bridge page que constrói confiança e gera cliques, com base em dados de milhares de campanhas.",
@@ -88,7 +87,7 @@
         "author": "Raz Podestá",
         "date": "10 de Agosto, 2025"
       }
-    ],
+    },
     "readMore": "Ler Mais",
     "featuredPostTitle": "Artigo em Destaque",
     "readFullStory": "Ler História Completa"

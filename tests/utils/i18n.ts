@@ -5,7 +5,7 @@
  *              Esta es la SSoT para cargar y ensamblar los archivos de mensajes
  *              de i18n para el entorno de pruebas. Refactorizado para usar una
  *              ruta relativa explícita y garantizar la resolución del módulo.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 3.0.0
  */
 import { setNestedProperty } from "@/lib/helpers/set-nested-property.helper";

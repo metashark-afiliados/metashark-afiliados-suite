@@ -2,9 +2,10 @@
 /**
  * @file updateSite.action.ts
  * @description Server Action atómica para la actualización general de un sitio.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 1.0.0
- * @see .docs-espejo/lib/actions/sites/updateSite.action.ts.md
+ *              Refactorizada para adherirse al contrato `ActionResult` blindado,
+ *              la Constitución de Observabilidad y la SSoT de seguridad.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
  */
 "use server";
 import "server-only";
@@ -17,34 +18,47 @@ import {
   createPersistentErrorLog,
 } from "@/lib/actions/_helpers";
 import { requireSitePermission } from "@/lib/auth/user-permissions";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, UpdateSiteSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  UpdateSiteSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
+/**
+ * @public
+ * @async
+ * @function updateSiteAction
+ * @description Orquesta la actualización de los metadatos de un sitio.
+ * @param {FormData} formData - Los datos del formulario de actualización.
+ * @returns {Promise<ActionResult<{ messageKey: ValidationErrorKey }>>} El resultado de la operación.
+ */
 export async function updateSiteAction(
   formData: FormData
-): Promise<ActionResult<{ message: string }>> {
+): Promise<ActionResult<{ messageKey: ValidationErrorKey }>> {
   const rawData = Object.fromEntries(formData);
-  let userIdForErrorLog: string | undefined;
+  let context: Record<string, any> = { payload: rawData };
 
   try {
     const { site_id, ...updateData } = UpdateSiteSchema.parse(rawData);
+    context.siteId = site_id;
+    context.updateData = updateData;
 
     const permissionCheck = await requireSitePermission(site_id, [
       "owner",
       "admin",
     ]);
     if (!permissionCheck.success) {
-      logger.warn(
-        `[SitesActions:updateSite] Permiso denegado para usuario ${permissionCheck.data?.user?.id} en sitio ${site_id}.`
-      );
+      context.userId = permissionCheck.data?.user?.id;
+      logger.warn(context, `[updateSiteAction] Permiso denegado.`);
       return {
         success: false,
-        error: "ValidationErrors.sites_update_permission_denied",
+        error: "sites.update_permission_denied",
       };
     }
     const { user } = permissionCheck.data;
-    userIdForErrorLog = user.id;
+    context.userId = user.id;
 
     const supabase = createClient();
     const { error } = await supabase
@@ -65,38 +79,37 @@ export async function updateSiteAction(
 
     revalidatePath("/dashboard/sites");
     revalidatePath(`/dashboard/sites/${site_id}/settings`);
-    logger.info(
-      `[SitesActions:updateSite] Sitio ${site_id} actualizado con éxito.`,
-      { userId: user.id, updateData }
-    );
+    logger.info(context, `[updateSiteAction] Sitio actualizado con éxito.`);
     return {
       success: true,
-      data: { message: "Sitio actualizado correctamente." }, // NOTA: Este mensaje es para un toast de admin, puede ser hardcodeado o migrado a un namespace `AdminToasts`.
+      data: { messageKey: "sites.update_success" },
     };
   } catch (error) {
+    let errorKey: ValidationErrorKey;
+
     if (error instanceof ZodError) {
-      logger.warn(`[SitesActions:updateSite] Datos de formulario inválidos:`, {
-        errors: error.flatten(),
-      });
-      const firstError = error.errors[0]?.message;
-      return {
-        success: false,
-        error: firstError || "ValidationErrors.error_invalid_data",
-      };
+      errorKey = error.errors[0]?.message as ValidationErrorKey;
+      logger.warn(
+        { errors: error.flatten(), ...context },
+        `[updateSiteAction] Datos de formulario inválidos.`
+      );
+    } else {
+      errorKey = "generic.error_server_generic";
     }
 
     const errorId = await createPersistentErrorLog(
-      "updateSiteAction.unexpected",
+      "updateSiteAction",
       error as Error,
-      { userId: userIdForErrorLog, payload: rawData }
+      context
     );
     logger.error(
-      `[SitesActions:updateSite] Error inesperado. Log ID: ${errorId}`,
-      {
-        error: error instanceof Error ? error.message : String(error),
-      }
+      { err: error, errorId, ...context },
+      `[updateSiteAction] Error inesperado.`
     );
-    return { success: false, error: "ValidationErrors.error_server_generic" };
+    return {
+      success: false,
+      error: errorKey,
+    };
   }
 }
 // src/lib/actions/sites/updateSite.action.ts

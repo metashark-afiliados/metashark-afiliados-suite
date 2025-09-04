@@ -5,7 +5,7 @@
  *              para el componente `DashboardTeamMembersCard`. Orquesta el
  *              consumo de datos de sesión, el estado del diálogo de invitación
  *              y la internacionalización.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.1.0
  */
 "use client";
@@ -13,7 +13,7 @@
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useWorkspaceDialogStore } from "@/lib/hooks/useWorkspaceDialogStore";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

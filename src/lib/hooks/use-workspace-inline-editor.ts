@@ -1,86 +1,114 @@
 // src/lib/hooks/use-workspace-inline-editor.ts
-"use client";
-
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
-
-import { updateWorkspaceNameAction } from "@/lib/actions/workspaces.actions";
-import { useDashboard } from "@/lib/context/DashboardContext";
-import { logger } from "@/lib/logging";
-
 /**
  * @file use-workspace-inline-editor.ts
  * @description Hook Soberano para la edición en línea del nombre del workspace.
- *              Corregido para usar importaciones atómicas de Server Actions.
- * @author Raz Podestá
- * @version 2.0.0
+ *              Paga la deuda técnica de "Fuga de Abstracción" al usar `role_id`
+ *              para la lógica de permisos.
+ * @author RaZ Podestá - MetaShark Tech
+ * @version 8.0.0
+ * @see .docs/debt/001_LEAN_DB_ABSTRACTION_LEAK.md
+ * @see .docs-espejo/lib/hooks/use-workspace-inline-editor.ts.md
+ */
+"use client";
+
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import toast from "react-hot-toast";
+import type { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { updateWorkspaceNameAction } from "@/lib/actions/workspaces.actions";
+import { WORKSPACE_ROLES } from "@/config/roles.config";
+import { useDashboard } from "@/lib/context/DashboardContext";
+import { useTypedTranslations } from "@/lib/i18n/hooks";
+import { clientLogger } from "@/lib/logger";
+import { isActionError, UpdateWorkspaceNameSchema } from "@/lib/validators";
+
+type FormData = z.infer<typeof UpdateWorkspaceNameSchema>;
+
+/**
+ * @public
+ * @function useWorkspaceInlineEditor
+ * @description Hook soberano que provee toda la lógica y estado necesarios para
+ *              la edición en línea del nombre del workspace.
+ * @returns Un objeto con el estado computado y los manejadores de eventos.
  */
 export function useWorkspaceInlineEditor() {
-  const t = useTranslations("WorkspaceSwitcher");
-  const tErrors = useTranslations("ValidationErrors");
-  const { activeWorkspace, activeWorkspaceRole } = useDashboard();
-
+  const t = useTypedTranslations("components.workspaces.WorkspaceSwitcher");
+  const tErrors = useTypedTranslations("shared.ValidationErrors");
+  const { activeWorkspace, activeWorkspaceRoleId } = useDashboard();
   const [isEditing, setIsEditing] = useState(false);
-  const [inputValue, setInputValue] = useState(activeWorkspace?.name || "");
   const [isApiPending, startApiTransition] = useTransition();
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const canEdit =
-    activeWorkspaceRole === "owner" || activeWorkspaceRole === "admin";
+  const form = useForm<FormData>({
+    resolver: zodResolver(UpdateWorkspaceNameSchema),
+    defaultValues: { name: activeWorkspace?.name || "" },
+  });
+  const {
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = form;
+
   const activeWorkspaceName = activeWorkspace?.name || "";
 
   useEffect(() => {
-    if (activeWorkspace) {
-      setInputValue(activeWorkspace.name);
-    }
-  }, [activeWorkspace]);
+    if (activeWorkspace) reset({ name: activeWorkspace.name });
+  }, [activeWorkspace, reset]);
 
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
+  const canEdit =
+    activeWorkspaceRoleId === WORKSPACE_ROLES.OWNER.id ||
+    activeWorkspaceRoleId === WORKSPACE_ROLES.ADMIN.id;
 
-  const handleSaveName = useCallback(() => {
-    if (
-      !activeWorkspace ||
-      inputValue.trim() === "" ||
-      inputValue.trim() === activeWorkspaceName
-    ) {
-      setIsEditing(false);
-      setInputValue(activeWorkspaceName);
-      return;
-    }
-
-    startApiTransition(async () => {
-      const result = await updateWorkspaceNameAction(
-        activeWorkspace.id,
-        inputValue
-      );
-
-      if (result.success) {
-        toast.success(t("edit_form.success_toast"));
-      } else {
-        toast.error(
-          tErrors(result.error as any, { defaultValue: result.error })
-        );
-        setInputValue(activeWorkspaceName);
+  const processSubmit: SubmitHandler<FormData> = useCallback(
+    (data) => {
+      if (!activeWorkspace || data.name.trim() === activeWorkspaceName) {
+        setIsEditing(false);
+        reset({ name: activeWorkspaceName });
+        return;
       }
+      clientLogger.info(
+        { newName: data.name, workspaceId: activeWorkspace.id },
+        "[useWorkspaceInlineEditor] Guardando nuevo nombre."
+      );
+      startApiTransition(async () => {
+        const result = await updateWorkspaceNameAction(
+          activeWorkspace.id,
+          data.name
+        );
+        if (isActionError(result)) {
+          toast.error(tErrors(result.error, { defaultValue: result.error }));
+          reset({ name: activeWorkspaceName });
+        } else {
+          toast.success(t("edit_form.success_toast"));
+        }
+        setIsEditing(false);
+      });
+    },
+    [activeWorkspace, activeWorkspaceName, t, tErrors, reset]
+  );
+
+  const handleBlur = () => handleSubmit(processSubmit)();
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSubmit(processSubmit)();
+    } else if (e.key === "Escape") {
       setIsEditing(false);
-    });
-  }, [activeWorkspace, inputValue, activeWorkspaceName, t, tErrors]);
+      reset({ name: activeWorkspaceName });
+    }
+  };
 
   return {
     isEditing,
     setIsEditing,
-    inputValue,
-    setInputValue,
-    isApiPending,
-    inputRef,
+    isApiPending: isApiPending || isSubmitting,
     canEdit,
-    handleSaveName,
     activeWorkspaceName,
+    form,
+    handleBlur,
+    handleKeyDown,
   };
 }
+// src/lib/hooks/use-workspace-inline-editor.ts

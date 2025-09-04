@@ -2,14 +2,23 @@
 /**
  * @file src/lib/validators/schemas/auth.schemas.ts
  * @description Aparato de validación atómico y SSoT para el ciclo de vida de
- *              autenticación. Enriquecido con `SignInSchema` para completar
- *              el contrato de validación del módulo.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-09-01
+ *              autenticación. Sincronizado para incluir el contrato `OAuthSchema`,
+ *              blindando la validación del proveedor de OAuth.
+ * @author RaZ Podestá - MetaShark Tech
+ * @version 3.0.0
  */
 import { z } from "zod";
 import { EmailSchema, PasswordSchema } from "./_base.schemas";
+
+/**
+ * @public
+ * @constant OAuthSchema
+ * @description Valida el payload para el inicio de un flujo de autenticación OAuth.
+ *              Garantiza que el proveedor sea uno de los soportados.
+ */
+export const OAuthSchema = z.object({
+  provider: z.enum(["google", "apple"]), // SSoT de proveedores permitidos
+});
 
 /**
  * @public
@@ -25,7 +34,6 @@ export const SignInSchema = z.object({
  * @public
  * @constant SignUpSchema
  * @description Valida el payload completo para el registro de un nuevo usuario.
- *              Incluye una refinación para asegurar que las contraseñas coincidan.
  */
 export const SignUpSchema = z
   .object({

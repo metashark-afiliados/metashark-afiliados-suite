@@ -13,14 +13,14 @@
  */
 "use client";
 
-import { useTransition, useCallback } from "react";
-import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useCallback, useTransition } from "react";
+import toast from "react-hot-toast";
 
 import { updateUserRoleAction } from "@/lib/actions/admin.actions";
 import { useUrlStateSync } from "@/lib/hooks/ui/useUrlStateSync";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { type Database } from "@/lib/types/database";
 
 interface UseUsersPageProps {

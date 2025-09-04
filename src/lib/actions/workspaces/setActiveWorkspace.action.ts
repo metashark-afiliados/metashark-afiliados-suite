@@ -2,7 +2,7 @@
 /**
  * @file setActiveWorkspace.action.ts
  * @description Server Action atómica para cambiar el workspace activo del usuario.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  * @see .docs-espejo/lib/actions/workspaces/setActiveWorkspace.action.ts.md
  */
@@ -13,7 +13,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 export async function setActiveWorkspaceAction(
   workspaceId: string

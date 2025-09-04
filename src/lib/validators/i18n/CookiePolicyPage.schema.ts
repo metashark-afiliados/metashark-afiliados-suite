@@ -1,40 +1,39 @@
 // src/lib/validators/i18n/CookiePolicyPage.schema.ts
 /**
  * @file CookiePolicyPage.schema.ts
- * @description Define el contrato de datos para el namespace 'CookiePolicyPage'.
- *              Sincronizado para reflejar la estructura anidada completa del contenido.
- * @author Raz Podestá - MetaShark Tech
+ * @description Define el contrato de datos para el namespace 'pages.CookiePolicyPage'.
+ *              Sincronizado con la Directiva 3.4 (IMAS), validando arrays de
+ *              contenido como objetos con claves numéricas.
+ * @author L.I.A Legacy
  * @version 2.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
  */
 import { z } from "zod";
 
-export const CookiePolicyPageSchema = z.object({
+/**
+ * @private
+ * @constant ContentSectionSchema
+ * @description Define la estructura para una única sección de contenido,
+ *              donde el cuerpo (`body`) es un objeto de párrafos.
+ */
+const ContentSectionSchema = z.object({
   title: z.string(),
-  content: z.array(
-    z.object({
-      title: z.string(),
-      body: z.array(z.string()),
-    })
-  ),
+  body: z.record(z.string()),
 });
 
 /**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización Completa de Contrato**: ((Implementada)) El schema ha sido actualizado para reflejar la estructura anidada completa del archivo `CookiePolicyPage.json`, incluyendo el array `content` con objetos `title` y `body`. Esto resuelve la brecha crítica de sincronización del contrato.
- * 2. **Documentación de Campos**: ((Implementada)) Se han añadido descripciones a los campos clave para mejorar la DX.
- *
- * =====================================================================
+ * @public
+ * @constant CookiePolicyPageSchema
+ * @description El schema Zod que valida la estructura completa del archivo de
+ *              mensajes para la página de Política de Cookies.
  */
+export const CookiePolicyPageSchema = z.object({
+  title: z.string(),
+  /**
+   * @property content
+   * @description Un objeto que representa una lista de secciones. Las claves son
+   *              strings numéricos ("0", "1", ...) y los valores son objetos
+   *              de sección que cumplen con `ContentSectionSchema`.
+   */
+  content: z.record(ContentSectionSchema),
+});
+// src/lib/validators/i18n/CookiePolicyPage.schema.ts

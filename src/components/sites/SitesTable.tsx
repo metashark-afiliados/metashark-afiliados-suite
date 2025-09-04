@@ -10,14 +10,14 @@
  */
 "use client";
 
-import React from "react";
 import { useTranslations } from "next-intl";
+import React from "react";
 
 import { PaginatedDataTable } from "@/components/shared/PaginatedDataTable";
-import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { clientLogger } from "@/lib/logging";
-import { getSitesTableColumns } from "./SitesTableColumns";
 import { type PaginationTexts } from "@/components/shared/pagination-controls";
+import { type SiteWithCampaignCount } from "@/lib/data/sites";
+import { clientLogger } from "@/lib/logger";
+import { getSitesTableColumns } from "./SitesTableColumns";
 
 export interface SitesTableProps {
   sites: SiteWithCampaignCount[];

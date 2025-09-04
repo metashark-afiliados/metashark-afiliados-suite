@@ -4,15 +4,15 @@
  * @description Aparato de UI atómico y soberano. Renderiza el botón de "Crear"
  *              principal en la barra lateral y gestiona su propia lógica de
  *              interacción e internacionalización.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.0.0
  */
 "use client";
 
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboardTranslations } from "@/lib/hooks/useDashboardTranslations";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
+import { Plus } from "lucide-react";
 
 /**
  * @public

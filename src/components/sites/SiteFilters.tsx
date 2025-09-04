@@ -1,19 +1,17 @@
 // src/components/sites/SiteFilters.tsx
 /**
  * @file SiteFilters.tsx
- * @description Aparato de UI atómico y soberano. Ha sido refactorizado a un
- *              estándar de élite para consumir el hook de traducción soberano
- *              `useSitesPageTranslations`, resolviendo la cascada de errores de
- *              tipo TS2345 y alineándolo con la arquitectura IMAS.
- * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
- * @date 2025-08-27
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Aparato de UI atómico y soberano. Refactorizado para consumir
+ *              `useTypedTranslations` con namespaces anidados, resolviendo la
+ *              cascada de errores de tipo TS2322 y restaurando la seguridad
+ *              de tipos de i18n.
+ * @author L.I.A. Legacy
+ * @version 5.0.0
  */
 "use client";
 
 import { Filter } from "lucide-react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -35,10 +33,8 @@ import {
   type SiteSortOption,
   type SiteStatusFilter,
 } from "@/lib/data/sites/types";
-// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N) ---
-import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
-// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
-import { clientLogger } from "@/lib/logging";
+import { useTypedTranslations } from "@/lib/i18n/hooks";
+import { clientLogger } from "@/lib/logger";
 
 export interface SiteFiltersProps {
   sortOption: SiteSortOption;
@@ -60,12 +56,9 @@ export function SiteFilters({
   clientLogger.trace(
     "[SiteFilters] Renderizando componente de filtros soberano."
   );
-  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N) ---
-  const { tSitesPage } = useSitesPageTranslations();
-  // Se accede a las claves anidadas a través de la función `t` correcta.
-  const tFilters = (key: string) => tSitesPage(`filters.${key}` as any);
-  const tStatus = (key: string) => tSitesPage(`status.${key}` as any);
-  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
+
+  const tFilters = useTypedTranslations("components.sites.SitesHeader.filters");
+  const tStatus = useTypedTranslations("components.sites.SitesHeader.status");
 
   const sortOptions: { value: SiteSortOption; label: string }[] = [
     { value: "created_at_desc", label: tFilters("sort_updated_desc") },
@@ -158,19 +151,4 @@ export function SiteFilters({
     </Popover>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Resolución Sistémica de `TS2345`**: Al consumir el hook soberano `useSitesPageTranslations`, el componente ahora tiene acceso garantizado y tipo-seguro a todos los namespaces que necesita, resolviendo la causa raíz de los errores de i18n.
- * 2. ((Implementada)) **Soberanía y Desacoplamiento**: El componente ya no depende de un hook de i18n monolítico. Ahora es un aparato más cohesivo y alineado con el SRP.
- *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Abstracción de `FilterGroup`**: El patrón de `Label` + `Control` (`RadioGroup` o `Select`) es reutilizable. Se podría abstraer a un componente `FilterGroup` genérico para un código más DRY.
- *
- * =====================================================================
- */
 // src/components/sites/SiteFilters.tsx

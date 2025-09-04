@@ -10,9 +10,9 @@
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
-import React from "react";
 import { EditableText } from "@/components/builder/ui/EditableText";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
+import React from "react";
 
 /**
  * @public

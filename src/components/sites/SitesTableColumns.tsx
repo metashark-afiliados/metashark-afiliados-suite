@@ -13,13 +13,12 @@
  */
 "use client";
 
-import React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useFormatter, useTranslations } from "next-intl";
 
 import { EditableText } from "@/components/builder/ui/EditableText";
 import { type SiteWithCampaignCount } from "@/lib/data/sites";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { SiteCardFooter } from "./SiteCardFooter";
 
 /**

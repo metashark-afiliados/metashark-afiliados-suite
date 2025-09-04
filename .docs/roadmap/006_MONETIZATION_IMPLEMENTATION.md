@@ -3,7 +3,7 @@
  * @file .docs/roadmap/006_MONETIZATION_IMPLEMENTATION.md
  * @description Roadmap de Ejecución v1.0: Implementación del Dominio de Monetización.
  *              Esta es la SSoT para la construcción del motor financiero de ConvertiKit.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Roadmap de Tarea: Implementación del Dominio de Monetización v1.0

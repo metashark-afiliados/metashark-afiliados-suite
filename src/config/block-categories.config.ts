@@ -4,7 +4,7 @@
  * @description Manifiesto de Configuración Declarativo y SSoT para las categorías
  *              de bloques del constructor. Corregido para asegurar la exportación
  *              correcta de la configuración, resolviendo un error crítico de build.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 2.1.0
  */
 import { type LucideIconName } from "@/config/lucide-icon-names";

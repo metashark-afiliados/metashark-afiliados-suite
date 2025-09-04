@@ -5,16 +5,16 @@
  *              refactorizado para reducir su alcance y cargar únicamente los
  *              namespaces globales del layout, delegando las traducciones de
  *              página a hooks más específicos.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 4.0.0
  */
 "use client";
 
-import { useMemo } from "react";
 import { useFormatter } from "next-intl";
+import { useMemo } from "react";
 
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

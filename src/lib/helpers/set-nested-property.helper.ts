@@ -4,7 +4,7 @@
  * @description Helper atómico y puro para la asignación de propiedades anidadas.
  *              Es una utilidad de propósito general, compatible con cualquier
  *              entorno de JavaScript (cliente, servidor, Edge).
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.3
  */
 // "server-only" ha sido eliminado para compatibilidad universal.

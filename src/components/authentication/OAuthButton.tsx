@@ -11,13 +11,13 @@
  */
 "use client";
 
-import React, { useTransition } from "react";
 import { type Provider } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
+import React, { useTransition } from "react";
 
-import { signInWithOAuthAction } from "@/lib/actions/auth.actions";
-import { clientLogger } from "@/lib/logging";
 import { Button } from "@/components/ui/button";
+import { signInWithOAuthAction } from "@/lib/actions/auth.actions";
+import { clientLogger } from "@/lib/logger";
 
 const GoogleIcon = () => (
   <svg className="mr-2 h-4 w-4" viewBox="0 0 48 48">

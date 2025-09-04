@@ -12,13 +12,11 @@
  */
 "use client";
 
-import React from "react";
 import { useFormatter, useTranslations } from "next-intl";
+import React from "react";
 
 import { getCampaignsColumns } from "@/components/campaigns";
-import { type CampaignMetadata } from "@/lib/data/campaigns";
-import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import {
   useCampaignsPage,
   type UseCampaignsPageProps,

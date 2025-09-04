@@ -6,7 +6,7 @@
  *              aplanado. La firma de `useTypedTranslations` ahora acepta directamente
  *              los namespaces completos como un tipo, resolviendo la cascada de
  *              errores de tipo en toda la aplicación.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
  */
 "use client";

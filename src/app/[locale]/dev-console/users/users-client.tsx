@@ -12,16 +12,16 @@
  */
 "use client";
 
-import React from "react";
 import { useTranslations } from "next-intl";
+import React from "react";
 
 import { PaginatedDataTable } from "@/components/shared/PaginatedDataTable";
-import { useUsersPage } from "@/lib/hooks/useUsersPage";
+import { type PaginationTexts } from "@/components/shared/pagination-controls";
 import { type UserProfilesWithEmail } from "@/lib/data/admin";
-import { clientLogger } from "@/lib/logging";
+import { useUsersPage } from "@/lib/hooks/useUsersPage";
+import { clientLogger } from "@/lib/logger";
 import { getUsersColumns } from "../components/users-table-columns";
 import { UsersPageHeader } from "./components/UsersPageHeader";
-import { type PaginationTexts } from "@/components/shared/pagination-controls";
 
 type ProfileRow = UserProfilesWithEmail;
 

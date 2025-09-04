@@ -5,7 +5,7 @@
  *              y el comportamiento de la paleta de comandos en toda la aplicación.
  *              Este enfoque desacopla el estado de la paleta de los componentes que
  *              la abren o la utilizan, adhiriéndose a la "Filosofía LEGO".
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
  */
 import { create } from "zustand";

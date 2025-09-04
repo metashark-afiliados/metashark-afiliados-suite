@@ -4,7 +4,7 @@
  * @description Migración de Base de Datos v13.0 - Fase 1.
  *              Implementa la tabla de conversión `workspace_roles` y migra la
  *              tabla `workspace_members` para utilizarla, reemplazando el tipo ENUM.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 13.0.0
  */
 

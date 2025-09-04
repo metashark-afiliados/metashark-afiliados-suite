@@ -7,7 +7,7 @@
  *              Next.js y estableciendo un atributo `lang` de fallback para
  *              páginas no internacionalizadas, cumpliendo con los estándares de
  *              accesibilidad.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import React from "react";

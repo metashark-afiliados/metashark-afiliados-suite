@@ -25,7 +25,7 @@ import {
 import { updateProfilePreferencesAction } from "@/lib/actions/profiles.actions";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { isActionError } from "@/lib/validators";
 import { type DashboardLayoutPreferencesSchema } from "@/lib/validators/schemas";
 

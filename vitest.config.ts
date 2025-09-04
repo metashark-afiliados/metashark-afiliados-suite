@@ -3,7 +3,7 @@
  * @file vitest.config.ts
  * @description Configuración base de Vitest de élite. Calibrada para excluir
  *              explícitamente los tests E2E, garantizando el aislamiento de suites.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 3.0.0
  */
 import { defineConfig, mergeConfig } from "vitest/config";

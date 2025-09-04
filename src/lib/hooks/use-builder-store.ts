@@ -6,7 +6,7 @@
  *              `useBuilderStore` para la selección de estado reactivo, y
  *              `useBuilderStoreApi` para el acceso no reactivo a la instancia
  *              completa del store (necesario para middlewares como `temporal`).
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil

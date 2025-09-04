@@ -5,11 +5,11 @@
  *              Esta versión completa la refactorización SSR, cargando todo el contenido
  *              con una única llamada a `getTranslations` y pasando los datos como props
  *              a sus componentes hijos puros. Resuelve la cascada de errores `IntlError`.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 13.0.0
  */
-import { redirect } from "next/navigation";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 import { BottomCTA } from "@/components/landing/BottomCTA";
 import { FAQ } from "@/components/landing/FAQ";
@@ -24,7 +24,7 @@ import { LandingFooter } from "@/components/layout/LandingFooter";
 import { LandingHeader } from "@/components/layout/LandingHeader";
 import { CursorTrail } from "@/components/ui/CursorTrail";
 import { type NavLinkItem } from "@/components/ui/SmartLink";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 
 const DICEBEAR_API_URL =

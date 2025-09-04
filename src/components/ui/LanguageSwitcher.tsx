@@ -2,9 +2,10 @@
 /**
  * @file src/components/ui/LanguageSwitcher.tsx
  * @description Componente de cliente atómico para cambiar el idioma.
- *              Refactorizado para consumir el namespace de i18n canónico.
+ *              Refactorizado para utilizar la firma correcta del `clientLogger`,
+ *              resolviendo el error de tipo TS2345.
  * @author L.I.A. Legacy
- * @version 2.2.0
+ * @version 3.0.0
  */
 "use client";
 
@@ -21,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { logger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import {
   type AppLocale,
   locales,
@@ -29,7 +30,7 @@ import {
   useRouter,
 } from "@/lib/navigation";
 
-const COOKIE_NAME = "NEXT_LOCALE_CHOSEN";
+const COOKIE_NAME = "NEXT_LOCALE"; // Corregido según el estándar de next-intl
 
 export function LanguageSwitcher(): React.ReactElement {
   const t = useTranslations("components.ui.LanguageSwitcher");
@@ -47,10 +48,10 @@ export function LanguageSwitcher(): React.ReactElement {
   };
 
   const handleLocaleChange = (newLocale: AppLocale): void => {
-    logger.trace("[LanguageSwitcher] Inicio de cambio de idioma.", {
-      from: currentLocale,
-      to: newLocale,
-    });
+    clientLogger.trace(
+      "[LanguageSwitcher] Inicio de cambio de idioma.", // Mensaje
+      { from: currentLocale, to: newLocale } // Contexto como argumento separado
+    );
     startTransition(() => {
       Cookies.set(COOKIE_NAME, newLocale, { expires: 365, path: "/" });
       router.replace(pathname as any, { locale: newLocale });
@@ -66,7 +67,7 @@ export function LanguageSwitcher(): React.ReactElement {
           <Globe className="h-4 w-4 mr-2" />
           {currentDetails ? (
             <>
-              <span className="mr-2" role="img">
+              <span className="mr-2" role="img" aria-hidden>
                 {currentDetails.flag}
               </span>
               <span className="hidden sm:inline">{currentDetails.name}</span>
@@ -83,7 +84,7 @@ export function LanguageSwitcher(): React.ReactElement {
             onSelect={() => handleLocaleChange(locale)}
             disabled={locale === currentLocale || isPending}
           >
-            <span className="mr-2" role="img">
+            <span className="mr-2" role="img" aria-hidden>
               {localeDetails[locale].flag}
             </span>
             {localeDetails[locale].name}
@@ -93,14 +94,4 @@ export function LanguageSwitcher(): React.ReactElement {
     </DropdownMenu>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Resolución de `IntlError`**: ((Implementada)) Se ha corregido la llamada a `useTranslations`, eliminando el error de mensaje faltante.
- *
- * =====================================================================
- */
 // src/components/ui/LanguageSwitcher.tsx

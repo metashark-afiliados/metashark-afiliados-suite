@@ -4,18 +4,16 @@
  * @description Componente de cliente interactivo para la página de diagnóstico.
  *              Refactorizado para resolver errores de compilación y mejorar
  *              la observabilidad y el manejo de errores.
- * @author L.I.A. Legacy & RaZ Podestá - MetaShark Tech
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá - MetaShark Tech
  * @version 2.0.0
  * @date 2025-09-01
  * @see .docs-espejo/app/[locale]/dev-console/diagnostics/diagnostics-client.tsx.md
  */
 "use client";
-import React, { useEffect, useState, useTransition } from "react";
 import * as Sentry from "@sentry/nextjs";
+import React, { useEffect, useState, useTransition } from "react";
 import toast from "react-hot-toast";
 
-import { dev as devActions } from "@/lib/actions";
-import { clientLogger } from "@/lib/logging";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,6 +22,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { dev as devActions } from "@/lib/actions";
+import { clientLogger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 export interface DiagnosticsPageTexts {

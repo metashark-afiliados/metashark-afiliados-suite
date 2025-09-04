@@ -15,14 +15,14 @@
  */
 "use client";
 
-import React from "react";
-import { useTranslations } from "next-intl";
 import { useDraggable } from "@dnd-kit/core";
 import { GripVertical } from "lucide-react";
+import { useTranslations } from "next-intl";
+import React from "react";
 
 import { blockRegistry } from "@/components/templates";
 import { initializeNewBlock } from "@/lib/builder/block-initializer.helper";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 /**

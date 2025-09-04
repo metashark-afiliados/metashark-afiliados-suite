@@ -7,7 +7,7 @@
  *              visual en tiempo real al usuario. Es un componente de presentación
  *              puro, completamente agnóstico al contenido, recibiendo todos sus
  *              textos y el estado del formulario a través de props.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.1.0
  */
 "use client";

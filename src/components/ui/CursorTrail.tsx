@@ -4,7 +4,7 @@
  * @description Componente de cliente que renderiza una estela visual brillante que
  *              sigue el cursor del ratón del usuario. Ha sido corregido para incluir
  *              la importación explícita de React, resolviendo el error de compilación TS2686.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.1
  */
 "use client";

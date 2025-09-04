@@ -10,12 +10,12 @@
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
-import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
+import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 
-import { admin as adminData } from "@/lib/data";
-import { logger } from "@/lib/logging";
 import { ErrorStateCard } from "@/components/shared/error-state-card";
+import { admin as adminData } from "@/lib/data";
+import { logger } from "@/lib/logger";
 import { CampaignViewerTable } from "../components/CampaignViewerTable";
 
 export default async function CampaignsViewerPage({

@@ -4,7 +4,7 @@
  * @description Componente de enlace inteligente y atómico. Ha sido nivelado a un
  *              estándar de élite para aceptar un `onClick` opcional y propagarlo
  *              al elemento subyacente, resolviendo un error de tipo `TS2322`.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.2.0
  */
 "use client";

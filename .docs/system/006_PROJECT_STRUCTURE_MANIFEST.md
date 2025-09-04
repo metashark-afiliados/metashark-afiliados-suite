@@ -6,7 +6,7 @@
  *              y la responsabilidad de cada componente arquitectónico. Sirve como el
  *              mapa maestro para la navegación y el desarrollo. Reemplaza a
  *              `.docs/005_PROJECT_ARCHITECTURE_MANIFEST.md`.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto de Estructura del Proyecto v1.0

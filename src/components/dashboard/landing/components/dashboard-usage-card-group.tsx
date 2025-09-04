@@ -15,13 +15,13 @@
  */
 "use client";
 
-import React, { useEffect, useRef } from "react";
 import { animate, motion, useInView } from "framer-motion";
+import React, { useEffect, useRef } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { useUsageCardGroup } from "@/lib/hooks/useUsageCardGroup";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @private

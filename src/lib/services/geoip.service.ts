@@ -2,16 +2,15 @@
 /**
  * @file src/lib/services/geoip.service.ts
  * @description Servicio de geolocalización de direcciones IP del lado del servidor.
- *              Utiliza una API externa (`ip-api.com`) como implementación principal y
- *              deja "sembrada" la lógica para una futura integración con una base de
- *              datos local de MaxMind GeoLite2 para un rendimiento de élite.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ *              Refactorizado para alinearse con la firma de logging canónica de la
+ *              Constitución y la SSoT de observabilidad.
+ * @author L.I.A Legacy
+ * @version 2.0.0
  */
 "use server";
 import "server-only";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { isPrivateIpAddress } from "@/lib/utils";
 
 const GEOIP_API_URL = process.env.GEOIP_API_URL || "http://ip-api.com/json/";
@@ -33,8 +32,8 @@ export async function lookupIpAddress(
 ): Promise<any | null> {
   if (!ipAddress || isPrivateIpAddress(ipAddress)) {
     logger.trace(
-      "[GeoIPService] No se realizará lookup GeoIP para IP inválida/privada.",
-      { ipAddress }
+      { ipAddress },
+      "[GeoIPService] No se realizará lookup GeoIP para IP inválida/privada."
     );
     return null;
   }
@@ -50,8 +49,12 @@ export async function lookupIpAddress(
 
     if (!response.ok) {
       logger.error(
-        `[GeoIPService] API externa GeoIP falló para ${ipAddress}:`,
-        { status: response.status, statusText: response.statusText }
+        {
+          status: response.status,
+          statusText: response.statusText,
+          ipAddress,
+        },
+        `[GeoIPService] API externa GeoIP falló.`
       );
       return null;
     }
@@ -59,46 +62,28 @@ export async function lookupIpAddress(
     const data = await response.json();
 
     if (data.status === "fail") {
-      logger.warn(`[GeoIPService] API externa GeoIP falló para ${ipAddress}:`, {
-        reason: data.message,
-      });
+      logger.warn(
+        { reason: data.message, ipAddress },
+        `[GeoIPService] API externa GeoIP devolvió un fallo.`
+      );
       return null;
     }
 
-    logger.trace(`[GeoIPService] Lookup exitoso para IP ${ipAddress}.`);
+    logger.trace({ ipAddress }, `[GeoIPService] Lookup exitoso.`);
     return data;
   } catch (error: any) {
     if (error.name === "AbortError") {
       logger.warn(
-        `[GeoIPService] Lookup GeoIP para ${ipAddress} abortado por timeout.`
+        { ipAddress },
+        `[GeoIPService] Lookup GeoIP abortado por timeout.`
       );
     } else {
       logger.error(
-        `[GeoIPService] Error de red en lookup GeoIP para ${ipAddress}:`,
-        {
-          message: error.message,
-        }
+        { err: error, ipAddress },
+        `[GeoIPService] Error de red en lookup GeoIP.`
       );
     }
     return null;
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Implementación de MaxMind GeoLite2**: ((Vigente)) Activar la lógica para usar una base de datos MaxMind local (`.mmdb`) descargada a `/tmp`. Esto eliminaría la dependencia de APIs externas, mejoraría la latencia y la fiabilidad. Requeriría configurar Supabase Storage para alojar el archivo de la base de datos y un proceso para su actualización periódica.
- * 2. **Caché en Memoria (LRU)**: ((Vigente)) Para mitigar el límite de peticiones de APIs gratuitas, se podría implementar un caché LRU (Least Recently Used) en memoria para las IPs más consultadas, reduciendo la latencia en invocaciones "cálidas".
- * 3. **Estrategia de Fallback**: ((Vigente)) Se podría configurar una segunda API de GeoIP gratuita y, si la primaria falla, intentar la consulta con la secundaria antes de devolver `null`.
- *
- * @subsection Melhorias Adicionadas
- * 1. **Servicio de Enriquecimiento de Datos**: ((Implementada)) Se ha reconstruido el servicio de GeoIP, una pieza clave para la detección de idioma y la telemetría de visitantes.
- * 2. **Manejo de Errores Robusto**: ((Implementada)) La función incluye un `AbortController` para gestionar timeouts y maneja de forma segura los errores de red y las respuestas fallidas de la API.
- * 3. **Optimización de Peticiones**: ((Implementada)) Al utilizar el helper `isPrivateIpAddress`, el servicio evita realizar llamadas a la API para direcciones IP no públicas, ahorrando recursos.
- *
- * =====================================================================
- */
 // src/lib/services/geoip.service.ts

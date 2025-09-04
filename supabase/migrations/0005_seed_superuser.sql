@@ -4,7 +4,7 @@
  * @description Script de seeding idempotente. Corregido para omitir la columna
  *              generada `confirmed_at` en la inserción de `auth.users`.
  * @version 1.1.0
- * @author L.I.A. Legacy & Raz Podestá
+ * @author Raz Podestá - MetaShark Tech & Raz Podestá
  */
 
 DO $$

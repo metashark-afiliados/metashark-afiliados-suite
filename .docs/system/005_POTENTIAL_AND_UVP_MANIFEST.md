@@ -4,7 +4,7 @@
  * @description Manifiesto de Potencialidades y Propuesta Única de Valor (PUV) v1.0.
  *              Esta es la SSoT que define las capacidades actuales y futuras de
  *              ConvertiKit, sirviendo como una "Wiki" interna del proyecto.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto de Potencialidades y Propuesta Única de Valor (PUV) v1.0

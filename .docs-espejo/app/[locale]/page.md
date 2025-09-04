@@ -2,7 +2,7 @@
 /**
  * @file signup/page.tsx.md
  * @description Documento Espejo y SSoT conceptual para la página de registro.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ WriTe (Arquitecto)
  * @version 2.0.0
  * @date 2025-09-01
  */

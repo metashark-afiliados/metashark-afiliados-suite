@@ -4,7 +4,7 @@
  * @description Director de Orquesta de Pruebas de Élite. Refactorizado para
  *              delegar la carga de datos de i18n al aparato especializado
  *              `loadTestMessages`, mejorando la cohesión y el SRP.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 4.0.0
  */
 import "@testing-library/jest-dom/vitest";

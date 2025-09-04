@@ -3,35 +3,20 @@
  * @file BuilderStoreProvider.tsx
  * @description Proveedor de contexto de élite para el `BuilderStore`. Implementa
  *              el patrón de "Hydration Segura" para Zustand en el App Router.
- *              Sincronizado con la arquitectura de SSoT canónica del núcleo de estado.
  * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
- * @date 2025-08-24
+ * @version 3.0.0
+ * @see .docs-espejo/components/builder/BuilderStoreProvider.tsx.md
  */
 "use client";
 
-import { createContext, useRef, type ReactNode, useContext } from "react";
-import { useStore } from "zustand";
+import { createContext, useContext, useRef, type ReactNode } from "react";
 
 import { createBuilderStore, type BuilderStore } from "@/lib/builder/core";
 import { type CampaignConfig } from "@/lib/builder/types.d";
-import { logger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
-/**
- * @public
- * @interface BuilderStoreProviderProps
- * @description Contrato de props para el proveedor.
- */
 export interface BuilderStoreProviderProps {
-  /**
-   * El estado inicial para hidratar el store, preparado por un Server Component.
-   */
   initialState: CampaignConfig;
-  /**
-   * Los componentes hijos que tendrán acceso al store.
-   */
   children: ReactNode;
 }
 
@@ -53,9 +38,10 @@ export function BuilderStoreProvider({
   if (!storeRef.current) {
     storeRef.current = createBuilderStore();
     storeRef.current.setState({ campaignConfig: initialState });
-    logger.info("[BuilderStoreProvider] Store de Zustand creado e hidratado.", {
-      campaignId: initialState.id,
-    });
+    clientLogger.info(
+      { campaignId: initialState.id },
+      "[BuilderStoreProvider] Store de Zustand creado e hidratado."
+    );
   }
 
   return (
@@ -81,16 +67,4 @@ export const useBuilderStoreContext = (): BuilderStore => {
   }
   return store;
 };
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Sincronización Arquitectónica**: ((Implementada)) Se ha corregido la ruta de importación para que apunte al manifiesto del módulo (`@/lib/builder/core`), resolviendo los errores de tipo y de módulo no encontrado.
- * 2. **Observabilidad Mejorada**: ((Implementada)) El log de hidratación ahora incluye el `campaignId` para una trazabilidad más granular.
- * 3. **Selector de Estado Atómico**: ((Implementada)) La funcionalidad de un selector de estado atómico que combina `useBuilderStoreContext` y `useStore` con un selector ya está provista por el hook `useBuilderStore` en `src/lib/hooks/use-builder-store.ts`.
- *
- * =====================================================================
- */
 // src/components/builder/BuilderStoreProvider.tsx

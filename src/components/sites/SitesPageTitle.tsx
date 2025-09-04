@@ -13,7 +13,7 @@
 "use client";
 
 import { useTypedTranslations } from "@/lib/i18n/hooks";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 export function SitesPageTitle() {
   clientLogger.trace(

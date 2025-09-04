@@ -3,17 +3,15 @@
  * @file users.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de
  *              lectura de alto privilegio para la gestión de usuarios, para
- *              uso exclusivo en el Dev Console.
+ *              uso exclusivo en el Dev Console. Refactorizado para alinear el
+ *              logging a la firma canónica.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-29
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 2.0.0
  */
 "use server";
 import "server-only";
 
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createAdminClient } from "@/lib/supabase/server";
 import { type UserProfilesWithEmail } from "./types";
 
@@ -40,9 +38,10 @@ export async function getPaginatedUsersWithRoles({
   limit?: number;
   query?: string;
 }): Promise<{ profiles: UserProfilesWithEmail[]; totalCount: number }> {
+  const context = { page, limit, query };
   logger.trace(
-    "[DataLayer:AdminUsers] Iniciando obtención de perfiles de usuario.",
-    { page, limit, query }
+    context,
+    "[DataLayer:AdminUsers] Iniciando obtención de perfiles de usuario."
   );
   try {
     const supabase = createAdminClient();
@@ -65,30 +64,16 @@ export async function getPaginatedUsersWithRoles({
       throw error;
     }
 
-    // El casteo es seguro aquí debido a la SSoT de la vista en la DB.
     return {
       profiles: (profiles as UserProfilesWithEmail[]) || [],
       totalCount: count || 0,
     };
   } catch (error) {
     logger.error(
-      `[DataLayer:AdminUsers] Error crítico al obtener perfiles de usuario:`,
-      error
+      { err: error, context },
+      `[DataLayer:AdminUsers] Error crítico al obtener perfiles de usuario.`
     );
     throw new Error("No se pudieron obtener los perfiles de usuario.");
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- * @subsection Melhorias Futuras
- * 1. **Índices de Búsqueda (GIN)**: Para optimizar el rendimiento de la búsqueda `ILIKE` en un gran número de usuarios, se deben crear índices GIN con la extensión `pg_trgm` en las columnas `email` y `full_name` de la tabla `profiles`.
- * 2. **Filtros por Rol**: Extender la función para aceptar un parámetro `role: AppRole` que permita filtrar a los usuarios por su `app_role`, una funcionalidad esencial para la gestión de usuarios.
- * 3. **Ordenamiento Dinámico**: Añadir un parámetro `sort` para permitir ordenar los resultados por diferentes columnas (ej. `email`, `full_name`, `created_at`).
- * 4. **Cacheo de Datos**: Para dashboards de administración con mucho tráfico, envolver esta función en `React.cache` con una revalidación basada en etiquetas para optimizar el rendimiento.
- * 5. **Tipado de Retorno con Zod**: En lugar de la aserción `as UserProfilesWithEmail[]`, crear un `UserProfilesWithEmailSchema` y usar `z.array(...).parse(profiles)` para una validación en tiempo de ejecución.
- * =====================================================================
- */
 // src/lib/data/admin/users.data.ts

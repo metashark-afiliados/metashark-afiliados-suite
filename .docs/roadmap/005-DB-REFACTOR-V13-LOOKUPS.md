@@ -4,7 +4,7 @@
  * @description Roadmap de Ejecución v13.0: Implementación de Tablas de Conversión (Lookup Tables).
  *              Esta es la SSoT para la refactorización holística de la base de datos,
  *              reemplazando los tipos ENUM por tablas de lookup para máxima flexibilidad.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 13.0.0
  */
 # Roadmap de Tarea: Refactorización a Tablas de Conversión v13.0

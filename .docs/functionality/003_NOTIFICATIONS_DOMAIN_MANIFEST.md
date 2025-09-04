@@ -5,7 +5,7 @@
  *              Esta es la SSoT que define la arquitectura y lógica para el sistema
  *              de notificaciones y el flujo de invitaciones. Reemplaza a la
  *              versión anterior.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Funcional y Arquitectónico: Dominio "Notifications & Invitations"

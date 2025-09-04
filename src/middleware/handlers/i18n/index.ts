@@ -4,9 +4,9 @@
  * @description Manejador de internacionalización (i18n) de élite. Implementa
  *              una detección de locale enriquecida y está alineado con la
  *              infraestructura de logging canónica de la aplicación.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @copilot RaZ WriTe
- * @version 3.0.0
+ * @version 3.1.0
  */
 import { type NextRequest, type NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";

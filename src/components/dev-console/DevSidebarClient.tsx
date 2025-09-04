@@ -5,22 +5,22 @@
  *              para invocar la Server Action de `signOut` a través de un evento
  *              `onClick` con `useTransition`, eliminando la advertencia de JSDOM
  *              y proporcionando un feedback de carga explícito.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 4.0.0
  */
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { Loader2, LogOut, ShieldCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useEffect, useState, useTransition } from "react";
 
-import { signOutAction } from "@/lib/actions/session.actions";
 import { Button } from "@/components/ui/button";
+import { signOutAction } from "@/lib/actions/session.actions";
+import { logger } from "@/lib/logger";
 import { NavLink } from "./sidebar/NavLink";
 import { RouteTreeViewer, type RouteNode } from "./sidebar/RouteTreeViewer";
 import { devConsoleNavLinks } from "./sidebar/sidebar.config";
-import { logger } from "@/lib/logging";
 
 export function DevSidebarClient() {
   const t = useTranslations("components.dev-console.DevSidebar");

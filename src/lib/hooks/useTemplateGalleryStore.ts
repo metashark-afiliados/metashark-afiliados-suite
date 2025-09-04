@@ -13,7 +13,7 @@
 import { create } from "zustand";
 
 import { type BlockCategoryId } from "@/config/block-categories.config";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 /**
  * @public

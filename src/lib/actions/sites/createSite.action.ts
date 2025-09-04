@@ -2,9 +2,10 @@
 /**
  * @file createSite.action.ts
  * @description Server Action atómica para la creación de un nuevo sitio.
- * @author L.I.A. Legacy & RaZ WriTe (Arquitecto)
- * @version 1.0.0
- * @see .docs-espejo/lib/actions/sites/createSite.action.ts.md
+ *              Refactorizada para adherirse al contrato `ActionResult` blindado,
+ *              la Constitución de Observabilidad y la SSoT de seguridad.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
  */
 "use server";
 import "server-only";
@@ -17,19 +18,33 @@ import {
   createPersistentErrorLog,
 } from "@/lib/actions/_helpers";
 import { requireWorkspacePermission } from "@/lib/auth/user-permissions";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, CreateSiteServerSchema } from "@/lib/validators";
+import {
+  type ActionResult,
+  CreateSiteServerSchema,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
+/**
+ * @public
+ * @async
+ * @function createSiteAction
+ * @description Orquesta la creación de un nuevo sitio, validando permisos y
+ *              manejando la inserción en la base de datos.
+ * @param {FormData} formData - Los datos del formulario de creación.
+ * @returns {Promise<ActionResult<{ id: string }>>} El resultado de la operación.
+ */
 export async function createSiteAction(
   formData: FormData
 ): Promise<ActionResult<{ id: string }>> {
-  const rawData = Object.fromEntries(formData);
-  let userIdForErrorLog: string | undefined;
+  const rawData = Object.fromEntries(formData.entries());
+  let context: Record<string, any> = { payload: rawData };
 
   try {
     const parsedData = CreateSiteServerSchema.parse(rawData);
     const { workspace_id, subdomain, name } = parsedData;
+    context.parsedData = parsedData;
 
     const permissionCheck = await requireWorkspacePermission(workspace_id, [
       "owner",
@@ -38,20 +53,19 @@ export async function createSiteAction(
     ]);
 
     if (!permissionCheck.success) {
-      logger.warn(
-        `[SitesActions:createSite] Permiso denegado para usuario ${permissionCheck.data?.user?.id} en workspace ${workspace_id}.`
-      );
+      const userId = permissionCheck.data?.user?.id;
+      context.userId = userId;
+      logger.warn(context, `[createSiteAction] Permiso denegado.`);
       return {
         success: false,
-        error: "ValidationErrors.sites_create_permission_denied",
+        error: "sites.create_permission_denied",
       };
     }
 
     const { user } = permissionCheck.data;
-    userIdForErrorLog = user.id;
+    context.userId = user.id;
 
     const supabase = createClient();
-
     const { data: newSite, error } = await supabase
       .from("sites")
       .insert({ ...parsedData, owner_id: user.id })
@@ -60,16 +74,15 @@ export async function createSiteAction(
 
     if (error) {
       if (error.code === "23505") {
-        // Unique constraint violation
         logger.warn(
-          `[SitesActions:createSite] Intento de crear sitio con subdominio duplicado: ${subdomain}`
+          context,
+          `[createSiteAction] Intento de crear sitio con subdominio duplicado.`
         );
         return {
           success: false,
-          error: "ValidationErrors.sites_subdomain_already_in_use",
+          error: "sites.subdomain_already_in_use",
         };
       }
-      // Re-lanzar otros errores de DB para ser capturados por el catch principal.
       throw error;
     }
 
@@ -81,35 +94,37 @@ export async function createSiteAction(
     });
 
     revalidatePath("/dashboard/sites");
-    logger.info(`[SitesActions:createSite] Sitio ${name} creado con éxito.`, {
-      siteId: newSite.id,
-      userId: user.id,
-    });
+    logger.info(
+      { siteId: newSite.id, ...context },
+      `[createSiteAction] Sitio creado.`
+    );
     return { success: true, data: { id: newSite.id } };
   } catch (error) {
+    let errorKey: ValidationErrorKey;
+
     if (error instanceof ZodError) {
-      logger.warn(`[SitesActions:createSite] Datos de formulario inválidos:`, {
-        errors: error.flatten(),
-      });
-      const firstError = error.errors[0]?.message;
-      return {
-        success: false,
-        error: firstError || "ValidationErrors.error_invalid_data",
-      };
+      errorKey = error.errors[0]?.message as ValidationErrorKey;
+      logger.warn(
+        { errors: error.flatten(), ...context },
+        `[createSiteAction] Datos de formulario inválidos.`
+      );
+    } else {
+      errorKey = "generic.error_server_generic";
     }
 
     const errorId = await createPersistentErrorLog(
-      "createSiteAction.unexpected",
+      "createSiteAction",
       error as Error,
-      { userId: userIdForErrorLog, payload: rawData }
+      context
     );
     logger.error(
-      `[SitesActions:createSite] Error inesperado. Log ID: ${errorId}`,
-      {
-        error,
-      }
+      { err: error, errorId, ...context },
+      `[createSiteAction] Error inesperado.`
     );
-    return { success: false, error: "ValidationErrors.error_server_generic" };
+    return {
+      success: false,
+      error: errorKey,
+    };
   }
 }
 // src/lib/actions/sites/createSite.action.ts

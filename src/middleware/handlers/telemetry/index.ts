@@ -3,9 +3,9 @@
  * @file src/middleware/handlers/telemetry/index.ts
  * @description Manejador de telemetría de élite. Alineado con la
  *              infraestructura de logging canónica de la aplicación.
- * @author L.I.A. Legacy
- * @copilot RaZ WriTe
- * @version 6.0.0
+ * @author Raz Podesta - MetaShark Tech
+ * @version 7.0.0
+ * Florianópolis/SC, Brazil
  */
 import { type NextRequest, type NextResponse } from "next/server";
 
@@ -31,7 +31,7 @@ export async function handleTelemetry(
   if (request.cookies.has("metashark_session_id")) {
     return;
   }
-  logger.info("[TelemetryHandler] Nuevo visitante detectado, iniciando log.");
+  logger.info({}, "[TelemetryHandler] Nuevo visitante detectado, iniciando log.");
 
   const sessionId = crypto.randomUUID();
   const ip = request.ip ?? "127.0.0.1";
@@ -53,7 +53,7 @@ export async function handleTelemetry(
 
   telemetry.logVisitorAction(logPayload).catch((error) => {
     logger.error(
-      { error: error instanceof Error ? error.message : String(error) },
+      { err: error },
       "[TelemetryHandler] Fallo en la ejecución en segundo plano de logVisitorAction."
     );
   });

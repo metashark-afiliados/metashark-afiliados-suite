@@ -2,15 +2,11 @@
 /**
  * @file useSitesHeader.ts
  * @description Hook soberano y atómico que encapsula toda la lógica de estado y
- *              acciones para el encabezado de la página "Mis Sitios". Gestiona
- *              los filtros, la búsqueda, el cambio de vista y la sincronización
- *              con la URL, actuando como el "cerebro" para los componentes de UI
- *              del encabezado.
+ *              acciones para el encabezado de la página "Mis Sitios". Ha sido
+ *              refactorizado para alinear su contrato de API y tipos con sus
+ *              dependencias y consumidores, resolviendo una cascada de errores.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
- * @date 2025-08-27
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @version 3.0.0
  */
 "use client";
 
@@ -21,9 +17,9 @@ import {
   type SiteStatusFilter,
   type ViewMode,
 } from "@/lib/data/sites/types";
-import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
 import { useUrlStateSync } from "@/lib/hooks/ui/useUrlStateSync";
-import { clientLogger } from "@/lib/logging";
+import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
+import { clientLogger } from "@/lib/logger";
 
 export interface UseSitesHeaderProps {
   initialSearchQuery: string;
@@ -46,6 +42,7 @@ type SiteFiltersState = {
  */
 export function useSitesHeader(props: UseSitesHeaderProps) {
   clientLogger.trace(
+    {},
     "[useSitesHeader] Inicializando hook soberano para el encabezado."
   );
 
@@ -68,7 +65,7 @@ export function useSitesHeader(props: UseSitesHeaderProps) {
   );
 
   const handleClearFilters = React.useCallback(() => {
-    clientLogger.info("[useSitesHeader] Limpiando todos los filtros.");
+    clientLogger.info({}, "[useSitesHeader] Limpiando todos los filtros.");
     setFilters({ q: "", status: "all", sort: "created_at_desc" });
   }, [setFilters]);
 
@@ -83,18 +80,7 @@ export function useSitesHeader(props: UseSitesHeaderProps) {
     onSortChange: (sort: SiteSortOption) => setFilters((f) => ({ ...f, sort })),
     onClearFilters: handleClearFilters,
     viewMode,
-    setViewMode,
+    onViewChange: setViewMode,
   };
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- *
- * @subsection Melhorias Futuras
- * 1. **Contexto de Encabezado (`SitesHeaderContext`)**: ((Vigente)) Para una pureza arquitectónica de élite y para eliminar completamente el "prop drilling", el valor de retorno de este hook podría ser proporcionado a través de un `SitesHeaderContext`. Esto permitiría que componentes anidados profundamente (como un botón dentro de `SiteFilters`) accedan al estado y a las acciones sin que cada componente intermedio tenga que pasar las props.
- * 2. **Estado de Filtros Activos**: ((Vigente)) El hook podría computar y devolver un booleano `areFiltersActive`. Esto simplificaría la lógica en el componente `SiteFilters` para mostrar el indicador de notificación y habilitar el botón "Limpiar Filtros", adhiriéndose aún más al SRP.
- *
- * =====================================================================
- */
 // src/lib/hooks/useSitesHeader.ts

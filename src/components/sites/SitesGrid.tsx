@@ -14,14 +14,14 @@
  */
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
 
 import { Card } from "@/components/ui/card";
 import { type SiteWithCampaignCount } from "@/lib/data/sites/types";
 import { useSitesPageTranslations } from "@/lib/hooks/i18n/useSitesPageTranslations";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 import { SiteCard } from "./SiteCard";
 import { SiteCardFooter } from "./SiteCardFooter";
 import { SiteCardHeader } from "./SiteCardHeader";

@@ -10,7 +10,7 @@ import { loadEnvironment } from "./_utils";
  * @description Herramienta de auditoría de sistema de élite. Invoca la RPC
  *              `get_system_diagnostics`, persiste el resultado como un snapshot JSON
  *              y muestra un resumen formateado en la consola.
- * @author L.I.A. Legacy & Raz Podestá
+ * @author Raz Podestá - MetaShark Tech & Raz Podestá
  * @version 4.0.0
  * @usage pnpm diag:schema
  */

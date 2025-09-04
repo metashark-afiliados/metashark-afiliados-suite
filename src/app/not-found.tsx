@@ -4,7 +4,7 @@
  * @description Manejador de Errores 404 Global. Ha sido refactorizado a un
  *              Server Component puro y estático para máxima simplicidad y
  *              robustez, garantizando un build exitoso en Vercel.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 4.0.0
  */
 import { Button } from "@/components/ui/button";

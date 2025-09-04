@@ -2,7 +2,7 @@
 /**
  * @file DashboardContextProviders.md
  * @description Documento Espejo y SSoT para el orquestador de proveedores de contexto.
- * @author L.I.A. Legacy & RaZ Podestá (Arquitecto)
+ * @author Raz Podestá - MetaShark Tech & RaZ Podestá (Arquitecto)
  * @version 1.0.0
  */
 # Manifiesto Conceptual: Orquestador de Proveedores de Contexto

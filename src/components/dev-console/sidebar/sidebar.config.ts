@@ -3,7 +3,7 @@
  * @file sidebar.config.ts
  * @description Manifiesto de Configuración Declarativo y SSoT para los
  *              enlaces de navegación del Dev Console. Contrato de tipo blindado.
- * @author L.I.A. Legacy
+ * @author Raz Podestá - MetaShark Tech
  * @version 2.0.0
  */
 import { Home, LayoutGrid, FileText, Users, Waypoints } from "lucide-react";

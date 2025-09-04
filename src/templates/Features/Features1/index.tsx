@@ -15,7 +15,7 @@ import React from "react";
 import { EditableText } from "@/components/builder/ui/EditableText";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { type FeatureItem } from "@/lib/builder/types.d";
-import { clientLogger } from "@/lib/logging";
+import { clientLogger } from "@/lib/logger";
 
 /**
  * @public

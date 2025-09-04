@@ -11,8 +11,8 @@
  * @contact raz.metashark.tech
  * @location Florianópolis/SC, Brazil
  */
-import React from "react";
 import { redirect } from "next/navigation";
+import React from "react";
 
 import {
   DashboardLayoutData,
@@ -21,7 +21,7 @@ import {
 import { DashboardContextProviders } from "@/components/layout/DashboardContextProviders";
 import DashboardLayoutClient from "@/components/layout/DashboardLayout";
 import { GlobalOverlays } from "@/components/layout/GlobalOverlays";
-import { logger } from "@/lib/logging";
+import { logger } from "@/lib/logger";
 
 export default async function DashboardLayout({
   children,

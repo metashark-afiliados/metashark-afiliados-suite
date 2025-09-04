@@ -2,11 +2,11 @@
 /**
  * @file src/lib/data/sites/management.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de
- *              lectura para la gestión de sitios (Dashboard). Ha sido optimizado
- *              con `unstable_cache` y enriquecido con una función de conteo.
- * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-09-01
+ *              lectura para la gestión de sitios (Dashboard). Refactorizado
+ *              para alinear el logging a la firma canónica y corregir el
+ *              patrón de cacheo dinámico.
+ * @author RaZ Podestá - MetaShark Tech
+ * @version 5.0.0
  */
 "use server";
 import "server-only";
@@ -31,17 +31,19 @@ function buildSiteSearchQuery(
     .from("sites_with_campaign_counts")
     .select("*", { count: "exact" })
     .eq("workspace_id", workspaceId);
+
   if (filters.query) {
     queryBuilder = queryBuilder.ilike("name", `%${filters.query}%`);
   }
+
   if (filters.status && filters.status !== "all") {
-    // La consulta debe usar el ID numérico del estado
     const statusMap = { draft: 1, published: 2, archived: 3 };
     const statusId = statusMap[filters.status as keyof typeof statusMap];
     if (statusId) {
       queryBuilder = queryBuilder.eq("status_id", statusId);
     }
   }
+
   const sortMap: Record<
     SiteSortOption,
     { column: string; ascending: boolean }
@@ -51,7 +53,10 @@ function buildSiteSearchQuery(
     name_desc: { column: "name", ascending: false },
   };
   const sort = sortMap[filters.sort || "created_at_desc"];
-  queryBuilder = queryBuilder.order(sort.column, { ascending: sort.ascending });
+  queryBuilder = queryBuilder.order(sort.column, {
+    ascending: sort.ascending,
+  });
+
   return queryBuilder;
 }
 
@@ -78,58 +83,80 @@ export async function getSitesByWorkspaceId(
     status: statusFilter,
     sort: sortOption,
   });
-  const { data, error, count } = await queryBuilder.range(from, to);
-  if (error) {
+
+  try {
+    const { data, error, count } = await queryBuilder.range(from, to);
+    if (error) {
+      throw error;
+    }
+    return {
+      sites: (data as SiteWithCampaignCount[]) || [],
+      totalCount: count || 0,
+    };
+  } catch (error) {
     logger.error(
-      `[DataLayer:Sites] Error al obtener sitios para workspace ${workspaceId}:`,
-      error
+      { err: error, workspaceId },
+      `[DataLayer:Sites] Error al obtener sitios para workspace.`
     );
     throw new Error("No se pudieron obtener los sitios del workspace.");
   }
-  return {
-    sites: (data as SiteWithCampaignCount[]) || [],
-    totalCount: count || 0,
-  };
 }
 
-export const getSiteById = cache(
-  async (siteId: string): Promise<SiteBasicInfo | null> => {
-    logger.trace(`[Cache MISS] Cargando datos del sitio: ${siteId}`);
-    const supabase = createServerClient();
-    const { data, error } = await supabase
-      .from("sites")
-      .select("id, subdomain, workspace_id, name")
-      .eq("id", siteId)
-      .single();
-    if (error && error.code !== "PGRST116") {
-      logger.error(
-        `[DataLayer:Sites] Error al obtener el sitio ${siteId}:`,
-        error
-      );
-    }
-    return data;
-  },
-  ["getSiteById"],
-  { revalidate: 3600, tags: ["sites"] }
-);
+export async function getSiteById(
+  siteId: string
+): Promise<SiteBasicInfo | null> {
+  const keyParts = ["getSiteById", siteId];
+  const tags = ["sites", `site:${siteId}`];
+
+  return cache(
+    async () => {
+      logger.trace({ siteId }, "[Cache MISS] Cargando datos del sitio.");
+      const supabase = createServerClient();
+      try {
+        const { data, error } = await supabase
+          .from("sites")
+          .select("id, subdomain, workspace_id, name")
+          .eq("id", siteId)
+          .single();
+
+        if (error && error.code !== "PGRST116") {
+          throw error;
+        }
+        return data;
+      } catch (error) {
+        logger.error(
+          { err: error, siteId },
+          `[DataLayer:Sites] Error al obtener el sitio.`
+        );
+        return null;
+      }
+    },
+    keyParts,
+    { revalidate: 3600, tags }
+  )();
+}
 
 export async function getActiveSitesCount(
   workspaceId: string
 ): Promise<{ count: number }> {
-  const supabase = createServerClient();
-  const { count, error } = await supabase
-    .from("sites")
-    .select("id", { count: "exact", head: true })
-    .eq("workspace_id", workspaceId)
-    .neq("status_id", 3); // 3 es el ID para 'archived' en `site_statuses`
+  try {
+    const supabase = createServerClient();
+    const { count, error } = await supabase
+      .from("sites")
+      .select("id", { count: "exact", head: true })
+      .eq("workspace_id", workspaceId)
+      .neq("status_id", 3);
 
-  if (error) {
+    if (error) {
+      throw error;
+    }
+    return { count: count || 0 };
+  } catch (error) {
     logger.error(
-      { error },
-      `[DataLayer:Sites] Error al contar sitios activos para workspace ${workspaceId}.`
+      { err: error, workspaceId },
+      `[DataLayer:Sites] Error al contar sitios activos.`
     );
     return { count: 0 };
   }
-  return { count: count || 0 };
 }
 // src/lib/data/sites/management.data.ts
