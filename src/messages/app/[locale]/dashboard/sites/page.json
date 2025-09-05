@@ -1,4 +1,3 @@
-
 {
   "en-US": {
     "entityName": "Site",
@@ -36,16 +35,22 @@
     "deleteDialog": {
       "title": "Are you sure?",
       "description": "This action is irreversible. The site <strong>{subdomain}</strong>, along with all its campaigns and data, will be permanently deleted.",
-      "confirmButton": "Yes, delete site"
+      "confirmButton": "Yes, delete site",
+      "confirmation_label": "To confirm, type <strong>{subdomain}</strong> below:"
     },
     "errorState": {
       "title": "Error Loading Sites",
-      "description": "Could not retrieve site information. Please try refreshing the page."
+      "description": "Could not retrieve site information. Please try refreshing the page. Error ID: {errorId}"
     },
     "pagination": {
       "previous": "Previous",
       "next": "Next",
       "page": "Go to page {pageNumber}"
+    },
+    "toasts": {
+      "create_success": "Site created successfully!",
+      "update_name_success": "Site name updated successfully!",
+      "delete_success": "Site deleted successfully!"
     },
     "validationErrors": {
       "name_required": "Site name is required.",
@@ -90,16 +95,22 @@
     "deleteDialog": {
       "title": "¿Estás seguro?",
       "description": "Esta acción es irreversible. El sitio <strong>{subdomain}</strong>, junto con todas sus campañas y datos, será eliminado permanentemente.",
-      "confirmButton": "Sí, eliminar sitio"
+      "confirmButton": "Sí, eliminar sitio",
+      "confirmation_label": "Para confirmar, escribe <strong>{subdomain}</strong> abajo:"
     },
     "errorState": {
       "title": "Error al Cargar Sitios",
-      "description": "No se pudo obtener la información de los sitios. Por favor, intenta recargar la página."
+      "description": "No se pudo obtener la información de los sitios. Por favor, intenta recargar la página. ID de Error: {errorId}"
     },
     "pagination": {
       "previous": "Anterior",
       "next": "Siguiente",
       "page": "Ir a la página {pageNumber}"
+    },
+    "toasts": {
+      "create_success": "¡Sitio creado con éxito!",
+      "update_name_success": "¡Nombre del sitio actualizado con éxito!",
+      "delete_success": "¡Sitio eliminado con éxito!"
     },
     "validationErrors": {
       "name_required": "El nombre del sitio es requerido.",
@@ -120,7 +131,7 @@
     },
     "form": {
       "nameLabel": "Nome do site",
-      "namePlaceholder": "Meu Primeiro Site Web",
+      "namePlaceholder": "Meu Primeiro Site",
       "subdomainLabel": "Subdomínio",
       "subdomainInUseError": "Este subdomínio já está em uso.",
       "descriptionLabel": "Descrição (opcional)",
@@ -144,16 +155,22 @@
     "deleteDialog": {
       "title": "Você tem certeza?",
       "description": "Esta ação é irreversível. O site <strong>{subdomain}</strong>, junto com todas as suas campanhas e dados, será excluído permanentemente.",
-      "confirmButton": "Sim, excluir site"
+      "confirmButton": "Sim, excluir site",
+      "confirmation_label": "Para confirmar, digite <strong>{subdomain}</strong> abaixo:"
     },
     "errorState": {
       "title": "Erro ao Carregar Sites",
-      "description": "Não foi possível obter as informações dos sites. Por favor, tente recarregar a página."
+      "description": "Não foi possível obter as informações dos sites. Por favor, tente recarregar a página. ID do Erro: {errorId}"
     },
     "pagination": {
       "previous": "Anterior",
       "next": "Próxima",
       "page": "Ir para a página {pageNumber}"
+    },
+    "toasts": {
+      "create_success": "Site criado com sucesso!",
+      "update_name_success": "Nome do site atualizado com sucesso!",
+      "delete_success": "Site excluído com sucesso!"
     },
     "validationErrors": {
       "name_required": "O nome do site é obrigatório.",

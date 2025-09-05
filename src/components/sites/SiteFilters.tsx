@@ -2,11 +2,11 @@
 /**
  * @file SiteFilters.tsx
  * @description Aparato de UI atómico y soberano. Refactorizado para consumir
- *              `useTypedTranslations` con namespaces anidados, resolviendo la
- *              cascada de errores de tipo TS2322 y restaurando la seguridad
- *              de tipos de i18n.
+ *              el namespace de i18n correcto, resolviendo la cascada de
+ *              errores de tipo TS2345.
  * @author L.I.A. Legacy
- * @version 5.0.0
+ * @version 8.0.0
+ * @see .docs-espejo/components/sites/SiteFilters.tsx.md
  */
 "use client";
 
@@ -57,20 +57,22 @@ export function SiteFilters({
     "[SiteFilters] Renderizando componente de filtros soberano."
   );
 
-  const tFilters = useTypedTranslations("components.sites.SitesHeader.filters");
-  const tStatus = useTypedTranslations("components.sites.SitesHeader.status");
+  const tSitesPage = useTypedTranslations("app.[locale].dashboard.sites.page");
 
   const sortOptions: { value: SiteSortOption; label: string }[] = [
-    { value: "created_at_desc", label: tFilters("sort_updated_desc") },
-    { value: "name_asc", label: tFilters("sort_name_asc") },
-    { value: "name_desc", label: tFilters("sort_name_desc") },
+    {
+      value: "created_at_desc",
+      label: tSitesPage("filters.sort_updated_desc"),
+    },
+    { value: "name_asc", label: tSitesPage("filters.sort_name_asc") },
+    { value: "name_desc", label: tSitesPage("filters.sort_name_desc") },
   ];
 
   const statusOptions: { value: SiteStatusFilter; label: string }[] = [
-    { value: "all", label: tFilters("status_all") },
-    { value: "draft", label: tStatus("draft") },
-    { value: "published", label: tStatus("published") },
-    { value: "archived", label: tStatus("archived") },
+    { value: "all", label: tSitesPage("filters.status_all") },
+    { value: "draft", label: tSitesPage("status.draft") },
+    { value: "published", label: tSitesPage("status.published") },
+    { value: "archived", label: tSitesPage("status.archived") },
   ];
 
   const areFiltersActive =
@@ -83,7 +85,9 @@ export function SiteFilters({
       <PopoverTrigger asChild>
         <Button variant="outline" className="gap-2 relative">
           <Filter className="h-4 w-4" />
-          <span className="hidden sm:inline">{tFilters("sort_label")}</span>
+          <span className="hidden sm:inline">
+            {tSitesPage("filters.sort_label")}
+          </span>
           {areFiltersActive && (
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -96,14 +100,14 @@ export function SiteFilters({
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">
-              {tFilters("sort_label")}
+              {tSitesPage("filters.sort_label")}
             </h4>
             <p className="text-sm text-muted-foreground">
-              {tFilters("sort_placeholder")}
+              {tSitesPage("filters.sort_placeholder")}
             </p>
           </div>
           <RadioGroup
-            aria-label={tFilters("sort_label")}
+            aria-label={tSitesPage("filters.sort_label")}
             value={sortOption}
             onValueChange={(value: string) =>
               onSortChange(value as SiteSortOption)
@@ -117,7 +121,9 @@ export function SiteFilters({
           </RadioGroup>
           <Separator />
           <div className="space-y-2">
-            <Label htmlFor="status-filter">{tFilters("status_label")}</Label>
+            <Label htmlFor="status-filter">
+              {tSitesPage("filters.status_label")}
+            </Label>
             <Select
               value={statusFilter}
               onValueChange={(value: string) =>
@@ -125,7 +131,9 @@ export function SiteFilters({
               }
             >
               <SelectTrigger id="status-filter">
-                <SelectValue placeholder={tFilters("status_placeholder")} />
+                <SelectValue
+                  placeholder={tSitesPage("filters.status_placeholder")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
@@ -144,7 +152,7 @@ export function SiteFilters({
             className="w-full"
             disabled={!areFiltersActive}
           >
-            {tFilters("clear_all")}
+            {tSitesPage("filters.clear_all")}
           </Button>
         </div>
       </PopoverContent>

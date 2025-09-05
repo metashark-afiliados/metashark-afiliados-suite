@@ -2,10 +2,12 @@
 /**
  * @file src/components/dashboard/ActionCard.tsx
  * @description Aparato de UI atómico que representa una tarjeta de acción.
- *              Enriquecido para ensamblar el `ModuleStatusIndicator` y aceptar
- *              props de `Tooltip` para una flexibilidad de élite.
+ *              Refactorizado a un estándar de élite para inferir tipos de
+ *              props de forma segura y componer su `statusIndicator` a través
+ *              de un "slot" para máxima flexibilidad.
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 4.0.0
+ * @see .docs-espejo/components/dashboard/ActionCard.tsx.md
  */
 "use client";
 
@@ -20,19 +22,22 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-  type TooltipContentProps,
 } from "@/components/ui/tooltip";
 import { type FeatureModule } from "@/lib/data/modules";
 import { clientLogger } from "@/lib/logger";
 import { useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import { ModuleStatusIndicator } from "./ModuleStatusIndicator";
+
+// Inferencia de tipo de élite. El componente ya no depende de un tipo exportado.
+type TooltipContentProps = React.ComponentProps<typeof TooltipContent>;
 
 interface ActionCardProps {
   module: FeatureModule;
   isPrimary?: boolean;
   tooltipSide?: TooltipContentProps["side"];
   tooltipAlign?: TooltipContentProps["align"];
+  /** Slot para un indicador de estado opcional. */
+  statusIndicatorSlot?: React.ReactNode;
 }
 
 export function ActionCard({
@@ -40,6 +45,7 @@ export function ActionCard({
   isPrimary = false,
   tooltipSide,
   tooltipAlign,
+  statusIndicatorSlot,
 }: ActionCardProps): React.ReactElement {
   const router = useRouter();
   const {
@@ -61,10 +67,8 @@ export function ActionCard({
   const handleCardClick = () => {
     if (module.status === "active" && module.href) {
       clientLogger.trace(
-        `[ActionCard] Navegando para el módulo '${module.title}'`,
-        {
-          href: module.href,
-        }
+        { href: module.href },
+        `[ActionCard] Navegando para el módulo '${module.title}'`
       );
       router.push(module.href as any);
     }
@@ -104,7 +108,7 @@ export function ActionCard({
                 !isClickable && "opacity-60 cursor-not-allowed"
               )}
             >
-              <ModuleStatusIndicator status={module.status} />
+              {statusIndicatorSlot}
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <div
@@ -114,7 +118,7 @@ export function ActionCard({
                     )}
                   >
                     <DynamicIcon
-                      name={module.icon}
+                      name={module.icon as any}
                       className={cn(
                         "h-5 w-5",
                         isPrimary ? "text-primary" : "text-foreground"

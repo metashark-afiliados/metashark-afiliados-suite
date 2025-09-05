@@ -1,11 +1,12 @@
 // src/components/authentication/sign-up-form.tsx
 /**
  * @file src/components/authentication/sign-up-form.tsx
- * @description Orquestador de UI para el formulario de registro. Corregido para
- *              utilizar importaciones relativas directas, resolviendo la
- *              dependencia circular `TS2303`.
+ * @description Orquestador de UI para el formulario de registro. Refactorizado
+ *              para consumir la API actualizada de `SignUpPasswordField`,
+ *              resolviendo el error de contrato TS2322.
  * @author L.I.A. Legacy
- * @version 2.0.0
+ * @version 3.0.0
+ * @see .docs-espejo/components/authentication/sign-up-form.tsx.md
  */
 "use client";
 
@@ -20,13 +21,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSignUpForm } from "@/lib/hooks/useSignUpForm";
 import { clientLogger } from "@/lib/logger";
-
-// --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (Rutas Relativas) ---
 import { SignUpConfirmPasswordField } from "./sign-up-form/SignUpConfirmPasswordField";
 import { SignUpEmailField } from "./sign-up-form/SignUpEmailField";
 import { SignUpLegalCheckboxes } from "./sign-up-form/SignUpLegalCheckboxes";
 import { SignUpPasswordField } from "./sign-up-form/SignUpPasswordField";
-// --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
 export interface SignupFormProps {
   texts: {
@@ -95,20 +93,6 @@ export function SignupForm({ texts }: SignupFormProps): React.ReactElement {
             ariaLabels={{
               show: "Mostrar contraseña",
               hide: "Ocultar contraseña",
-            }}
-            strengthMeterTexts={{
-              strength_weak: t.rich("strength_weak", {
-                strong: (chunks) => <strong>{chunks}</strong>,
-              }),
-              strength_fair: t.rich("strength_fair", {
-                strong: (chunks) => <strong>{chunks}</strong>,
-              }),
-              strength_good: t.rich("strength_good", {
-                strong: (chunks) => <strong>{chunks}</strong>,
-              }),
-              strength_strong: t.rich("strength_strong", {
-                strong: (chunks) => <strong>{chunks}</strong>,
-              }),
             }}
           />
           <SignUpConfirmPasswordField

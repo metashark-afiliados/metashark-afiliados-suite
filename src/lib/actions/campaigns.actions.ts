@@ -2,19 +2,19 @@
 /**
  * @file src/lib/actions/campaigns.actions.ts
  * @description Manifiesto (Barrel File) y API pública para las Server Actions
- *              relacionadas con la entidad `campaigns`. Ensambla y exporta todas
- *              las acciones atómicas del directorio `campaigns/`. Sincronizado
- *              para incluir `createCampaignFromTemplateAction`.
- * @author Raz Podestá
- * @version 4.0.0
+ *              del dominio de campañas. Ensambla y exporta todas las acciones
+ *              atómicas de forma explícita, adhiriéndose a la Constitución.
+ * @author L.I.A. Legacy
+ * @version 5.0.0
+ * @see .docs-espejo/lib/actions/campaigns.actions.ts.md
  */
 "use server";
 import "server-only";
 
-export * from "./campaigns/archive.action";
-export * from "./campaigns/assign-site.action";
-export * from "./campaigns/create.action";
-export * from "./campaigns/create-from-template.action";
-export * from "./campaigns/delete.action";
-export * from "./campaigns/duplicate.action";
+export { archiveCampaignAction } from "./campaigns/archive.action";
+export { assignSiteToCampaignAction } from "./campaigns/assign-site.action";
+export { createCampaignAction } from "./campaigns/create.action";
+export { createCreationAction as createCampaignFromTemplateAction } from "./campaigns/create-from-template.action";
+export { deleteCampaignAction } from "./campaigns/delete.action";
+export { duplicateCampaignAction } from "./campaigns/duplicate.action";
 // src/lib/actions/campaigns.actions.ts

@@ -1,13 +1,17 @@
-// src/lib/actions/dev/diagnostics/index.ts
+// src/lib/actions/dev/index.ts
 /**
  * @file index.ts
  * @description Manifiesto (Barrel File) y API pública para las Server Actions
- *              del sub-dominio de diagnóstico.
+ *              del dominio de desarrollo y diagnóstico. Ensambla y exporta los
+ *              sub-módulos bajo un namespace para una API cohesiva.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
+ * @see .docs-espejo/lib/actions/dev/index.ts.md
  */
 "use server";
 import "server-only";
 
-export { triggerSentryErrorAction } from "./triggerSentryError.action";
-// src/lib/actions/dev/diagnostics/index.ts
+import * as diagnostics from "./diagnostics.actions";
+
+export { diagnostics };
+// src/lib/actions/dev/index.ts

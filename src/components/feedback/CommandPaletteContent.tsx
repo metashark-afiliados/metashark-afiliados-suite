@@ -1,21 +1,21 @@
 // src/components/feedback/CommandPaletteContent.tsx
 /**
  * @file CommandPaletteContent.tsx
- * @description Ensamblador de UI puro para la Paleta de Comandos. Compone los
- *              grupos de comandos atómicos.
- * @author @author RaZ Podestá - MetaShark Tech
- * @version 4.0.0
+ * @description Ensamblador de UI puro y soberano para la Paleta de Comandos.
+ *              Compone los grupos de comandos atómicos y consume sus propias
+ *              traducciones.
+ * @author L.I.A. Legacy
+ * @version 5.0.0
  * @see .docs-espejo/components/feedback/CommandPaletteContent.tsx.md
  */
 import React from "react";
-import { type useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import {
   CommandDialog,
   CommandEmpty,
   CommandInput,
   CommandList,
-  CommandSeparator,
 } from "@/components/ui/command";
 import { type FeatureModule } from "@/lib/data/modules";
 import { type Workspace } from "@/lib/data/workspaces";
@@ -37,7 +37,6 @@ export interface CommandPaletteContentProps {
   runCommand: (action: () => void, commandName: string) => void;
   handleWorkspaceSelect: (workspaceId: string) => void;
   handleOpenLiaChat: () => void;
-  t: ReturnType<typeof useTranslations>;
 }
 
 export function CommandPaletteContent({
@@ -53,8 +52,9 @@ export function CommandPaletteContent({
   runCommand,
   handleWorkspaceSelect,
   handleOpenLiaChat,
-  t,
 }: CommandPaletteContentProps) {
+  const t = useTranslations("components.feedback.CommandPalette");
+
   return (
     <CommandDialog open={isOpen} onOpenChange={onOpenChange}>
       <CommandInput

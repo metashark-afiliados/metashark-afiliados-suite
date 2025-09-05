@@ -2,18 +2,15 @@
 /**
  * @file useDashboardUIStore.ts
  * @description Store de estado global de Zustand para la UI del Dashboard.
- *              Corregido con tipificación explícita y aserciones quirúrgicas
- *              para resolver errores de inferencia de tipos complejos al anidar
- *              middlewares.
- * @author Raz Podestá - MetaShark Tech
- * @version 3.3.0
- * @date 2025-08-26
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              Refactorizado para incluir la gestión de la librería de iconos activa,
+ *              completando el contrato de datos para la personalización de la UI y
+ *              utilizando tipos estrictos derivados de la SSoT de configuración.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
+ * @see .docs-espejo/lib/hooks/useDashboardUIStore.ts.md
  */
 "use client";
 
-import { clientLogger } from "@/lib/logger";
 import { create, type StateCreator } from "zustand";
 import { syncTabs } from "zustand-sync-tabs";
 import {
@@ -22,18 +19,23 @@ import {
   type PersistOptions,
 } from "zustand/middleware";
 
+import { type IconLibraryDefinition } from "@/config/icon-libraries.config";
+import { clientLogger } from "@/lib/logger";
+
 interface DashboardUIState {
   isSidebarCollapsed: boolean;
   isProfileWidgetOpen: boolean;
+  activeIconLibraryId: IconLibraryDefinition["id"];
   toggleSidebar: () => void;
   toggleProfileWidget: () => void;
   setProfileWidgetOpen: (isOpen: boolean) => void;
+  setActiveIconLibraryId: (id: IconLibraryDefinition["id"]) => void;
 }
 
-// --- INICIO DE CORRECCIÓN DE TIPO (TS7006) ---
 const creator: StateCreator<DashboardUIState> = (set) => ({
   isSidebarCollapsed: false,
   isProfileWidgetOpen: true,
+  activeIconLibraryId: "lucide", // SSoT Default
   toggleSidebar: () =>
     set((state) => {
       clientLogger.trace("[Zustand:DashboardUI] Alternando barra lateral.", {
@@ -55,45 +57,31 @@ const creator: StateCreator<DashboardUIState> = (set) => ({
     );
     set({ isProfileWidgetOpen: isOpen });
   },
+  setActiveIconLibraryId: (id) => {
+    clientLogger.trace(
+      `[Zustand:DashboardUI] Estableciendo librería de iconos activa.`,
+      { newLibraryId: id }
+    );
+    set({ activeIconLibraryId: id });
+  },
 });
-// --- FIN DE CORRECCIÓN DE TIPO (TS7006) ---
 
-// --- INICIO DE CORRECCIÓN DE TIPO (TS2322) ---
 const persistOptions: PersistOptions<
   DashboardUIState,
-  Pick<DashboardUIState, "isSidebarCollapsed"> // Especifica la forma del estado persistido
+  Pick<DashboardUIState, "isSidebarCollapsed" | "activeIconLibraryId">
 > = {
   name: "convertikit-dashboard-ui-preferences",
   storage: createJSONStorage(() => localStorage),
   partialize: (state) => ({
     isSidebarCollapsed: state.isSidebarCollapsed,
+    activeIconLibraryId: state.activeIconLibraryId,
   }),
 };
-// --- FIN DE CORRECCIÓN DE TIPO (TS2322) ---
 
 export const useDashboardUIStore = create<DashboardUIState>()(
-  syncTabs(
-    // --- INICIO DE CORRECCIÓN DE TIPO (TS2345) ---
-    persist(creator, persistOptions) as StateCreator<DashboardUIState>,
-    // --- FIN DE CORRECCIÓN DE TIPO (TS2345) ---
-    {
-      name: "convertikit-dashboard-ui-sync",
-      exclude: ["isProfileWidgetOpen"],
-    }
-  )
+  syncTabs(persist(creator, persistOptions) as StateCreator<DashboardUIState>, {
+    name: "convertikit-dashboard-ui-sync",
+    exclude: ["isProfileWidgetOpen"],
+  })
 );
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. ((Implementada)) **Resolución de Regresión de Tipo Compleja:** La tipificación explícita de `PersistOptions` y la aserción de tipo quirúrgica en `persist` resuelven la cascada de errores de TypeScript, restaurando la integridad del sistema de tipos.
- *
- * @subsection Melhorias Futuras
- * 1. ((Vigente)) **Sincronización Selectiva con el Servidor:** El estado persistido en `localStorage` podría ser sincronizado periódicamente con la base de datos para mantener las preferencias de UI entre diferentes dispositivos.
- *
- * =====================================================================
- */
 // src/lib/hooks/useDashboardUIStore.ts

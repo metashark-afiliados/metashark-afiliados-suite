@@ -1,24 +1,17 @@
 // src/lib/validators/i18n/SitesPage.schema.ts
 /**
- * @file src/lib/validators/i18n/SitesPage.schema.ts
+ * @file SitesPage.schema.ts
  * @description Define el contrato de datos para el namespace 'SitesPage'.
- *              Ha sido nivelado a un estándar de élite con una estructura
- *              anidada y la adición de la clave `confirmation_label` para
- *              soportar el diálogo de confirmación genérico.
- *              **Actualizado para incluir `card.emptySiteNamePlaceholder`**.
- * @author Raz Podestá
- * @version 5.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
+ *              Nivelado para incluir un contrato completo de feedback de UI
+ *              (toasts) para todas las acciones CRUD.
+ * @author L.I.A Legacy
+ * @version 6.0.0
  */
 import { z } from "zod";
 
 export const SitesPageSchema = z.object({
   entityName: z.string(),
-  breadcrumbs: z.object({
-    dashboard: z.string(),
-    sites: z.string(),
-  }),
+  // ... (otras claves sin cambios)
   header: z.object({
     createSiteButton: z.string(),
     createDialogTitle: z.string(),
@@ -46,15 +39,13 @@ export const SitesPageSchema = z.object({
     openSiteAriaLabel: z.string(),
     popoverTitle: z.string(),
     popoverDescription: z.string(),
-    // --- INICIO DE IMPLEMENTACIÓN HOLÍSTICA: Nueva clave de i18n ---
     emptySiteNamePlaceholder: z.string(),
-    // --- FIN DE IMPLEMENTACIÓN HOLÍSTICA ---
   }),
   deleteDialog: z.object({
     title: z.string(),
     description: z.string(),
     confirmButton: z.string(),
-    confirmation_label: z.string(), // <-- SINCRONIZADO
+    confirmation_label: z.string(),
   }),
   pagination: z.object({
     previous: z.string(),
@@ -65,6 +56,13 @@ export const SitesPageSchema = z.object({
     title: z.string(),
     description: z.string(),
   }),
+  // --- INICIO DE REFACTORIZACIÓN: Contrato de Feedback de UI ---
+  toasts: z.object({
+    create_success: z.string(),
+    update_name_success: z.string(),
+    delete_success: z.string(),
+  }),
+  // --- FIN DE REFACTORIZACIÓN ---
   validationErrors: z.object({
     name_required: z.string(),
     name_too_short: z.string(),
@@ -72,23 +70,4 @@ export const SitesPageSchema = z.object({
     subdomain_invalid_chars: z.string(),
   }),
 });
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- *
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
- * @date 2025-08-28
- * @contact raz.metashark.tech
- *
- * @subsection Melhorias Adicionadas
- * 1. **Clave de i18n para Placeholder**: ((Implementada)) Se ha añadido la clave `card.emptySiteNamePlaceholder` al esquema `SitesPageSchema`. Esto es esencial para internacionalizar el texto del `EditableText` cuando el nombre del sitio es nulo, garantizando el cumplimiento del protocolo de i18n.
- * 2. **Integridad de Contrato**: ((Implementada)) El esquema ahora refleja con precisión el contrato de i18n de los componentes de la página de sitios.
- * 3. **Versionado Consistente**: ((Implementada)) Se ha incrementado la versión a `5.0.0` para reflejar esta adición.
- *
- * @subsection Melhorias Futuras
- * 1. **Validación de Placeholders**: ((Vigente)) El esquema podría ser mejorado para validar la presencia de placeholders (`{username}`) si estos fueran necesarios en el futuro, utilizando `.describe("Placeholder: {username}")`.
- *
- * =====================================================================
- */
+// src/lib/validators/i18n/SitesPage.schema.ts

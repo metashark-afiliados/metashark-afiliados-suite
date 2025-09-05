@@ -6,6 +6,7 @@
  *              la Constitución de Observabilidad.
  * @author L.I.A. Legacy
  * @version 4.0.0
+ * @see .docs-espejo/lib/actions/campaigns/archive.action.ts.md
  */
 "use server";
 import "server-only";
@@ -34,16 +35,14 @@ import { type ActionResult, type ValidationErrorKey } from "@/lib/validators";
 export async function archiveCampaignAction(
   campaignId: string
 ): Promise<ActionResult<{ messageKey: ValidationErrorKey }>> {
-  const context = { campaignId };
+  let context: { campaignId: string; userId?: string } = { campaignId };
   try {
     const user = await getAuthenticatedUserOrThrow();
     context.userId = user.id;
 
     logger.trace(context, "[archiveCampaignAction] Iniciando acción.");
 
-    // La capa de datos debe validar la propiedad. `getCampaignForEditor` es semánticamente incorrecto aquí.
-    // DEUDA TÉCNICA: Se necesita un `getCampaignForManagement` que verifique permisos de 'member' o superior.
-    // Usamos el existente por ahora para mantener la funcionalidad.
+    // DEUDA: Esta capa de permisos debe ser más robusta y específica.
     const campaign =
       await campaignsData.auth.getCampaignSiteInfoById(campaignId);
     if (!campaign) {
@@ -76,7 +75,7 @@ export async function archiveCampaignAction(
     if (campaign.site_id) {
       revalidatePath(`/dashboard/sites/${campaign.site_id}/campaigns`);
     }
-    revalidatePath("/dashboard/sites"); // Revalidar vista de sitios por si afecta conteos
+    revalidatePath("/dashboard/sites");
 
     logger.info(
       context,

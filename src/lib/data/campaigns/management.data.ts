@@ -8,34 +8,31 @@
  *              de JOIN de Supabase como un array.
  * @author L.I.A Legacy
  * @version 2.2.0
+ * @see .docs-espejo/lib/data/campaigns/management.data.ts.md
  */
 "use server";
 import "server-only";
 
-import { type SupabaseClient } from "@supabase/supabase-js";
 import { requireWorkspacePermission } from "@/lib/auth/user-permissions";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type Database, type Tables } from "@/lib/types/database";
+import { type Tables } from "@/lib/types/database";
 import {
   type CampaignMetadata,
   type CampaignSortOption,
   type CampaignStatusFilter,
 } from "./types";
 
-type Supabase = SupabaseClient<Database, "public">;
-
-// ANÁLISIS DE CÓDIGO: El tipo intermedio ahora modela correctamente la respuesta de Supabase,
-// donde el JOIN a `campaign_statuses` devuelve un ARRAY de objetos.
+// Tipo intermedio que modela correctamente la respuesta de Supabase.
 type RawCampaignData = Tables<"campaigns"> & {
   campaign_statuses: { name: string }[] | null;
-  sites?: { workspace_id: string } | null; // Opcional para getCampaignMetadataById
+  sites?: { workspace_id: string } | null;
 };
 
 /**
  * @private
  * @function buildCampaignsQuery
- * @description Construye la consulta de Supabase para obtener metadatos de campañas con filtros y ordenamiento.
+ * @description Construye la consulta de Supabase para obtener metadatos de campañas.
  * @param {string} siteId - El ID del sitio.
  * @param {object} filters - Los filtros a aplicar.
  * @returns Un query builder de Supabase.
@@ -92,11 +89,11 @@ function buildCampaignsQuery(
  * @public
  * @async
  * @function getCampaignsMetadataBySiteId
- * @description Obtiene una lista paginada de metadatos de campañas para un sitio específico.
- * @param {string} siteId - El ID del sitio para el que se obtienen las campañas.
+ * @description Obtiene una lista paginada de metadatos de campañas para un sitio.
+ * @param {string} siteId - El ID del sitio.
  * @param {object} options - Opciones de paginación, filtrado y ordenamiento.
- * @returns {Promise<{ campaigns: CampaignMetadata[]; totalCount: number }>} Un objeto con las campañas y el conteo total.
- * @throws {Error} Si la consulta a la base de datos falla.
+ * @returns {Promise<{ campaigns: CampaignMetadata[]; totalCount: number }>}
+ * @throws {Error} Si la consulta falla.
  */
 export async function getCampaignsMetadataBySiteId(
   siteId: string,
@@ -115,10 +112,8 @@ export async function getCampaignsMetadataBySiteId(
   const queryBuilder = buildCampaignsQuery(siteId, { query, status, sortBy });
   try {
     const { data, error, count } = await queryBuilder.range(from, to);
-
     if (error) throw error;
 
-    // ANÁLISIS DE CÓDIGO: La transformación ahora accede de forma segura al primer elemento del array.
     const campaigns: CampaignMetadata[] = (data as RawCampaignData[]).map(
       (c) => ({
         ...c,
@@ -140,11 +135,11 @@ export async function getCampaignsMetadataBySiteId(
  * @public
  * @async
  * @function getCampaignMetadataById
- * @description Obtiene los metadatos de una campaña específica por su ID, validando permisos.
- * @param {string} campaignId - El ID de la campaña a obtener.
- * @param {string} userId - El ID del usuario que solicita.
- * @returns {Promise<CampaignMetadata | null>} Los metadatos de la campaña o null.
- * @throws {Error} Si la consulta a la base de datos falla.
+ * @description Obtiene los metadatos de una campaña por su ID, validando permisos.
+ * @param {string} campaignId - El ID de la campaña.
+ * @param {string} userId - El ID del usuario.
+ * @returns {Promise<CampaignMetadata | null>}
+ * @throws {Error} Si la consulta falla.
  */
 export async function getCampaignMetadataById(
   campaignId: string,
@@ -178,7 +173,6 @@ export async function getCampaignMetadataById(
     ]);
     if (!permissionCheck.success) return null;
 
-    // ANÁLISIS DE CÓDIGO: Transformación segura de tipos.
     const rawData = data as RawCampaignData;
     const campaign: CampaignMetadata = {
       ...rawData,

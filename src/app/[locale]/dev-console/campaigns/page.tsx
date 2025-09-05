@@ -2,13 +2,11 @@
 /**
  * @file page.tsx
  * @description Página del Visor de Campañas en el Dev Console. Ha sido
- *              refactorizado a un estándar de élite para consumir la nueva API
- *              de datos atomizada, resolviendo el error de compilación TS2339.
- * @author Raz Podestá - MetaShark Tech
- * @version 2.0.0
- * @date 2025-08-27
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ *              refactorizado a un estándar de élite para consumir la API de
+ *              datos atomizada y para alinear el logging con la Constitución.
+ * @author L.I.A. Legacy
+ * @version 3.0.0
+ * @see .docs-espejo/app/[locale]/dev-console/campaigns/page.tsx.md
  */
 import { AlertTriangle } from "lucide-react";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
@@ -27,11 +25,7 @@ export default async function CampaignsViewerPage({
   const t = await getTranslations("app.dev-console.CampaignsTable");
 
   try {
-    // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (TS2339) ---
-    // Se consume la función desde el módulo atomizado y namespaced,
-    // alineando el componente con la nueva SSoT de la capa de datos.
     const campaigns = await adminData.campaigns.getAllCampaignsWithSiteInfo();
-    // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
     return (
       <div className="space-y-6">
@@ -44,8 +38,8 @@ export default async function CampaignsViewerPage({
     );
   } catch (error) {
     logger.error(
-      "[DevConsole:CampaignsPage] Error al cargar la lista de campañas:",
-      error instanceof Error ? error.message : String(error)
+      { err: error as Error },
+      "[DevConsole:CampaignsPage] Error al cargar la lista de campañas."
     );
     return (
       <ErrorStateCard
@@ -56,16 +50,4 @@ export default async function CampaignsViewerPage({
     );
   }
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Paginación del Lado del Servidor**: ((Vigente)) Para escalar a miles de campañas, la llamada a `getAllCampaignsWithSiteInfo` debería aceptar parámetros de paginación leídos desde la URL (`searchParams`), y esta página debería pasar la información de paginación al `CampaignViewerTable`.
- * 2. **Abstracción a `PaginatedResourceView`**: ((Vigente)) Una vez implementada la paginación, este componente podría ser refactorizado para utilizar la abstracción `PaginatedResourceView`, siguiendo el mismo patrón de élite que `sites-client.tsx`, para una máxima reutilización de código y consistencia de UI.
- *
- * =====================================================================
- */
 // src/app/[locale]/dev-console/campaigns/page.tsx

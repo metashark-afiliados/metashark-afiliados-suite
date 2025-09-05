@@ -8,7 +8,8 @@
  *              puro, completamente agnóstico al contenido, recibiendo todos sus
  *              textos y el estado del formulario a través de props.
  * @author Raz Podestá - MetaShark Tech
- * @version 1.1.0
+ * @version 2.0.0
+ * @see .docs-espejo/components/sites/SubdomainInput.tsx.md
  */
 "use client";
 
@@ -16,11 +17,11 @@ import { type UseFormReturn } from "react-hook-form";
 import { Check, Loader2, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
+import { rootDomain } from "@/config/site.config";
 import {
   useSubdomainAvailability,
   type AvailabilityStatus,
 } from "@/lib/hooks/use-subdomain-availability";
-import { rootDomain } from "@/lib/utils";
 
 /**
  * @public
@@ -47,7 +48,10 @@ interface SubdomainInputProps {
  * @param {SubdomainInputProps} props - Las propiedades para configurar el componente.
  * @returns {React.ReactElement}
  */
-export function SubdomainInput({ form, errorText }: SubdomainInputProps) {
+export function SubdomainInput({
+  form,
+  errorText,
+}: SubdomainInputProps): React.ReactElement {
   const {
     register,
     watch,
@@ -115,18 +119,4 @@ export function SubdomainInput({ form, errorText }: SubdomainInputProps) {
     </>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Corrección de Modularidad**: ((Implementada)) Se ha añadido la palabra clave `export` a `function SubdomainInput`. Esta corrección crítica transforma el archivo de un script a un módulo ES6, permitiendo que sea importado y resolviendo el error `TS2306`.
- *
- * @subsection Melhorias Futuras
- * 1. **Tooltip de Contexto**: ((Vigente)) Añadir un `<Tooltip>` al icono de disponibilidad para proporcionar más información al usuario (ej. "¡Este subdominio está disponible!").
- *
- * =====================================================================
- */
 // src/components/sites/SubdomainInput.tsx

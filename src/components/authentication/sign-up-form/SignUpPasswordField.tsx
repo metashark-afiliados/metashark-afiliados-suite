@@ -1,10 +1,12 @@
 // src/components/authentication/sign-up-form/SignUpPasswordField.tsx
 /**
  * @file src/components/authentication/sign-up-form/SignUpPasswordField.tsx
- * @description Aparato de UI atómico. Adaptado para propagar los textos de i18n
- *              a su componente hijo `PasswordStrengthMeter`.
+ * @description Aparato de UI atómico. Refactorizado a un componente de
+ *              presentación puro que consume el `PasswordStrengthMeter`
+ *              soberano sin "prop drilling" de contenido.
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 4.0.0
+ * @see .docs-espejo/components/authentication/sign-up-form/SignUpPasswordField.tsx.md
  */
 "use client";
 
@@ -13,14 +15,10 @@ import { type FieldErrors, type UseFormRegister } from "react-hook-form";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { type z } from "zod";
 
-import {
-  PasswordStrengthMeter,
-  type StrengthMeterTexts,
-} from "@/components/authentication/PasswordStrengthMeter";
+import { PasswordStrengthMeter } from "@/components/authentication/PasswordStrengthMeter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { clientLogger } from "@/lib/logger";
 import { type SignUpSchema } from "@/lib/validators";
 
 type FormData = z.infer<typeof SignUpSchema>;
@@ -36,7 +34,6 @@ export interface SignUpPasswordFieldProps {
     show: string;
     hide: string;
   };
-  strengthMeterTexts: StrengthMeterTexts; // <-- PROP AÑADIDA
 }
 
 export function SignUpPasswordField({
@@ -47,7 +44,6 @@ export function SignUpPasswordField({
   label,
   errorMessage,
   ariaLabels,
-  strengthMeterTexts, // <-- PROP CONSUMIDA
 }: SignUpPasswordFieldProps): React.ReactElement {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -83,10 +79,7 @@ export function SignUpPasswordField({
           )}
         </Button>
       </div>
-      <PasswordStrengthMeter
-        password={passwordValue}
-        texts={strengthMeterTexts}
-      />
+      <PasswordStrengthMeter password={passwordValue} />
       {errorMessage && (
         <p className="text-sm text-destructive" role="alert">
           {errorMessage}

@@ -42,7 +42,6 @@ const WorkspaceSwitcherContent = React.memo((): React.ReactElement => {
   const { workspaces, activeWorkspace } = useDashboard();
   const { canEdit, canDelete } = useWorkspaceContext();
 
-  // ANÁLISIS DE CÓDIGO: Se consume la API completa del hook soberano.
   const {
     popoverOpen,
     setPopoverOpen,
@@ -56,7 +55,6 @@ const WorkspaceSwitcherContent = React.memo((): React.ReactElement => {
         <WorkspaceTrigger />
       </PopoverTrigger>
       <PopoverContent className="w-[220px] p-0">
-        {/* ANÁLISIS DE CÓDIGO: Se propagan todos los callbacks requeridos a través de `...actionHandlers`. */}
         <WorkspacePopoverContent
           workspaces={workspaces}
           activeWorkspaceId={activeWorkspace!.id}

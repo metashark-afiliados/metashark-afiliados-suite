@@ -4,7 +4,8 @@
  * @description Aparato de UI atómico y soberano. Renderiza un indicador visual
  *              y un tooltip contextual para el estado de un módulo.
  * @author L.I.A. Legacy
- * @version 1.0.0
+ * @version 2.0.0
+ * @see .docs-espejo/components/dashboard/ModuleStatusIndicator.tsx.md
  */
 "use client";
 
@@ -46,7 +47,7 @@ const statusConfig = {
 export function ModuleStatusIndicator({
   status,
 }: ModuleStatusIndicatorProps): React.ReactElement {
-  const t = useTypedTranslations("components.dashboard.ActionDock"); // Namespace a definir
+  const t = useTypedTranslations("shared.ActionDock");
   const config = statusConfig[status] || statusConfig.locked;
   const Icon = config.icon;
 

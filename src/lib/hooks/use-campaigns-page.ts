@@ -1,16 +1,16 @@
 // src/lib/hooks/use-campaigns-page.ts
 /**
  * @file use-campaigns-page.ts
- * @description Hook orquestador soberano. Sincronizado para consumir el contrato
- *              de API puro de `useOptimisticResourceManagement`, resolviendo el error
- *              de tipo TS2345 y alineándose con la arquitectura de composición de hooks.
- * @author Raz Podestá - MetaShark Tech
- * @version 11.0.0
+ * @description Hook orquestador soberano. Sincronizado para consumir los tipos
+ *              canónicos desde la SSoT de la capa de datos, resolviendo el
+ *              conflicto de tipos TS2322.
+ * @author L.I.A. Legacy
+ * @version 13.0.0
  * @see .docs-espejo/lib/hooks/use-campaigns-page.ts.md
  */
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import toast from "react-hot-toast";
@@ -21,36 +21,30 @@ import {
   deleteCampaignAction,
   duplicateCampaignAction,
 } from "@/lib/actions/campaigns.actions";
-import { type CampaignMetadata } from "@/lib/data/campaigns";
+import {
+  type CampaignMetadata,
+  type CampaignSortOption, // <-- SSoT Importada
+  type CampaignStatusFilter, // <-- SSoT Importada
+} from "@/lib/data/campaigns";
 import { useUrlStateSync } from "@/lib/hooks/ui/useUrlStateSync";
 import { clientLogger } from "@/lib/logger";
 import { isActionError, type ValidationErrorKey } from "@/lib/validators";
 import { useOptimisticResourceManagement } from "./use-optimistic-resource-management";
 
-type CampaignStatus = "draft" | "published" | "archived";
-type SortByOption = "updated_at_desc" | "name_asc" | "name_desc";
-
 type CampaignFiltersState = {
   q: string;
-  status: CampaignStatus | "all";
-  sort: SortByOption;
+  status: CampaignStatusFilter;
+  sort: CampaignSortOption;
 };
 
 export interface UseCampaignsPageProps {
   initialCampaigns: CampaignMetadata[];
   initialSearchQuery: string;
   siteId: string;
-  initialStatus?: CampaignStatus;
-  initialSortBy?: SortByOption;
+  initialStatus?: CampaignStatusFilter;
+  initialSortBy?: CampaignSortOption;
 }
 
-/**
- * @public
- * @function useCampaignsPage
- * @description Orquesta toda la lógica de estado y de negocio para la página de gestión de campañas.
- * @param {UseCampaignsPageProps} props - Propiedades iniciales para el hook.
- * @returns La API completa para gestionar la UI de la página de campañas.
- */
 export function useCampaignsPage({
   initialCampaigns,
   initialSearchQuery,
@@ -132,7 +126,9 @@ export function useCampaignsPage({
             return tErrors(result.data.messageKey);
           },
           error: (err) =>
-            tErrors(err.message, { defaultValue: t("errors.archive_failed") }),
+            tErrors(err.message as ValidationErrorKey, {
+              defaultValue: t("errors.archive_failed"),
+            }),
         });
       });
     },
@@ -154,7 +150,7 @@ export function useCampaignsPage({
             return tErrors("campaigns.duplicate_success");
           },
           error: (err) =>
-            tErrors(err.message, {
+            tErrors(err.message as ValidationErrorKey, {
               defaultValue: t("errors.duplication_failed"),
             }),
         });
@@ -172,13 +168,10 @@ export function useCampaignsPage({
     setSearchTerm: (value: string) =>
       setFilters((f: CampaignFiltersState) => ({ ...f, q: value })),
     statusFilter: filters.status,
-    setStatusFilter: (status?: CampaignStatus | "all") =>
-      setFilters((f: CampaignFiltersState) => ({
-        ...f,
-        status: status || "all",
-      })),
+    setStatusFilter: (status: CampaignStatusFilter) =>
+      setFilters((f: CampaignFiltersState) => ({ ...f, status })),
     sortBy: filters.sort,
-    setSortBy: (sort: SortByOption) =>
+    setSortBy: (sort: CampaignSortOption) =>
       setFilters((f: CampaignFiltersState) => ({ ...f, sort })),
     handleCreateCampaign,
     handleDelete,

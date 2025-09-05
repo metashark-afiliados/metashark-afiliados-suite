@@ -3,10 +3,11 @@
  * @file DevSidebarClient.tsx
  * @description Ensamblador de UI. Ha sido refactorizado a un estándar de élite
  *              para invocar la Server Action de `signOut` a través de un evento
- *              `onClick` con `useTransition`, eliminando la advertencia de JSDOM
- *              y proporcionando un feedback de carga explícito.
- * @author Raz Podestá - MetaShark Tech
- * @version 4.0.0
+ *              `onClick` con `useTransition` y para alinear el logging con la
+ *              Constitución.
+ * @author L.I.A. Legacy
+ * @version 5.0.0
+ * @see .docs-espejo/components/dev-console/DevSidebarClient.tsx.md
  */
 "use client";
 
@@ -35,12 +36,13 @@ export function DevSidebarClient() {
 
   useEffect(() => {
     fetch("/routes-manifest.json")
-      .then((res) => (res.ok ? res.json() : Promise.reject("Failed to fetch")))
+      .then((res) => (res.ok ? res.json() : Promise.reject(res.statusText)))
       .then(setRoutes)
       .catch((error) =>
-        logger.warn("[DevSidebarClient] Could not load routes manifest.", {
-          error,
-        })
+        logger.warn(
+          { err: error },
+          "[DevSidebarClient] Could not load routes manifest."
+        )
       );
   }, []);
 
@@ -85,18 +87,4 @@ export function DevSidebarClient() {
     </aside>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Robustez en Entorno de Pruebas**: ((Implementada)) Se ha eliminado el uso de `<form action={...}>`, lo que erradica la advertencia de React en JSDOM.
- * 2. **Feedback de Usuario de Élite**: ((Implementada)) El uso de `useTransition` permite mostrar un estado de carga (`Loader2`) y deshabilitar el botón durante el proceso de cierre de sesión, mejorando la UX.
- *
- * @subsection Melhorias Futuras
- * 1. **Confirmación de Cierre de Sesión**: ((Vigente)) Para una UX más segura, se podría abrir un pequeño diálogo de confirmación (`ConfirmationDialog`) antes de invocar la `signOutAction`.
- *
- * =====================================================================
- */
 // src/components/dev-console/DevSidebarClient.tsx

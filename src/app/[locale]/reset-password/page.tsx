@@ -2,17 +2,15 @@
 /**
  * @file src/app/[locale]/reset-password/page.tsx
  * @description Página y formulario para restablecer la contraseña. Refactorizado a un
- *              estándar de élite para manejar correctamente el contrato `ActionResult`
- *              de su Server Action, utilizando un estado inicial nulo y guardianes
- *              de tipo para un manejo de errores robusto y seguro.
- * @author RaZ Podestá - MetaShark Tech
- * @version 4.1.0
+ *              estándar de élite, consumiendo el componente soberano `PasswordStrengthMeter`
+ *              y resolviendo la cascada de errores de contrato TS2305 y TS2322.
+ * @author L.I.A. Legacy
+ * @version 6.0.0
  * @see .docs-espejo/app/[locale]/reset-password/page.tsx.md
  */
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
 import React, { useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import toast from "react-hot-toast";
@@ -31,17 +29,14 @@ import {
   type ActionResult,
   isActionError,
   isActionSuccess,
+  type ValidationErrorKey,
 } from "@/lib/validators";
 
-/**
- * @author RaZ Podestá - MetaShark Tech
- */
-
-type UpdatePasswordFormState = ActionResult<{ messageKey: string }>;
+type UpdatePasswordFormState = ActionResult<{ messageKey: ValidationErrorKey }>;
 
 function SubmitButton() {
   const { pending } = useFormStatus();
-  const t = useTranslations("pages.ResetPasswordPage");
+  const t = useTypedTranslations("pages.ResetPasswordPage");
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -52,7 +47,7 @@ function SubmitButton() {
 
 export default function ResetPasswordPage(): React.ReactElement {
   clientLogger.trace("[ResetPasswordPage] Renderizando página.");
-  const t = useTranslations("pages.ResetPasswordPage");
+  const tPage = useTypedTranslations("pages.ResetPasswordPage");
   const tErrors = useTypedTranslations("shared.ValidationErrors");
   const router = useRouter();
   const [password, setPassword] = useState("");
@@ -63,9 +58,9 @@ export default function ResetPasswordPage(): React.ReactElement {
   >(updatePasswordAction, null);
 
   const [redirectEnabled, setRedirectEnabled] = useState(false);
-  const REDIRECT_DELAY_SECONDS = 3;
+  const REDIRECT_DELAY_SECONDS = 5;
 
-  const { countdown } = useCountdownRedirect(REDIRECT_DELAY_SECONDS, () => {
+  useCountdownRedirect(REDIRECT_DELAY_SECONDS, () => {
     if (redirectEnabled) {
       router.push("/login");
     }
@@ -94,12 +89,12 @@ export default function ResetPasswordPage(): React.ReactElement {
     <div className="w-full max-w-md">
       <Card className="border-border/60 bg-card/50 backdrop-blur-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+          <CardTitle className="text-2xl font-bold">{tPage("title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="space-y-4">
             <div className="space-y-1">
-              <Label htmlFor="password">{t("newPasswordLabel")}</Label>
+              <Label htmlFor="password">{tPage("newPasswordLabel")}</Label>
               <Input
                 id="password"
                 name="password"
@@ -113,7 +108,7 @@ export default function ResetPasswordPage(): React.ReactElement {
             </div>
             <div className="space-y-1">
               <Label htmlFor="confirmPassword">
-                {t("confirmPasswordLabel")}
+                {tPage("confirmPasswordLabel")}
               </Label>
               <Input
                 id="confirmPassword"

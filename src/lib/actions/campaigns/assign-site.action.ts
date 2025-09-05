@@ -6,6 +6,7 @@
  *              observabilidad canónica y la SSoT de autenticación.
  * @author L.I.A Legacy
  * @version 5.0.0
+ * @see .docs-espejo/lib/actions/campaigns/assign-site.action.ts.md
  */
 "use server";
 import "server-only";
@@ -20,13 +21,13 @@ import { getAuthenticatedUserOrThrow } from "@/lib/actions/_helpers/auth.helper"
 import { requireSitePermission } from "@/lib/auth/user-permissions";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type ActionResult, type ValidationErrorKey } from "@/lib/validators";
+import { type ActionResult } from "@/lib/validators";
 
 /**
  * @public
  * @async
  * @function assignSiteToCampaignAction
- * @description Asigna una campaña (a través de su `creationId`) a un sitio específico.
+ * @description Asigna una campaña (a través de su `id`) a un sitio específico.
  *              Esta acción es crítica para el flujo de publicación. Valida que:
  *              1. El usuario tenga permisos de edición sobre el sitio de destino.
  *              2. La campaña no esté ya asignada a otro sitio.
@@ -39,7 +40,10 @@ export async function assignSiteToCampaignAction(
   campaignId: string,
   siteId: string
 ): Promise<ActionResult<void>> {
-  const context = { campaignId, siteId };
+  let context: { campaignId: string; siteId: string; userId?: string } = {
+    campaignId,
+    siteId,
+  };
   try {
     const user = await getAuthenticatedUserOrThrow();
     context.userId = user.id;
@@ -82,7 +86,7 @@ export async function assignSiteToCampaignAction(
     if (creation?.created_by !== user.id || campaign.site_id !== null) {
       logger.warn(
         context,
-        "[assignSiteToCampaignAction] VIOLACIÓN: Intento de asignación no permitida (ya asignada o no es propietario)."
+        "[assignSiteToCampaignAction] VIOLACIÓN: Intento de asignación no permitida."
       );
       return {
         success: false,
@@ -110,7 +114,7 @@ export async function assignSiteToCampaignAction(
       },
     });
 
-    revalidatePath(`/builder/${campaignId}`);
+    revalidatePath(`/builder/${campaign.creation_id}`); // Revalidar por creation_id
     revalidatePath(`/dashboard/sites/${siteId}/campaigns`);
 
     logger.info(context, "[assignSiteToCampaignAction] Asignación exitosa.");

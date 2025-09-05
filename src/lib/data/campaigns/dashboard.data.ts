@@ -2,99 +2,117 @@
 /**
  * @file dashboard.data.ts
  * @description Aparato de datos atómico. Responsable de las operaciones de
- *              lectura para los componentes del dashboard principal.
+ *              lectura para el dashboard. Refactorizado para transformar
+ *              correctamente el payload para la cláusula `.in()` de Supabase,
+ *              resolviendo el error de tipo TS2322.
  * @author L.I.A Legacy
- * @version 1.0.0
+ * @version 5.0.0
+ * @see .docs-espejo/lib/data/campaigns/dashboard.data.ts.md
  */
 "use server";
 import "server-only";
 
 import { unstable_cache as cache } from "next/cache";
-import { type SupabaseClient } from "@supabase/supabase-js";
+
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
-import { type Database, type Tables } from "@/lib/types/database";
+import { type Tables } from "@/lib/types/database";
+import { type RecentCampaign } from "./types";
 
-type Supabase = SupabaseClient<Database, "public">;
+type RawRecentCampaignData = Pick<
+  Tables<"campaigns">,
+  | "id"
+  | "name"
+  | "updated_at"
+  | "created_at"
+  | "creation_id"
+  | "site_id"
+  | "status_id"
+> & {
+  campaign_statuses: { name: string }[] | null;
+};
 
-/**
- * @public
- * @async
- * @function getRecentCampaignsByWorkspaceId
- * @description Obtiene las campañas modificadas más recientemente para un workspace.
- * @param {string} workspaceId - El ID del workspace.
- * @param {number} limit - El número de campañas a obtener.
- * @param {Supabase} [supabaseClient] - Instancia opcional de Supabase.
- * @returns {Promise<Pick<Tables<'campaigns'>, ...>[]>}
- */
 export const getRecentCampaignsByWorkspaceId = (
   workspaceId: string,
-  limit: number,
-  supabaseClient?: Supabase
-): Promise<
-  Pick<
-    Tables<"campaigns">,
-    "id" | "name" | "updated_at" | "created_at" | "creation_id"
-  >[]
-> =>
+  limit: number
+): Promise<RecentCampaign[]> =>
   cache(
     async () => {
-      const supabase = supabaseClient || createClient();
-      logger.trace({ workspaceId, limit }, `[Cache MISS] Campañas recientes.`);
-      const { data, error } = await supabase
-        .from("campaigns")
-        .select(
-          "id, name, updated_at, created_at, creation_id, sites!inner(workspace_id)"
-        )
-        .eq("sites.workspace_id", workspaceId)
-        .order("updated_at", { ascending: false, nullsFirst: false })
-        .limit(limit);
-      if (error) {
+      const context = { workspaceId, limit };
+      logger.trace(context, "[Cache MISS] Cargando campañas recientes.");
+      const supabase = createClient();
+      try {
+        const { data, error } = await supabase
+          .from("campaigns")
+          .select(
+            `
+            id, name, updated_at, created_at, creation_id, site_id, status_id,
+            campaign_statuses ( name ),
+            sites!inner(workspace_id)
+          `
+          )
+          .eq("sites.workspace_id", workspaceId)
+          .order("updated_at", { ascending: false, nullsFirst: false })
+          .limit(limit);
+
+        if (error) throw error;
+
+        return (
+          (data?.map((c) => {
+            const raw = c as unknown as RawRecentCampaignData;
+            return {
+              ...raw,
+              status: raw.campaign_statuses?.[0]?.name || "unknown",
+            };
+          }) as RecentCampaign[]) || []
+        );
+      } catch (error) {
         logger.error(
-          { err: error, workspaceId },
-          `Error al obtener recientes.`
+          { err: error as Error, ...context },
+          "[DataLayer:Dashboard] Error al obtener campañas recientes."
         );
         return [];
       }
-      return data || [];
     },
     ["recent-campaigns-by-workspace", workspaceId, limit],
     { tags: ["campaigns", `workspace:${workspaceId}`] }
   )();
 
-/**
- * @public
- * @async
- * @function getPublishedCampaignsCountByWorkspace
- * @description Obtiene el conteo de campañas publicadas para un workspace.
- * @param {string} workspaceId - El ID del workspace.
- * @returns {Promise<{ count: number }>}
- */
 export async function getPublishedCampaignsCountByWorkspace(
   workspaceId: string
 ): Promise<{ count: number }> {
+  const context = { workspaceId };
+  logger.trace(
+    context,
+    "[DataLayer:Dashboard] Iniciando conteo de campañas publicadas."
+  );
   const supabase = createClient();
-  const { data: siteIds, error: siteError } = await supabase
-    .from("sites")
-    .select("id")
-    .eq("workspace_id", workspaceId);
-  if (siteError || !siteIds) {
-    logger.error({ err: siteError, workspaceId }, `Error al obtener sitios.`);
+  try {
+    const { data: siteIds, error: siteError } = await supabase
+      .from("sites")
+      .select("id")
+      .eq("workspace_id", workspaceId);
+    if (siteError) throw siteError;
+    if (siteIds.length === 0) return { count: 0 };
+
+    const { count, error: countError } = await supabase
+      .from("campaigns")
+      .select("id", { count: "exact", head: true })
+      .in(
+        "site_id",
+        siteIds.map((s) => s.id)
+      )
+      .eq("status_id", 2);
+
+    if (countError) throw countError;
+
+    return { count: count || 0 };
+  } catch (error) {
+    logger.error(
+      { err: error as Error, ...context },
+      "[DataLayer:Dashboard] Error al contar campañas publicadas."
+    );
     return { count: 0 };
   }
-  if (siteIds.length === 0) return { count: 0 };
-  const { count, error } = await supabase
-    .from("campaigns")
-    .select("id", { count: "exact", head: true })
-    .in(
-      "site_id",
-      siteIds.map((s) => s.id)
-    )
-    .eq("status_id", 2); // 2 = 'published'
-  if (error) {
-    logger.error({ err: error, workspaceId }, `Error al contar publicadas.`);
-    return { count: 0 };
-  }
-  return { count: count || 0 };
 }
 // src/lib/data/campaigns/dashboard.data.ts

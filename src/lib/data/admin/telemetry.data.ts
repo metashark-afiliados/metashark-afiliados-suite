@@ -7,6 +7,7 @@
  *              con la firma de logging canónica de la Constitución.
  * @author L.I.A Legacy
  * @version 2.0.0
+ * @see .docs-espejo/lib/data/admin/telemetry.data.ts.md
  */
 "use server";
 import "server-only";
@@ -37,12 +38,11 @@ export async function getVisitorLogs({
   limit?: number;
   query?: string;
 }): Promise<{ logs: Tables<"visitor_logs">[]; totalCount: number }> {
-  // --- INICIO DE REFACTORIZACIÓN: Firma de Logging Canónica ---
+  const context = { page, limit, query };
   logger.trace(
-    { page, limit, query },
+    context,
     "[DataLayer:AdminTelemetry] Iniciando obtención de logs de visitantes."
   );
-  // --- FIN DE REFACTORIZACIÓN ---
   try {
     const supabase = createAdminClient();
     const from = (page - 1) * limit;
@@ -70,12 +70,10 @@ export async function getVisitorLogs({
       totalCount: count || 0,
     };
   } catch (error) {
-    // --- INICIO DE REFACTORIZACIÓN: Firma de Logging Canónica ---
     logger.error(
-      { err: error },
+      { err: error as Error, context },
       `[DataLayer:AdminTelemetry] Error crítico al obtener los logs de visitantes.`
     );
-    // --- FIN DE REFACTORIZACIÓN ---
     throw new Error("No se pudieron obtener los logs de visitantes.");
   }
 }

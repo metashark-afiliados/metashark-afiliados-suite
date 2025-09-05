@@ -1,13 +1,11 @@
 // src/lib/hooks/useSitesPage.ts
 /**
  * @file useSitesPage.ts
- * @description Hook orquestador soberano. Ha sido refactorizado holísticamente
- *              para delegar la gestión de filtros y vista al hook atómico
- *              `useSitesHeader`, para alinear su lógica optimista con la
- *              arquitectura "Lean Database" (usando status_id), y para incluir
- *              la funcionalidad de edición en línea.
- * @author Raz Podestá - MetaShark Tech
- * @version 5.0.0
+ * @description Hook orquestador soberano. Ha sido refactorizado para alinear
+ *              su lógica de feedback de UI (toasts) con el contrato de i18n
+ *              de su dominio, resolviendo errores de tipo TS2345.
+ * @author L.I.A. Legacy
+ * @version 6.0.0
  * @see .docs-espejo/lib/hooks/useSitesPage.ts.md
  */
 "use client";
@@ -34,13 +32,6 @@ export interface UseSitesPageProps extends UseSitesHeaderProps {
   initialSites: SiteWithCampaignCount[];
 }
 
-/**
- * @public
- * @function useSitesPage
- * @description Orquesta toda la lógica de estado y de negocio para la página "Mis Sitios".
- * @param {UseSitesPageProps} props - Propiedades iniciales para el hook.
- * @returns La API completa para gestionar la UI de la página de sitios.
- */
 export function useSitesPage(props: UseSitesPageProps) {
   clientLogger.trace(
     {},
@@ -50,7 +41,7 @@ export function useSitesPage(props: UseSitesPageProps) {
   const { activeWorkspace, user } = useDashboard();
   const router = useRouter();
 
-  const { onViewChange, ...headerState } = useSitesHeader(props);
+  const headerState = useSitesHeader(props);
 
   const {
     isOpen: isCreateDialogOpen,
@@ -95,9 +86,7 @@ export function useSitesPage(props: UseSitesPageProps) {
     if (!genericHandleCreate) return;
     const result = await genericHandleCreate(formData);
     if (result.success) {
-      toast.success(
-        tSitesPage("header.createDialogTitle") + " " + tErrors("create_success")
-      );
+      toast.success(tSitesPage("toasts.create_success"));
       router.refresh();
     } else {
       const errorMessage = isActionError(result)
@@ -135,7 +124,7 @@ export function useSitesPage(props: UseSitesPageProps) {
       const result = await updateSiteNameAction(siteId, newName);
 
       if (result.success) {
-        toast.success(tSitesPage("card.update_name_success_toast"));
+        toast.success(tSitesPage("toasts.update_name_success"));
         router.refresh();
       } else {
         const errorMessage = isActionError(result)
@@ -154,7 +143,6 @@ export function useSitesPage(props: UseSitesPageProps) {
     isPending,
     mutatingId,
     ...headerState,
-    onViewChange, // <-- API CORREGIDA
     handleDelete,
     isCreateDialogOpen,
     setCreateDialogOpen,

@@ -2,18 +2,17 @@
 /**
  * @file requestPasswordReset.action.ts
  * @description Server Action atómica para el inicio del flujo de recuperación
- *              de contraseña. Refactorizada para unificar su comportamiento de
- *              redirección, mejorando la seguridad y adhiriéndose al
- *              contrato `ActionResult` y la Constitución de Observabilidad.
+ *              de contraseña. Refactorizada para alinear su contrato de retorno
+ *              explícitamente con las expectativas de `useFormState`.
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 5.0.0
+ * @see .docs-espejo/lib/actions/password/requestPasswordReset.action.ts.md
  */
 "use server";
 import "server-only";
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import toast from "react-hot-toast";
 
 import {
   checkRateLimit,
@@ -23,28 +22,25 @@ import {
 } from "@/lib/actions/_helpers";
 import { logger } from "@/lib/logger";
 import { createAdminClient } from "@/lib/supabase/server";
-import {
-  type ActionResult,
-  EmailSchema,
-  type ValidationErrorKey,
-} from "@/lib/validators";
+import { type ActionResult, EmailSchema } from "@/lib/validators";
+
+type RequestPasswordResetState = ActionResult<null>;
 
 /**
  * @public
  * @async
  * @function requestPasswordResetAction
  * @description Inicia el flujo de restablecimiento de contraseña. Por seguridad,
- *              siempre redirige a una página de notificación para prevenir
- *              ataques de enumeración de usuarios.
- * @param {unknown} prevState - El estado anterior, requerido por `useFormState`.
+ *              siempre redirige a una página de notificación.
+ * @param {unknown} prevState - Requerido por `useFormState`.
  * @param {FormData} formData - Los datos del formulario.
- * @returns {Promise<ActionResult<null>>} Retorna un ActionResult solo si falla
- *          el rate limiter o en caso de un error crítico del servidor.
+ * @returns {Promise<RequestPasswordResetState>} Retorna un ActionResult solo
+ *          en caso de error, de lo contrario redirige.
  */
 export async function requestPasswordResetAction(
   prevState: unknown,
   formData: FormData
-): Promise<ActionResult<null>> {
+): Promise<RequestPasswordResetState> {
   const ip = headers().get("x-forwarded-for");
   const limit = await checkRateLimit(ip, "password_reset");
 
@@ -66,7 +62,6 @@ export async function requestPasswordResetAction(
         { email: rawData.email, ...context },
         "[PasswordActions] Intento de reseteo con email inválido."
       );
-      // Redirigir igualmente para no revelar el motivo del fallo.
       redirect("/auth-notice?message=check-email-for-reset");
     }
 

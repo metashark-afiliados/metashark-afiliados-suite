@@ -6,6 +6,7 @@
  *              a un estándar de élite para cumplir con la Constitución.
  * @author L.I.A Legacy
  * @version 4.0.0
+ * @see .docs-espejo/lib/actions/telemetry/enrichVisitorLog.action.ts.md
  */
 "use server";
 import "server-only";
@@ -33,14 +34,19 @@ import {
 export async function enrichVisitorLogAction(
   payload: unknown
 ): Promise<ActionResult<void>> {
-  const context = { payload };
+  // Extracción preliminar y segura del sessionId para el contexto de logging.
+  const preliminarySessionId =
+    typeof payload === "object" && payload !== null && "sessionId" in payload
+      ? (payload as { sessionId: unknown }).sessionId
+      : undefined;
+
+  const context = { payload, sessionId: preliminarySessionId };
+
   try {
     const { sessionId, ...enrichmentData } =
       ClientEnrichmentSchema.parse(payload);
-    context.sessionId = sessionId;
 
     const browserContext = enrichmentData.browser_context as Json;
-
     const updatePayload = {
       fingerprint: enrichmentData.fingerprint,
       browser_context: browserContext,
@@ -57,7 +63,7 @@ export async function enrichVisitorLogAction(
     }
 
     logger.trace(
-      context,
+      { ...context, sessionId }, // Usar sessionId validado para el log de éxito.
       "[enrichVisitorLogAction] Log de visitante enriquecido."
     );
 
@@ -71,7 +77,6 @@ export async function enrichVisitorLogAction(
         { errors: error.flatten(), ...context },
         "[enrichVisitorLogAction] Payload de enriquecimiento inválido."
       );
-      // No persistir errores de validación de cliente.
       return {
         success: false,
         error: errorKey,
@@ -81,7 +86,7 @@ export async function enrichVisitorLogAction(
     const errorId = await createPersistentErrorLog(
       "enrichVisitorLogAction",
       error as Error,
-      context
+      context // El contexto ya contiene el sessionId preliminar.
     );
     logger.error(
       { err: error, errorId, ...context },

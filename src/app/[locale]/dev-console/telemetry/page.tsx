@@ -1,12 +1,12 @@
 // src/app/[locale]/dev-console/telemetry/page.tsx
 /**
  * @file page.tsx
- * @description Página del Visor de Telemetría. Ha sido refactorizada a un
- *              estándar de élite para obtener e inyectar los textos de
- *              paginación en su componente hijo, resolviendo el error de tipo TS2322.
- * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-31
+ * @description Página del Visor de Telemetría. Ha sido refactorizado a un
+ *              estándar de élite para alinear el logging con la Constitución
+ *              y para inyectar los textos de paginación requeridos.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
+ * @see .docs-espejo/app/[locale]/dev-console/telemetry/page.tsx.md
  */
 import { AlertTriangle } from "lucide-react";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
@@ -16,8 +16,8 @@ import {
   PaginationControls,
   type PaginationTexts,
 } from "@/components/shared/pagination-controls";
+import { admin as adminData } from "@/lib/data";
 import { logger } from "@/lib/logger";
-import { createClient } from "@/lib/supabase/server";
 import {
   VisitorLogsTable,
   type VisitorLogRow,
@@ -34,36 +34,26 @@ export default async function TelemetryPage({
 }) {
   unstable_setRequestLocale(locale);
   const t = await getTranslations("app.dev-console.TelemetryTable");
-  const supabase = createClient();
   const page = Number(searchParams.page) || 1;
-  const from = (page - 1) * LOGS_PER_PAGE;
-  const to = from + LOGS_PER_PAGE - 1;
 
   try {
-    const {
-      data: rawLogs,
-      error,
-      count,
-    } = await supabase
-      .from("visitor_logs")
-      .select("*", { count: "exact" })
-      .order("created_at", { ascending: false })
-      .range(from, to);
+    const { logs: rawLogs, totalCount } =
+      await adminData.telemetry.getVisitorLogs({
+        page,
+        limit: LOGS_PER_PAGE,
+      });
 
-    if (error) throw error;
-
+    // Adaptación de datos para el contrato de la tabla
     const logs: VisitorLogRow[] = (rawLogs || []).map((log) => ({
       ...log,
       ip_address: String(log.ip_address || "N/A"),
     }));
 
-    // --- INICIO DE REFACTORIZACIÓN (CONSTRUCCIÓN DE PROPS I18N) ---
     const paginationTexts: PaginationTexts = {
       previous: t("pagination.previousPageLabel"),
       next: t("pagination.nextPageLabel"),
       page: t("pagination.pageLabelTemplate"),
     };
-    // --- FIN DE REFACTORIZACIÓN ---
 
     return (
       <div className="space-y-6">
@@ -74,17 +64,17 @@ export default async function TelemetryPage({
         <VisitorLogsTable logs={logs} />
         <PaginationControls
           page={page}
-          totalCount={count ?? 0}
+          totalCount={totalCount ?? 0}
           limit={LOGS_PER_PAGE}
           basePath="/dev-console/telemetry"
-          texts={paginationTexts} // <-- PROP INYECTADA
+          texts={paginationTexts}
         />
       </div>
     );
   } catch (error) {
     logger.error(
-      "[DevConsole:TelemetryPage] Error al cargar los logs de visitantes:",
-      error instanceof Error ? error.message : String(error)
+      { err: error as Error },
+      "[DevConsole:TelemetryPage] Error al cargar los logs de visitantes."
     );
     return (
       <ErrorStateCard

@@ -1,15 +1,15 @@
 // src/components/feedback/CommandPalette.tsx
 /**
  * @file CommandPalette.tsx
- * @description Orquestador de lógica para la paleta de comandos. Corregido
- *              para invocar el store de L.I.A. y manejar errores de sintaxis.
- * @author @author RaZ Podestá - MetaShark Tech
- * @version 5.0.0
+ * @description Orquestador de lógica para la paleta de comandos. Consume
+ *              stores y contextos para proveer de estado al componente de
+ *              presentación `CommandPaletteContent`.
+ * @author L.I.A. Legacy
+ * @version 6.0.0
  * @see .docs-espejo/components/feedback/CommandPalette.tsx.md
  */
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -27,8 +27,6 @@ export function CommandPalette() {
   const router = useRouter();
   const [search, setSearch] = React.useState("");
   const [pages, setPages] = React.useState<"root" | "workspaces">("root");
-
-  const t = useTranslations("components.feedback.CommandPalette");
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -48,10 +46,8 @@ export function CommandPalette() {
 
   const runCommand = React.useCallback(
     (action: () => void, commandName: string) => {
-      logger.trace("[CommandPalette] Ejecutando comando.", {
-        userId: user.id,
-        command: commandName,
-      });
+      const context = { userId: user.id, command: commandName };
+      logger.trace(context, "[CommandPalette] Ejecutando comando.");
       close();
       action();
     },
@@ -89,7 +85,6 @@ export function CommandPalette() {
       runCommand={handleNavCommand}
       handleWorkspaceSelect={handleWorkspaceSelect}
       handleOpenLiaChat={handleOpenLiaChat}
-      t={t}
     />
   );
 }

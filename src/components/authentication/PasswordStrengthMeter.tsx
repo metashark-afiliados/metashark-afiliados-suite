@@ -1,31 +1,27 @@
 // src/components/authentication/PasswordStrengthMeter.tsx
 /**
  * @file PasswordStrengthMeter.tsx
- * @description Componente de UI atómico y de presentación 100% puro.
- *              Refactorizado para ser agnóstico al contenido, recibiendo
- *              sus textos a través de props.
+ * @description Componente de UI atómico y soberano. Muestra una barra de
+ *              fortaleza de contraseña con feedback visual en tiempo real.
+ *              Consume sus propias traducciones, desacoplándose de sus padres
+ *              y resolviendo errores de contrato de API.
  * @author L.I.A. Legacy
- * @version 3.0.0
+ * @version 4.0.0
+ * @see .docs-espejo/components/authentication/PasswordStrengthMeter.tsx.md
  */
 "use client";
 
 import { zxcvbn, type ZxcvbnResult } from "@zxcvbn-ts/core";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import React from "react";
 
+import { useTypedTranslations } from "@/lib/i18n/hooks";
 import { clientLogger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
-export interface StrengthMeterTexts {
-  strength_weak: React.ReactNode;
-  strength_fair: React.ReactNode;
-  strength_good: React.ReactNode;
-  strength_strong: React.ReactNode;
-}
-
 interface PasswordStrengthMeterProps {
   password?: string;
-  texts: StrengthMeterTexts;
 }
 
 const strengthLevels = [
@@ -38,16 +34,16 @@ const strengthLevels = [
 
 export function PasswordStrengthMeter({
   password,
-  texts,
-}: PasswordStrengthMeterProps) {
+}: PasswordStrengthMeterProps): React.ReactElement | null {
+  const t = useTypedTranslations("app.[locale].signup.page");
   const [strength, setStrength] = useState<ZxcvbnResult | null>(null);
 
   useEffect(() => {
     if (password) {
       const result = zxcvbn(password);
       clientLogger.trace(
-        "[PasswordStrengthMeter] Fortaleza de contraseña calculada.",
-        { score: result.score }
+        { score: result.score },
+        "[PasswordStrengthMeter] Fortaleza de contraseña calculada."
       );
       setStrength(result);
     } else {
@@ -61,7 +57,9 @@ export function PasswordStrengthMeter({
 
   const score = strength?.score ?? 0;
   const { labelKey, color } = strengthLevels[score];
-  const labelText = texts[labelKey as keyof StrengthMeterTexts];
+  const labelText = t.rich(labelKey as any, {
+    strong: (chunks) => <strong>{chunks}</strong>,
+  });
 
   return (
     <div className="space-y-1">

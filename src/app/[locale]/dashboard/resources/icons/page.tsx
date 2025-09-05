@@ -1,13 +1,17 @@
 // src/app/[locale]/dashboard/resources/icons/page.tsx
 /**
  * @file page.tsx
- * @description Server Component para la Galería de Iconos. Lee la SSoT de iconos,
- *              los agrupa por prefijo y pasa los datos al componente cliente.
- * @author Raz Podestá - MetaShark Tech
- * @version 1.0.0
+ * @description Orquestador de servidor para la Galería de Iconos. Su única
+ *              responsabilidad es cargar los manifiestos de iconos y las
+ *              traducciones, y pasarlos al componente de cliente para su
+ *              renderizado.
+ * @author L.I.A. Legacy
+ * @version 2.0.0
+ * @see .docs-espejo/app/[locale]/dashboard/resources/icons/page.tsx.md
  */
 import type { Metadata } from "next";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
+import React from "react";
 
 import {
   IconGalleryClient,
@@ -16,6 +20,13 @@ import {
 import { lucideIconNames } from "@/config/lucide-icon-names";
 import { logger } from "@/lib/logger";
 
+/**
+ * @public
+ * @async
+ * @function generateMetadata
+ * @description Genera los metadatos de la página de forma dinámica.
+ * @returns {Promise<Metadata>}
+ */
 export async function generateMetadata({
   params: { locale },
 }: {
@@ -30,67 +41,53 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * @public
+ * @async
+ * @page IconGalleryPage
+ * @description Ensambla y renderiza la página de la Galería de Iconos.
+ * @returns {Promise<React.ReactElement>}
+ */
 export default async function IconGalleryPage({
   params: { locale },
 }: {
   params: { locale: string };
-}) {
+}): Promise<React.ReactElement> {
   unstable_setRequestLocale(locale);
+  logger.trace({}, "[IconGalleryPage] Renderizando orquestador de servidor.");
   const t = await getTranslations("pages.IconGalleryPage");
 
-  // Lógica de Agrupación de Élite en Servidor
   const groupedIcons = lucideIconNames.reduce<IconGroup[]>((acc, iconName) => {
-    const match = iconName.match(/^[A-Z][a-z]*/);
-    const category = match ? match[0] : "Other";
-
-    let group = acc.find((g) => g.category === category);
+    const firstLetter = iconName.charAt(0).toUpperCase();
+    let group = acc.find((g) => g.category === firstLetter);
     if (!group) {
-      group = { category, icons: [] };
+      group = { category: firstLetter, icons: [] };
       acc.push(group);
     }
     group.icons.push(iconName);
-
     return acc;
   }, []);
 
-  // Ordenar categorías alfabéticamente
-  groupedIcons.sort((a, b) => a.category.localeCompare(b.category));
+  logger.trace(
+    { groupCount: groupedIcons.length },
+    "[IconGalleryPage] Iconos agrupados."
+  );
 
-  logger.trace("[IconGalleryPage] Iconos agrupados en el servidor", {
-    groupCount: groupedIcons.length,
-  });
-
-  const clientProps = {
-    groupedIcons,
-    texts: {
-      searchPlaceholder: t("searchPlaceholder"),
-      clearSearchAriaLabel: t("clearSearchAriaLabel"),
-      noResults: t("noResults"),
-      copySuccessMessage: t("copySuccessMessage"),
-    },
+  const clientTexts = {
+    searchPlaceholder: t("searchPlaceholder"),
+    clearSearchAriaLabel: t("clearSearchAriaLabel"),
+    noResults: t("noResults"),
+    copySuccessMessage: t("copySuccessMessage"),
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <header className="p-4 border-b">
-        <h1 className="text-2xl font-bold">{t("pageTitle")}</h1>
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="text-3xl font-bold">{t("pageTitle")}</h1>
         <p className="text-muted-foreground">{t("pageDescription")}</p>
-      </header>
-      <div className="flex-1 overflow-y-auto p-4">
-        <IconGalleryClient {...clientProps} />
       </div>
+      <IconGalleryClient groupedIcons={groupedIcons} texts={clientTexts} />
     </div>
   );
 }
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Procesamiento en Servidor**: ((Implementada)) La costosa operación de agrupar 1300+ iconos se realiza una vez en el servidor, optimizando el rendimiento del cliente.
- * 2. **Desacoplamiento Servidor-Cliente**: ((Implementada)) Sigue el patrón canónico donde el Server Component prepara todos los datos y textos para el Client Component.
- *
- * =====================================================================
- */
 // src/app/[locale]/dashboard/resources/icons/page.tsx

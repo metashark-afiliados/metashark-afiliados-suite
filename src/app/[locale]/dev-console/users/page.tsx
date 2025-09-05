@@ -1,15 +1,12 @@
 // src/app/[locale]/dev-console/users/page.tsx
 /**
  * @file page.tsx
- * @description Punto de entrada para la gestión de usuarios. Ha sido refactorizado
- *              para consumir la nueva API de datos atomizada, resolviendo el
- *              error de compilación TS2339 y alineándose con la SSoT de la
- *              capa de datos.
- * @author Raz Podestá - MetaShark Tech
- * @version 3.0.0
- * @date 2025-08-27
- * @contact raz.metashark.tech
- * @location Florianópolis/SC, Brazil
+ * @description Punto de entrada y orquestador de UI para la gestión de usuarios.
+ *              Refactorizado a un estándar de élite para alinear el logging con la
+ *              Constitución y formalizar su arquitectura de carga de datos.
+ * @author L.I.A. Legacy
+ * @version 4.0.0
+ * @see .docs-espejo/app/[locale]/dev-console/users/page.tsx.md
  */
 import { AlertTriangle } from "lucide-react";
 import type { Metadata } from "next";
@@ -25,8 +22,10 @@ import { UsersClient } from "./users-client";
 
 const USERS_PER_PAGE = 20;
 
+// Esqueleto de Carga (Componente Puro)
 const UsersTableSkeleton = () => (
   <div className="space-y-6 relative animate-pulse">
+    {/* ... contenido del esqueleto sin cambios ... */}
     <div className="h-10 w-1/3 bg-muted rounded-md mb-4" />
     <div className="rounded-md border">
       <table className="w-full">
@@ -74,6 +73,7 @@ const UsersTableSkeleton = () => (
   </div>
 );
 
+// Generador de Metadatos (Función Pura)
 export async function generateMetadata({
   params: { locale },
 }: {
@@ -88,6 +88,7 @@ export async function generateMetadata({
   };
 }
 
+// Cargador de Datos (Componente de Servidor Atómico)
 async function UsersPageLoader({
   searchParams,
 }: {
@@ -100,22 +101,18 @@ async function UsersPageLoader({
   if (!roleCheck.success) {
     const redirectPath =
       roleCheck.error === "SESSION_NOT_FOUND"
-        ? "/auth/login?next=/dev-console/users"
+        ? "/login?next=/dev-console/users"
         : "/dashboard";
     return redirect(redirectPath);
   }
 
   try {
-    // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (TS2339) ---
-    // Se consume la función desde el módulo atomizado y namespaced,
-    // alineando el componente con la nueva SSoT de la capa de datos.
     const { profiles, totalCount } =
       await adminData.users.getPaginatedUsersWithRoles({
         page,
         limit: USERS_PER_PAGE,
         query: searchQuery,
       });
-    // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
     return (
       <div className="space-y-6">
@@ -130,8 +127,8 @@ async function UsersPageLoader({
     );
   } catch (error) {
     logger.error(
-      "[DevConsole/Users] Error al cargar la lista de usuarios:",
-      error instanceof Error ? error.message : String(error)
+      { err: error as Error },
+      "[DevConsole/Users] Error al cargar la lista de usuarios."
     );
     const t = await getTranslations("app.dev-console.CampaignsTable");
     return (
@@ -144,6 +141,7 @@ async function UsersPageLoader({
   }
 }
 
+// Componente de Página (Ensamblador Puro)
 export default async function UsersPage({
   params: { locale },
   searchParams,
@@ -158,16 +156,4 @@ export default async function UsersPage({
     </Suspense>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Futuras
- * 1. **Abstracción de `loading.tsx`**: ((Vigente)) El componente `UsersTableSkeleton` está definido localmente. Para una adhesión estricta a las convenciones de Next.js y al principio DRY, debería ser extraído a su propio archivo `loading.tsx` en el mismo directorio.
- * 2. **Filtros Avanzados**: ((Vigente)) La UI podría ser extendida para incluir filtros que permitan al administrador buscar usuarios por `app_role` específico. Esto requeriría actualizar la función `getPaginatedUsersWithRoles` para aceptar un nuevo parámetro de filtro.
- *
- * =====================================================================
- */
 // src/app/[locale]/dev-console/users/page.tsx

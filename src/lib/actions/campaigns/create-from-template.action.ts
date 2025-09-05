@@ -2,12 +2,11 @@
 /**
  * @file create-from-template.action.ts
  * @description Orquestador de Server Action para crear una `Creation`.
- *              Refactorizado para alinearse con la arquitectura de "Creations",
- *              consumir la SSoT de boilerplate canónica, el helper de payload
- *              de creaciones, y cumplir con los estándares de logging y errores.
- *              **Corregido para consumir la API de mutaciones de datos atomizada.**
+ *              Refactorizado para alinear su firma de retorno con el contrato
+ *              `ActionResult` completo, incluyendo `TErrorData`.
  * @author L.I.A Legacy
- * @version 7.1.0
+ * @version 8.0.0
+ * @see .docs-espejo/lib/actions/campaigns/create-from-template.action.ts.md
  */
 "use server";
 import "server-only";
@@ -31,12 +30,12 @@ import {
  * @description Orquesta el flujo de creación de una nueva `Creation`.
  * @param {string} creationType - El tipo de creación a generar (ej. "landing-page").
  * @param {string} [siteId] - El ID opcional del sitio al que se asignará (lógica futura).
- * @returns {Promise<ActionResult<{ id: string }>>}
+ * @returns {Promise<ActionResult<{ id: string }, { errorId: string }>>}
  */
 export async function createCreationAction(
   creationType: string,
   siteId?: string
-): Promise<ActionResult<{ id: string }>> {
+): Promise<ActionResult<{ id: string }, { errorId: string }>> {
   if (process.env.DEV_MODE_BOILERPLATE_CREATION === "true") {
     logger.warn(
       {},
@@ -67,7 +66,6 @@ export async function createCreationAction(
       type: creationType,
     });
 
-    // DEUDA TÉCNICA: Esta lógica debe migrar a `creations.data.ts`
     const newCampaign = await campaignsData.mutations.insertCampaignRecord(
       creationPayload as any
     );
@@ -98,6 +96,7 @@ export async function createCreationAction(
     return {
       success: false,
       error: "generic.error_creation_failed" as ValidationErrorKey,
+      data: { errorId },
     };
   }
 }

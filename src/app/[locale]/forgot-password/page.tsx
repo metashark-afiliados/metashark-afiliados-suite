@@ -2,12 +2,12 @@
 /**
  * @file src/app/[locale]/forgot-password/page.tsx
  * @description Página y formulario para solicitar la recuperación de contraseña.
- *              Ha sido refactorizado a un componente de cliente soberano para
- *              utilizar `useFormState` y proporcionar una UX de élite.
- *              Corregido para manejar correctamente los errores de tipo en el
- *              uso de `useFormState`.
- * @author Raz Podestá
- * @version 2.0.2
+ *              Refactorizado a un estándar de élite, utilizando `null` como
+ *              estado inicial para `useFormState` y guardianes de tipo para un
+ *              manejo de errores robusto, resolviendo el error TS2322.
+ * @author L.I.A. Legacy
+ * @version 3.0.0
+ * @see .docs-espejo/app/[locale]/forgot-password/page.tsx.md
  */
 "use client";
 
@@ -28,10 +28,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { requestPasswordResetAction } from "@/lib/actions/password.actions";
-import { type ActionResult } from "@/lib/validators";
+import { useTypedTranslations } from "@/lib/i18n/hooks";
+import {
+  type ActionResult,
+  isActionError,
+  type ValidationErrorKey,
+} from "@/lib/validators";
 
-// Define a local type alias for clarity, matching ActionResult<null>
-type RequestPasswordResetState = ActionResult<null>;
+type RequestPasswordResetState = ActionResult<null, ValidationErrorKey>;
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -46,24 +50,21 @@ function SubmitButton() {
 
 export default function ForgotPasswordPage() {
   const t = useTranslations("pages.ForgotPasswordPage");
-  const [state, formAction] = useFormState<RequestPasswordResetState, FormData>(
-    requestPasswordResetAction,
-    {
-      success: false,
-      error: "",
-      // --- INICIO DE CORRECCIÓN: Eliminado `data: null` para el estado de error ---
-      // La inicialización del estado de error no debe incluir 'data: null'
-      // ya que el tipo ActionResult<null> no lo define cuando success es false.
-      // --- FIN DE CORRECCIÓN ---
-    }
-  );
+  const tErrors = useTypedTranslations("shared.ValidationErrors");
+
+  const [state, formAction] = useFormState<
+    RequestPasswordResetState | null,
+    FormData
+  >(requestPasswordResetAction, null);
 
   useEffect(() => {
-    // CORRECTION: Explicitly narrow the type to ensure 'error' property exists
-    if (state && !state.success && state.error) {
-      toast.error(state.error);
+    if (isActionError(state)) {
+      const errorMessage = tErrors(state.error, {
+        defaultValue: "An unexpected error occurred.",
+      });
+      toast.error(errorMessage);
     }
-  }, [state]);
+  }, [state, tErrors]);
 
   return (
     <div className="w-full max-w-md">
@@ -92,18 +93,4 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
-
-/**
- * =====================================================================
- *                           MEJORA CONTINUA
- * =====================================================================
- *
- * @subsection Melhorias Adicionadas
- * 1. **Corrección de Tipos en `useFormState`**: ((Implementada)) Se ha eliminado la propiedad `data: null` del estado inicial del `useFormState` cuando `success` es `false`, resolviendo el error `TS2353` y alineando el objeto de estado con el contrato de tipo `ActionResult`.
- *
- * @subsection Melhorias Futuras
- * 1. **Feedback de Validación en Tiempo Real**: ((Vigente)) Aunque `onTouched` está configurado, la UI podría mejorarse para mostrar marcas de verificación verdes junto a los campos que pasan la validación, proporcionando un feedback más proactivo.
- *
- * =====================================================================
- */
 // src/app/[locale]/forgot-password/page.tsx
