@@ -22,7 +22,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint . --ext .js,jsx,.ts,.tsx",
     "lint:fix": "pnpm lint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -31,6 +31,8 @@
     "gen:i18n:manifest": "tsx --tsconfig tsconfig.json scripts/i18n/generate-manifest.ts",
     "gen:i18n:schema": "tsx --tsconfig tsconfig.json scripts/i18n/generate-schema.ts",
     "gen:i18n": "pnpm gen:i18n:manifest && pnpm gen:i18n:schema",
+    "gen:icons": "tsx --tsconfig tsconfig.json scripts/generation/generate-lucide-icon-enum.ts",
+    "gen:all": "pnpm gen:icons && pnpm gen:i18n",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit",
@@ -87,8 +89,9 @@
     "sharp": "^0.34.3",
     "tailwind-merge": "^2.6.0",
     "zod": "^3.23.8",
+    "zundo": "^2.3.0",
     "zustand": "^4.5.4",
-    "zustand-undo": "^1.0.1"
+    "zustand-sync-tabs": "^0.2.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -139,6 +142,7 @@
     "jest-axe": "^10.0.0",
     "jsdom": "^24.1.1",
     "lint-staged": "^15.2.7",
+    "microdiff": "^1.5.0",
     "msw": "^2.10.4",
     "next-router-mock": "^1.0.2",
     "pg": "^8.16.3",

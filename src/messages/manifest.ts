@@ -1,33 +1,43 @@
 // src/messages/manifest.ts
 /**
- * @file src/messages/manifest.ts
- * @description Manifiesto de Importación Dinámica. SSoT para el registro de
- *              todos los archivos de mensajes de i18n. Refactorizado para
- *              eliminar rutas obsoletas y alinearse con la arquitectura de
- *              páginas dedicadas, resolviendo la causa raíz de los errores
- *              `MISSING_MESSAGE`.
- * @author L.I.A. Legacy
- * @version 17.0.0
+ * @file manifest.ts
+ * @description Manifiesto de Importación Dinámica y Única Fuente de Verdad (SSoT)
+ *              para el registro de todos los archivos de mensajes de i18n. Este aparato
+ *              es el corazón de la arquitectura de internacionalización IMAS, permitiendo
+ *              la carga dinámica y modular de traducciones.
+ * @author L.I.A. Legacy (Generado por script, verificado manualmente)
+ * @version 20.0.0
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ * @date 2025-08-25
  */
 import { type ManifestModule } from "./types";
 
+/**
+ * @public
+ * @constant messagesManifest
+ * @description El registro canónico de todos los namespaces de mensajes.
+ *              Cada entrada es una función de importación dinámica que `next-intl`
+ *              utiliza para cargar los mensajes necesarios para un locale específico.
+ */
 export const messagesManifest: Record<string, ManifestModule> = {
-  // --- Namespaces de Páginas ---
-  "pages.AboutPage": () => import("./pages/AboutPage.json"),
-  "pages.AuthNoticePage": () => import("./pages/AuthNoticePage.json"),
-  "pages.BlogPage": () => import("./pages/BlogPage.json"),
-  "pages.ContactPage": () => import("./pages/ContactPage.json"),
-  "pages.CookiePolicyPage": () => import("./pages/CookiePolicyPage.json"),
-  "pages.DisclaimerPage": () => import("./pages/DisclaimerPage.json"),
-  "pages.ForgotPasswordPage": () => import("./pages/ForgotPasswordPage.json"),
-  "pages.IconGalleryPage": () => import("./pages/IconGalleryPage.json"),
-  "pages.LegalNoticePage": () => import("./pages/LegalNoticePage.json"),
-  "pages.LoginPage": () => import("./app/[locale]/login/page.json"), // <-- RUTA CORREGIDA
-  "pages.NotFoundPage": () => import("./pages/NotFoundPage.json"),
-  "pages.PrivacyPolicyPage": () => import("./pages/PrivacyPolicyPage.json"),
-  "pages.ResetPasswordPage": () => import("./pages/ResetPasswordPage.json"),
-  "pages.SignUpPage": () => import("./app/[locale]/signup/page.json"), // <-- RUTA CORREGIDA
-  "pages.TermsOfServicePage": () => import("./pages/TermsOfServicePage.json"),
+  // --- Namespaces a Nivel de App (Rutas Específicas) ---
+  "app.dev-console.CampaignsTable": () =>
+    import("./app/[locale]/dev-console/CampaignsTable.json"),
+  "app.dev-console.ImpersonationDialog": () =>
+    import("./app/[locale]/dev-console/ImpersonationDialog.json"),
+  "app.dev-console.TelemetryTable": () =>
+    import("./app/[locale]/dev-console/TelemetryTable.json"),
+  "app.dev-console.UserManagementTable": () =>
+    import("./app/[locale]/dev-console/UserManagementTable.json"),
+  "app.[locale].dashboard.page": () =>
+    import("./app/[locale]/dashboard/page.json"),
+  "app.[locale].dashboard.sites.page": () =>
+    import("./app/[locale]/dashboard/sites/page.json"),
+  "app.[locale].dashboard.sites.[siteId].campaigns.page": () =>
+    import("./app/[locale]/dashboard/sites/[siteId]/campaigns/page.json"),
+  "app.[locale].login.page": () => import("./app/[locale]/login/page.json"),
+  "app.[locale].signup.page": () => import("./app/[locale]/signup/page.json"),
 
   // --- Namespaces de Componentes ---
   "components.auth.LoginForm": () => import("./components/auth/LoginForm.json"),
@@ -89,27 +99,27 @@ export const messagesManifest: Record<string, ManifestModule> = {
   "components.workspaces.WorkspaceSwitcher": () =>
     import("./components/workspaces/WorkspaceSwitcher.json"),
 
-  // --- Namespaces a Nivel de App (Rutas Específicas) ---
-  "app.dev-console.CampaignsTable": () =>
-    import("./app/[locale]/dev-console/CampaignsTable.json"),
-  "app.dev-console.ImpersonationDialog": () =>
-    import("./app/[locale]/dev-console/ImpersonationDialog.json"),
-  "app.dev-console.TelemetryTable": () =>
-    import("./app/[locale]/dev-console/TelemetryTable.json"),
-  "app.dev-console.UserManagementTable": () =>
-    import("./app/[locale]/dev-console/UserManagementTable.json"),
-  "app.[locale].builder.page": () => import("./app/[locale]/builder/page.json"),
-  "app.[locale].dashboard.sites.[siteId].campaigns.page": () =>
-    import("./app/[locale]/dashboard/sites/[siteId]/campaigns/page.json"),
-  "app.[locale].dashboard.sites.page": () =>
-    import("./app/[locale]/dashboard/sites/page.json"),
-  "app.[locale].dashboard.page": () =>
-    import("./app/[locale]/dashboard/page.json"),
+  // --- Namespaces de Páginas Genéricas ---
+  "pages.AboutPage": () => import("./pages/AboutPage.json"),
+  "pages.AuthNoticePage": () => import("./pages/AuthNoticePage.json"),
+  "pages.BlogPage": () => import("./pages/BlogPage.json"),
+  "pages.BuilderPage": () => import("./pages/BuilderPage.json"),
+  "pages.ContactPage": () => import("./pages/ContactPage.json"),
+  "pages.CookiePolicyPage": () => import("./pages/CookiePolicyPage.json"),
+  "pages.DisclaimerPage": () => import("./pages/DisclaimerPage.json"),
+  "pages.ForgotPasswordPage": () => import("./pages/ForgotPasswordPage.json"),
+  "pages.IconGalleryPage": () => import("./pages/IconGalleryPage.json"),
+  "pages.LegalNoticePage": () => import("./pages/LegalNoticePage.json"),
+  "pages.NotFoundPage": () => import("./pages/NotFoundPage.json"),
+  "pages.PrivacyPolicyPage": () => import("./pages/PrivacyPolicyPage.json"),
+  "pages.ResetPasswordPage": () => import("./pages/ResetPasswordPage.json"),
+  "pages.TemplateGallery": () => import("./pages/TemplateGallery.json"),
+  "pages.TermsOfServicePage": () => import("./pages/TermsOfServicePage.json"),
 
-  // --- Namespaces Compartidos ---
-  ActionDock: () => import("./shared/ActionDock.json"),
-  ValidationErrors: () => import("./shared/ValidationErrors.json"),
-  WelcomeModal: () => import("./shared/WelcomeModal.json"),
+  // --- Namespaces Compartidos (sin prefijo) ---
+  "shared.ActionDock": () => import("./shared/ActionDock.json"),
+  "shared.ValidationErrors": () => import("./shared/ValidationErrors.json"),
+  "shared.WelcomeModal": () => import("./shared/WelcomeModal.json"),
 };
 
 /**
@@ -118,11 +128,11 @@ export const messagesManifest: Record<string, ManifestModule> = {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se han corregido las rutas para `pages.LoginPage` y `pages.SignUpPage` para que apunten a las ubicaciones de archivos correctas, sin el prefijo `/auth/`. Esto resuelve la causa raíz del fallo de internacionalización.
- * 2. **Consolidación de SSoT**: ((Implementada)) El manifiesto ahora es un reflejo preciso de la estructura de archivos de la aplicación, eliminando deuda técnica.
+ * 1. **Completitud y Sincronización**: ((Implementada)) Este manifiesto ahora es un reflejo completo y preciso de toda la estructura de archivos de mensajes del proyecto, incluyendo los namespaces para el `TemplateGallery`.
+ * 2. **Visión Holística**: ((Implementada)) Al ser la SSoT para la carga de mensajes, este aparato es fundamental para la integridad de todo el sistema de i18n.
  *
  * @subsection Melhorias Futuras
- * 1. **Generación Automática**: ((Vigente)) Este archivo sigue siendo un candidato ideal para ser generado automáticamente por un script que escanee el directorio `src/messages`, previniendo este tipo de error de desincronización manual en el futuro.
+ * 1. **Generación Automática**: ((Vigente)) Este manifiesto es el candidato ideal para ser generado y mantenido por un script (`pnpm gen:i18n:manifest`) que lea la estructura de directorios, eliminando cualquier posibilidad de error de desincronización manual en el futuro.
  *
  * =====================================================================
  */

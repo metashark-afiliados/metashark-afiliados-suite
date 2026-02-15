@@ -1,4 +1,17 @@
 // src/lib/hooks/useWorkspaceInlineEditor.ts
+/**
+ * @file useWorkspaceInlineEditor.ts
+ * @description Hook soberano que encapsula la lógica completa para la edición en línea
+ *              del nombre del workspace. Gestiona el estado de edición, el valor del input,
+ *              la invocación de la server action y el feedback al usuario.
+ * @author Raz Podestá - MetaShark Tech, Florianópolis/SC, Brazil, raz.metashark.tech
+ * @version 2.0.1
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
+ */
+"use client";
+
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
@@ -17,7 +30,9 @@ import { clientLogger } from "@/lib/logging";
  */
 export function useWorkspaceInlineEditor() {
   const t = useTranslations("WorkspaceSwitcher");
-  const tErrors = useTranslations("ValidationErrors");
+  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const tErrors = useTranslations("shared.ValidationErrors");
+  // --- FIN DE REFACTORIZACIÓN ---
   const { activeWorkspace, activeWorkspaceRole } = useDashboard();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -88,13 +103,10 @@ export function useWorkspaceInlineEditor() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Lógica de UI Aislada**: ((Implementada)) El hook aísla completamente la lógica de estado (isEditing, inputValue) y la lógica de negocio (handleSaveName), manteniendo el componente de UI (`WorkspaceTrigger`) como un presentador puro.
- * 2. **Gestión de Foco**: ((Implementada)) Utiliza `useEffect` y `useRef` para enfocar y seleccionar automáticamente el texto del input cuando se entra en modo de edición, una mejora de UX de élite.
- * 3. **Observabilidad y Feedback**: ((Implementada)) La acción de guardado se registra con `clientLogger` y proporciona feedback al usuario a través de `toast`.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el hook con la arquitectura IMAS y los schemas de Zod.
  *
  * @subsection Melhorias Futuras
  * 1. **Prevención de Guardado Innecesario**: ((Vigente)) La lógica ya previene la llamada a la API si el nombre no ha cambiado, pero se podría añadir un feedback visual sutil al usuario en `handleSaveName` para indicar que no se realizaron cambios.
  *
  * =====================================================================
  */
-// src/lib/hooks/useWorkspaceInlineEditor.ts

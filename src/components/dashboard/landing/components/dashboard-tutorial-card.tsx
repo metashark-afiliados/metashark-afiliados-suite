@@ -1,36 +1,63 @@
-// src/components/dashboard/landing/components/dashboard-tutorial-card.tsx
 /**
  * @file dashboard-tutorial-card.tsx
- * @description Componente de UI que renderiza una tarjeta estática con un
- *              llamado a la acción para ver tutoriales o documentación.
- * @author Raz Podestá (adaptado de paddle-nextjs-starter-kit)
- * @version 1.0.0
+ * @description Componente de UI atómico y de presentación 100% puro.
+ *              Ha sido refactorizado a un estándar de élite para ser
+ *              completamente agnóstico al contenido y para corregir un
+ *              error de composición (TS2322) con el componente `SmartLink`.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.1.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
+"use client";
+
 import { ArrowUpRight } from "lucide-react";
-import Link from "next/link"; // Usar Link de Next.js para rutas estáticas
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SmartLink } from "@/components/ui/SmartLink";
+import { clientLogger } from "@/lib/logging";
 
-export function DashboardTutorialCard() {
-  // En una versión futura, los textos serían consumidos desde i18n
-  const texts = {
-    title: "Tutorials & Docs",
-    description:
-      "Learn how to get the most out of ConvertiKit's tools and master affiliate marketing.",
-    button: "Explore Guides",
-  };
+/**
+ * @public
+ * @interface DashboardTutorialCardProps
+ * @description Contrato de props para el componente. Define todo el contenido
+ *              necesario para renderizar la tarjeta.
+ */
+export interface DashboardTutorialCardProps {
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonHref: any; // `any` para compatibilidad con el `Link` de next-intl
+}
+
+/**
+ * @public
+ * @component DashboardTutorialCard
+ * @description Renderiza una tarjeta estática con un llamado a la acción para
+ *              ver tutoriales o documentación.
+ * @param {DashboardTutorialCardProps} props - Propiedades para configurar la tarjeta.
+ * @returns {React.ReactElement}
+ */
+export function DashboardTutorialCard({
+  title,
+  description,
+  buttonText,
+  buttonHref,
+}: DashboardTutorialCardProps): React.ReactElement {
+  clientLogger.trace("[DashboardTutorialCard] Renderizando componente.");
 
   return (
     <Card className={"bg-background/50 backdrop-blur-[24px] border-border p-6"}>
       <CardHeader className="p-0 space-y-0">
         <CardTitle className="flex justify-between items-center text-xl mb-2 font-medium">
-          {texts.title}
+          {title}
         </CardTitle>
       </CardHeader>
       <CardContent className={"p-0 flex flex-col gap-6"}>
         <div className="text-base leading-6 text-muted-foreground">
-          {texts.description}
+          {description}
         </div>
         <div>
           <Button
@@ -39,10 +66,18 @@ export function DashboardTutorialCard() {
             variant={"outline"}
             className={"flex gap-2 text-sm rounded-sm border-border"}
           >
-            <Link href="/docs">
-              {texts.button}
-              <ArrowUpRight size={16} className={"text-muted-foreground"} />
-            </Link>
+            <SmartLink
+              href={buttonHref}
+              label={
+                <>
+                  {buttonText}
+                  <ArrowUpRight
+                    size={16}
+                    className={"ml-2 text-muted-foreground"}
+                  />
+                </>
+              }
+            />
           </Button>
         </div>
       </CardContent>
@@ -56,11 +91,13 @@ export function DashboardTutorialCard() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Soporte al Usuario**: ((Implementada)) Añade un punto de entrada claro hacia la documentación, mejorando la experiencia de onboarding y reduciendo la carga de soporte.
+ * 1. **Resolución de Error de Compilación (TS2322)**: ((Implementada)) Se ha corregido el patrón de composición del componente `SmartLink`. El icono `ArrowUpRight` ahora se pasa como parte de la prop `label`, en lugar de como `children`, alineando el uso con el contrato de la API de `SmartLink` y resolviendo el error de tipo.
+ * 2. **Componente de Presentación Puro**: ((Implementada)) El componente ahora es 100% agnóstico al contenido, adhiriéndose a la "Filosofía LEGO".
+ * 3. **Full Internacionalización**: ((Implementada)) Se ha eliminado todo el texto codificado en duro, resolviendo la brecha de internacionalización.
+ * 4. **Full Observabilidad**: ((Implementada)) Se ha añadido `clientLogger` para trazar el renderizado del componente.
  *
  * @subsection Melhorias Futuras
- * 1. **Full Internacionalización**: ((Vigente)) Refactorizar el componente para que reciba sus textos (`title`, `description`, `button`) a través de props, permitiendo que la página principal lo ensamble con contenido de `next-intl`.
- * 2. **Enlace Dinámico**: ((Vigente)) El `href="/docs"` podría ser obtenido desde una variable de entorno o un manifiesto de rutas para una mayor flexibilidad.
+ * 1. **Icono Dinámico**: ((Vigente)) El icono `ArrowUpRight` está codificado. El componente podría ser mejorado para aceptar una prop `iconName: LucideIconName` y renderizarlo con `DynamicIcon` para una mayor flexibilidad.
  *
  * =====================================================================
  */

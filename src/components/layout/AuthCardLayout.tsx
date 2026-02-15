@@ -5,8 +5,11 @@
  *              responsabilidad es proporcionar una estructura visual consistente
  *              y centrada para los formularios de autenticación, cumpliendo con
  *              la "Filosofía LEGO" y el principio DRY.
- * @author Raz Podestá
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -14,6 +17,7 @@ import React from "react";
 
 import { LoginCardGradient } from "@/components/gradients/login-card-gradient";
 import { LoginGradient } from "@/components/gradients/login-gradient";
+import { clientLogger } from "@/lib/logging";
 
 export interface AuthCardLayoutProps {
   /**
@@ -40,6 +44,7 @@ export function AuthCardLayout({
   children,
   bottomLink,
 }: AuthCardLayoutProps): React.ReactElement {
+  clientLogger.trace("[AuthCardLayout] Renderizando layout de autenticación.");
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center p-4">
       <LoginGradient />
@@ -67,18 +72,18 @@ export function AuthCardLayout({
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Abstracción de Layout (DRY)**: ((Implementada)) Este nuevo aparato encapsula la lógica de layout repetida de las páginas de `login` y `signup`, eliminando la duplicación de código.
- * 2. **Layout de Élite Centrado**: ((Implementada)) Utiliza Flexbox para garantizar un centrado vertical y horizontal perfecto, resolviendo los problemas de espaciado y scroll innecesario.
+ * 1. **Abstracción de Layout (DRY)**: ((Implementada)) Este nuevo aparato encapsula la lógica de layout que será repetida en las páginas de `login` y `signup`, eliminando la duplicación de código y estableciendo una SSoT visual.
+ * 2. **Layout de Élite Centrado**: ((Implementada)) Utiliza Flexbox para garantizar un centrado vertical y horizontal perfecto, proporcionando una base visual robusta y profesional.
  *
  * @subsection Melhorias Futuras
- * 1. **Variantes de Tarjeta**: ((Vigente)) El componente podría ser extendido para aceptar una prop `variant` que modifique sutilmente la apariencia de la tarjeta para diferentes contextos (ej. `variant="compact"`).
+ * 1. **Variantes de Tarjeta**: ((Vigente)) El componente podría ser extendido para aceptar una prop `variant` que modifique sutilmente la apariencia de la tarjeta para diferentes contextos (ej. `variant="compact"` para un modal).
+ * 2. **Animación de Entrada**: ((Vigente)) Envolver la tarjeta en `motion.div` de `framer-motion` para añadir una animación de entrada sutil, mejorando la experiencia de usuario.
  *
  * =====================================================================
  */

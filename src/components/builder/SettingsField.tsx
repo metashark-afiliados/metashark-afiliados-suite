@@ -1,38 +1,27 @@
 // src/components/builder/SettingsField.tsx
 /**
  * @file SettingsField.tsx
- * @description Aparato de UI atómico y especializado ("Obrero"). Su única
- *              responsabilidad es renderizar un único par de Label-Input para
- *              una propiedad de bloque específica. Es la pieza fundamental de la
- *              "Arquitectura de Panel Atómico".
- * @author Raz Podestá
- * @version 1.0.0
+ * @description Orquestador de UI atómico. Su única responsabilidad es leer la
+ *              definición de una propiedad y delegar su renderizado al
+ *              componente especialista apropiado (`ArrayField`, `IconField`, `SimpleField`).
+ *              Esta es una implementación de élite de la "Filosofía LEGO".
+ * @author Raz Podestá - MetaShark Tech
+ * @version 3.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import React from "react";
+import { useTranslations } from "next-intl";
 
 import {
-  BuilderBooleanSwitch,
-  BuilderColorPicker,
-  BuilderTextAreaInput,
-  BuilderTextInput,
-} from "@/components/builder/ui";
-import { Label } from "@/components/ui/label";
-import {
-  type BlockPropertyType,
   type EditablePropertyDefinition,
   type PageBlock,
 } from "@/lib/builder/types.d";
 import { logger } from "@/lib/logging";
-
-const propertyComponentMap: Record<BlockPropertyType, React.ElementType> = {
-  text: BuilderTextInput,
-  textarea: BuilderTextAreaInput,
-  color: BuilderColorPicker,
-  boolean: BuilderBooleanSwitch,
-  number: BuilderTextInput, // Placeholder
-  select: BuilderTextInput, // Placeholder
-  image: BuilderTextInput, // Placeholder
-};
+import { ArrayField } from "./settings-fields/ArrayField";
+import { IconField } from "./settings-fields/IconField";
+import { SimpleField } from "./settings-fields/SimpleField";
 
 export interface SettingsFieldProps {
   block: PageBlock;
@@ -42,72 +31,47 @@ export interface SettingsFieldProps {
   updateFn: (blockId: string, propertyKey: string, value: any) => void;
 }
 
-/**
- * @public
- * @component SettingsField
- * @description Renderiza un campo de configuración dinámicamente basado en su definición.
- * @param {SettingsFieldProps} props - Propiedades para configurar el campo.
- * @returns {React.ReactElement}
- */
-export function SettingsField({
-  block,
-  propertyKey,
-  definition,
-  value,
-  updateFn,
-}: SettingsFieldProps): React.ReactElement {
-  const InputComponent = propertyComponentMap[definition.type];
+export function SettingsField(props: SettingsFieldProps): React.ReactElement {
+  const t = useTranslations("components.builder.SettingsPanel");
+  const { definition, ...rest } = props;
 
-  if (!InputComponent) {
-    logger.warn(
-      `[SettingsField] Componente de input no mapeado para el tipo: "${definition.type}"`
-    );
-    return (
-      <div className="text-xs text-destructive">
-        Error: Componente de UI no implementado para el tipo '{definition.type}'
-      </div>
-    );
+  const label = t(definition.label as any);
+  const placeholder = definition.placeholder
+    ? t(definition.placeholder as any, {
+        defaultValue: definition.placeholder,
+      })
+    : undefined;
+
+  switch (definition.type) {
+    case "array":
+      return <ArrayField {...props} />;
+    case "icon":
+      return <IconField {...rest} label={label} />;
+    case "text":
+    case "textarea":
+    case "color":
+    case "boolean":
+    case "number":
+    case "select":
+    case "image":
+      return (
+        <SimpleField
+          {...rest}
+          type={definition.type}
+          label={label}
+          placeholder={placeholder}
+        />
+      );
+    default:
+      logger.error(
+        `[SettingsField:Orchestrator] Tipo de propiedad desconocido: "${definition.type}"`
+      );
+      return (
+        <div className="text-xs text-destructive">
+          Error: Tipo de UI desconocido '{definition.type}'
+        </div>
+      );
   }
-
-  const commonProps = {
-    id: `${block.id}-${propertyKey}`,
-    "aria-label": definition.label,
-    placeholder: definition.placeholder,
-  };
-
-  const eventHandlerProps = {
-    text: {
-      value: value ?? "",
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        updateFn(block.id, propertyKey, e.target.value),
-    },
-    textarea: {
-      value: value ?? "",
-      onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
-        updateFn(block.id, propertyKey, e.target.value),
-    },
-    color: {
-      value: value ?? "",
-      onChange: (color: string) => updateFn(block.id, propertyKey, color),
-    },
-    boolean: {
-      checked: !!value,
-      onCheckedChange: (checked: boolean) =>
-        updateFn(block.id, propertyKey, checked),
-    },
-  };
-
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={commonProps.id}>{definition.label}</Label>
-      <InputComponent
-        {...commonProps}
-        {...eventHandlerProps[
-          definition.type as keyof typeof eventHandlerProps
-        ]}
-      />
-    </div>
-  );
 }
 
 /**
@@ -116,11 +80,12 @@ export function SettingsField({
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Atomicidad Radical (SRP)**: ((Implementada)) Este nuevo aparato encapsula perfectamente la lógica de renderizar un único campo de configuración.
- * 2. **Desacoplamiento Total**: ((Implementada)) Es un componente de presentación puro, controlado al 100% por sus props (`value`, `updateFn`), lo que lo hace predecible y fácil de probar.
- * 3. **Arquitectura Declarativa**: ((Implementada)) Utiliza un mapa (`propertyComponentMap`) para renderizar dinámicamente el componente de UI correcto, adhiriéndose al principio de "Configuración sobre Código".
+ * 1. **Atomización Radical Completa**: ((Implementada)) El componente ha sido transformado exitosamente en un orquestador puro. Su lógica ahora es trivialmente simple, mejorando drásticamente la legibilidad, mantenibilidad y el cumplimiento del SRP.
+ * 2. **Internacionalización Centralizada**: ((Implementada)) La lógica de traducción ahora reside únicamente en el orquestador, que pasa las etiquetas ya traducidas a los componentes hijos puros.
  *
  * @subsection Melhorias Futuras
- * 1. **Manejo de Tipos de Input Faltantes**: ((Vigente)) El fallback actual para un tipo de input no mapeado es un mensaje de error. Podría renderizar un `BuilderTextInput` genérico por defecto para una mayor resiliencia.
+ * 1. **Mapeo Declarativo de Componentes**: ((Vigente)) El `switch` statement es funcional, pero un mapeo de objeto (`Record<BlockPropertyType, React.ElementType>`) sería una solución aún más declarativa y extensible, adhiriéndose al principio de "Configuración sobre Código".
+ *
+ * =====================================================================
  */
 // src/components/builder/SettingsField.tsx

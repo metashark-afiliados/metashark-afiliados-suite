@@ -1,0 +1,32 @@
+{
+  "en-US": {
+    "sites_active_title": "Active Sites",
+    "sites_active_change": "{count} available on Free plan",
+    "campaigns_published_title": "Published Campaigns",
+    "campaigns_published_change": "+{percent}% this month",
+    "visitors_30d_title": "Unique Visitors (30d)",
+    "visitors_30d_change": "+{percent}% from last period",
+    "ai_credits_title": "AI Credits Remaining",
+    "ai_credits_change": "Renews next month"
+  },
+  "es-ES": {
+    "sites_active_title": "Sitios Activos",
+    "sites_active_change": "{count} disponibles en el plan Gratuito",
+    "campaigns_published_title": "Campañas Publicadas",
+    "campaigns_published_change": "+{percent}% este mes",
+    "visitors_30d_title": "Visitantes Únicos (30d)",
+    "visitors_30d_change": "+{percent}% desde el último período",
+    "ai_credits_title": "Créditos de IA Restantes",
+    "ai_credits_change": "Se renuevan el próximo mes"
+  },
+  "pt-BR": {
+    "sites_active_title": "Sites Ativos",
+    "sites_active_change": "{count} disponíveis no plano Gratuito",
+    "campaigns_published_title": "Campanhas Publicadas",
+    "campaigns_published_change": "+{percent}% este mês",
+    "visitors_30d_title": "Visitantes Únicos (30d)",
+    "visitors_30d_change": "+{percent}% do último período",
+    "ai_credits_title": "Créditos de IA Restantes",
+    "ai_credits_change": "Renovam no próximo mês"
+  }
+}

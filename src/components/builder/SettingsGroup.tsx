@@ -5,8 +5,11 @@
  *              es renderizar un grupo de campos de configuración, iterando sobre
  *              un objeto de definiciones y delegando el renderizado de cada campo
  *              individual al átomo `SettingsField`.
- * @author Raz Podestá
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import React from "react";
 
@@ -14,6 +17,7 @@ import {
   type BlockPropertiesSchema,
   type PageBlock,
 } from "@/lib/builder/types.d";
+import { logger } from "@/lib/logging";
 import { SettingsField } from "./SettingsField";
 
 export interface SettingsGroupProps {
@@ -36,6 +40,11 @@ export function SettingsGroup({
   values,
   updateFn,
 }: SettingsGroupProps): React.ReactElement {
+  logger.trace("[SettingsGroup] Renderizando grupo de ajustes.", {
+    blockId: block.id,
+    definitionKeys: Object.keys(definitions),
+  });
+
   return (
     <div className="space-y-4">
       {Object.entries(definitions).map(([key, def]) => (
@@ -51,20 +60,17 @@ export function SettingsGroup({
     </div>
   );
 }
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Componente de Ensamblaje (LEGO)**: ((Implementada)) Este nuevo aparato actúa como un ensamblador de nivel medio, consumiendo el átomo `SettingsField` para construir una sección completa de UI.
- * 2. **Desacoplamiento y Reutilización**: ((Implementada)) Al ser un componente puro, `SettingsGroup` puede ser utilizado para renderizar cualquier conjunto de definiciones (contenido, estilo, etc.), promoviendo la reutilización de código.
- * 3. **Principio de Responsabilidad Única (SRP)**: ((Implementada)) Su única responsabilidad es la iteración y delegación, manteniendo el código simple y cohesivo.
+ * 1. **Composición Atómica (LEGO)**: ((Implementada)) Este aparato es un ensamblador puro que delega el trabajo pesado a `SettingsField`, cumpliendo la "Filosofía LEGO".
+ * 2. **Full Observabilidad**: ((Implementada)) Incluye logging para trazar su renderizado, proporcionando visibilidad sobre qué grupo de ajustes se está mostrando.
  *
  * @subsection Melhorias Futuras
- * 1. **Renderizado Condicional de Grupos**: ((Vigente)) Se podría añadir una prop `title` opcional. Si se proporciona, el componente renderizaría un título (`<h3>`) y envolvería los campos en un `<fieldset>`, mejorando la estructura semántica.
- * 2. **Agrupación Visual**: ((Vigente)) La `EditablePropertyDefinition` podría incluir una propiedad `group: string`. Este componente podría agrupar visualmente los campos que compartan el mismo `group` usando un `<Separator>` entre ellos.
+ * 1. **Renderizado Condicional de Grupos**: ((Vigente)) Añadir una prop `title` opcional que, si se proporciona, renderice un `<h4 class="font-semibold">{title}</h4>` sobre el grupo de campos para una mejor organización visual.
  *
  * =====================================================================
  */

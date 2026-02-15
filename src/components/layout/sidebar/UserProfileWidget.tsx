@@ -1,11 +1,15 @@
 // src/components/layout/sidebar/UserProfileWidget.tsx
 /**
  * @file UserProfileWidget.tsx
- * @description Nuevo aparato de UI atómico y desacoplado. Renderiza el perfil
+ * @description Aparato de UI atómico y desacoplado. Renderiza el perfil
  *              del usuario de forma flotante y gestiona su propia visibilidad
- *              a través del `useDashboardUIStore`.
- * @author L.I.A. Legacy
+ *              a través del `useDashboardUIStore`. Es una pieza clave de la
+ *              nueva arquitectura de layout "Workspace Creativo".
+ * @author Raz Podestá - MetaShark Tech
  * @version 1.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -16,10 +20,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useDashboardUIStore } from "@/lib/hooks/useDashboardUIStore";
+import { clientLogger } from "@/lib/logging";
 
 export function UserProfileWidget() {
   const { user } = useDashboard();
   const { setProfileWidgetOpen } = useDashboardUIStore();
+
+  clientLogger.trace("[UserProfileWidget] Renderizando widget de perfil.");
 
   const userInitials = (user?.user_metadata?.full_name || user?.email || "U")
     .split(" ")
@@ -33,7 +40,7 @@ export function UserProfileWidget() {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex items-center gap-3 rounded-lg bg-card p-3 shadow-lg border"
+      className="flex items-center gap-3 rounded-lg bg-card p-3 shadow-lg border w-64"
     >
       <Avatar className="h-10 w-10">
         <AvatarImage
@@ -51,11 +58,28 @@ export function UserProfileWidget() {
       <Button
         variant="ghost"
         size="icon"
-        className="h-7 w-7 ml-auto"
+        className="h-7 w-7 ml-auto flex-shrink-0"
         onClick={() => setProfileWidgetOpen(false)}
+        aria-label="Cerrar widget de perfil"
       >
         <X className="h-4 w-4" />
       </Button>
     </motion.div>
   );
 }
+/**
+ * =====================================================================
+ *                           MEJORA CONTINUA
+ * =====================================================================
+ *
+ * @subsection Melhorias Adicionadas
+ * 1. **Componente de UI Desacoplado**: ((Implementada)) Este aparato aísla la UI del perfil de usuario, controlando su estado a través de un store global, lo que permite una mayor flexibilidad en el layout.
+ * 2. **Animación de Élite**: ((Implementada)) Utiliza `framer-motion` para una animación de entrada/salida fluida, mejorando la calidad percibida de la interfaz.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Internacionalización de ARIA Label**: ((Vigente)) El `aria-label` del botón de cierre está codificado. Debería consumir un namespace de i18n para una accesibilidad completa.
+ * 2. **Acciones Rápidas**: ((Vigente)) Se podría añadir un menú contextual (`DropdownMenu`) al hacer clic en el widget para acciones rápidas como "Ver Perfil" o "Cerrar Sesión".
+ *
+ * =====================================================================
+ */
+// src/components/layout/sidebar/UserProfileWidget.tsx

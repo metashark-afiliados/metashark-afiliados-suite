@@ -1,10 +1,12 @@
 // src/lib/validators/schemas.ts
 /**
  * @file validators/schemas.ts
- * @description Biblioteca de Schemas de Zod y SSoT. Corregido para alinear
- *              la validación de `termsAccepted` con la lógica de UI de un formulario.
+ * @description Biblioteca de Schemas de Zod y Única Fuente de Verdad (SSoT) para
+ *              la validación de datos en toda la aplicación. Sincronizado para
+ *              incluir el nuevo `CreateCreationSchema` para la arquitectura
+ *              de creaciones soberanas.
  * @author Raz Podestá
- * @version 4.1.0
+ * @version 6.0.0
  */
 import { z } from "zod";
 
@@ -44,11 +46,9 @@ export const SignUpSchema = z
     email: EmailSchema,
     password: PasswordSchema,
     confirmPassword: PasswordSchema,
-    // --- INICIO DE CORRECCIÓN ---
     termsAccepted: z.boolean().refine((val) => val === true, {
       message: "terms_must_be_accepted",
     }),
-    // --- FIN DE CORRECCIÓN ---
     newsletterSubscribed: z.boolean().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -57,6 +57,12 @@ export const SignUpSchema = z
   });
 
 // --- ESQUEMAS DE ENTIDADES ---
+
+export const CreateCreationSchema = z.object({
+  name: NameSchema,
+  type: z.string().min(1), // ej. "landing-page", "doc"
+});
+
 export const CreateSiteClientSchema = z.object({
   name: NameSchema.optional(),
   subdomain: SubdomainSchema,
@@ -145,17 +151,19 @@ export const ClientEnrichmentSchema = z.object({
   fingerprint: z.string().min(1, { message: "fingerprint_required" }),
   browser_context: z.record(z.any()).nullable().optional(),
 });
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Errores de Tipo**: ((Implementada)) La modificación de `termsAccepted` a `z.boolean().refine(...)` resuelve los errores `TS2322` y `TS2345` al alinear el contrato del validador con el ciclo de vida real de un formulario.
+ * 1. **Contrato de `Creation`**: ((Implementada)) Se ha añadido el nuevo `CreateCreationSchema`, proporcionando el contrato de validación necesario para la nueva arquitectura de creaciones soberanas.
+ * 2. **Cero Regresiones**: ((Implementada)) Se ha mantenido la totalidad de los schemas existentes del snapshot, garantizando que no haya regresiones en otras partes de la aplicación.
  *
  * @subsection Melhorias Futuras
- * 1. **Mensajes de Error en `refine`**: ((Vigente)) El mensaje de error para `refine` está codificado. Podría ser una clave de i18n (`"terms_must_be_accepted"`) para una internacionalización completa.
+ * 1. **Tipado Estricto para `type`**: ((Vigente)) El campo `type` en `CreateCreationSchema` es actualmente un `z.string()`. Podría ser refinado a un `z.enum(["landing-page", "doc", ...])` a medida que se definan los tipos de creación soportados, para una seguridad de tipos aún mayor.
+ * 2. **Refactorización a Módulos Atómicos**: ((Vigente)) Este archivo está creciendo en tamaño. Una refactorización de élite a futuro sería dividirlo en archivos atómicos por entidad (ej. `schemas/auth.schemas.ts`, `schemas/sites.schemas.ts`) y re-exportarlos desde este `index.ts`.
  *
  * =====================================================================
  */
+// src/lib/validators/schemas.ts

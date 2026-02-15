@@ -1,12 +1,13 @@
 // src/lib/navigation.ts
 /**
  * @file src/lib/navigation.ts
- * @description Manifiesto de Enrutamiento y SSoT. Sincronizado para eliminar
- *              las rutas obsoletas `/auth/*` y consolidar `/login` y `/signup`
- *              como las únicas rutas canónicas para la autenticación, resolviendo
- *              la desincronización arquitectónica.
- * @author Raz Podestá
- * @version 7.0.0
+ * @description Manifiesto de Enrutamiento y SSoT. Sincronizado para incluir
+ *              las nuevas rutas del "Workspace Creativo".
+ * @author Raz Podestá - MetaShark Tech
+ * @version 8.1.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 import {
   createLocalizedPathnamesNavigation,
@@ -19,19 +20,21 @@ export const localePrefix = "as-needed";
 
 export const pathnames = {
   "/": "/",
-  // --- Rutas de Autenticación Canónicas ---
   "/login": "/login",
   "/signup": "/signup",
-
-  // --- Rutas de Aplicación ---
   "/about": "/about",
   "/admin": "/admin",
   "/blog": "/blog",
-  "/builder/[campaignId]": "/builder/[campaignId]",
+  "/builder/[creationId]": "/builder/[creationId]",
   "/choose-language": "/choose-language",
   "/contact": "/contact",
   "/cookies": "/cookies",
   "/dashboard": "/dashboard",
+  // --- INICIO DE SINCRONIZACIÓN DE RUTAS ---
+  "/dashboard/projects": "/dashboard/projects",
+  "/dashboard/templates": "/dashboard/templates",
+  "/dashboard/brand": "/dashboard/brand",
+  // --- FIN DE SINCRONIZACIÓN DE RUTAS ---
   "/dashboard/settings": "/dashboard/settings",
   "/dashboard/sites": "/dashboard/sites",
   "/dashboard/sites/[siteId]/campaigns": "/dashboard/sites/[siteId]/campaigns",
@@ -55,7 +58,7 @@ export const pathnames = {
   "/terms": "/terms",
   "/unauthorized": "/unauthorized",
   "/wiki": "/wiki",
-  "/auth-notice": "/auth-notice", // Ruta para notificaciones post-auth
+  "/auth-notice": "/auth-notice",
 } satisfies Pathnames<typeof locales>;
 
 export const { Link, redirect, usePathname, useRouter } =
@@ -69,18 +72,13 @@ export type Route =
       pathname: PathnameKeys;
       params?: Record<string, string | number>;
     };
-
 /**
  * =====================================================================
  *                           MEJORA CONTINUA
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Resolución de Error 404 (Capa de Navegación)**: ((Implementada)) Se han eliminado las rutas obsoletas (`/auth/login`, `/auth/signup`) y se han consolidado las rutas canónicas `/login` y `/signup`. Esto asegura que todos los componentes que consumen el hook `useRouter` o el componente `Link` de este módulo ahora generarán las URLs correctas, eliminando otra causa del error 404.
- * 2. **Consolidación de SSoT**: ((Implementada)) El manifiesto `pathnames` ahora refleja con precisión la arquitectura de rutas de la aplicación, eliminando la deuda técnica y el riesgo de regresión.
- *
- * @subsection Melhorias Futuras
- * 1. **Generación Automática de Manifiesto**: ((Vigente)) Este archivo podría ser generado por un script que escanee la estructura de directorios de `src/app/[locale]` para prevenir futuras desincronizaciones manuales.
+ * 1. **Sincronización de SSoT**: ((Implementada)) Se han añadido las nuevas rutas del "Workspace Creativo" al manifiesto, expandiendo el tipo `Route` y resolviendo el error de compilación.
  *
  * =====================================================================
  */

@@ -1,0 +1,20 @@
+{
+  "en-US": {
+    "title": "Tutorials & Docs",
+    "description": "Learn how to get the most out of ConvertiKit's tools and master affiliate marketing.",
+    "buttonText": "Explore Guides",
+    "buttonHref": "/docs"
+  },
+  "es-ES": {
+    "title": "Tutoriales y Documentación",
+    "description": "Aprende a sacar el máximo provecho de las herramientas de ConvertiKit y domina el marketing de afiliados.",
+    "buttonText": "Explorar Guías",
+    "buttonHref": "/docs"
+  },
+  "pt-BR": {
+    "title": "Tutoriais & Documentos",
+    "description": "Aprenda a tirar o máximo proveito das ferramentas da ConvertiKit e domine o marketing de afiliados.",
+    "buttonText": "Explorar Guias",
+    "buttonHref": "/docs"
+  }
+}

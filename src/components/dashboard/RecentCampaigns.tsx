@@ -1,12 +1,14 @@
-// src/components/dashboard/RecentCampaigns.tsx
 /**
  * @file src/components/dashboard/RecentCampaigns.tsx
- * @description Aparato de UI atómico y reutilizable que renderiza la sección
- *              de campañas recientes en el dashboard principal. Gestiona tanto
- *              el estado de visualización de campañas como el estado vacío,
- *              proporcionando un "call to action" para nuevos usuarios.
- * @author L.I.A. Legacy
- * @version 1.0.0
+ * @description Aparato de UI atómico que renderiza la sección de campañas recientes.
+ *              Ha sido refactorizado a un estándar de élite para alinearse con
+ *              la SSoT de enrutamiento canónica (`navigation.ts`), utilizando
+ *              el `pathname` y los `params` correctos para la navegación.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
@@ -15,6 +17,7 @@ import { Plus, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { clientLogger } from "@/lib/logging";
 import { useRouter } from "@/lib/navigation";
 import { type Tables } from "@/lib/types/database";
 
@@ -37,6 +40,19 @@ export function RecentCampaigns({
   const router = useRouter();
   const t = useTranslations("DashboardPage.RecentCampaigns");
 
+  const handleNavigate = (campaign: Tables<"campaigns">) => {
+    clientLogger.trace(
+      `[RecentCampaigns] Navegando al builder para la campaña: ${campaign.name}`,
+      { creationId: campaign.id }
+    );
+    // --- INICIO DE CORRECCIÓN DE ENRUTAMIENTO (TS2820) ---
+    router.push({
+      pathname: "/builder/[creationId]",
+      params: { creationId: campaign.id },
+    });
+    // --- FIN DE CORRECCIÓN DE ENRUTAMIENTO (TS2820) ---
+  };
+
   if (campaigns.length === 0) {
     return (
       <div>
@@ -53,9 +69,6 @@ export function RecentCampaigns({
             <Button
               className="ml-auto"
               onClick={() => {
-                // TODO: Navegar a la página de creación de sitios, que a su vez
-                // abrirá el diálogo de creación. Esto evita acoplar el estado
-                // del diálogo aquí.
                 router.push("/dashboard/sites");
               }}
             >
@@ -76,19 +89,11 @@ export function RecentCampaigns({
           <Card
             key={campaign.id}
             className="group cursor-pointer hover:border-primary/40"
-            onClick={() =>
-              router.push({
-                pathname: "/builder/[campaignId]",
-                params: { campaignId: campaign.id },
-              })
-            }
+            onClick={() => handleNavigate(campaign)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                router.push({
-                  pathname: "/builder/[campaignId]",
-                  params: { campaignId: campaign.id },
-                });
+                handleNavigate(campaign);
               }
             }}
             role="button"
@@ -123,14 +128,13 @@ export function RecentCampaigns({
  *                           MEJORA CONTINUA
  * =====================================================================
  *
- * @subsection Melhorias Futuras
- * 1. **Pré-visualizações de Campanhas**: ((Vigente)) A área de pré-visualização na `CardContent` poderia ser aprimorada para mostrar uma captura de tela real ou uma representação em miniatura do conteúdo da campanha, em vez de um placeholder.
- *
  * @subsection Melhorias Adicionadas
- * 1. **Componente Atômico e de Alta Coesão**: ((Implementada)) Este aparato encapsula toda a lógica de apresentação para a seção de "Campanhas Recentes", melhorando a organização do `DashboardClient`.
- * 2. **Internacionalização Completa**: ((Implementada)) Todos os textos, incluindo os do estado vazio e as datas relativas, são processados através da camada de `next-intl`.
- * 3. **Acessibilidade (a11y)**: ((Implementada)) As tarjetas de campanha são totalmente operáveis por teclado e incluem `aria-labels` descritivas.
+ * 1. **Sincronización de Enrutamiento**: ((Implementada)) Se han corregido el `pathname` y los `params` en la llamada a `router.push`, alineando el componente con la SSoT de `navigation.ts` y resolviendo los errores de tipo `TS2820`.
+ * 2. **Abstracción de Lógica**: ((Implementada)) La lógica de navegación se ha extraído a una función `handleNavigate` para adherirse al principio DRY.
+ * 3. **Observabilidad Mejorada**: ((Implementada)) Se ha añadido `clientLogger.trace` para registrar la interacción del usuario, mejorando la visibilidad del flujo de navegación.
+ *
+ * @subsection Melhorias Futuras
+ * 1. **Previsualizaciones de Campañas**: ((Vigente)) La `CardContent` podría mostrar una miniatura real de la campaña en lugar de un placeholder, requiriendo una Server Action para generar y almacenar una captura de pantalla del `content`.
  *
  * =====================================================================
  */
-// src/components/dashboard/RecentCampaigns.tsx

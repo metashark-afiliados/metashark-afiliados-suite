@@ -1,42 +1,39 @@
-// src/app/[locale]/signup/page.tsx
 /**
  * @file page.tsx
- * @description Ensamblador de UI para la página de registro. Refactorizado a un
- *              estándar de élite para consumir el `AuthCardLayout`, eliminando
- *              código duplicado y adhiriéndose a la "Filosofía LEGO".
- * @author Raz Podestá
- * @version 3.0.0
+ * @description Página de registro de usuario. Ha sido refactorizada a un estándar de
+ *              élite para consumir los namespaces de i18n completos y canónicos,
+ *              resolviendo un error crítico de `MISSING_MESSAGE` que impedía el
+ *              despliegue en Vercel.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
+"use client";
+
 import { useTranslations } from "next-intl";
 
-import { OAuthButtonGroup } from "@/components/authentication/OAuthButtonGroup";
 import { SignupForm } from "@/components/authentication/sign-up-form";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
+import { clientLogger } from "@/lib/logging";
 import { SmartLink } from "@/components/ui/SmartLink";
 
+/**
+ * @public
+ * @page SignupPage
+ * @description Ensambla el `AuthCardLayout` y el `SignupForm` para construir la
+ *              vista de registro completa, actuando como un orquestador de UI puro.
+ * @returns {React.ReactElement}
+ */
 export default function SignupPage(): React.ReactElement {
-  const t = useTranslations("pages.SignUpPage");
-  const tLogin = useTranslations("pages.LoginPage");
-  const tForm = useTranslations("components.auth.LoginForm");
-
-  const formContent = (
-    <>
-      <SignupForm />
-      <div className="relative px-6 md:px-16 pb-4">
-        <div className="absolute inset-x-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            {tForm("signInWith")}
-          </span>
-        </div>
-      </div>
-      <div className="px-6 md:px-16 pb-8">
-        <OAuthButtonGroup providers={["google", "apple"]} />
-      </div>
-    </>
-  );
+  clientLogger.trace("[SignupPage] Renderizando página de registro.");
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
+  // Se consumen los namespaces completos y canónicos según la SSoT (i18n.ts),
+  // resolviendo el error `MISSING_MESSAGE` que bloqueaba el build.
+  const t = useTranslations("app.[locale].signup.page");
+  const tLogin = useTranslations("app.[locale].login.page");
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
   const bottomLink = tLogin.rich("alreadyHaveAccount", {
     signin: (chunks) => (
@@ -48,7 +45,11 @@ export default function SignupPage(): React.ReactElement {
     ),
   });
 
-  return <AuthCardLayout bottomLink={bottomLink}>{formContent}</AuthCardLayout>;
+  return (
+    <AuthCardLayout bottomLink={bottomLink}>
+      <SignupForm />
+    </AuthCardLayout>
+  );
 }
 
 /**
@@ -57,12 +58,11 @@ export default function SignupPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Consumo de Layout Atómico**: ((Implementada)) La página ahora consume `AuthCardLayout`, lo que centraliza la lógica de maquetación y resuelve los problemas de espaciado y scroll.
- * 2. **Principio DRY**: ((Implementada)) Se ha eliminado una cantidad significativa de código de layout duplicado, mejorando la mantenibilidad.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se han corregido las llamadas a `useTranslations` con los namespaces canónicos, resolviendo las múltiples instancias del error `MISSING_MESSAGE` asociadas a esta página y reportadas en el log de Vercel.
+ * 2. **Full Observabilidad**: ((Implementada)) Se ha añadido `clientLogger` para trazar el renderizado del componente.
  *
  * @subsection Melhorias Futuras
- * 1. **Componente `AuthFormWrapper`**: ((Vigente)) La estructura que contiene el formulario y los botones OAuth también se repite. Podría ser abstraída a un componente `AuthFormWrapper` para una atomización aún más profunda.
+ * 1. **Metadatos Dinámicos (SEO/UX)**: ((Vigente)) Convertir este aparato a un Server Component para poder implementar la función `generateMetadata`. Esto permitiría establecer el título de la pestaña del navegador de forma dinámica y traducida (ej. "Crear Cuenta - ConvertiKit"), mejorando el SEO y la experiencia de usuario.
  *
  * =====================================================================
  */
-// src/app/[locale]/signup/page.tsx

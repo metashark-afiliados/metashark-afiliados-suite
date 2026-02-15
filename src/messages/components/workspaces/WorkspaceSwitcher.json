@@ -1,3 +1,4 @@
+
 {
   "en-US": {
     "selectWorkspace_label": "Select workspace",
@@ -32,6 +33,12 @@
       "role_admin": "Admin",
       "sending_button": "Sending...",
       "send_button": "Send Invitation"
+    },
+    "rename_dialog": {
+      "title": "Rename Workspace",
+      "description": "Enter a new name for your workspace.",
+      "save_button": "Save Changes",
+      "saving_button": "Saving..."
     },
     "delete_dialog": {
       "title": "Delete Workspace",
@@ -75,6 +82,12 @@
       "sending_button": "Enviando...",
       "send_button": "Enviar Invitación"
     },
+    "rename_dialog": {
+      "title": "Renombrar Workspace",
+      "description": "Introduce un nuevo nombre para tu workspace.",
+      "save_button": "Guardar Cambios",
+      "saving_button": "Guardando..."
+    },
     "delete_dialog": {
       "title": "Eliminar Workspace",
       "description": "Esta es una acción permanente. Todos los sitios y campañas dentro de <strong>{workspaceName}</strong> serán eliminados. Esto no se puede deshacer.",
@@ -117,6 +130,12 @@
       "sending_button": "Enviando...",
       "send_button": "Enviar Convite"
     },
+    "rename_dialog": {
+      "title": "Renomear Workspace",
+      "description": "Digite um novo nome para o seu workspace.",
+      "save_button": "Salvar Alterações",
+      "saving_button": "Salvando..."
+    },
     "delete_dialog": {
       "title": "Excluir Workspace",
       "description": "Esta é uma ação permanente. Todos os sites e campanhas dentro de <strong>{workspaceName}</strong> serão excluídos. Isso não pode ser desfeito.",
@@ -126,4 +145,3 @@
     }
   }
 }
-

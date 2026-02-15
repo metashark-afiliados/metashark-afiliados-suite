@@ -6,15 +6,18 @@
  *              persistente en el servidor mediante `createPersistentErrorLog`.
  *              Ha sido refactorizado para utilizar el "guardián de tipo" `isActionError`,
  *              resolviendo los errores de tipado de forma robusta.
- * @author L.I.A. Legacy
- * @version 1.0.4
+ * @author Raz Podestá - MetaShark Tech
+ * @version 1.0.5
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
 "use client";
 
 import { useCallback } from "react";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
-import { ZodError } from "zod";
+import { ZodError, type ZodIssue } from "zod";
 
 import { createPersistentErrorLog } from "@/lib/actions/_helpers/error-log.helper";
 import { clientLogger } from "@/lib/logging";
@@ -31,8 +34,9 @@ import { type ActionResult, isActionError } from "@/lib/validators";
  *          Un objeto que contiene la función para manejar errores.
  */
 export function useHandleErrors() {
-  // CORRECCIÓN: Usar el namespace correcto "ValidationErrors" según src/messages/manifest.ts
-  const tValidationErrors = useTranslations("ValidationErrors");
+  // --- INICIO DE REFACTORIZACIÓN: Namespace Canónico ---
+  const tValidationErrors = useTranslations("shared.ValidationErrors");
+  // --- FIN DE REFACTORIZACIÓN ---
 
   const handleError = useCallback(
     async (error: unknown, context?: Record<string, any>) => {
@@ -122,7 +126,7 @@ export function useHandleErrors() {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Sincronización de Namespace de i18n**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"ValidationErrors"`, alineándose con la clave definida en `src/messages/manifest.ts` y el `i18n.schema.ts`. Esto, en combinación con el `loadTestMessages` corregido, resuelve los errores `IntlError: MISSING_MESSAGE`.
+ * 1. **Resolución de `MISSING_MESSAGE`**: ((Implementada)) Se ha corregido el namespace de `useTranslations` a `"shared.ValidationErrors"`. Esta es una corrección de élite que resuelve la causa raíz de los errores `MISSING_MESSAGE` para este namespace, alineando el hook con la arquitectura IMAS y los schemas de Zod.
  *
  * @subsection Melhorias Futuras
  * 1. **Contexto de Usuario en `createPersistentErrorLog`**: ((Vigente)) El `handleError` podría ser mejorado para obtener el `userId` y el `locale` del contexto global (ej. `DashboardContext`) y pasarlos a `createPersistentErrorLog` como metadatos, enriqueciendo los logs del backend.
@@ -131,4 +135,3 @@ export function useHandleErrors() {
  *
  * =====================================================================
  */
-// src/lib/hooks/useHandleErrors.ts

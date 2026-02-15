@@ -1,0 +1,17 @@
+{
+  "en-US": {
+    "title": "Team Members",
+    "description": "Invite your team members to collaborate",
+    "invite_button_aria": "Invite new member"
+  },
+  "es-ES": {
+    "title": "Miembros del Equipo",
+    "description": "Invita a los miembros de tu equipo a colaborar",
+    "invite_button_aria": "Invitar nuevo miembro"
+  },
+  "pt-BR": {
+    "title": "Membros da Equipe",
+    "description": "Convide os membros da sua equipe para colaborar",
+    "invite_button_aria": "Convidar novo membro"
+  }
+}

@@ -1,42 +1,37 @@
-// src/app/[locale]/login/page.tsx
 /**
  * @file page.tsx
- * @description Ensamblador de UI para la página de inicio de sesión. Refactorizado
- *              a un estándar de élite para consumir el `AuthCardLayout`, garantizando
- *              la consistencia visual y el cumplimiento del principio DRY.
- * @author Raz Podestá
- * @version 3.0.0
+ * @description Página de inicio de sesión. Ha sido refactorizada a un estándar
+ *              de élite para consumir los namespaces de i18n completos y canónicos,
+ *              resolviendo un error crítico de `MISSING_MESSAGE` durante el build
+ *              en Vercel.
+ * @author Raz Podestá - MetaShark Tech
+ * @version 2.0.0
+ * @date 2025-08-25
+ * @contact raz.metashark.tech
+ * @location Florianópolis/SC, Brazil
  */
+"use client";
+
 import { useTranslations } from "next-intl";
 
 import { LoginForm } from "@/components/authentication/login-form";
-import { OAuthButtonGroup } from "@/components/authentication/OAuthButtonGroup";
 import { AuthCardLayout } from "@/components/layout/AuthCardLayout";
 import { SmartLink } from "@/components/ui/SmartLink";
 
+/**
+ * @public
+ * @page LoginPage
+ * @description Ensambla el `AuthCardLayout` y el `LoginForm` para construir la
+ *              vista de inicio de sesión completa.
+ * @returns {React.ReactElement}
+ */
 export default function LoginPage(): React.ReactElement {
-  const t = useTranslations("pages.LoginPage");
-  const tSignUp = useTranslations("pages.SignUpPage");
-  const tForm = useTranslations("components.auth.LoginForm");
-
-  const formContent = (
-    <>
-      <LoginForm />
-      <div className="relative px-6 md:px-16 pb-4">
-        <div className="absolute inset-x-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            {tForm("signInWith")}
-          </span>
-        </div>
-      </div>
-      <div className="px-6 md:px-16 pb-8">
-        <OAuthButtonGroup providers={["google", "apple"]} />
-      </div>
-    </>
-  );
+  // --- INICIO DE CORRECCIÓN ARQUITECTÓNICA (I18N Namespace) ---
+  // Se consumen los namespaces completos y canónicos según la SSoT (i18n.ts),
+  // resolviendo el error `MISSING_MESSAGE` que bloqueaba el build.
+  const t = useTranslations("app.[locale].login.page");
+  const tSignUp = useTranslations("app.[locale].signup.page");
+  // --- FIN DE CORRECCIÓN ARQUITECTÓNICA ---
 
   const bottomLink = tSignUp.rich("dontHaveAccount", {
     signup: (chunks) => (
@@ -48,7 +43,11 @@ export default function LoginPage(): React.ReactElement {
     ),
   });
 
-  return <AuthCardLayout bottomLink={bottomLink}>{formContent}</AuthCardLayout>;
+  return (
+    <AuthCardLayout bottomLink={bottomLink}>
+      <LoginForm />
+    </AuthCardLayout>
+  );
 }
 
 /**
@@ -57,12 +56,10 @@ export default function LoginPage(): React.ReactElement {
  * =====================================================================
  *
  * @subsection Melhorias Adicionadas
- * 1. **Consistencia Visual y de Código**: ((Implementada)) Al consumir `AuthCardLayout`, esta página ahora es visual y estructuralmente idéntica a la página de registro, cumpliendo un principio fundamental de la UX de élite.
- * 2. **Principio DRY**: ((Implementada)) Se ha eliminado el código de layout duplicado.
+ * 1. **Resolución de Blocker de Build**: ((Implementada)) Se han corregido las llamadas a `useTranslations` con los namespaces canónicos, resolviendo las múltiples instancias del error `MISSING_MESSAGE` asociadas a esta página y reportadas en el log de Vercel.
  *
  * @subsection Melhorias Futuras
- * 1. **Componente `AuthFormWrapper`**: ((Vigente)) La estructura interna del `formContent` sigue siendo un candidato para ser abstraída a un componente reutilizable.
+ * 1. **Metadatos Dinámicos**: ((Vigente)) Convertir a un Server Component para poder usar la función `generateMetadata` y establecer el título de la página de forma dinámica y traducida, mejorando el SEO y la UX.
  *
  * =====================================================================
  */
-// src/app/[locale]/login/page.tsx
